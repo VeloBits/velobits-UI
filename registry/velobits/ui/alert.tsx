@@ -19,6 +19,22 @@ import { cn } from '../lib/cn';
  * to an action; wrong for a static informational panel rendered with the page,
  * where it announces on every navigation. Defaults to `status` (polite), and a
  * caller escalates deliberately.
+ *
+ * ## `surface` applies to the neutral variant ONLY, and that is not an oversight
+ *
+ * A neutral Alert is a panel, so it takes the Tier-S material by default —
+ * `.glass-surface`, the same material as `Card`. The four status variants keep
+ * their `*-soft` wash, because a wash and a glass tier cannot coexist on one
+ * element: `bg-danger-soft` is a utility, `.glass-surface` is in the `components`
+ * layer, so the wash REPLACES the tint at alpha 0.10 and what survives is the
+ * glass border and shadow around a nearly transparent panel. `toast.tsx` already
+ * carries a regression test for exactly this on Tier O; the same trap applies
+ * here, so the surface axis is confined to `neutral` through a compound variant
+ * rather than being applied to the base.
+ *
+ * `surface="panel"` returns the opaque neutral panel, and is what a neutral Alert
+ * nested inside a glass Card or a Tier-O overlay should use — glass over the same
+ * glass composites 2/255 apart, so the inner surface disappears.
  */
 const alertVariants = cva(
   [
@@ -29,26 +45,41 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        neutral: 'border-border bg-panel text-fg',
+        // No background or border colour here: the neutral variant gets its
+        // material from the `surface` compound variants below.
+        neutral: 'text-fg',
         info: 'border-info/30 bg-info-soft text-fg',
         success: 'border-success/30 bg-success-soft text-fg',
         warning: 'border-warning/30 bg-warning-soft text-fg',
         danger: 'border-danger/30 bg-danger-soft text-fg',
       },
+      /*
+       * Declared with empty classes because cva can only match a compound
+       * variant on a key it knows about. Every class this axis contributes is in
+       * `compoundVariants`, so it is inert on the status variants.
+       */
+      surface: {
+        glass: '',
+        panel: '',
+      },
     },
-    defaultVariants: { variant: 'neutral' },
+    compoundVariants: [
+      { variant: 'neutral', surface: 'glass', class: 'glass-surface' },
+      { variant: 'neutral', surface: 'panel', class: 'border-border bg-panel' },
+    ],
+    defaultVariants: { variant: 'neutral', surface: 'glass' },
   },
 );
 
 export interface AlertProps
   extends React.ComponentProps<'div'>, VariantProps<typeof alertVariants> {}
 
-function Alert({ className, variant, role = 'status', ...props }: AlertProps) {
+function Alert({ className, variant, surface, role = 'status', ...props }: AlertProps) {
   return (
     <div
       data-slot="alert"
       role={role}
-      className={cn(alertVariants({ variant }), className)}
+      className={cn(alertVariants({ variant, surface }), className)}
       {...props}
     />
   );

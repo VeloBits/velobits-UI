@@ -1,3 +1,5 @@
+import { compositeOver } from './color';
+import { glass, type GlassSurfaceTierName } from './glass';
 import type { SemanticTokens, ThemeName } from './semantic';
 import { themes } from './semantic';
 
@@ -167,5 +169,73 @@ export function resolvePair(
     fg: themes[theme][pair.fg],
     bg: themes[theme][pair.bg],
     target: TARGET[pair.target],
+  };
+}
+
+/* ── tier S: the glass that IS the component surface ──────────────────────── */
+
+/**
+ * The minimum 8-bit channel separation a tier-S composite must hold against
+ * BOTH `--panel` and `--bg`.
+ *
+ * This is not a WCAG number — nothing in WCAG cares whether a card looks like
+ * glass. It is the gate that stops the retrofit from silently becoming a no-op:
+ * the naive "panel colour at α 0.85" composites to within **3/255** of the
+ * opaque panel in both themes, and blurring a uniform page returns the same
+ * uniform page, so the browser pays for a backdrop repaint and the user sees no
+ * difference at all. 8/255 is roughly where a flat-colour edge becomes visible
+ * on a calibrated display, and it is comfortably clear of the 3/255 failure.
+ *
+ * Nothing in the WCAG pair sweep would ever have caught this — an invisible
+ * glass card has *better* contrast than a visible one.
+ */
+export const PERCEPTIBILITY_FLOOR = 8;
+
+/**
+ * The tier-S measurements, as data, in the same spirit as {@link CONTRAST_PAIRS}.
+ *
+ * Tier O is NOT here and should not be moved here: an overlay's backdrop is
+ * arbitrary, so it is swept across `worstCaseBackdrops` in the glass suite of
+ * `test/contrast.test.ts` instead. Tier S has exactly one backdrop — the page
+ * — which is what makes a single composite per theme the whole measurement.
+ */
+export interface GlassSurfacePair {
+  /** Human-readable, and what the failure message prints. */
+  label: string;
+  theme: ThemeName;
+  tier: GlassSurfaceTierName;
+}
+
+export const GLASS_SURFACE_PAIRS: readonly GlassSurfacePair[] = [
+  { label: 'light component surface (Card, Panel, Sidebar)', theme: 'light', tier: 'surfaceLight' },
+  { label: 'dark component surface (Card, Panel, Sidebar)', theme: 'dark', tier: 'surfaceDark' },
+];
+
+/**
+ * Flatten a tier-S entry into the opaque colours the gates measure.
+ *
+ * `compositeOver` blends in GAMMA-ENCODED sRGB, which is what browsers do for
+ * `rgba()`. Measuring these in linear light reports every composite several 8-bit
+ * steps lighter and would report the perceptibility gate as passing on values
+ * that are invisible in a browser — see the note on `compositeOver`.
+ */
+export function resolveGlassSurface(pair: GlassSurfacePair): {
+  /** The tier-S surface flattened over the page: the colour text actually sits on. */
+  composite: string;
+  /** The opaque panel this tier has to look different from. */
+  panel: string;
+  /** The page it has to look different from in the other direction. */
+  bg: string;
+  fg: string;
+  mutedFg: string;
+} {
+  const theme = themes[pair.theme];
+  const tier = glass[pair.tier];
+  return {
+    composite: compositeOver(tier.surface, theme.bg, tier.alpha),
+    panel: theme.panel,
+    bg: theme.bg,
+    fg: theme.fg,
+    mutedFg: theme.mutedFg,
   };
 }

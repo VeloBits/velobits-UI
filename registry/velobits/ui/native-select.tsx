@@ -21,6 +21,15 @@ import { cn } from '../lib/cn';
  * control stays a single focusable node. It is positioned with `right` in a
  * data-URI, so under `dir="rtl"` set `bg-[position:left_…]` at the call site;
  * CSS backgrounds are not direction-aware.
+ *
+ * ## Opaque `--panel`, deliberately, while Card and Alert are Tier-S glass
+ *
+ * Same call as `Input`, which documents the reasoning in full. In short: a glass
+ * control inside a glass Card composites 2/255 off it and loses its well, where
+ * the opaque fill sits 10/255 clear in light and 9/255 in dark; and
+ * `--field-border`'s WCAG 1.4.11 margin stops being one gateable number per
+ * surface (3.86:1 on `--panel` light, 3.58:1 dark) and becomes a function of the
+ * ancestor chain (3.66:1–4.04:1 — passing, but not pinnable by a test).
  */
 function NativeSelect({ className, children, ...props }: React.ComponentProps<'select'>) {
   return (
