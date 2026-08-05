@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { compositeOver, contrastRatio, round2 } from '../src/color';
-import { GLASS_ALPHA_FLOOR, glass } from '../src/glass';
+import { compositeOver, contrastRatio, hexToRgb, round2 } from '../src/color';
+import { GLASS_ALPHA_FLOOR, GLASS_SPECULAR_ALPHA, glass } from '../src/glass';
 import { worstCaseBackdrops } from '../src/palette';
 import { themes, type SemanticTokens, type ThemeName } from '../src/semantic';
 import {
   CONTRAST_EXEMPT,
   CONTRAST_PAIRS,
+  GLASS_SURFACE_PAIRS,
+  PERCEPTIBILITY_FLOOR,
   TARGET,
+  resolveGlassSurface,
   resolvePair,
   type ContrastPair,
 } from '../src/contrast-pairs';
@@ -221,6 +224,193 @@ describe('glass tiers stay legible over every worst-case backdrop', () => {
     }
     for (const tier of Object.values(glass)) {
       expect(tier.border.startsWith('rgba(')).toBe(true);
+    }
+  });
+});
+
+/* ── tier S ────────────────────────────────────────────────────────────────── */
+
+/** 0-255 channels, the units perceptibility is argued in. */
+const channels = (hex: string) => hexToRgb(hex).map((c) => Math.round(c * 255));
+
+/** Largest single-channel separation between two opaque colours, in 8-bit steps. */
+function maxChannelDelta(a: string, b: string): number {
+  const [x, y] = [channels(a), channels(b)];
+  return Math.max(...x.map((v, i) => Math.abs(v - y[i]!)));
+}
+
+/** Parse `rgba(r, g, b, a)` — the only translucent spelling these tokens use. */
+function parseRgba(css: string): { hex: string; alpha: number } {
+  const m = /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/.exec(css);
+  if (!m) throw new Error(`Not an rgba() colour: ${css}`);
+  const hex =
+    '#' +
+    [1, 2, 3]
+      .map((i) => Number(m[i]).toString(16).padStart(2, '0'))
+      .join('')
+      .toUpperCase();
+  return { hex, alpha: Number(m[4]!) };
+}
+
+describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in disguise', () => {
+  /**
+   * The one gate in this file that is not about accessibility.
+   *
+   * Everything above asks "can you read this". This asks "can you SEE it at
+   * all", and nothing above would ever have caught the failure: an invisible
+   * glass card has *better* text contrast than a visible one, so the whole WCAG
+   * sweep reports green while the feature does nothing.
+   *
+   * The failure being prevented is specific and was the first attempt at this
+   * tier: white at α 0.85 over the cream page composites to #FDFCFC, 3/255 from
+   * the opaque #FFFFFF panel, and #2C2D2C at α 0.85 over the dark page gives
+   * #292A29, also 3/255 off its panel. Blurring a uniform page returns that same
+   * uniform page, so the browser pays for a backdrop repaint per surface and the
+   * pixels do not move.
+   */
+  for (const pair of GLASS_SURFACE_PAIRS) {
+    const r = resolveGlassSurface(pair);
+    const tier = glass[pair.tier];
+
+    describe(`${pair.label} — ${tier.surface} @α${tier.alpha} → ${r.composite}`, () => {
+      it(`differs from --panel by ≥${PERCEPTIBILITY_FLOOR}/255 on some channel`, () => {
+        const delta = maxChannelDelta(r.composite, r.panel);
+        expect(
+          delta,
+          `Tier-S glass (${tier.surface} @α${tier.alpha}) composites over the page to ` +
+            `${r.composite}, which is ${delta}/255 from the opaque --panel (${r.panel}).\n\n` +
+            `THAT MEANS THE GLASS IS VISUALLY IDENTICAL TO AN OPAQUE PANEL: the blur costs a ` +
+            `backdrop repaint per surface for no visual change, and blurring a uniform page ` +
+            `returns that same uniform page.\n\n` +
+            `Fix it by TINTING the tier-S surface further off the panel — not by lowering the ` +
+            `alpha, which makes the composite drift over any backdrop that is not the page ` +
+            `(--panel at α 0.50 lands on the same colour and drifts 11/255 in light, 31/255 ` +
+            `in dark, against this tier's 3/255).`,
+        ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
+      });
+
+      it(`differs from --bg by ≥${PERCEPTIBILITY_FLOOR}/255 on some channel`, () => {
+        const delta = maxChannelDelta(r.composite, r.bg);
+        expect(
+          delta,
+          `Tier-S glass composites to ${r.composite}, only ${delta}/255 off the page ` +
+            `(${r.bg}) it is drawn on. A surface that matches the page is not a surface — ` +
+            `the card boundary would be carried entirely by its 1px border.`,
+        ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
+      });
+
+      it('reads as RAISED off the page, not recessed into it', () => {
+        /**
+         * Direction matters as much as magnitude. A tier-S composite DARKER than
+         * the page satisfies both deltas above and still looks wrong — a card is
+         * elevation, and elevation reads lighter in both themes. Light lands at
+         * +9/+11/+11 over cream, dark at +9/+9/+9 over the charcoal page.
+         */
+        const lift = channels(r.composite).map((v, i) => v - channels(r.bg)[i]!);
+        expect(
+          Math.min(...lift),
+          `${r.composite} sits BELOW the page ${r.bg} on some channel (${lift.join('/')}), ` +
+            `so the surface reads as a well rather than a card.`,
+        ).toBeGreaterThan(0);
+      });
+
+      it(`body text clears AA on the composite (≥${TARGET.text}:1)`, () => {
+        const ratio = contrastRatio(r.fg, r.composite);
+        expect(ratio, `${round2(ratio)}:1 on ${r.composite}`).toBeGreaterThanOrEqual(TARGET.text);
+      });
+
+      it(`--muted-fg clears AA on the composite, so --muted-on-glass is NOT needed here`, () => {
+        /**
+         * The load-bearing difference between the tiers. Tier O has to step muted
+         * text up to `--muted-on-glass` because its backdrop is unknown and the
+         * ordinary token sinks to 3.09:1 against the worst of them. Tier S knows
+         * its backdrop, and the ordinary token measures 5.57:1 (light) / 6.19:1
+         * (dark) — so `.glass-surface` deliberately does NOT set the override,
+         * and darkening every secondary label in the product is not the price of
+         * this retrofit.
+         */
+        const ratio = contrastRatio(r.mutedFg, r.composite);
+        expect(
+          ratio,
+          `--muted-fg (${r.mutedFg}) on ${r.composite} = ${round2(ratio)}:1. If this drops ` +
+            `below ${TARGET.text}:1, .glass-surface has to start overriding --muted-fg the ` +
+            `way .glass does — see css/glass.css.`,
+        ).toBeGreaterThanOrEqual(TARGET.text);
+      });
+
+      it('the hairline border stays visible against its own surface', () => {
+        /**
+         * NOT a 1.4.11 gate: `--border` is CONTRAST_EXEMPT because a card
+         * outline is decorative, and the tier-S border is the same kind of line.
+         * It is asserted anyway because in LIGHT mode it is most of the material
+         * — measured 1.60:1, tuned to match what the opaque `--border` shows on
+         * `--panel` (1.61:1), where the tier-O border at α 0.10 would give only
+         * 1.21:1. Dark measures 1.50:1 against the opaque pairing's 1.15:1.
+         */
+        const { hex, alpha } = parseRgba(tier.border);
+        const line = compositeOver(hex, r.composite, alpha);
+        const ratio = contrastRatio(line, r.composite);
+        expect(
+          ratio,
+          `border ${tier.border} over ${r.composite} = ${line}, ${round2(ratio)}:1`,
+        ).toBeGreaterThan(1.4);
+      });
+    });
+  }
+
+  it('the specular highlight is a DARK-MODE-ONLY material — you cannot lighten white', () => {
+    /**
+     * The measurement the whole asymmetry rests on, and the reason light mode
+     * gets a firmer border and a bottom-weighted shadow instead of a lit edge.
+     * White at α 0.35:
+     *
+     *   light  over #FDF8F5 → #FEFAF9, 1.02:1   invisible
+     *   dark   over #232423 → #707170, 3.18:1   clearly a lit edge
+     *
+     * If a future palette edit ever made the light figure meaningful, this test
+     * failing is the signal to give light mode a highlight too.
+     */
+    const [light, dark] = GLASS_SURFACE_PAIRS.map((p) => resolveGlassSurface(p).composite);
+    const lit = (base: string) =>
+      contrastRatio(compositeOver('#FFFFFF', base, GLASS_SPECULAR_ALPHA), base);
+
+    expect(round2(lit(light!)), 'light: a white highlight on a near-white surface').toBeLessThan(
+      1.05,
+    );
+    expect(round2(lit(dark!)), 'dark: the highlight IS the material').toBeGreaterThanOrEqual(
+      TARGET.nonText,
+    );
+
+    // And the tokens encode that asymmetry rather than paying for the no-op.
+    expect(glass.surfaceLight.highlight).toBe('transparent');
+    expect(parseRgba(glass.surfaceDark.highlight).alpha).toBe(GLASS_SPECULAR_ALPHA);
+  });
+
+  it('tier S keeps tier O’s alpha — the tint carries it, not the transparency', () => {
+    /**
+     * Dropping the alpha is the tempting way to make tier S visible, and it is
+     * wrong: `--panel` at α 0.50 lands on an almost identical composite, then
+     * drifts 11/255 (light) and 31/255 (dark) the moment the surface sits over
+     * anything but the page — a `bg2` well, a selected row, the plum
+     * `--elevated`. The tinted surfaces at α 0.85 drift 3/255.
+     */
+    for (const pair of GLASS_SURFACE_PAIRS) {
+      const tier = glass[pair.tier];
+      const theme = themes[pair.theme];
+      expect(tier.alpha, `${pair.tier} alpha`).toBeGreaterThanOrEqual(GLASS_ALPHA_FLOOR);
+      expect(tier.alpha, `${pair.tier} alpha matches the overlay tier`).toBe(
+        glass[pair.theme].alpha,
+      );
+
+      const overPage = compositeOver(tier.surface, theme.bg, tier.alpha);
+      for (const backdrop of [theme.panel, theme.bg2] as const) {
+        const drift = maxChannelDelta(compositeOver(tier.surface, backdrop, tier.alpha), overPage);
+        expect(
+          drift,
+          `${pair.tier} drifts ${drift}/255 between the page and ${backdrop}; a tier-S surface ` +
+            `has to look the same wherever a card is placed.`,
+        ).toBeLessThanOrEqual(4);
+      }
     }
   });
 });

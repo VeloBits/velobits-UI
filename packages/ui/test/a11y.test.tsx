@@ -1,5 +1,3 @@
-import { render } from '@testing-library/react';
-import axe from 'axe-core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { Alert, AlertDescription, AlertTitle } from '../../../registry/velobits/ui/alert';
@@ -28,54 +26,16 @@ import { NativeSelect } from '../../../registry/velobits/ui/native-select';
 import { Separator } from '../../../registry/velobits/ui/separator';
 import { Switch } from '../../../registry/velobits/ui/switch';
 import { Textarea } from '../../../registry/velobits/ui/textarea';
+import { RULES_UNRUNNABLE_WITHOUT_LAYOUT, audit, describeViolations } from './axe';
 
 /**
- * The axe gate.
+ * The primitive-level axe gate: every Tier-1 component rendered in a
+ * representative composition and audited.
  *
- * The plan called for "axe-core on every Storybook story"; the docs site is
- * Next.js + MDX rather than Storybook, so the same guarantee lives here instead
- * — every primitive is rendered in a representative composition and audited.
- *
- * ## What this can and cannot catch
- *
- * happy-dom has no layout engine and no CSS cascade, so **colour-contrast rules
- * cannot run here** and are disabled below rather than silently passing. Contrast
- * is covered properly and exhaustively by `@velobits/tokens`' own suite, which
- * measures the actual token values instead of sampling rendered pixels. What
- * this file catches is the structural half: roles, names, label association,
- * ARIA validity, and nesting.
+ * `audit()`, `describeViolations()` and the disabled-rule set live in `./axe`,
+ * shared with every other suite that audits — including what the shared helper
+ * can and cannot catch, which is worth reading before adding a case here.
  */
-
-const RULES_UNRUNNABLE_WITHOUT_LAYOUT = [
-  // Needs computed colours and a real cascade. See @velobits/tokens/test/contrast.test.ts.
-  'color-contrast',
-  // Needs a full page, which a component fixture is not.
-  'region',
-  'landmark-one-main',
-  'page-has-heading-one',
-  'html-has-lang',
-];
-
-async function audit(ui: React.ReactElement) {
-  const { container } = render(
-    // A landmark, so region-scoped rules have somewhere sensible to anchor.
-    <main>{ui}</main>,
-  );
-  const results = await axe.run(container, {
-    rules: Object.fromEntries(
-      RULES_UNRUNNABLE_WITHOUT_LAYOUT.map((id) => [id, { enabled: false }]),
-    ),
-  });
-  return results.violations;
-}
-
-function describeViolations(violations: axe.Result[]): string {
-  return violations
-    .map(
-      (v) => `${v.id} (${v.impact}): ${v.help}\n    ${v.nodes.map((n) => n.html).join('\n    ')}`,
-    )
-    .join('\n  ');
-}
 
 afterEach(() => {
   document.body.innerHTML = '';

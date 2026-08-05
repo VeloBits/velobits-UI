@@ -137,9 +137,9 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Alert',
     description:
-      'Status panel. Defaults to polite role="status"; escalate to "alert" deliberately.',
+      'Status panel. Defaults to polite role="status"; escalate to "alert" deliberately. Tier-S glass on the neutral variant only — the four soft washes would replace the tint.',
     dependencies: [CVA],
-    registryDependencies: ['cn'],
+    registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/alert.tsx', type: 'registry:ui' }],
   },
   {
@@ -174,8 +174,8 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Card',
     description:
-      'Writes border-border explicitly, so it survives an app that skipped the base layer.',
-    registryDependencies: ['cn'],
+      'Tier-S glass by default; surface="panel" for the opaque original, which writes border-border explicitly so it survives an app that skipped the base layer.',
+    registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/card.tsx', type: 'registry:ui' }],
   },
   {
@@ -200,7 +200,8 @@ const ui: RegistryItem[] = [
     name: 'glass-surface',
     type: 'registry:ui',
     title: 'GlassSurface',
-    description: 'The overlay tier’s shared panel. Never for page backgrounds or table rows.',
+    description:
+      'All three glass tiers behind one prop: surface (Tier S, no blur by default) · overlay · elevated. Never for page backgrounds, table rows, or nested glass.',
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/glass-surface.tsx', type: 'registry:ui' }],
   },
@@ -289,6 +290,109 @@ const ui: RegistryItem[] = [
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/tooltip.tsx', type: 'registry:ui' }],
   },
+
+  /* ── Tier 2 — overlays. Every one of these is Tier-O glass, so each depends
+   * on `velobits-theme` for `.glass`: a CLI consumer who copies the component
+   * without the token layer gets an unstyled transparent box, not an error. ── */
+  {
+    name: 'command-palette',
+    type: 'registry:ui',
+    title: 'CommandPalette',
+    description:
+      'cmdk inside a Radix Dialog. The ⌘K listener is opt-in via `shortcut` — a design system must not bind a global key by merely being imported.',
+    dependencies: ['cmdk', RADIX, '@velobits/icons'],
+    registryDependencies: ['cn', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/command-palette.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'dialog',
+    type: 'registry:ui',
+    title: 'Dialog',
+    description:
+      'The centred form modal. `focusFirstField` exists because autoFocus is silently swallowed by Radix FocusScope — ADR-0031.',
+    dependencies: [CVA, RADIX, '@velobits/icons'],
+    registryDependencies: ['cn', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/dialog.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'dropdown-menu',
+    type: 'registry:ui',
+    title: 'DropdownMenu',
+    description:
+      'Highlight is data-[highlighted], never :hover — Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.',
+    dependencies: [RADIX, '@velobits/icons'],
+    registryDependencies: ['cn', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/dropdown-menu.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'popover',
+    type: 'registry:ui',
+    title: 'Popover',
+    description:
+      'The elevated tier, for glass stacked on glass. PopoverTitle wires aria-labelledby — Radix content is role="dialog" with no Title part, so it is otherwise unnamed.',
+    dependencies: [RADIX],
+    registryDependencies: ['cn', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/popover.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'side-panel',
+    type: 'registry:ui',
+    title: 'SidePanel',
+    description:
+      'The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — ADR-0032. The bottom variant needs a definite 75dvh.',
+    dependencies: [CVA, RADIX, '@velobits/icons'],
+    registryDependencies: ['cn', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/side-panel.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'toast',
+    type: 'registry:ui',
+    title: 'Toast',
+    description:
+      'Variants use a logical border stripe, not a soft wash: bg-*-soft is a utility and beats --glass-bg from the components layer, flattening the tier.',
+    dependencies: [CVA, RADIX, '@velobits/icons'],
+    registryDependencies: ['cn', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/toast.tsx', type: 'registry:ui' }],
+  },
+
+  /* ── Tier 3 — composites. ─────────────────────────────────────────────── */
+  {
+    name: 'accordion',
+    type: 'registry:ui',
+    title: 'Accordion',
+    description:
+      'The one sanctioned height animation: Radix measures --radix-accordion-content-height, so it does not thrash layout the way an unbounded height:auto transition would.',
+    dependencies: [RADIX, '@velobits/icons'],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/accordion.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'segmented-control',
+    type: 'registry:ui',
+    title: 'SegmentedControl',
+    description:
+      'Radix ToggleGroup with a REAL disabled and a working accessible name — a div root makes an external htmlFor dangle, and pointer-events-none leaves the control focusable and unannounced.',
+    dependencies: [RADIX],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/segmented-control.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'table',
+    type: 'registry:ui',
+    title: 'Table',
+    description:
+      'Rows are never glass — one backdrop-filter per row repaints its own backdrop region on every scroll. Surface treatment belongs on the container.',
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/table.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'tabs',
+    type: 'registry:ui',
+    title: 'Tabs',
+    dependencies: [CVA, RADIX],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/tabs.tsx', type: 'registry:ui' }],
+  },
 ];
 
 /* ── Theme ─────────────────────────────────────────────────────────────────── */
@@ -331,8 +435,16 @@ const styles: RegistryItem[] = [
     type: 'registry:style',
     title: 'VeloBits',
     description:
-      'The base style: tokens, the cn util, the provider stack and every Tier-1 primitive. Start here.',
-    dependencies: [CVA, 'clsx', 'tailwind-merge', RADIX, 'framer-motion', '@velobits/icons'],
+      'The base style: tokens, the cn util, the provider stack, and every Tier-1 primitive, Tier-2 overlay and Tier-3 composite. Start here.',
+    dependencies: [
+      CVA,
+      'clsx',
+      'tailwind-merge',
+      RADIX,
+      'cmdk',
+      'framer-motion',
+      '@velobits/icons',
+    ],
     devDependencies: ['tw-animate-css'],
     registryDependencies: [
       'velobits-theme',
