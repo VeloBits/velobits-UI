@@ -1,0 +1,354 @@
+{
+  "name": "@velobits/ui",
+  "version": "0.1.0",
+  "description": "VeloBits shared React components. Built from registry/velobits, the same source the shadcn CLI serves.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VeloBits/velobits-UI.git",
+    "directory": "packages/ui"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./cn": {
+      "import": {
+        "types": "./dist/cn.d.ts",
+        "default": "./dist/cn.js"
+      },
+      "require": {
+        "types": "./dist/cn.d.cts",
+        "default": "./dist/cn.cjs"
+      }
+    },
+    "./theme": {
+      "import": {
+        "types": "./dist/theme.d.ts",
+        "default": "./dist/theme.js"
+      },
+      "require": {
+        "types": "./dist/theme.d.cts",
+        "default": "./dist/theme.cjs"
+      }
+    },
+    "./use-theme": {
+      "import": {
+        "types": "./dist/use-theme.d.ts",
+        "default": "./dist/use-theme.js"
+      },
+      "require": {
+        "types": "./dist/use-theme.d.cts",
+        "default": "./dist/use-theme.cjs"
+      }
+    },
+    "./use-media-query": {
+      "import": {
+        "types": "./dist/use-media-query.d.ts",
+        "default": "./dist/use-media-query.js"
+      },
+      "require": {
+        "types": "./dist/use-media-query.d.cts",
+        "default": "./dist/use-media-query.cjs"
+      }
+    },
+    "./velobits-provider": {
+      "import": {
+        "types": "./dist/velobits-provider.d.ts",
+        "default": "./dist/velobits-provider.js"
+      },
+      "require": {
+        "types": "./dist/velobits-provider.d.cts",
+        "default": "./dist/velobits-provider.cjs"
+      }
+    },
+    "./alert": {
+      "import": {
+        "types": "./dist/alert.d.ts",
+        "default": "./dist/alert.js"
+      },
+      "require": {
+        "types": "./dist/alert.d.cts",
+        "default": "./dist/alert.cjs"
+      }
+    },
+    "./avatar": {
+      "import": {
+        "types": "./dist/avatar.d.ts",
+        "default": "./dist/avatar.js"
+      },
+      "require": {
+        "types": "./dist/avatar.d.cts",
+        "default": "./dist/avatar.cjs"
+      }
+    },
+    "./badge": {
+      "import": {
+        "types": "./dist/badge.d.ts",
+        "default": "./dist/badge.js"
+      },
+      "require": {
+        "types": "./dist/badge.d.cts",
+        "default": "./dist/badge.cjs"
+      }
+    },
+    "./button": {
+      "import": {
+        "types": "./dist/button.d.ts",
+        "default": "./dist/button.js"
+      },
+      "require": {
+        "types": "./dist/button.d.cts",
+        "default": "./dist/button.cjs"
+      }
+    },
+    "./card": {
+      "import": {
+        "types": "./dist/card.d.ts",
+        "default": "./dist/card.js"
+      },
+      "require": {
+        "types": "./dist/card.d.cts",
+        "default": "./dist/card.cjs"
+      }
+    },
+    "./checkbox": {
+      "import": {
+        "types": "./dist/checkbox.d.ts",
+        "default": "./dist/checkbox.js"
+      },
+      "require": {
+        "types": "./dist/checkbox.d.cts",
+        "default": "./dist/checkbox.cjs"
+      }
+    },
+    "./field": {
+      "import": {
+        "types": "./dist/field.d.ts",
+        "default": "./dist/field.js"
+      },
+      "require": {
+        "types": "./dist/field.d.cts",
+        "default": "./dist/field.cjs"
+      }
+    },
+    "./glass-surface": {
+      "import": {
+        "types": "./dist/glass-surface.d.ts",
+        "default": "./dist/glass-surface.js"
+      },
+      "require": {
+        "types": "./dist/glass-surface.d.cts",
+        "default": "./dist/glass-surface.cjs"
+      }
+    },
+    "./input": {
+      "import": {
+        "types": "./dist/input.d.ts",
+        "default": "./dist/input.js"
+      },
+      "require": {
+        "types": "./dist/input.d.cts",
+        "default": "./dist/input.cjs"
+      }
+    },
+    "./kbd": {
+      "import": {
+        "types": "./dist/kbd.d.ts",
+        "default": "./dist/kbd.js"
+      },
+      "require": {
+        "types": "./dist/kbd.d.cts",
+        "default": "./dist/kbd.cjs"
+      }
+    },
+    "./label": {
+      "import": {
+        "types": "./dist/label.d.ts",
+        "default": "./dist/label.js"
+      },
+      "require": {
+        "types": "./dist/label.d.cts",
+        "default": "./dist/label.cjs"
+      }
+    },
+    "./native-select": {
+      "import": {
+        "types": "./dist/native-select.d.ts",
+        "default": "./dist/native-select.js"
+      },
+      "require": {
+        "types": "./dist/native-select.d.cts",
+        "default": "./dist/native-select.cjs"
+      }
+    },
+    "./separator": {
+      "import": {
+        "types": "./dist/separator.d.ts",
+        "default": "./dist/separator.js"
+      },
+      "require": {
+        "types": "./dist/separator.d.cts",
+        "default": "./dist/separator.cjs"
+      }
+    },
+    "./skeleton": {
+      "import": {
+        "types": "./dist/skeleton.d.ts",
+        "default": "./dist/skeleton.js"
+      },
+      "require": {
+        "types": "./dist/skeleton.d.cts",
+        "default": "./dist/skeleton.cjs"
+      }
+    },
+    "./spinner": {
+      "import": {
+        "types": "./dist/spinner.d.ts",
+        "default": "./dist/spinner.js"
+      },
+      "require": {
+        "types": "./dist/spinner.d.cts",
+        "default": "./dist/spinner.cjs"
+      }
+    },
+    "./switch": {
+      "import": {
+        "types": "./dist/switch.d.ts",
+        "default": "./dist/switch.js"
+      },
+      "require": {
+        "types": "./dist/switch.d.cts",
+        "default": "./dist/switch.cjs"
+      }
+    },
+    "./textarea": {
+      "import": {
+        "types": "./dist/textarea.d.ts",
+        "default": "./dist/textarea.js"
+      },
+      "require": {
+        "types": "./dist/textarea.d.cts",
+        "default": "./dist/textarea.cjs"
+      }
+    },
+    "./tooltip": {
+      "import": {
+        "types": "./dist/tooltip.d.ts",
+        "default": "./dist/tooltip.js"
+      },
+      "require": {
+        "types": "./dist/tooltip.d.cts",
+        "default": "./dist/tooltip.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "size": "size-limit",
+    "publint": "publint",
+    "attw": "attw --pack . --profile node16",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "radix-ui": "^1.6.7",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "@velobits/icons": "^0.1.0",
+    "@velobits/tokens": "^0.1.0",
+    "framer-motion": ">=12.0.0",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@size-limit/preset-small-lib": "^13.0.3",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@velobits/icons": "*",
+    "@velobits/tokens": "*",
+    "axe-core": "^4.12.1",
+    "framer-motion": "^12.43.0",
+    "happy-dom": "^20.11.1",
+    "publint": "^0.3.23",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "size-limit": "^13.0.3",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "size-limit": [
+    {
+      "name": "Button alone, our code only (proves per-entry tree-shaking)",
+      "path": "dist/button.js",
+      "limit": "2 kB",
+      "ignore": [
+        "react",
+        "react-dom",
+        "framer-motion",
+        "@velobits/icons",
+        "@velobits/tokens",
+        "radix-ui",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "name": "the whole barrel, our code only",
+      "path": "dist/index.js",
+      "limit": "6 kB",
+      "ignore": [
+        "react",
+        "react-dom",
+        "framer-motion",
+        "@velobits/icons",
+        "@velobits/tokens",
+        "radix-ui",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "name": "the whole barrel, with every dependency (what a consumer pays)",
+      "path": "dist/index.js",
+      "limit": "36 kB",
+      "ignore": [
+        "react",
+        "react-dom"
+      ]
+    }
+  ]
+}

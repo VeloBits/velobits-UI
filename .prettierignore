@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+package-lock.json
+CHANGELOG.md
+
+# Generated, and checked by test/neutrals.test.ts rather than by eye.
+packages/tokens/src/generated/
+
+# Next build output and its generated ambient types.
+**/.next/
+**/next-env.d.ts
+
+# Compiled registry, written by `npm run registry:build`.
+apps/docs/public/r/
+
+# Written by `npm run registry:build` from registry/registry.ts. Formatting it
+# by hand would be overwritten on the next build.
+registry.json

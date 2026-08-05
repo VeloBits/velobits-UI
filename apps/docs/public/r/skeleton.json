@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "skeleton",
+  "title": "Skeleton",
+  "description": "aria-hidden; pair with ONE sr-only live region rather than announcing each block.",
+  "registryDependencies": [
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/velobits/ui/skeleton.tsx",
+      "content": "'use client';\n\nimport { cn } from '../lib/cn';\n\n/**\n * A loading placeholder.\n *\n * `aria-hidden` with a sibling live region rather than `role=\"status\"` on the\n * skeleton itself: a screen reader should hear \"Loading flags\" once, not\n * enumerate fourteen grey rectangles. Pair it with a single announcement:\n *\n * ```tsx\n * <span className=\"sr-only\" role=\"status\">Loading flags…</span>\n * {rows.map((r) => <Skeleton key={r} className=\"h-8 w-full\" />)}\n * ```\n *\n * The pulse is a CSS animation, so the token layer's `prefers-reduced-motion`\n * block already stills it — no JS check needed.\n */\nfunction Skeleton({ className, ...props }: React.ComponentProps<'div'>) {\n  return (\n    <div\n      data-slot=\"skeleton\"\n      aria-hidden=\"true\"\n      className={cn('animate-pulse rounded-md bg-bg2', className)}\n      {...props}\n    />\n  );\n}\n\nexport { Skeleton };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

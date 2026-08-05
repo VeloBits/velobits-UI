@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkbox",
+  "title": "Checkbox",
+  "description": "Includes the indeterminate state bulk-selection headers need.",
+  "dependencies": [
+    "radix-ui",
+    "@velobits/icons"
+  ],
+  "registryDependencies": [
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/velobits/ui/checkbox.tsx",
+      "content": "'use client';\n\nimport { Checkbox as CheckboxPrimitive } from 'radix-ui';\n\nimport { CheckIcon, MinusIcon } from '@velobits/icons';\n\nimport { cn } from '../lib/cn';\n\n/**\n * Radix Checkbox, which is safe under happy-dom in a way Radix Select is not —\n * it renders a real `<button role=\"checkbox\">` and needs no measurement.\n *\n * Handles the indeterminate state, which matters for the bulk-selection headers\n * these dashboards use: a header checkbox reflecting \"some rows selected\" must\n * render a dash, not a tick, and must report `aria-checked=\"mixed\"`. Radix does\n * the ARIA; the icon swap below is what makes it visible.\n */\nfunction Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {\n  return (\n    <CheckboxPrimitive.Root\n      data-slot=\"checkbox\"\n      className={cn(\n        'peer size-4 shrink-0 rounded-sm border border-input bg-panel',\n        'transition-shadow duration-micro ease-out',\n        'outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40',\n        'disabled:cursor-not-allowed disabled:opacity-50',\n        'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-on-primary',\n        'data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-on-primary',\n        'aria-invalid:border-danger aria-invalid:ring-danger/30',\n        className,\n      )}\n      {...props}\n    >\n      <CheckboxPrimitive.Indicator\n        data-slot=\"checkbox-indicator\"\n        className=\"flex items-center justify-center text-current\"\n      >\n        {props.checked === 'indeterminate' ? <MinusIcon size={12} /> : <CheckIcon size={12} />}\n      </CheckboxPrimitive.Indicator>\n    </CheckboxPrimitive.Root>\n  );\n}\n\nexport { Checkbox };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

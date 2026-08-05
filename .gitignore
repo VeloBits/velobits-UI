@@ -1,0 +1,30 @@
+# deps / build
+node_modules/
+dist/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Next.js: build output, and the ambient types it regenerates on every build.
+.next/
+next-env.d.ts
+
+# env - keep .env.example tracked
+.env
+.env.*
+!.env.example
+
+# misc
+*.log
+.DS_Store
+.playwright-mcp/
+
+.claude*
+
+# NOT ignored, deliberately:
+#   registry.json             the shadcn CLI manifest. Generated from
+#                             registry/registry.ts, but committed so the repo is
+#                             installable from a clone without a build step.
+#   apps/docs/public/r/*.json the compiled registry the CLI actually fetches.
+#                             Committed for the same reason — and because the
+#                             docs deploy serves these as static files.

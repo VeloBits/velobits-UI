@@ -1,0 +1,62 @@
+{
+  "name": "@velobits/tokens",
+  "version": "0.1.0",
+  "description": "VeloBits design tokens — colour, type, spacing, motion and glass, as CSS and TypeScript. Zero dependencies.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VeloBits/velobits-UI.git",
+    "directory": "packages/tokens"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./theme.css": "./css/theme.css",
+    "./tokens.css": "./css/tokens.css",
+    "./glass.css": "./css/glass.css",
+    "./keycloakify.css": "./css/keycloakify.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "css"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "generate": "tsx scripts/generate-neutrals.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "publint": "publint",
+    "attw": "attw --pack . --profile node16 --exclude-entrypoints theme.css tokens.css glass.css keycloakify.css",
+    "clean": "rm -rf dist .turbo"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "publint": "^0.3.23",
+    "tsup": "^8.5.1",
+    "tsx": "^4.20.6",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.10"
+  }
+}

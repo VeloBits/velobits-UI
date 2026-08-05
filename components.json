@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "packages/tokens/css/theme.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/registry/velobits",
+    "ui": "@/registry/velobits/ui",
+    "utils": "@/registry/velobits/lib/cn",
+    "lib": "@/registry/velobits/lib",
+    "hooks": "@/registry/velobits/hooks"
+  }
+}

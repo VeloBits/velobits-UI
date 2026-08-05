@@ -1,0 +1,76 @@
+/*
+ * The glass tier. Imported by theme.css into Tailwind's `components` layer, so
+ * utilities still override it without `!important`.
+ *
+ * ALLOWED on: Dialog · Sheet/SidePanel · Popover · DropdownMenu ·
+ *             CommandPalette · Toast · sticky TopBar/Navbar.
+ *   Every one of those floats over page content, which is the only place a blur
+ *   reads as glass.
+ *
+ * FORBIDDEN on: page/body backgrounds · table rows · anything inside a scroll
+ *   container · nested glass · more than ~6 simultaneous instances.
+ *   Page backgrounds are both the explicit product decision and where blur
+ *   costs the most for the least effect — there is nothing behind them to see.
+ *
+ * Two behaviours that will look like bugs if you meet them cold:
+ *   1. `backdrop-filter` establishes a containing block for `position: fixed`
+ *      descendants. A fixed child of a glass surface is trapped inside it.
+ *   2. It also forms a stacking context, so `z-index` inside a glass surface is
+ *      scoped to it.
+ * And one performance rule: never animate the blur RADIUS. Each frame forces a
+ * full backdrop repaint. Animate opacity and transform.
+ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  /* The one sanctioned translucent border in the system: a glass surface has no
+   * fixed backdrop, so an opaque edge would read as a hard seam against some
+   * backdrops and vanish against others. */
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-overlay);
+}
+
+/*
+ * Muted text needs a firmer step once glass is composited over an arbitrary
+ * backdrop: --muted-fg measures 3.09:1 over the worst case, --muted-on-glass
+ * holds 4.92:1. Scoped to descendants so a `text-muted-foreground` utility
+ * inside a Dialog picks it up without every call site knowing.
+ */
+.glass {
+  --muted-fg: var(--muted-on-glass);
+}
+
+/*
+ * Elevated glass: for a surface stacked above an already-glass overlay (a
+ * Popover inside a Dialog). Plum-tinted in dark mode, and at a higher alpha
+ * because a chromatic tint at 0.85 drifts visibly green over the lime brand fill.
+ */
+.dark .glass-elevated,
+body.dark .glass-elevated {
+  --glass-bg: rgba(89, 41, 65, 0.9);
+  --glass-border: rgba(242, 235, 232, 0.14);
+}
+
+/*
+ * Graceful degradation, in both directions.
+ *
+ * Without backdrop-filter support the translucent background alone reads as a
+ * washed-out panel with page content bleeding through, so fall back to the
+ * opaque surface rather than to "glass minus the blur".
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--panel);
+  }
+}
+
+/* A user preference, not a capability check — honour it even where blur works. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--panel);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

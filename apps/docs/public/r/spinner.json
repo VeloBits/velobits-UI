@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spinner",
+  "title": "Spinner",
+  "registryDependencies": [
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/velobits/ui/spinner.tsx",
+      "content": "'use client';\n\nimport { cn } from '../lib/cn';\n\nexport interface SpinnerProps extends React.ComponentProps<'span'> {\n  /** Matches the icon scale: 16px default. */\n  size?: number;\n  /**\n   * Announced to assistive tech. Set to `null` when a visible label already\n   * says what is loading, so it is not read twice.\n   */\n  label?: string | null;\n}\n\n/**\n * An indeterminate busy indicator.\n *\n * Drawn with a bordered box rather than an SVG so it has no icon dependency and\n * inherits `currentColor` for free.\n *\n * Reduced motion is handled by the token layer, which collapses animation\n * durations to ~0. A stopped spinner still communicates \"busy\" through its\n * `role=\"status\"` label — which is exactly why the label is not optional by\n * default.\n */\nfunction Spinner({ className, size = 16, label = 'Loading', ...props }: SpinnerProps) {\n  return (\n    <span\n      data-slot=\"spinner\"\n      role={label ? 'status' : undefined}\n      aria-label={label ?? undefined}\n      aria-hidden={label ? undefined : 'true'}\n      className={cn(\n        'inline-block animate-spin rounded-full border-2 border-current border-t-transparent align-[-0.125em]',\n        className,\n      )}\n      style={{ width: size, height: size }}\n      {...props}\n    />\n  );\n}\n\nexport { Spinner };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

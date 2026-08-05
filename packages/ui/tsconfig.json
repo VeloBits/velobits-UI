@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [],
+    "paths": {
+      "@velobits/tokens": ["../tokens/src/index.ts"],
+      "@velobits/icons": ["../icons/src/index.ts"]
+    }
+  },
+  "include": ["../../registry/velobits", "test", "tsup.config.ts", "vitest.config.ts"]
+}

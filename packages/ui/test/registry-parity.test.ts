@@ -1,0 +1,176 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+import { buildableItems, registry } from '../../../registry/registry';
+
+/**
+ * The dual distribution has three lists that must agree, maintained in three
+ * files:
+ *
+ *   1. `registry/registry.ts`      — what the shadcn CLI serves
+ *   2. `packages/ui/tsup.config.ts` — what gets built for npm
+ *   3. `packages/ui/package.json`   — what npm consumers can import
+ *
+ * Any one of them can be updated alone, and the failure is quiet: a component
+ * that builds but is not importable, or is importable but 404s from the CLI.
+ * This test is the thing that makes adding a component a single coherent change.
+ */
+
+/*
+ * `process.cwd()` rather than `import.meta.url`: vitest rewrites import.meta in
+ * transformed modules, and the URL-relative form resolved to the package's
+ * `main` field instead of this directory.
+ */
+const uiDir = process.cwd();
+const tsupSource = readFileSync(join(uiDir, 'tsup.config.ts'), 'utf8');
+const pkg = JSON.parse(readFileSync(join(uiDir, 'package.json'), 'utf8')) as {
+  exports: Record<string, unknown>;
+  peerDependencies: Record<string, string>;
+  dependencies: Record<string, string>;
+};
+
+/** Entry keys declared in the tsup entry map. */
+const tsupEntries = [...tsupSource.matchAll(/^\s{2}(?:'([a-z-]+)'|([a-z-]+)):\s*`/gm)].map(
+  (m) => m[1] ?? m[2]!,
+);
+
+const exportSubpaths = Object.keys(pkg.exports)
+  .filter((k) => k !== '.' && k !== './package.json')
+  .map((k) => k.replace('./', ''));
+
+describe('registry ↔ tsup ↔ exports parity', () => {
+  it('every buildable registry item has a tsup entry', () => {
+    const missing = buildableItems.map((i) => i.name).filter((n) => !tsupEntries.includes(n));
+    expect(
+      missing,
+      `In registry/registry.ts but not built by packages/ui/tsup.config.ts: ${missing.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  it('every tsup entry is a registry item', () => {
+    const names = new Set(buildableItems.map((i) => i.name));
+    const extra = tsupEntries.filter((e) => e !== 'index' && !names.has(e));
+    expect(
+      extra,
+      `Built by tsup but absent from registry/registry.ts, so the CLI cannot install it: ${extra.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  it('every tsup entry is importable as a subpath', () => {
+    const missing = tsupEntries.filter((e) => e !== 'index' && !exportSubpaths.includes(e));
+    expect(
+      missing,
+      `Built but not listed in package.json "exports", so it is unreachable: ${missing.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  it('every exported subpath is actually built', () => {
+    const missing = exportSubpaths.filter((s) => !tsupEntries.includes(s));
+    expect(
+      missing,
+      `Declared in "exports" but never built — a consumer gets a resolution error: ${missing.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  it('re-exports every entry from the barrel', () => {
+    /**
+     * The fourth list, and the one that bit first: `Textarea` was a registry
+     * item, a tsup entry AND an exports subpath, but absent from
+     * `registry/velobits/index.ts`. Subpath imports worked; the barrel import
+     * did not. Caught by the docs build rather than by a test, which is exactly
+     * the gap this closes.
+     */
+    const barrel = readFileSync(join(uiDir, '../../registry/velobits/index.ts'), 'utf8');
+    const missing = buildableItems
+      .filter((item) => {
+        const path = item.files![0]!.path.replace('registry/velobits/', '').replace(/\.tsx?$/, '');
+        return !barrel.includes(`'./${path}'`);
+      })
+      .map((i) => i.name);
+    expect(
+      missing,
+      `Built and exported as a subpath, but missing from the barrel — so ` +
+        `\`import { X } from '@velobits/ui'\` fails while ` +
+        `\`from '@velobits/ui/x'\` works: ${missing.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  it('found a non-trivial number of entries, so the regex above still works', () => {
+    // Guards against the parse silently returning [] and every assertion passing.
+    expect(tsupEntries.length).toBeGreaterThan(20);
+    expect(tsupEntries).toContain('button');
+    expect(tsupEntries).toContain('index');
+  });
+});
+
+describe('registry hygiene', () => {
+  it('has no duplicate item names', () => {
+    const names = registry.items.map((i) => i.name);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it('resolves every registryDependency within the registry', () => {
+    const names = new Set(registry.items.map((i) => i.name));
+    const dangling = registry.items.flatMap((i) =>
+      (i.registryDependencies ?? [])
+        .filter((d) => !d.startsWith('http') && !names.has(d))
+        .map((d) => `${i.name} → ${d}`),
+    );
+    expect(dangling, `dangling registryDependencies: ${dangling.join(', ')}`).toEqual([]);
+  });
+
+  it('gives the `velobits` style every component, so one command installs the set', () => {
+    const style = registry.items.find((i) => i.name === 'velobits')!;
+    const uiNames = registry.items.filter((i) => i.type === 'registry:ui').map((i) => i.name);
+    const missing = uiNames.filter((n) => !style.registryDependencies?.includes(n));
+    expect(missing, `not reachable from the base style: ${missing.join(', ')}`).toEqual([]);
+  });
+
+  it('ships the theme item with both light and dark variable sets', () => {
+    const theme = registry.items.find((i) => i.name === 'velobits-theme')!;
+    expect(Object.keys(theme.cssVars?.light ?? {}).length).toBeGreaterThan(20);
+    expect(Object.keys(theme.cssVars?.dark ?? {}).length).toBeGreaterThan(20);
+    // Derived from @velobits/tokens, so the two sets necessarily match in shape.
+    expect(Object.keys(theme.cssVars!.light!).sort()).toEqual(
+      Object.keys(theme.cssVars!.dark!).sort(),
+    );
+  });
+
+  it('declares @velobits/icons wherever a component imports an icon', () => {
+    /**
+     * A CLI consumer copies the file and installs the listed dependencies. Miss
+     * this and their build fails on an unresolved import — on their machine, not
+     * in our CI.
+     */
+    const checkbox = registry.items.find((i) => i.name === 'checkbox')!;
+    expect(checkbox.dependencies).toContain('@velobits/icons');
+  });
+});
+
+describe('packaging invariants that break consumers quietly', () => {
+  it('keeps React and the sibling packages as peers, never dependencies', () => {
+    /**
+     * A bundled React means two copies at runtime and hooks that throw. Bundling
+     * @velobits/ui's siblings would also defeat the Module Federation singleton
+     * arrangement FixMyText needs.
+     */
+    for (const p of [
+      'react',
+      'react-dom',
+      '@velobits/tokens',
+      '@velobits/icons',
+      'framer-motion',
+    ]) {
+      expect(pkg.peerDependencies).toHaveProperty(p);
+      expect(pkg.dependencies).not.toHaveProperty(p);
+    }
+  });
+
+  it('marks the package side-effect free so tree-shaking is permitted', () => {
+    const raw = JSON.parse(readFileSync(join(uiDir, 'package.json'), 'utf8')) as {
+      sideEffects: boolean;
+    };
+    expect(raw.sideEffects).toBe(false);
+  });
+});

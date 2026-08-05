@@ -1,0 +1,104 @@
+/*
+ * @velobits/tokens/keycloakify.css — the Keycloak login theme's seam.
+ *
+ * ## Why this file exists at all
+ *
+ * The login theme CANNOT consume @velobits/ui. Its component sources are
+ * git-ignored and vended by `@oussemasahbeni/keycloakify-login-shadcn` through a
+ * `keycloakify sync-extensions` postinstall hook. Files must be claimed one at a
+ * time with `npx keycloakify own --path …`, and editing an unclaimed file is
+ * silently reverted by the next `npm install`. Adopting shared *components*
+ * there means fighting the upstream extension forever; adopting shared *tokens*
+ * is a clean seam the theme's own README already points at.
+ *
+ * ## How to wire it up
+ *
+ *   1. npx keycloakify own --path "login/index.css"
+ *   2. In that now-owned file:
+ *        @import '@velobits/tokens/theme.css';
+ *        @import '@velobits/tokens/keycloakify.css';
+ *   3. Update the owned `velobits` base + accent presets in
+ *      src/login/components/Template/theme/Themes.ts to reference these vars.
+ *
+ * The extension reads `--keycloakify-shadcn-*` custom properties, which it also
+ * lets Keycloak set at RUNTIME from `kcContext.properties` (SHADCN_THEME_PRESET,
+ * _BASE, _RADIUS, _FONT, _APP_NAME, _LAYOUT, _LOGO_*) applied inline on
+ * `documentElement`. Those runtime knobs need no rebuild — but anything in this
+ * file DOES, and a theme rebuild is not a plain `restart`:
+ *
+ *     docker compose stop keycloak-dev
+ *     FORCE_THEME_REBUILD=1 docker compose up keycloak-theme-builder
+ *     docker compose start keycloak-dev
+ *
+ * Docker file-locks the mounted jar, `start-dev` only picks up providers at
+ * startup, and a MISSING jar makes the login page 500 while realm import still
+ * succeeds — which is why CI asserts the login page actually rendered the
+ * `velobits` theme rather than merely that the realm imported.
+ *
+ * ## Consequence accepted with the user
+ *
+ * The theme's owned `button.tsx` forces `rounded-full`. A shared control radius
+ * cannot also be a pill, so login buttons become `--radius-md` (6px) like every
+ * other VeloBits control. To revert, set `--keycloakify-shadcn-radius: 999px`.
+ */
+
+:root {
+  /* ── surfaces ───────────────────────────────────────────────────────────── */
+  --keycloakify-shadcn-background: var(--bg);
+  --keycloakify-shadcn-foreground: var(--fg);
+  --keycloakify-shadcn-card: var(--panel);
+  --keycloakify-shadcn-card-foreground: var(--fg);
+  --keycloakify-shadcn-popover: var(--panel);
+  --keycloakify-shadcn-popover-foreground: var(--fg);
+
+  /* ── brand ──────────────────────────────────────────────────────────────── */
+  --keycloakify-shadcn-primary: var(--primary);
+  --keycloakify-shadcn-primary-foreground: var(--on-primary);
+  --keycloakify-shadcn-secondary: var(--bg2);
+  --keycloakify-shadcn-secondary-foreground: var(--fg);
+  --keycloakify-shadcn-muted: var(--bg2);
+  --keycloakify-shadcn-muted-foreground: var(--muted-fg);
+  --keycloakify-shadcn-accent: var(--highlight);
+  --keycloakify-shadcn-accent-foreground: var(--fg);
+  --keycloakify-shadcn-destructive: var(--danger);
+  --keycloakify-shadcn-destructive-foreground: var(--on-primary);
+
+  /* ── lines and focus ────────────────────────────────────────────────────── */
+  --keycloakify-shadcn-border: var(--border);
+  /* Control edge, not separator — the half WCAG 1.4.11 gates. */
+  --keycloakify-shadcn-input: var(--field-border);
+  --keycloakify-shadcn-ring: var(--ring);
+
+  /* ── shape and type ─────────────────────────────────────────────────────── */
+  /* 6px, not the pill the vended button.tsx hardcodes. See the note above. */
+  --keycloakify-shadcn-radius: var(--radius-md);
+  --keycloakify-shadcn-font-sans: var(--font-sans);
+  --keycloakify-shadcn-font-mono: var(--font-mono);
+
+  /* ── charts, for completeness: the extension declares them ──────────────── */
+  --keycloakify-shadcn-chart-1: var(--chart-1);
+  --keycloakify-shadcn-chart-2: var(--chart-2);
+  --keycloakify-shadcn-chart-3: var(--chart-3);
+  --keycloakify-shadcn-chart-4: var(--chart-4);
+  --keycloakify-shadcn-chart-5: var(--chart-5);
+}
+
+/*
+ * No `.dark` block is needed here.
+ *
+ * Every value above is a `var()` reference to a token that tokens.css already
+ * re-declares under `.dark, body.dark` — and that selector list deliberately
+ * includes the bare `.dark` so it matches this theme's `html.dark` as well as
+ * the apps' `body.dark`. A second block here would be a duplicate palette to
+ * keep in sync, which is exactly the failure mode ADR-0031's single bridge
+ * exists to prevent.
+ *
+ * Verify with `?dark=true` and `?dark=false` on login, register,
+ * reset-password, OTP and select-authenticator.
+ */
+
+/*
+ * Delete-on-sight: the owned `TemplateContent.tsx` hardcodes an Atlassian-blue
+ * shadow, `rgba(9, 30, 66, 0.25)`, which belongs to no VeloBits palette. Use
+ * `var(--shadow-md)` / `var(--shadow-overlay)` instead.
+ */

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button",
+  "title": "Button",
+  "description": "Controls are radius-md. No variant paints --primary as text; `link` uses --primary-text.",
+  "dependencies": [
+    "class-variance-authority",
+    "radix-ui"
+  ],
+  "registryDependencies": [
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/velobits/ui/button.tsx",
+      "content": "'use client';\n\nimport { cva, type VariantProps } from 'class-variance-authority';\nimport { Slot } from 'radix-ui';\n\nimport { cn } from '../lib/cn';\n\n/**\n * ## Why there is no `primary`-coloured text variant\n *\n * `--primary` (#007ACC) measures 3.90:1 on the cream page — fine as a fill\n * behind white text (4.51:1), failing AA as text. The `link` variant therefore\n * uses `text-link` (`--primary-text`, 4.68:1), and no variant paints\n * `--primary` on a page background.\n *\n * ## Radius\n *\n * Controls are `--radius-md` (6px) system-wide. The Keycloak login theme's\n * vended `button.tsx` hardcodes `rounded-full`, so adopting this shared radius\n * is what makes login buttons stop being pills — an accepted consequence,\n * reversible by overriding `--keycloakify-shadcn-radius`.\n *\n * ## RTL\n *\n * Tailwind v4's `px-*` and `gap-*` are already logical, so nothing here needs\n * mirroring under `dir=\"rtl\"`. A directional icon *child* still does.\n */\nconst buttonVariants = cva(\n  [\n    'inline-flex items-center justify-center gap-2 whitespace-nowrap',\n    'rounded-md text-sm font-medium',\n    'transition-colors duration-micro ease-out',\n    // The visible ring comes from the token layer's global :focus-visible rule.\n    // This adds the soft halo; `outline-none` only suppresses the UA default.\n    'outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40',\n    'disabled:pointer-events-none disabled:opacity-50',\n    // Size any icon child once, rather than at every call site.\n    \"[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0\",\n  ],\n  {\n    variants: {\n      variant: {\n        primary: 'bg-primary text-on-primary shadow-sm hover:bg-primary-hover',\n        /**\n         * The lime brand fill. `text-on-brand` is charcoal at 10.89:1 — the only\n         * sanctioned pairing on lime. White on lime is 1.31:1, which is why no\n         * white-on-brand variant exists to reach for by mistake.\n         */\n        brand: 'bg-brand text-on-brand shadow-sm hover:brightness-95',\n        secondary: 'border border-field-border bg-panel text-fg hover:bg-highlight',\n        ghost: 'text-fg hover:bg-highlight',\n        destructive: 'bg-danger text-on-primary shadow-sm hover:brightness-95',\n        link: 'text-link underline-offset-4 hover:underline',\n      },\n      size: {\n        sm: 'h-8 px-3 text-xs',\n        md: 'h-9 px-4',\n        lg: 'h-10 px-6',\n        /** Square, for an icon-only button — which needs an `aria-label`. */\n        icon: 'size-9',\n      },\n    },\n    defaultVariants: { variant: 'secondary', size: 'md' },\n  },\n);\n\nexport interface ButtonProps\n  extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {\n  /**\n   * Render the single child element instead of a `<button>`, forwarding these\n   * classes onto it — for wrapping a router `<Link>` without nesting an anchor\n   * inside a button.\n   */\n  asChild?: boolean;\n}\n\nfunction Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {\n  const Comp = asChild ? Slot.Root : 'button';\n  return (\n    // `data-slot` is how shadcn's generated code targets sub-parts; keeping it\n    // means anything `npx shadcn add` writes composes with these primitives.\n    <Comp\n      data-slot=\"button\"\n      className={cn(buttonVariants({ variant, size }), className)}\n      {...props}\n    />\n  );\n}\n\nexport { Button, buttonVariants };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

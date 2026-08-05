@@ -1,0 +1,48 @@
+{
+  "name": "velobits-ui",
+  "private": true,
+  "version": "0.0.0",
+  "description": "VeloBits design system — shared tokens, icons and components for every VeloBits product surface",
+  "type": "module",
+  "packageManager": "npm@11.8.0",
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "turbo run clean",
+    "size": "turbo run size",
+    "publint": "turbo run publint",
+    "attw": "turbo run attw",
+    "package:check": "turbo run publint attw",
+    "changeset": "changeset",
+    "version-packages": "changeset version && npm install --package-lock-only",
+    "release": "turbo run build && changeset publish",
+    "registry:build": "tsx scripts/build-registry.ts",
+    "docs": "npm run dev -w @velobits/docs"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.1",
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6",
+    "turbo": "^2.10.8",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.66.0",
+    "tsx": "^4.20.6"
+  }
+}

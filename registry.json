@@ -1,0 +1,518 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "velobits",
+  "homepage": "https://ui.velobits.dev",
+  "items": [
+    {
+      "name": "velobits",
+      "type": "registry:style",
+      "title": "VeloBits",
+      "description": "The base style: tokens, the cn util, the provider stack and every Tier-1 primitive. Start here.",
+      "dependencies": [
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge",
+        "radix-ui",
+        "framer-motion",
+        "@velobits/icons"
+      ],
+      "devDependencies": [
+        "tw-animate-css"
+      ],
+      "registryDependencies": [
+        "velobits-theme",
+        "cn",
+        "theme",
+        "use-theme",
+        "use-media-query",
+        "velobits-provider",
+        "alert",
+        "avatar",
+        "badge",
+        "button",
+        "card",
+        "checkbox",
+        "field",
+        "glass-surface",
+        "input",
+        "kbd",
+        "label",
+        "native-select",
+        "separator",
+        "skeleton",
+        "spinner",
+        "switch",
+        "textarea",
+        "tooltip"
+      ],
+      "files": []
+    },
+    {
+      "name": "velobits-theme",
+      "type": "registry:theme",
+      "title": "VeloBits theme",
+      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits/tokens test suite.",
+      "cssVars": {
+        "theme": {
+          "radius-sm": "4px",
+          "radius-md": "6px",
+          "radius-lg": "10px",
+          "radius-xl": "14px",
+          "radius-2xl": "20px",
+          "radius-pill": "999px",
+          "container-page": "72rem",
+          "duration-micro": "120ms",
+          "duration-enter": "180ms",
+          "duration-overlay": "240ms",
+          "duration-page": "320ms",
+          "ease-out": "cubic-bezier(0.32, 0.72, 0, 1)",
+          "ease-in": "cubic-bezier(0.4, 0, 1, 1)"
+        },
+        "light": {
+          "bg": "#F4EDEA",
+          "bg2": "#F2EBE8",
+          "panel": "#FFFFFF",
+          "elevated": "#FFFFFF",
+          "fg": "#2A2B2A",
+          "muted-fg": "#646562",
+          "muted-on-glass": "#464745",
+          "border": "#D0CBC7",
+          "field-border": "#82827E",
+          "primary": "#007ACC",
+          "primary-hover": "#0062A3",
+          "on-primary": "#FFFFFF",
+          "primary-text": "#006CBD",
+          "primary-soft": "rgba(0, 122, 204, 0.10)",
+          "brand": "#C8F135",
+          "on-brand": "#2A2B2A",
+          "brand-soft": "rgba(200, 241, 53, 0.18)",
+          "accent-text": "#582840",
+          "ring": "#007ACC",
+          "highlight": "rgba(42, 43, 42, 0.05)",
+          "overlay": "rgba(26, 27, 26, 0.45)",
+          "success": "#2B762D",
+          "success-soft": "rgba(43, 118, 45, 0.12)",
+          "danger": "#C0322B",
+          "danger-soft": "rgba(192, 50, 43, 0.10)",
+          "warning": "#8A5B00",
+          "warning-soft": "rgba(138, 91, 0, 0.12)",
+          "info": "#006CBD",
+          "info-soft": "rgba(0, 108, 189, 0.10)",
+          "chart-1": "#1D82D2",
+          "chart-2": "#6F8714",
+          "chart-3": "#BC5F8D",
+          "chart-4": "#AF7011",
+          "chart-5": "#368A8A"
+        },
+        "dark": {
+          "bg": "#1A1B1A",
+          "bg2": "#2C2D2C",
+          "panel": "#2C2D2C",
+          "elevated": "#592941",
+          "fg": "#F2EBE8",
+          "muted-fg": "#A5A39F",
+          "muted-on-glass": "#E4DEDB",
+          "border": "#383635",
+          "field-border": "#82827E",
+          "primary": "#007ACC",
+          "primary-hover": "#1177BB",
+          "on-primary": "#FFFFFF",
+          "primary-text": "#42A4F9",
+          "primary-soft": "rgba(0, 122, 204, 0.22)",
+          "brand": "#C8F135",
+          "on-brand": "#2A2B2A",
+          "brand-soft": "rgba(200, 241, 53, 0.16)",
+          "accent-text": "#C8F135",
+          "ring": "#3094E8",
+          "highlight": "rgba(242, 235, 232, 0.06)",
+          "overlay": "rgba(14, 15, 14, 0.60)",
+          "success": "#7FB86B",
+          "success-soft": "rgba(127, 184, 107, 0.16)",
+          "danger": "#F1706B",
+          "danger-soft": "rgba(241, 112, 107, 0.16)",
+          "warning": "#E0C060",
+          "warning-soft": "rgba(224, 192, 96, 0.16)",
+          "info": "#42A4F9",
+          "info-soft": "rgba(66, 164, 249, 0.16)",
+          "chart-1": "#2387D7",
+          "chart-2": "#738C1B",
+          "chart-3": "#C06492",
+          "chart-4": "#B37519",
+          "chart-5": "#3B8F8E"
+        }
+      }
+    },
+    {
+      "name": "cn",
+      "type": "registry:lib",
+      "title": "cn",
+      "description": "Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — ToggleFlow points components.json `utils` at it.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/lib/cn.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "theme",
+      "type": "registry:lib",
+      "title": "Theme resolution",
+      "description": "React-free light/dark resolution, storage and the blocking init script. Storage key is required, never defaulted.",
+      "files": [
+        {
+          "path": "registry/velobits/lib/theme.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "use-theme",
+      "type": "registry:hook",
+      "title": "useTheme",
+      "description": "ThemeProvider + useTheme. Honours the existing fmx_theme_mode and tf.theme keys.",
+      "registryDependencies": [
+        "theme"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/hooks/use-theme.tsx",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "use-media-query",
+      "type": "registry:hook",
+      "title": "useMediaQuery",
+      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits/tokens — ADR-0017.",
+      "files": [
+        {
+          "path": "registry/velobits/hooks/use-media-query.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "velobits-provider",
+      "type": "registry:ui",
+      "title": "VelobitsProvider",
+      "description": "Mount once at the shell root: ThemeProvider + TooltipProvider + MotionConfig reducedMotion=\"user\".",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "use-theme",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/providers/velobits-provider.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "Status panel. Defaults to polite role=\"status\"; escalate to \"alert\" deliberately.",
+      "dependencies": [
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/alert.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/avatar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Soft washes pair with the matching text token, never with the solid fill.",
+      "dependencies": [
+        "class-variance-authority",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "Controls are radius-md. No variant paints --primary as text; `link` uses --primary-text.",
+      "dependencies": [
+        "class-variance-authority",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "Writes border-border explicitly, so it survives an app that skipped the base layer.",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/card.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "Includes the indeterminate state bulk-selection headers need.",
+      "dependencies": [
+        "radix-ui",
+        "@velobits/icons"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/checkbox.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Label/description/error wiring. Keeps BOTH ids in aria-describedby when a field has an error and a hint.",
+      "registryDependencies": [
+        "cn",
+        "label"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/field.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "glass-surface",
+      "type": "registry:ui",
+      "title": "GlassSurface",
+      "description": "The overlay tier’s shared panel. Never for page backgrounds or table rows.",
+      "registryDependencies": [
+        "cn",
+        "velobits-theme"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/glass-surface.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "border-input maps to --field-border, the half WCAG 1.4.11 gates.",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/input.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/kbd.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "description": "A real <label>, so htmlFor resolves. Non-control roots need aria-labelledby instead.",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/label.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "native-select",
+      "type": "registry:ui",
+      "title": "NativeSelect",
+      "description": "A cva-styled native <select>. Deliberately NOT Radix Select, which is undriveable under happy-dom.",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/native-select.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "Decorative, so it uses --border and is exempt from 1.4.11.",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/separator.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "aria-hidden; pair with ONE sr-only live region rather than announcing each block.",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/skeleton.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/spinner.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "Applies immediately. Thumb translation is mirrored explicitly for RTL.",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/switch.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/textarea.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "TooltipProvider is required — Radix throws without it, and under Module Federation it must be a singleton.",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/tooltip.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}

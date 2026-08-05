@@ -1,0 +1,79 @@
+{
+  "name": "@velobits/icons",
+  "version": "0.1.0",
+  "description": "VeloBits icon set — 88 hand-drawn stroke icons on a 24×24 grid, tuned for 13-18px rendering.",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VeloBits/velobits-UI.git",
+    "directory": "packages/icons"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "size": "size-limit",
+    "publint": "publint",
+    "attw": "attw --pack . --profile node16",
+    "clean": "rm -rf dist .turbo"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@size-limit/preset-small-lib": "^13.0.3",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "happy-dom": "^20.11.1",
+    "publint": "^0.3.23",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "size-limit": "^13.0.3",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "size-limit": [
+    {
+      "name": "one icon (proves tree-shaking)",
+      "path": "dist/index.js",
+      "import": "{ FlagIcon }",
+      "limit": "400 B"
+    },
+    {
+      "name": "the whole set",
+      "path": "dist/index.js",
+      "import": "*",
+      "limit": "6 kB"
+    }
+  ]
+}

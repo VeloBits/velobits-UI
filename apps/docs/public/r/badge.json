@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "badge",
+  "title": "Badge",
+  "description": "Soft washes pair with the matching text token, never with the solid fill.",
+  "dependencies": [
+    "class-variance-authority",
+    "radix-ui"
+  ],
+  "registryDependencies": [
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/velobits/ui/badge.tsx",
+      "content": "'use client';\n\nimport { cva, type VariantProps } from 'class-variance-authority';\nimport { Slot } from 'radix-ui';\n\nimport { cn } from '../lib/cn';\n\n/**\n * The `*-soft` variants pair a tinted wash with the matching *text* token, never\n * with the solid fill — `bg-success-soft text-success`, not\n * `bg-success text-success`. Each text token is gated at AA against the page and\n * the panel, and the washes are low-alpha enough not to move that materially.\n *\n * `brand` is the exception that proves the palette's asymmetry: lime is a fill\n * with charcoal on it in both themes. There is no soft-lime-with-lime-text\n * variant, because lime on cream is 1.13:1.\n */\nconst badgeVariants = cva(\n  [\n    'inline-flex w-fit shrink-0 items-center justify-center gap-1',\n    'rounded-md border px-2 py-0.5 text-xs font-medium whitespace-nowrap',\n    'transition-colors duration-micro ease-out',\n    \"[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-3\",\n  ],\n  {\n    variants: {\n      variant: {\n        neutral: 'border-border bg-bg2 text-fg',\n        primary: 'border-transparent bg-primary-soft text-link',\n        brand: 'border-transparent bg-brand text-on-brand',\n        success: 'border-transparent bg-success-soft text-success',\n        danger: 'border-transparent bg-danger-soft text-danger',\n        warning: 'border-transparent bg-warning-soft text-warning',\n        info: 'border-transparent bg-info-soft text-info',\n        outline: 'border-field-border text-fg',\n      },\n    },\n    defaultVariants: { variant: 'neutral' },\n  },\n);\n\nexport interface BadgeProps\n  extends React.ComponentProps<'span'>, VariantProps<typeof badgeVariants> {\n  asChild?: boolean;\n}\n\nfunction Badge({ className, variant, asChild = false, ...props }: BadgeProps) {\n  const Comp = asChild ? Slot.Root : 'span';\n  return (\n    <Comp data-slot=\"badge\" className={cn(badgeVariants({ variant }), className)} {...props} />\n  );\n}\n\nexport { Badge, badgeVariants };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

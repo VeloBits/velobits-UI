@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          # Needed even to READ @velobits/* from a consumer's perspective; this
+          # repo's own @velobits deps are workspace links, but the registry
+          # mapping in .npmrc still has to resolve.
+          registry-url: https://npm.pkg.github.com
+
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # The contrast gate lives here. A palette edit that breaks a WCAG target
+      # fails this step rather than shipping.
+      - name: Test
+        run: npm run test
+
+      # publint + attw are what catch the TS-version skew across consumers:
+      # FixMyText is on TS 6.0.3, the Keycloak theme ~6.0.2, ToggleFlow 5.9.3.
+      # A .d.ts that fails to resolve under one of them breaks quietly, which is
+      # why this is a gate and not a nice-to-have.
+      - name: Package exports and types
+        run: npm run package:check
+
+      - name: Bundle size
+        run: npm run size
+
+      # Proves the shadcn half of the distribution actually resolves: every file
+      # a registry item references exists, and every registryDependency resolves.
+      # Without this, the failure surfaces on a consumer's machine.
+      - name: Registry build
+        run: npm run registry:build
+
+      - name: Docs build
+        run: npm run build -w @velobits/docs

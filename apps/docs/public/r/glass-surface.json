@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "glass-surface",
+  "title": "GlassSurface",
+  "description": "The overlay tier’s shared panel. Never for page backgrounds or table rows.",
+  "registryDependencies": [
+    "cn",
+    "velobits-theme"
+  ],
+  "files": [
+    {
+      "path": "registry/velobits/ui/glass-surface.tsx",
+      "content": "'use client';\n\nimport { cn } from '../lib/cn';\n\nexport interface GlassSurfaceProps extends React.ComponentProps<'div'> {\n  /** `elevated` uses the plum-tinted tier, for glass stacked on glass. */\n  tier?: 'default' | 'elevated';\n  asChild?: never;\n}\n\n/**\n * The shared implementation behind every Tier-2 overlay's panel. Not for direct\n * use on page furniture — see the allow/forbid list below.\n *\n * ALLOWED: Dialog · Sheet/SidePanel · Popover · DropdownMenu · CommandPalette ·\n *          Toast · sticky TopBar/Navbar. All of them float over page content,\n *          which is the only place a blur reads as glass.\n *\n * FORBIDDEN: page/body backgrounds · table rows · anything inside a scroll\n *          container · nested glass · more than ~6 simultaneous instances.\n *\n * ## Two layout behaviours that will look like component bugs\n *\n *  - `backdrop-filter` establishes a containing block for `position: fixed`\n *    descendants, so a fixed child of a glass surface is trapped inside it.\n *  - It also forms a stacking context, so `z-index` within is scoped locally.\n *\n * ## One performance rule\n *\n * Never animate the blur RADIUS — each frame forces a full backdrop repaint.\n * Animate `opacity` and `transform`, which is what the `animate-in` utilities on\n * the overlay components already do.\n *\n * Legibility, fallbacks and the reduced-transparency override all live in\n * `@velobits/tokens/glass.css` under `.glass`, so they apply identically to any\n * consumer that reaches for the class directly.\n */\nfunction GlassSurface({ className, tier = 'default', ...props }: GlassSurfaceProps) {\n  return (\n    <div\n      data-slot=\"glass-surface\"\n      className={cn('glass', tier === 'elevated' && 'glass-elevated', className)}\n      {...props}\n    />\n  );\n}\n\nexport { GlassSurface };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}
