@@ -2,7 +2,12 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Alert, AlertDescription, AlertTitle } from '../../../registry/velobits/ui/alert';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  alertVariants,
+} from '../../../registry/velobits/ui/alert';
 import { Badge } from '../../../registry/velobits/ui/badge';
 import { Button } from '../../../registry/velobits/ui/button';
 import {
@@ -98,15 +103,37 @@ describe('Badge', () => {
 });
 
 describe('Card', () => {
-  it('states its border colour explicitly', () => {
+  it('states its border colour explicitly on the opaque variant', () => {
     /**
      * Tailwind v4's bare `border` emits width and style only, so the colour
      * falls back to currentColor — which painted a near-white outline on every
      * dark-mode card. The base layer fixes it globally; this makes the component
      * correct even in an app that skipped the base layer.
+     *
+     * Only the `panel` variant needs the guard. The default glass variant takes
+     * its border from `.glass-surface`, which sets the `border` SHORTHAND —
+     * colour included — from the components layer.
+     */
+    const { container } = render(<Card surface="panel">x</Card>);
+    expect(container.firstElementChild!.className).toContain('border-border');
+  });
+
+  it('defaults to the Tier-S material and adds nothing that would override it', () => {
+    /**
+     * `.glass-surface` sits in Tailwind's `components` layer, so a utility on the
+     * same element wins and silently removes part of the material: `bg-*` drops
+     * the tint that IS the material, `shadow-*` replaces the whole box-shadow
+     * list — which carries the inset specular highlight that is the entire
+     * dark-mode treatment — and a `border-*` colour swaps the sanctioned
+     * translucent edge for an opaque one (1.60:1 → 1.53:1 light, 1.50:1 → 1.30:1
+     * dark). `surface="panel"` is the escape hatch; an override is not.
      */
     const { container } = render(<Card>x</Card>);
-    expect(container.firstElementChild!.className).toContain('border-border');
+    const cls = container.firstElementChild!.className;
+    expect(cls).toContain('glass-surface');
+    expect(cls).not.toMatch(/\bbg-/);
+    expect(cls).not.toMatch(/\bshadow-/);
+    expect(cls).not.toMatch(/\bborder-/);
   });
 
   it('places CardAction beside the title, not below the description', () => {
@@ -180,6 +207,23 @@ describe('Alert', () => {
     );
     // WCAG 1.4.1: the red wash is not the message.
     expect(screen.getByText('Rollout failed')).toBeTruthy();
+  });
+
+  it('takes the Tier-S material on neutral only, never under a *-soft wash', () => {
+    /**
+     * `bg-danger-soft` is a utility and `.glass-surface` is in the `components`
+     * layer, so a wash on the glass tier REPLACES the tint at alpha 0.10 and what
+     * survives is the glass border and shadow around a near-transparent panel.
+     * `toast.test.tsx` guards the same trap on Tier O. Here the surface axis is
+     * confined to `neutral` through a compound variant, and `surface="panel"` is
+     * the way back to an opaque neutral alert.
+     */
+    expect(alertVariants()).toContain('glass-surface');
+    expect(alertVariants({ surface: 'panel' })).not.toContain('glass-surface');
+    expect(alertVariants({ surface: 'panel' })).toContain('bg-panel');
+    for (const variant of ['info', 'success', 'warning', 'danger'] as const) {
+      expect(alertVariants({ variant, surface: 'glass' }), variant).not.toContain('glass-surface');
+    }
   });
 });
 
@@ -370,6 +414,21 @@ describe('Separator, Skeleton, Spinner', () => {
     /** Fourteen grey rectangles should not be enumerated; one live region announces. */
     const { container } = render(<Skeleton className="h-4 w-20" />);
     expect(container.firstElementChild!.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('Skeleton fills with a translucent scrim, never with a glass tier', () => {
+    /**
+     * A placeholder has to differ from whatever hosts it, and the Tier-S retrofit
+     * changed what hosts it. A glass Skeleton inside a glass Card would composite
+     * 2/255 off the card and vanish; the previous opaque `bg-bg2` measured 0/255
+     * inside a dark `--panel`, because `--bg2` IS `--panel` in dark mode.
+     * `--highlight` is a scrim, so it tracks its host: ≥10/255 on the page, on
+     * `--panel` and on `.glass-surface`, in both themes.
+     */
+    const { container } = render(<Skeleton className="h-4 w-20" />);
+    const cls = container.firstElementChild!.className;
+    expect(cls).toContain('bg-highlight');
+    expect(cls).not.toMatch(/glass/);
   });
 
   it('Spinner announces by default and can be silenced', () => {

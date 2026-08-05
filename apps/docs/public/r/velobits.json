@@ -2,12 +2,13 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "velobits",
   "title": "VeloBits",
-  "description": "The base style: tokens, the cn util, the provider stack and every Tier-1 primitive. Start here.",
+  "description": "The base style: tokens, the cn util, the provider stack, and every Tier-1 primitive, Tier-2 overlay and Tier-3 composite. Start here.",
   "dependencies": [
     "class-variance-authority",
     "clsx",
     "tailwind-merge",
     "radix-ui",
+    "cmdk",
     "framer-motion",
     "@velobits/icons"
   ],
@@ -38,7 +39,17 @@
     "spinner",
     "switch",
     "textarea",
-    "tooltip"
+    "tooltip",
+    "command-palette",
+    "dialog",
+    "dropdown-menu",
+    "popover",
+    "side-panel",
+    "toast",
+    "accordion",
+    "segmented-control",
+    "table",
+    "tabs"
   ],
   "files": [],
   "type": "registry:style"

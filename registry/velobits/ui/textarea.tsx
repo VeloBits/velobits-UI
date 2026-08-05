@@ -7,6 +7,17 @@ import { cn } from '../lib/cn';
  * observer, which is what the editor surfaces used to hand-roll. `min-h-16`
  * keeps it usable before the first keystroke, since a content-sized empty
  * textarea collapses to one line.
+ *
+ * ## Opaque `--panel`, deliberately, while Card and Alert are Tier-S glass
+ *
+ * Same call as `Input`, which documents the reasoning in full: a glass control
+ * inside a glass Card composites 2/255 off it and loses its well (the opaque fill
+ * sits 10/255 clear in light, 9/255 in dark), and `--field-border`'s WCAG 1.4.11
+ * margin stops being one gateable number per surface and becomes a function of
+ * the ancestor chain. A Textarea adds the sharpest version of the affordance
+ * argument: it is the largest editable region in the system, so it is where a
+ * translucent fill would put the most page content behind the most user-typed
+ * text.
  */
 function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
   return (

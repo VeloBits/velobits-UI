@@ -258,6 +258,106 @@
         "default": "./dist/tooltip.cjs"
       }
     },
+    "./command-palette": {
+      "import": {
+        "types": "./dist/command-palette.d.ts",
+        "default": "./dist/command-palette.js"
+      },
+      "require": {
+        "types": "./dist/command-palette.d.cts",
+        "default": "./dist/command-palette.cjs"
+      }
+    },
+    "./dialog": {
+      "import": {
+        "types": "./dist/dialog.d.ts",
+        "default": "./dist/dialog.js"
+      },
+      "require": {
+        "types": "./dist/dialog.d.cts",
+        "default": "./dist/dialog.cjs"
+      }
+    },
+    "./dropdown-menu": {
+      "import": {
+        "types": "./dist/dropdown-menu.d.ts",
+        "default": "./dist/dropdown-menu.js"
+      },
+      "require": {
+        "types": "./dist/dropdown-menu.d.cts",
+        "default": "./dist/dropdown-menu.cjs"
+      }
+    },
+    "./popover": {
+      "import": {
+        "types": "./dist/popover.d.ts",
+        "default": "./dist/popover.js"
+      },
+      "require": {
+        "types": "./dist/popover.d.cts",
+        "default": "./dist/popover.cjs"
+      }
+    },
+    "./side-panel": {
+      "import": {
+        "types": "./dist/side-panel.d.ts",
+        "default": "./dist/side-panel.js"
+      },
+      "require": {
+        "types": "./dist/side-panel.d.cts",
+        "default": "./dist/side-panel.cjs"
+      }
+    },
+    "./toast": {
+      "import": {
+        "types": "./dist/toast.d.ts",
+        "default": "./dist/toast.js"
+      },
+      "require": {
+        "types": "./dist/toast.d.cts",
+        "default": "./dist/toast.cjs"
+      }
+    },
+    "./accordion": {
+      "import": {
+        "types": "./dist/accordion.d.ts",
+        "default": "./dist/accordion.js"
+      },
+      "require": {
+        "types": "./dist/accordion.d.cts",
+        "default": "./dist/accordion.cjs"
+      }
+    },
+    "./segmented-control": {
+      "import": {
+        "types": "./dist/segmented-control.d.ts",
+        "default": "./dist/segmented-control.js"
+      },
+      "require": {
+        "types": "./dist/segmented-control.d.cts",
+        "default": "./dist/segmented-control.cjs"
+      }
+    },
+    "./table": {
+      "import": {
+        "types": "./dist/table.d.ts",
+        "default": "./dist/table.js"
+      },
+      "require": {
+        "types": "./dist/table.d.cts",
+        "default": "./dist/table.cjs"
+      }
+    },
+    "./tabs": {
+      "import": {
+        "types": "./dist/tabs.d.ts",
+        "default": "./dist/tabs.js"
+      },
+      "require": {
+        "types": "./dist/tabs.d.cts",
+        "default": "./dist/tabs.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -277,6 +377,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "radix-ui": "^1.6.7",
     "tailwind-merge": "^3.6.0"
   },
@@ -326,9 +427,25 @@
       ]
     },
     {
+      "name": "Dialog alone, our code only (the overlay tier's per-entry proof)",
+      "path": "dist/dialog.js",
+      "limit": "3 kB",
+      "ignore": [
+        "react",
+        "react-dom",
+        "framer-motion",
+        "@velobits/icons",
+        "@velobits/tokens",
+        "radix-ui",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
       "name": "the whole barrel, our code only",
       "path": "dist/index.js",
-      "limit": "6 kB",
+      "limit": "26 kB",
       "ignore": [
         "react",
         "react-dom",
@@ -344,7 +461,7 @@
     {
       "name": "the whole barrel, with every dependency (what a consumer pays)",
       "path": "dist/index.js",
-      "limit": "36 kB",
+      "limit": "64 kB",
       "ignore": [
         "react",
         "react-dom"
