@@ -1,24 +1,62 @@
 /*
- * The glass tier. Imported by theme.css into Tailwind's `components` layer, so
+ * The glass layer. Imported by theme.css into Tailwind's `components` layer, so
  * utilities still override it without `!important`.
  *
- * ALLOWED on: Dialog · Sheet/SidePanel · Popover · DropdownMenu ·
- *             CommandPalette · Toast · sticky TopBar/Navbar.
- *   Every one of those floats over page content, which is the only place a blur
- *   reads as glass.
+ * TWO TIERS. The component surfaces ARE glassmorphic; the page background is
+ * not, and stays exactly as it is.
  *
- * FORBIDDEN on: page/body backgrounds · table rows · anything inside a scroll
- *   container · nested glass · more than ~6 simultaneous instances.
- *   Page backgrounds are both the explicit product decision and where blur
- *   costs the most for the least effect — there is nothing behind them to see.
+ *   TIER O — `.glass` / `.glass-elevated`
+ *     Overlays: Dialog · Sheet/SidePanel · Popover · DropdownMenu ·
+ *     CommandPalette · Toast. The backdrop is arbitrary, so this tier is
+ *     measured against all seven worst-case backdrops in the palette and steps
+ *     muted text up to `--muted-on-glass`.
  *
- * Two behaviours that will look like bugs if you meet them cold:
+ *   TIER S — `.glass-surface` / `.glass-surface-blur`
+ *     Component surfaces: Card · Panel · Table shell · Sidebar · sticky TopBar.
+ *     The backdrop is KNOWN (it is the page), so the values are measured against
+ *     one thing and `--muted-fg` stays safe on it.
+ *
+ * FORBIDDEN on both: page/body backgrounds · nested glass. Page backgrounds are
+ *   both the explicit product decision and where blur costs the most for the
+ *   least effect — there is nothing behind them to see.
+ *
+ * ── WHY TIER S IS TINTED, AND WHY IT IS ASYMMETRIC ──────────────────────────
+ *
+ * Putting `.glass` on a Card is a NO-OP. Composited over the flat page, white
+ * at α 0.85 over cream #F4EDEA gives #FDFCFC — 3/255 from the opaque #FFFFFF
+ * panel — and blurring a uniform page returns that same uniform page. Dark is
+ * the same story: #2C2D2C at α 0.85 over #1A1B1A gives #292A29, also 3/255 off
+ * the panel. The blur buys a backdrop repaint and zero visual change.
+ *
+ * So Tier S is TINTED off both the page and the panel (10-11/255 in light,
+ * 9/255 in dark; gated in test/contrast.test.ts), and the two themes carry the
+ * material differently, because a white top-edge specular highlight at α 0.35
+ * measures 3.18:1 over the dark composite and 1.02:1 over the light one:
+ *
+ *   dark   the specular highlight is the material. Border 1.50:1, no shadow.
+ *   light  NO highlight. The material is the tint (#FFFAF7 → composite
+ *          #FDF8F5), a firmer 1.60:1 hairline — matching what `--border` shows
+ *          on `--panel`, where the tier-O border manages only 1.21:1 — and a
+ *          bottom-weighted shadow so the surface reads as raised off the cream.
+ *
+ * ── PERFORMANCE ─────────────────────────────────────────────────────────────
+ *
+ *   1. `backdrop-filter` is the expensive half, so `.glass-surface` DOES NOT USE
+ *      IT. That is what makes Tier S safe on a repeated component. Opt in with
+ *      `.glass-surface-blur` only where content genuinely scrolls behind —
+ *      a sticky bar, a sidebar over the scroll container.
+ *   2. Cap roughly 6 live blur layers per view; each is a backdrop snapshot.
+ *   3. Never nest glass. The inner surface blurs the outer's already-blurred
+ *      output: double the cost, and both read as mud.
+ *   4. Never animate the blur RADIUS — each frame forces a full backdrop
+ *      repaint. Animate opacity and transform.
+ *
+ * ── TWO BEHAVIOURS THAT WILL LOOK LIKE BUGS IF YOU MEET THEM COLD ───────────
+ *
  *   1. `backdrop-filter` establishes a containing block for `position: fixed`
- *      descendants. A fixed child of a glass surface is trapped inside it.
- *   2. It also forms a stacking context, so `z-index` inside a glass surface is
- *      scoped to it.
- * And one performance rule: never animate the blur RADIUS. Each frame forces a
- * full backdrop repaint. Animate opacity and transform.
+ *      descendants. A fixed child of a blurred surface is trapped inside it.
+ *   2. It also forms a stacking context, so `z-index` inside a blurred surface
+ *      is scoped to it.
  */
 
 .glass {
@@ -37,6 +75,8 @@
  * backdrop: --muted-fg measures 3.09:1 over the worst case, --muted-on-glass
  * holds 4.92:1. Scoped to descendants so a `text-muted-foreground` utility
  * inside a Dialog picks it up without every call site knowing.
+ *
+ * TIER O ONLY. `.glass-surface` deliberately does NOT do this — see below.
  */
 .glass {
   --muted-fg: var(--muted-on-glass);
@@ -54,21 +94,76 @@ body.dark .glass-elevated {
 }
 
 /*
+ * ── TIER S ──────────────────────────────────────────────────────────────────
+ *
+ * The component-surface material. Note what is NOT here: `backdrop-filter`.
+ * A Card is a repeated component, and the tint is what makes the material
+ * visible, not the blur.
+ *
+ * The specular highlight rides in the same `box-shadow` as the drop shadow, as
+ * an inset, rather than on a pseudo-element — it then follows `border-radius`
+ * for free and cannot collide with a component's own ::before. The cost of that
+ * choice: `--glass-surface-shadow` can never be `none`, because `none` inside a
+ * comma-separated shadow list invalidates the whole declaration. Dark mode
+ * spells its absent shadow `0 0 0 transparent` for exactly this reason.
+ */
+.glass-surface,
+.glass-surface-blur {
+  background: var(--glass-surface-bg);
+  border: 1px solid var(--glass-surface-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-surface-highlight),
+    var(--glass-surface-shadow);
+}
+
+/*
+ * DELIBERATELY ABSENT: `--muted-fg: var(--muted-on-glass)`.
+ *
+ * That override exists because a tier-O overlay floats over an unknown backdrop
+ * and --muted-fg sinks to 3.09:1 against the worst of them. Tier S has a known
+ * backdrop — the page — and --muted-fg measures 5.57:1 in light and 6.19:1 in
+ * dark on the composite. Stepping it up here would darken every secondary label
+ * in the product for no accessibility gain.
+ */
+
+/*
+ * Tier S with the blur, for the surfaces where content genuinely scrolls behind:
+ * sticky TopBar, Sidebar over the scroll container, a pinned table header. Each
+ * instance is a live backdrop snapshot — see the ~6-layer cap above, and note
+ * this is the class that brings the fixed-descendant and stacking-context
+ * behaviours with it.
+ */
+.glass-surface-blur {
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+}
+
+/*
  * Graceful degradation, in both directions.
  *
  * Without backdrop-filter support the translucent background alone reads as a
  * washed-out panel with page content bleeding through, so fall back to the
  * opaque surface rather than to "glass minus the blur".
+ *
+ * `.glass-surface` is included even though it never blurred: a sticky bar
+ * falling back to opaque while the cards beneath it stay translucent is a worse
+ * artefact than either state on its own. The tier degrades as one material.
+ * The border, shadow and specular highlight all survive — they are what make
+ * the fallback still read as a raised surface.
  */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass {
+  .glass,
+  .glass-surface,
+  .glass-surface-blur {
     background: var(--panel);
   }
 }
 
 /* A user preference, not a capability check — honour it even where blur works. */
 @media (prefers-reduced-transparency: reduce) {
-  .glass {
+  .glass,
+  .glass-surface,
+  .glass-surface-blur {
     background: var(--panel);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;

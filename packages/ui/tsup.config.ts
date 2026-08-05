@@ -5,7 +5,7 @@ const R = '../../registry/velobits';
 /**
  * Per-component entry points, so `import { Button } from '@velobits/ui/button'`
  * pulls in Button and nothing else. `size-limit` asserts that rather than
- * assuming it — a barrel-only build would quietly ship all 18 primitives to a
+ * assuming it — a barrel-only build would quietly ship all 28 components to a
  * consumer that imported one.
  *
  * The entries live OUTSIDE this package, in `registry/velobits/`, because that
@@ -73,6 +73,20 @@ const CLIENT = {
   switch: `${R}/ui/switch.tsx`,
   textarea: `${R}/ui/textarea.tsx`,
   tooltip: `${R}/ui/tooltip.tsx`,
+
+  /* Tier 2 — overlays. */
+  'command-palette': `${R}/ui/command-palette.tsx`,
+  dialog: `${R}/ui/dialog.tsx`,
+  'dropdown-menu': `${R}/ui/dropdown-menu.tsx`,
+  popover: `${R}/ui/popover.tsx`,
+  'side-panel': `${R}/ui/side-panel.tsx`,
+  toast: `${R}/ui/toast.tsx`,
+
+  /* Tier 3 — composites. */
+  accordion: `${R}/ui/accordion.tsx`,
+  'segmented-control': `${R}/ui/segmented-control.tsx`,
+  table: `${R}/ui/table.tsx`,
+  tabs: `${R}/ui/tabs.tsx`,
 };
 
 const shared: Options = {

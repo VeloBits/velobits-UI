@@ -19,9 +19,11 @@
  * `--border` and `--field-border` are OPAQUE, and that is deliberate. A
  * translucent border composites against whatever sits beneath it, so a single
  * token renders as several different colours — #2E2E2E over the page but
- * #343435 inside a card. The borders are supposed to *match*. `--glass-border`
- * is the one sanctioned exception, because a glass surface has no fixed
- * backdrop by definition.
+ * #343435 inside a card. The borders are supposed to *match*. The two glass
+ * borders are the sanctioned exceptions: `--glass-border` because an overlay
+ * has no fixed backdrop by definition, and `--glass-surface-border` because it
+ * has to track whatever its own translucent surface composites to — an opaque
+ * line would read as a hard seam the moment a glass surface moved off the page.
  */
 
 :root {
@@ -104,12 +106,31 @@
   --chart-4: #af7011;
   --chart-5: #368a8a;
 
-  /* ── glass (overlay tier only — see css/glass.css) ──────────────────────── */
+  /* ── glass, tier O: overlays only — see css/glass.css ───────────────────── */
   /* α 0.85. The measured floor for body text over the worst backdrop in the
    * palette is 0.72; the test suite fails if a tier drops below it. */
   --glass-bg: rgba(255, 255, 255, 0.85);
   --glass-blur: 16px;
   --glass-border: rgba(42, 43, 42, 0.1);
+
+  /* ── glass, tier S: component surfaces (Card, Panel, Sidebar, TopBar) ───── */
+  /* #FFFAF7 is oklch(0.99 0.0085 44.9) — neutral-50's own hue and chroma one
+   * notch further up the ramp's warm axis. It has to be TINTED: plain white at
+   * this alpha composites to #FDFCFC over the page, 3/255 from the opaque
+   * --panel, so the blur costs a repaint and changes nothing. This tint
+   * composites to #FDF8F5 — 11/255 off the page, 10/255 off the panel.
+   * fg 13.48:1, --muted-fg 5.57:1 (so NOT --muted-on-glass on this tier). */
+  --glass-surface-bg: rgba(255, 250, 247, 0.85);
+  /* 1.60:1 over that composite, matching what --border shows on --panel
+   * (1.61:1). In light mode the edge is most of the material — the tier-O
+   * border at α 0.10 measures only 1.21:1 here. */
+  --glass-surface-border: rgba(42, 43, 42, 0.24);
+  /* No specular highlight in light mode. The same white at α 0.35 measures
+   * 1.02:1 over the composite: you cannot lighten white. */
+  --glass-surface-highlight: transparent;
+  /* Bottom-weighted, so the surface reads as raised off the cream page rather
+   * than recessed into it. */
+  --glass-surface-shadow: 0 1px 2px rgba(42, 43, 42, 0.05), 0 8px 16px -6px rgba(42, 43, 42, 0.14);
 
   /* ── elevation: real shadows in light, borders in dark (ADR-0024) ───────── */
   --shadow-sm: 0 1px 2px rgba(42, 43, 42, 0.06);
@@ -177,6 +198,23 @@ body.dark {
   --glass-bg: rgba(26, 27, 26, 0.85);
   --glass-blur: 16px;
   --glass-border: rgba(242, 235, 232, 0.12);
+
+  /* Tier S, dark. #252625 is mix(neutral-900 → neutral-800, 0.6) — on the
+   * ramp's axis between the page and the panel, because that 18/255 gap is the
+   * entire budget dark mode has. Composites to #232423: 9/255 off the page and
+   * 9/255 off the panel, the balanced midpoint. fg 13.22:1, --muted-fg 6.19:1.
+   * The naive choice — --panel at α 0.85 — lands on #292A29, 3/255 from the
+   * opaque panel, i.e. an invisible material. */
+  --glass-surface-bg: rgba(37, 38, 37, 0.85);
+  --glass-surface-border: rgba(242, 235, 232, 0.14);
+  /* THE dark-mode material: a lit top edge at 3.18:1 over #232423. This is the
+   * half of the asymmetry that light mode cannot have. */
+  --glass-surface-highlight: rgba(255, 255, 255, 0.35);
+  /* Dark delineates with borders and the lit edge, not shadows (ADR-0024).
+   * NOT `none`: .glass-surface composes this into a box-shadow LIST with the
+   * highlight, and `none` inside a comma list invalidates the whole
+   * declaration — dark mode would silently lose its specular edge. */
+  --glass-surface-shadow: 0 0 0 transparent;
 
   /* Dark mode delineates with borders, not shadows (ADR-0024) — except the
    * glass tier, which floats over content and needs the separation. */
