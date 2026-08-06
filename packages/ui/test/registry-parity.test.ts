@@ -39,6 +39,21 @@ const exportSubpaths = Object.keys(pkg.exports)
   .filter((k) => k !== '.' && k !== './package.json')
   .map((k) => k.replace('./', ''));
 
+const barrel = readFileSync(join(uiDir, '../../registry/velobits/index.ts'), 'utf8');
+
+/** `registry/velobits/ui/form.tsx` → `ui/form`, which is how the barrel spells it. */
+function sourcePath(item: { files?: { path: string }[] }): string {
+  return item.files![0]!.path.replace('registry/velobits/', '').replace(/\.tsx?$/, '');
+}
+
+/**
+ * Components deliberately NOT re-exported from `registry/velobits/index.ts`,
+ * reachable only as a subpath. Each one costs a consumer an extra import line,
+ * so the bar for adding to this set is an optional peer dependency that would
+ * otherwise become mandatory for everyone. See the suite below.
+ */
+const BARREL_EXCLUDED = new Set(['form']);
+
 describe('registry ↔ tsup ↔ exports parity', () => {
   it('every buildable registry item has a tsup entry', () => {
     const missing = buildableItems.map((i) => i.name).filter((n) => !tsupEntries.includes(n));
@@ -81,12 +96,9 @@ describe('registry ↔ tsup ↔ exports parity', () => {
      * did not. Caught by the docs build rather than by a test, which is exactly
      * the gap this closes.
      */
-    const barrel = readFileSync(join(uiDir, '../../registry/velobits/index.ts'), 'utf8');
     const missing = buildableItems
-      .filter((item) => {
-        const path = item.files![0]!.path.replace('registry/velobits/', '').replace(/\.tsx?$/, '');
-        return !barrel.includes(`'./${path}'`);
-      })
+      .filter((item) => !BARREL_EXCLUDED.has(item.name))
+      .filter((item) => !barrel.includes(`'./${sourcePath(item)}'`))
       .map((i) => i.name);
     expect(
       missing,
@@ -94,6 +106,58 @@ describe('registry ↔ tsup ↔ exports parity', () => {
         `\`import { X } from '@velobits-dev/ui'\` fails while ` +
         `\`from '@velobits-dev/ui/x'\` works: ${missing.join(', ')}`,
     ).toEqual([]);
+  });
+
+  describe('the barrel exclusions are a decision, not an oversight', () => {
+    /**
+     * `Form` is the only component NOT re-exported from the barrel, because
+     * `react-hook-form` is an OPTIONAL peer dependency and the barrel is one
+     * bundled module: a re-export would put a top-level `import
+     * 'react-hook-form'` at the top of `dist/index.js`, and every app importing
+     * a Button from the barrel would fail to resolve a package it never
+     * installed. The marketing site is exactly that app.
+     *
+     * Asserted in both directions, because each half fails silently on its own.
+     * Adding the export back would break three consumers' builds; letting the
+     * subpath lapse would make the component unreachable entirely.
+     */
+    for (const name of BARREL_EXCLUDED) {
+      const item = buildableItems.find((i) => i.name === name)!;
+
+      it(`${name} is genuinely absent from the barrel`, () => {
+        expect(item, `${name} is in the exclusion list but not in the registry`).toBeDefined();
+        expect(
+          barrel.includes(`'./${sourcePath(item)}'`),
+          `${name} was re-exported from the barrel. If that is intended, the optional peer ` +
+            `dependency has to become a required one first — see the docblock in ` +
+            `registry/velobits/ui/${name}.tsx.`,
+        ).toBe(false);
+      });
+
+      it(`${name} is still reachable as its own subpath`, () => {
+        expect(
+          exportSubpaths,
+          `${name} is excluded from the barrel, so the subpath export is the ONLY way in.`,
+        ).toContain(name);
+        expect(tsupEntries).toContain(name);
+      });
+    }
+
+    it('declares the optional peer as optional, and never bundles it', () => {
+      const raw = JSON.parse(readFileSync(join(uiDir, 'package.json'), 'utf8')) as {
+        peerDependenciesMeta?: Record<string, { optional?: boolean }>;
+      };
+      expect(pkg.peerDependencies['react-hook-form']).toBeDefined();
+      expect(pkg.dependencies['react-hook-form']).toBeUndefined();
+      expect(raw.peerDependenciesMeta?.['react-hook-form']?.optional).toBe(true);
+      /**
+       * Bundling it would be the quieter failure of the two: our copy would have
+       * its own module state, so `useFormContext()` inside `FormField` would read
+       * a different context from the consumer's `useForm()` and every field would
+       * register against nothing.
+       */
+      expect(tsupSource).toMatch(/external:[\s\S]*'react-hook-form'/);
+    });
   });
 
   it('found a non-trivial number of entries, so the regex above still works', () => {

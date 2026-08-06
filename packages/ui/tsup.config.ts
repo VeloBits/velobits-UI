@@ -53,6 +53,7 @@ const CLIENT = {
 
   'use-theme': `${R}/hooks/use-theme.tsx`,
   'use-media-query': `${R}/hooks/use-media-query.ts`,
+  'use-row-selection': `${R}/hooks/use-row-selection.ts`,
   'velobits-provider': `${R}/providers/velobits-provider.tsx`,
 
   alert: `${R}/ui/alert.tsx`,
@@ -84,7 +85,16 @@ const CLIENT = {
 
   /* Tier 3 — composites. */
   accordion: `${R}/ui/accordion.tsx`,
+  'app-shell': `${R}/ui/app-shell.tsx`,
+  breadcrumb: `${R}/ui/breadcrumb.tsx`,
+  'code-block': `${R}/ui/code-block.tsx`,
+  'data-table': `${R}/ui/data-table.tsx`,
+  'diff-viewer': `${R}/ui/diff-viewer.tsx`,
+  'empty-state': `${R}/ui/empty-state.tsx`,
+  form: `${R}/ui/form.tsx`,
+  pagination: `${R}/ui/pagination.tsx`,
   'segmented-control': `${R}/ui/segmented-control.tsx`,
+  'status-chip': `${R}/ui/status-chip.tsx`,
   table: `${R}/ui/table.tsx`,
   tabs: `${R}/ui/tabs.tsx`,
 };
@@ -103,9 +113,25 @@ const shared: Options = {
    * `size-limit` holds the per-entry budgets that prove it.
    */
   splitting: false,
-  // Peers stay external so a consumer's copy is the only copy — also what makes
-  // the Module Federation singleton arrangement possible at all.
-  external: ['react', 'react-dom', 'framer-motion', '@velobits-dev/icons', '@velobits-dev/tokens'],
+  /*
+   * Peers stay external so a consumer's copy is the only copy — also what makes
+   * the Module Federation singleton arrangement possible at all.
+   *
+   * `react-hook-form` is here for a sharper version of the same reason. It is an
+   * OPTIONAL peer, used only by `form.tsx`; bundling it would give our copy its
+   * own module state, so `useFormContext()` inside `FormField` would read a
+   * different context from the consumer's `useForm()` and every field would
+   * register against nothing. Externalising it is also what makes the barrel
+   * exclusion work — see the docblock at the top of `registry/velobits/ui/form.tsx`.
+   */
+  external: [
+    'react',
+    'react-dom',
+    'framer-motion',
+    'react-hook-form',
+    '@velobits-dev/icons',
+    '@velobits-dev/tokens',
+  ],
   /*
    * Both configs run CONCURRENTLY, so neither may clean: whichever starts second
    * would wipe the other's finished output, non-deterministically. `npm run

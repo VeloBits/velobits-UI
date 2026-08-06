@@ -100,6 +100,18 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     only: 'light',
   },
 
+  /* ── the terminal surface ─────────────────────────────────────────────── */
+  {
+    label: 'on-code over a code fill',
+    fg: 'onCode',
+    bg: 'code',
+    target: 'text',
+    note:
+      'measured once and it holds for BOTH themes, because the pair is theme-invariant by ' +
+      'design — see semantic.ts. A revealed secret has to be transcribable, and this is the ' +
+      'only text in the product where a single wrong character is unrecoverable.',
+  },
+
   /* ── focus and control affordances (1.4.11) ───────────────────────────── */
   { label: 'focus ring vs page', fg: 'ring', bg: 'bg', target: 'nonText' },
   { label: 'focus ring vs panel', fg: 'ring', bg: 'panel', target: 'nonText' },
@@ -144,6 +156,7 @@ export const CONTRAST_EXEMPT: Readonly<Record<string, string>> = {
   bg2: 'a backdrop',
   panel: 'a backdrop',
   elevated: 'a backdrop',
+  code: 'a backdrop, measured as the `bg` side of the on-code pair',
   border:
     'decorative separators only (table rules, card outlines). WCAG 1.4.11 applies to visuals REQUIRED to identify a component — a divider is not one. Control edges use fieldBorder, which IS gated.',
   primaryHover:

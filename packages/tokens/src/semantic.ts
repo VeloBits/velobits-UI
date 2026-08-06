@@ -41,6 +41,21 @@ export interface SemanticTokens {
   brandSoft: string;
   /** Plum text accent (light) / plum elevated tint (dark). */
   accentText: string;
+  /**
+   * The terminal surface: a `CodeBlock` in its `terminal` variant, which is what
+   * a one-time secret is shown on.
+   *
+   * **Identical in both themes, deliberately.** Everything else in this object
+   * flips; this pair does not, and that is the point. A revealed API key is the
+   * one string in the product that must be transcribed *exactly*, and a surface
+   * that changes colour with the theme changes which characters are easiest to
+   * misread. Pinning it also makes the block unmistakably "not part of the page"
+   * in light mode, which is the visual cue that this content is different in
+   * kind.
+   */
+  code: string;
+  /** Text on a `code` fill — 12.95:1. */
+  onCode: string;
   /** Focus ring. */
   ring: string;
   /** Hover wash on an otherwise transparent control. */
@@ -92,6 +107,8 @@ export const light: SemanticTokens = {
   onBrand: seed.charcoal,
   brandSoft: 'rgba(200, 241, 53, 0.18)',
   accentText: plumSteps.text,
+  code: '#101828',
+  onCode: '#7DF3B1',
   ring: seed.blue,
   highlight: 'rgba(42, 43, 42, 0.05)',
   overlay: 'rgba(26, 27, 26, 0.45)',
@@ -139,6 +156,12 @@ export const dark: SemanticTokens = {
   // Lime IS a valid text accent in dark mode (13.24:1 on the page). In light
   // mode the same token as text measures 1.13:1 — hence the asymmetry.
   accentText: seed.lime,
+  // Same values as light — see the docblock on `code`. Restated rather than
+  // omitted: a token declared only for light inherits the light value into dark,
+  // which works by accident here and would stop working the day someone edits
+  // one half. The CSS parity test requires both blocks to declare it anyway.
+  code: '#101828',
+  onCode: '#7DF3B1',
   ring: blueSteps.ringDark,
   highlight: 'rgba(242, 235, 232, 0.06)',
   overlay: 'rgba(14, 15, 14, 0.60)',

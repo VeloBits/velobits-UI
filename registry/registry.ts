@@ -114,6 +114,14 @@ const hooks: RegistryItem[] = [
       'Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits-dev/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.',
     files: [{ path: 'registry/velobits/hooks/use-media-query.ts', type: 'registry:hook' }],
   },
+  {
+    name: 'use-row-selection',
+    type: 'registry:hook',
+    title: 'useRowSelection',
+    description:
+      'Row selection for DataTable. The selection is DERIVED — the stored set intersected with the rows on screen — so a bulk action can never point at a row the filter has hidden. Returns a stable object identity, which is what keeps DataTable’s memoised rows from re-rendering per keystroke.',
+    files: [{ path: 'registry/velobits/hooks/use-row-selection.ts', type: 'registry:hook' }],
+  },
 ];
 
 const providers: RegistryItem[] = [
@@ -367,6 +375,85 @@ const ui: RegistryItem[] = [
     files: [{ path: 'registry/velobits/ui/accordion.tsx', type: 'registry:ui' }],
   },
   {
+    name: 'app-shell',
+    type: 'registry:ui',
+    title: 'AppShell',
+    description:
+      'The authenticated chrome. `sidebar` is a prop rather than a child because it is rendered TWICE — as a rail at md and up, and inside a drawer below it — so a nav item cannot exist in one and not the other. Ships the skip link, which is the most-skipped WCAG requirement in an admin UI.',
+    dependencies: [RADIX, '@velobits-dev/icons', '@velobits-dev/tokens'],
+    registryDependencies: ['cn', 'use-media-query', 'button', 'side-panel', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/app-shell.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'breadcrumb',
+    type: 'registry:ui',
+    title: 'Breadcrumb',
+    description:
+      'A named nav landmark around an ordered list. The leaf is a plain span with aria-current="page" — NOT shadcn’s role="link" aria-disabled, which announces static text as a broken link.',
+    dependencies: [RADIX, '@velobits-dev/icons'],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/breadcrumb.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'code-block',
+    type: 'registry:ui',
+    title: 'CodeBlock',
+    description:
+      'Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on.',
+    dependencies: [CVA, '@velobits-dev/icons'],
+    registryDependencies: ['cn', 'button', 'velobits-theme'],
+    files: [{ path: 'registry/velobits/ui/code-block.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'data-table',
+    type: 'registry:ui',
+    title: 'DataTable',
+    description:
+      'Sorting, selection and row activation over a column registry — deliberately not TanStack, whose grouping and pivoting nothing here uses. aria-sort goes on the th, not the sort button, and an activatable row needs tabIndex + Enter/Space + a target check or it is mouse-only.',
+    dependencies: ['@velobits-dev/icons'],
+    registryDependencies: ['cn', 'table', 'use-row-selection'],
+    files: [{ path: 'registry/velobits/ui/data-table.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'diff-viewer',
+    type: 'registry:ui',
+    title: 'DiffViewer',
+    description:
+      'A unified line diff. The +/− gutter is the primary channel and the green/red wash the secondary — colour alone fails 1.4.1, and the gutter is also the only channel that survives greyscale. Ships `diffLines`, with a guard: LCS is O(n·m) in MEMORY.',
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/diff-viewer.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'empty-state',
+    type: 'registry:ui',
+    title: 'EmptyState',
+    description:
+      'First-run, filtered-to-nothing and failed-to-load are three different states; this covers the first two and an Alert covers the third. The title is a <p> unless headingLevel is set, because an empty state usually sits inside a container that already has the heading.',
+    dependencies: [CVA],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/empty-state.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'form',
+    type: 'registry:ui',
+    title: 'Form',
+    description:
+      'react-hook-form bound to Field’s ARIA wiring. label and description are PROPS, not children, because aria-describedby is assembled before children render — a description left out while its id is still listed is a dangling reference. NOT exported from the npm barrel: react-hook-form is an optional peer.',
+    dependencies: ['react-hook-form'],
+    registryDependencies: ['cn', 'field'],
+    files: [{ path: 'registry/velobits/ui/form.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'pagination',
+    type: 'registry:ui',
+    title: 'Pagination',
+    description:
+      'Numbers are links, previous/next are buttons: an <a> cannot express "unavailable" without ceasing to be focusable. Unavailability is aria-disabled plus a guard, so focus is not lost at the ends of the range. `paginationRange` returns a CONSTANT number of slots so the control never reflows as you page.',
+    dependencies: [RADIX, '@velobits-dev/icons'],
+    registryDependencies: ['cn', 'button'],
+    files: [{ path: 'registry/velobits/ui/pagination.tsx', type: 'registry:ui' }],
+  },
+  {
     name: 'segmented-control',
     type: 'registry:ui',
     title: 'SegmentedControl',
@@ -375,6 +462,16 @@ const ui: RegistryItem[] = [
     dependencies: [RADIX],
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/segmented-control.tsx', type: 'registry:ui' }],
+  },
+  {
+    name: 'status-chip',
+    type: 'registry:ui',
+    title: 'StatusChip',
+    description:
+      'On/off/partial/pending/archived as one chip. Every status ships a DISTINCT glyph, because colour alone fails 1.4.1 and on-versus-off is the distinction a control plane exists to make unambiguous. Composes Badge rather than re-deriving the soft-wash pairs.',
+    dependencies: [CVA, RADIX, '@velobits-dev/icons'],
+    registryDependencies: ['cn', 'badge'],
+    files: [{ path: 'registry/velobits/ui/status-chip.tsx', type: 'registry:ui' }],
   },
   {
     name: 'table',
@@ -443,7 +540,12 @@ const styles: RegistryItem[] = [
       RADIX,
       'cmdk',
       'framer-motion',
+      // Only `form` needs it, and only if you use `form`. Listed because this
+      // style installs every component, so the CLI must install it too — the npm
+      // half of the distribution treats it as an OPTIONAL peer instead.
+      'react-hook-form',
       '@velobits-dev/icons',
+      '@velobits-dev/tokens',
     ],
     devDependencies: ['tw-animate-css'],
     registryDependencies: [
@@ -452,6 +554,7 @@ const styles: RegistryItem[] = [
       'theme',
       'use-theme',
       'use-media-query',
+      'use-row-selection',
       'velobits-provider',
       ...ui.map((i) => i.name),
     ],

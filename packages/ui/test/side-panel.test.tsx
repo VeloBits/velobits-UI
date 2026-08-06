@@ -204,7 +204,7 @@ describe('SidePanel sides', () => {
 
   it('gives the bottom sheet a DEFINITE height in dvh, not a percentage', async () => {
     /**
-     * the editor app's the consumer ADR constraint. `h-[75%]` resolves against a
+     * the editor app's mobile-IA constraint. `h-[75%]` resolves against a
      * fixed-position containing block that is not always what you expect, and
      * `max-h` with an auto height leaves an inner `flex-1`/`min-h-0` scroll region
      * nothing to measure — the sheet then either collapses to its content or

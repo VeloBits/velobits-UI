@@ -82,6 +82,10 @@
   --color-primary-text: var(--primary-text);
   --color-accent-text: var(--accent-text);
   --color-muted-on-glass: var(--muted-on-glass);
+  /* The terminal surface. `bg-code` / `text-on-code`, following the same
+   * fill/on-fill convention as `--brand`/`--on-brand`. */
+  --color-code: var(--code);
+  --color-on-code: var(--on-code);
 
   /* ── status ────────────────────────────────────────────────────────────── */
   --color-success: var(--success);

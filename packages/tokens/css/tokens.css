@@ -81,6 +81,12 @@
    * text-safe (13.24:1) and plum is not (1.23:1 on charcoal). */
   --accent-text: #582840;
 
+  /* The terminal surface — a CodeBlock in its `terminal` variant, which is what
+   * a one-time secret is revealed on. 12.95:1. THEME-INVARIANT: the dark block
+   * restates the identical pair, deliberately. See semantic.ts. */
+  --code: #101828;
+  --on-code: #7df3b1;
+
   --ring: #007acc;
   --highlight: rgba(42, 43, 42, 0.05);
   --overlay: rgba(26, 27, 26, 0.45);
@@ -174,6 +180,10 @@ body.dark {
   /* Lime IS a text accent here — 13.24:1 on the page. This is the asymmetry
    * that makes --accent-text a token rather than a hardcoded plum. */
   --accent-text: #c8f135;
+
+  /* Identical to light, and restated rather than inherited — see semantic.ts. */
+  --code: #101828;
+  --on-code: #7df3b1;
 
   --ring: #3094e8;
   --highlight: rgba(242, 235, 232, 0.06);

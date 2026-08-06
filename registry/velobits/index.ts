@@ -9,6 +9,21 @@
  * Per-component entry points are generated from `registry.json` at build time,
  * so `import { Button } from '@velobits-dev/ui/button'` also works and is what
  * `size-limit` measures.
+ *
+ * ## The one deliberate omission
+ *
+ * **`Form` is not re-exported here.** It is reachable only as
+ * `@velobits-dev/ui/form`.
+ *
+ * `react-hook-form` is an optional peer dependency, and this barrel is a single
+ * bundled module — so re-exporting `Form` would put a top-level
+ * `import 'react-hook-form'` at the top of `dist/index.js`, and every app that
+ * imports a Button from the barrel would fail to resolve a package it never
+ * installed and has no forms in.
+ *
+ * `packages/ui/test/registry-parity.test.ts` asserts this exception by name, in
+ * both directions: `Form` must be absent from the barrel AND present as a
+ * subpath export. Every other buildable item must be here.
  */
 
 /* ── Tier 0 — foundation ──────────────────────────────────────────────────── */
@@ -32,6 +47,7 @@ export {
   type ThemeProviderProps,
 } from './hooks/use-theme';
 export { useMediaQuery, usePrefersReducedMotion } from './hooks/use-media-query';
+export { useRowSelection, type RowSelection } from './hooks/use-row-selection';
 export { VelobitsProvider, type VelobitsProviderProps } from './providers/velobits-provider';
 
 /* ── Tier 1 — primitives ──────────────────────────────────────────────────── */
@@ -162,10 +178,58 @@ export {
   type AccordionTriggerProps,
 } from './ui/accordion';
 export {
+  AppShell,
+  AppShellHeader,
+  AppShellSidebarTrigger,
+  useAppShell,
+  type AppShellHeaderProps,
+  type AppShellProps,
+} from './ui/app-shell';
+export {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  type BreadcrumbLinkProps,
+} from './ui/breadcrumb';
+export { CodeBlock, codeBlockVariants, type CodeBlockProps } from './ui/code-block';
+export {
+  DataTable,
+  nextSort,
+  type DataTableColumn,
+  type DataTableProps,
+  type SortState,
+} from './ui/data-table';
+export {
+  DiffViewer,
+  diffLines,
+  type DiffKind,
+  type DiffLine,
+  type DiffViewerProps,
+} from './ui/diff-viewer';
+export { EmptyState, emptyStateVariants, type EmptyStateProps } from './ui/empty-state';
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  paginationRange,
+  type PaginationLinkProps,
+  type PaginationRangeOptions,
+  type PaginationStepProps,
+} from './ui/pagination';
+export {
   SegmentedControl,
   type SegmentOption,
   type SegmentedControlProps,
 } from './ui/segmented-control';
+export { STATUS_ORDER, StatusChip, type Status, type StatusChipProps } from './ui/status-chip';
 export {
   Table,
   TableBody,
