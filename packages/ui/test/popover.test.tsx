@@ -111,7 +111,7 @@ describe('Popover', () => {
   it('renders the hand-rolled Header/Title/Description trio as div/h2/p', async () => {
     /**
      * Radix Popover has no `Title` or `Description` parts to wire — it is not a
-     * labelled region — so these are ours. ToggleFlow's copy typed `PopoverTitle`
+     * labelled region — so these are ours. the dashboard app's copy typed `PopoverTitle`
      * as `'h2'` props while rendering a `div`, which left the heading invisible to
      * a screen reader's heading list. Kept at the same names and `data-slot`s so
      * its call sites migrate without edits.
@@ -131,7 +131,7 @@ describe('Popover naming', () => {
      * Radix Popover's content is a `role="dialog"` with no `Title` part, so unlike
      * Radix Dialog it never sets `aria-labelledby` — the panel is announced as bare
      * "dialog" and the heading is only found once the user is already inside it.
-     * axe reports it as `aria-dialog-name`; ToggleFlow's copy ships it today.
+     * axe reports it as `aria-dialog-name`; the dashboard app's copy ships it today.
      */
     render(<FilterPopover />);
     const panel = await open();

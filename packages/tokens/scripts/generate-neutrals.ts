@@ -1,5 +1,5 @@
 /**
- * Generates `src/generated/neutrals.ts`. Run with `npm run generate -w @velobits/tokens`.
+ * Generates `src/generated/neutrals.ts`. Run with `npm run generate -w @velobits-dev/tokens`.
  *
  * ## The rule
  *
@@ -22,11 +22,11 @@
  *
  * 2. **`750` exists for one job:** the dark-mode `--border`. It has to sit
  *    *above* `--panel` (`neutral-800`) to be visible at all. The value the
- *    plan's illustrative CSS carried over from ToggleFlow (`#2E2E2E`) was tuned
- *    against that app's darker `#252526` panel; against this palette's lighter
- *    `#2C2D2C` it lands at 1.02:1, i.e. invisible. `750` measures 1.15:1
- *    against the panel — a real but quiet edge, which is what a table rule
- *    wants.
+ *    plan's illustrative CSS carried over from the dashboard app (`#2E2E2E`)
+ *    was tuned against that app's darker `#252526` panel; against this
+ *    palette's lighter `#2C2D2C` it lands at 1.02:1, i.e. invisible. `750`
+ *    measures 1.15:1 against the panel — a real but quiet edge, which is what a
+ *    table rule wants.
  *
  * Luminance is asserted monotonic and every hex asserted round-trip-stable by
  * `test/neutrals.test.ts`, so a bad hand-edit fails CI rather than shipping.
@@ -60,7 +60,7 @@ const rows = Object.entries(LADDER).map(([step, oklch]) => {
 
 const banner = `/**
  * GENERATED FILE — do not edit.
- * Regenerate with: npm run generate -w @velobits/tokens
+ * Regenerate with: npm run generate -w @velobits-dev/tokens
  * Source of truth: scripts/generate-neutrals.ts
  *
  * Warm neutral ramp: cream's hue held at the light end, chroma decaying toward

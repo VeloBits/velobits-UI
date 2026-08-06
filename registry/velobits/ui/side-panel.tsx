@@ -3,7 +3,7 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 
-import { XIcon } from '@velobits/icons';
+import { XIcon } from '@velobits-dev/icons';
 
 import { cn } from '../lib/cn';
 
@@ -13,7 +13,7 @@ import { cn } from '../lib/cn';
  * the ARIA wiring and the scroll lock — and deliberately NOT the same component
  * as `Dialog`.
  *
- * ## Why this is not just `<Dialog side="right">` (ADR-0032)
+ * ## Why this is not just `<Dialog side="right">`
  *
  * The two differ in the one behaviour that is hardest to bolt on afterwards:
  * **initial focus**.
@@ -27,7 +27,7 @@ import { cn } from '../lib/cn';
  *    mobile keyboard, and starts a screen-reader user in the middle of the
  *    content instead of at its heading.
  *
- * ADR-0032 split them for exactly that reason. **Do not merge them back** into
+ * They are two components for exactly that reason. **Do not merge them back** into
  * one component with a `side` variant: the merged version has to choose one
  * focus policy, and either choice breaks half the call sites. There is
  * intentionally no `focusFirstField` prop here, and the suite asserts its
@@ -67,8 +67,8 @@ function SidePanelClose({ ...props }: React.ComponentProps<typeof DialogPrimitiv
  *
  * Two reasons, both structural: the shadcn CLI copies each registry item as a
  * standalone file, so a cross-import would make every `side-panel` install drag
- * `dialog` in behind it — and ADR-0032's split is easier to keep honest when the
- * two files share no code to drift through.
+ * `dialog` in behind it — and keeping the two components separate is easier to
+ * keep honest when the two files share no code to drift through.
  */
 function SidePanelOverlay({
   className,
@@ -150,13 +150,14 @@ const sidePanelContentVariants = cva(
           'data-[state=open]:slide-in-from-start data-[state=closed]:slide-out-to-start',
         ],
         /**
-         * A DEFINITE height, per FixMyText's ADR-0017. `h-[75%]` resolves against
-         * a fixed-position containing block whose height is not always what you
-         * expect, and `max-h` with `h-auto` leaves an inner `flex-1`/`min-h-0`
-         * scroll region with nothing to measure — the sheet then either collapses
-         * to its content or refuses to scroll. `dvh` also tracks mobile browser
-         * chrome, which `vh` does not: with `vh` the bottom of the sheet sits
-         * under the URL bar on iOS.
+         * A DEFINITE height, per the rule the editor app settled on the hard way:
+         * a scroll region needs an ancestor chain whose height actually resolves.
+         * `h-[75%]` resolves against a fixed-position containing block whose
+         * height is not always what you expect, and `max-h` with `h-auto` leaves
+         * an inner `flex-1`/`min-h-0` scroll region with nothing to measure — the
+         * sheet then either collapses to its content or refuses to scroll. `dvh`
+         * also tracks mobile browser chrome, which `vh` does not: with `vh` the
+         * bottom of the sheet sits under the URL bar on iOS.
          */
         bottom: [
           'inset-x-0 bottom-0 h-[75dvh] rounded-t-xl',
@@ -200,7 +201,7 @@ function SidePanelContent({
         {/*
          * FIRST in the DOM, painted in the corner. It is therefore the first
          * tabbable node and what Radix focuses on open — which for a reading
-         * sheet is the whole intent (ADR-0032). Move it after `children` and
+         * sheet is the whole intent. Move it after `children` and
          * initial focus silently becomes "whatever the caller put first", which
          * for a detail panel containing an inline editor is a field.
          */}

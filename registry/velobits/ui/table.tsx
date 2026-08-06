@@ -30,7 +30,7 @@ export interface TableProps extends React.ComponentProps<'table'> {
  * fixed` descendants (so a fixed-position child of a cell is trapped in the row).
  *
  * The wrapper is also a **scroll container** (`overflow-x-auto`), and glass is
- * forbidden inside a scroll container by `@velobits/tokens/glass.css` for the
+ * forbidden inside a scroll container by `@velobits-dev/tokens/glass.css` for the
  * same repaint reason — so if this table sits *inside* a glass Dialog, the glass
  * stops at the Dialog panel.
  *
@@ -104,9 +104,9 @@ function TableFooter({ className, ...props }: React.ComponentProps<'tfoot'>) {
  * than `transition-all` keeps it that way even if a caller adds a layout utility
  * through `className`.
  *
- * `has-aria-expanded:` matches ToggleFlow's behaviour of keeping a row washed
- * while the detail panel it opened is on screen, so the row you are reading about
- * stays findable.
+ * `has-aria-expanded:` matches the dashboard app's behaviour of keeping a row
+ * washed while the detail panel it opened is on screen, so the row you are reading
+ * about stays findable.
  */
 function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
   return (

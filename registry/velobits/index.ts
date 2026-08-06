@@ -1,5 +1,5 @@
 /**
- * The barrel `@velobits/ui` publishes.
+ * The barrel `@velobits-dev/ui` publishes.
  *
  * This file exists for the npm half of the dual distribution only. Consumers
  * using the shadcn CLI never see it — they get individual component files copied
@@ -7,7 +7,7 @@
  * relative path rather than from this barrel.
  *
  * Per-component entry points are generated from `registry.json` at build time,
- * so `import { Button } from '@velobits/ui/button'` also works and is what
+ * so `import { Button } from '@velobits-dev/ui/button'` also works and is what
  * `size-limit` measures.
  */
 

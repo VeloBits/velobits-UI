@@ -72,7 +72,7 @@ export const zIndex = {
 } as const;
 
 /**
- * Light mode uses real shadows; dark mode uses 1px borders instead (ADR-0024),
+ * Light mode uses real shadows; dark mode delineates with 1px borders instead,
  * with `overlay` carved out for the glass tier — a floating surface needs
  * separation from the page in both themes.
  */
@@ -84,7 +84,7 @@ export const shadow = {
   none: 'none',
 } as const;
 
-/** Aligns with `TOGGLEFLOW_UX_DESIGN.md` §5's "120-180ms ease-out". */
+/** Aligns with the dashboard app's motion spec: "120-180ms ease-out". */
 export const duration = {
   micro: '120ms',
   enter: '180ms',
@@ -103,9 +103,9 @@ export const easing = {
 export const container = { page: '72rem' } as const;
 
 /**
- * Kept in sync with the `editor.css` media query in FixMyText by ADR-0017 —
- * `useMediaQuery('(max-width: 768px)')` and the CSS breakpoint must agree or
- * the two-surface mobile IA desynchronises mid-resize.
+ * Kept in sync with the `editor.css` media query in the editor app: the rule is
+ * that `useMediaQuery('(max-width: 768px)')` and the CSS breakpoint must agree,
+ * or the two-surface mobile IA desynchronises mid-resize.
  */
 export const breakpoint = {
   sm: '640px',

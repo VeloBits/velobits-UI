@@ -197,7 +197,7 @@ export const glass = {
     border: 'rgba(242, 235, 232, 0.14)',
     // 3.18:1 over #232423. THE dark-mode material.
     highlight: 'rgba(255, 255, 255, 0.35)',
-    // Dark delineates with borders and the lit edge, not shadows (ADR-0024).
+    // Dark delineates with borders and the lit edge, not shadows.
     // Not `none` — see {@link GlassSurfaceTier.shadow}.
     shadow: '0 0 0 transparent',
   },

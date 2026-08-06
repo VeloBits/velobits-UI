@@ -274,7 +274,7 @@ describe('glass CSS agrees with glass.ts', () => {
 describe('the dark selector list covers both toggle conventions', () => {
   it('matches body.dark (apps) AND bare .dark (Keycloak html.dark)', () => {
     /**
-     * FixMyText and ToggleFlow toggle `body.dark`; the Keycloak login theme
+     * the editor app and the dashboard app toggle `body.dark`; the Keycloak login theme
      * toggles `html.dark`. Dropping either half silently breaks dark mode for
      * one of the four surfaces.
      */
@@ -288,7 +288,7 @@ describe('the dark selector list covers both toggle conventions', () => {
 
   it('the base border reset uses --border, NOT --color-border', () => {
     /**
-     * ADR-0031 trap 1, and the single most expensive mistake in this file. A
+     * trap 1, and the single most expensive mistake in this file. A
      * `@theme` variable is emitted as a real `:root` declaration, so
      * `var(--color-border)` resolves against `:root` — the light value — and
      * then inherits everywhere, so `body.dark` never reaches it.

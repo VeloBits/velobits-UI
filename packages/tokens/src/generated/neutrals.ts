@@ -1,6 +1,6 @@
 /**
  * GENERATED FILE — do not edit.
- * Regenerate with: npm run generate -w @velobits/tokens
+ * Regenerate with: npm run generate -w @velobits-dev/tokens
  * Source of truth: scripts/generate-neutrals.ts
  *
  * Warm neutral ramp: cream's hue held at the light end, chroma decaying toward

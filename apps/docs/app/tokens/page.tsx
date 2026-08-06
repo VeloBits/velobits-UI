@@ -6,8 +6,8 @@ import {
   round2,
   seed,
   type SemanticTokens,
-} from '@velobits/tokens';
-import { Badge } from '@velobits/ui';
+} from '@velobits-dev/tokens';
+import { Badge } from '@velobits-dev/ui';
 
 export const metadata = { title: 'Tokens — VeloBits UI' };
 
@@ -53,7 +53,7 @@ export default function TokensPage() {
       <section>
         <h1 className="mt-8 mb-2 text-3xl font-semibold tracking-tight">Tokens</h1>
         <p className="text-muted-foreground">
-          Every value below is read from <code>@velobits/tokens</code> at build time. Nothing on
+          Every value below is read from <code>@velobits-dev/tokens</code> at build time. Nothing on
           this page is transcribed.
         </p>
       </section>

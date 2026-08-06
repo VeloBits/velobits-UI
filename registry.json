@@ -15,7 +15,7 @@
         "radix-ui",
         "cmdk",
         "framer-motion",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "devDependencies": [
         "tw-animate-css"
@@ -62,7 +62,7 @@
       "name": "velobits-theme",
       "type": "registry:theme",
       "title": "VeloBits theme",
-      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits/tokens test suite.",
+      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits-dev/tokens test suite.",
       "cssVars": {
         "theme": {
           "radius-sm": "4px",
@@ -157,7 +157,7 @@
       "name": "cn",
       "type": "registry:lib",
       "title": "cn",
-      "description": "Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — ToggleFlow points components.json `utils` at it.",
+      "description": "Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — the dashboard app points components.json `utils` at it.",
       "dependencies": [
         "clsx",
         "tailwind-merge"
@@ -200,7 +200,7 @@
       "name": "use-media-query",
       "type": "registry:hook",
       "title": "useMediaQuery",
-      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits/tokens — ADR-0017.",
+      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits-dev/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.",
       "files": [
         {
           "path": "registry/velobits/hooks/use-media-query.ts",
@@ -324,7 +324,7 @@
       "description": "Includes the indeterminate state bulk-selection headers need.",
       "dependencies": [
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn"
@@ -535,7 +535,7 @@
       "dependencies": [
         "cmdk",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -552,11 +552,11 @@
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
-      "description": "The centred form modal. `focusFirstField` exists because autoFocus is silently swallowed by Radix FocusScope — ADR-0031.",
+      "description": "The centred form modal. `focusFirstField` exists because autoFocus is silently swallowed by Radix FocusScope.",
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -576,7 +576,7 @@
       "description": "Highlight is data-[highlighted], never :hover — Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.",
       "dependencies": [
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -612,11 +612,11 @@
       "name": "side-panel",
       "type": "registry:ui",
       "title": "SidePanel",
-      "description": "The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — ADR-0032. The bottom variant needs a definite 75dvh.",
+      "description": "The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — the two focus policies are opposites, so do not merge them behind a `side` variant. The bottom variant needs a definite 75dvh.",
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -637,7 +637,7 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -657,7 +657,7 @@
       "description": "The one sanctioned height animation: Radix measures --radix-accordion-content-height, so it does not thrash layout the way an unbounded height:auto transition would.",
       "dependencies": [
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn"

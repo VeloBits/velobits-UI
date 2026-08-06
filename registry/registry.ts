@@ -4,28 +4,28 @@
  *
  * Same arrangement as shadcn/ui itself (`apps/v4/registry/*.ts` → `registry.json`),
  * and for the same reason: the theme item's `cssVars` are DERIVED from
- * `@velobits/tokens` here rather than typed twice. A palette change flows into
+ * `@velobits-dev/tokens` here rather than typed twice. A palette change flows into
  * the registry on the next build, and `test/registry.test.ts` fails if
  * `registry.json` is stale.
  *
  * ## The two halves of the distribution
  *
- * Every path below is also a tsup entry point for `@velobits/ui` (generated from
+ * Every path below is also a tsup entry point for `@velobits-dev/ui` (generated from
  * this same list), so a component is authored once and shipped both ways:
  *
- *   npm      import { Button } from '@velobits/ui'
+ *   npm      import { Button } from '@velobits-dev/ui'
  *   shadcn   npx shadcn@latest add https://ui.velobits.dev/r/button.json
  *
  * Which one a consumer should use is not a matter of taste:
- *   - FixMyText MUST use npm. Module Federation needs `@velobits/ui` to be a
- *     real singleton package so the shell's TooltipProvider context reaches
+ *   - The editor app MUST use npm. Module Federation needs `@velobits-dev/ui` to
+ *     be a real singleton package so the shell's TooltipProvider context reaches
  *     into each remote; copied files cannot be shared across remote boundaries.
  *   - The Keycloak login theme MUST use neither for components — it takes
- *     tokens only, via `@velobits/tokens/keycloakify.css`.
+ *     tokens only, via `@velobits-dev/tokens/keycloakify.css`.
  *   - Greenfield apps and one-off surfaces are better served by the CLI, where
  *     owning the source beats carrying a dependency.
  */
-import { dark, light } from '@velobits/tokens';
+import { dark, light } from '@velobits-dev/tokens';
 
 export type RegistryItemType =
   'registry:style' | 'registry:theme' | 'registry:ui' | 'registry:lib' | 'registry:hook';
@@ -83,7 +83,7 @@ const lib: RegistryItem[] = [
     type: 'registry:lib',
     title: 'cn',
     description:
-      'Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — ToggleFlow points components.json `utils` at it.',
+      'Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — the dashboard app points components.json `utils` at it.',
     dependencies: ['clsx', 'tailwind-merge'],
     files: [{ path: 'registry/velobits/lib/cn.ts', type: 'registry:lib' }],
   },
@@ -111,7 +111,7 @@ const hooks: RegistryItem[] = [
     type: 'registry:hook',
     title: 'useMediaQuery',
     description:
-      'Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits/tokens — ADR-0017.',
+      'Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits-dev/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.',
     files: [{ path: 'registry/velobits/hooks/use-media-query.ts', type: 'registry:hook' }],
   },
 ];
@@ -183,7 +183,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Checkbox',
     description: 'Includes the indeterminate state bulk-selection headers need.',
-    dependencies: [RADIX, '@velobits/icons'],
+    dependencies: [RADIX, '@velobits-dev/icons'],
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/checkbox.tsx', type: 'registry:ui' }],
   },
@@ -300,7 +300,7 @@ const ui: RegistryItem[] = [
     title: 'CommandPalette',
     description:
       'cmdk inside a Radix Dialog. The ⌘K listener is opt-in via `shortcut` — a design system must not bind a global key by merely being imported.',
-    dependencies: ['cmdk', RADIX, '@velobits/icons'],
+    dependencies: ['cmdk', RADIX, '@velobits-dev/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/command-palette.tsx', type: 'registry:ui' }],
   },
@@ -309,8 +309,8 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Dialog',
     description:
-      'The centred form modal. `focusFirstField` exists because autoFocus is silently swallowed by Radix FocusScope — ADR-0031.',
-    dependencies: [CVA, RADIX, '@velobits/icons'],
+      'The centred form modal. `focusFirstField` exists because autoFocus is silently swallowed by Radix FocusScope.',
+    dependencies: [CVA, RADIX, '@velobits-dev/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/dialog.tsx', type: 'registry:ui' }],
   },
@@ -320,7 +320,7 @@ const ui: RegistryItem[] = [
     title: 'DropdownMenu',
     description:
       'Highlight is data-[highlighted], never :hover — Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.',
-    dependencies: [RADIX, '@velobits/icons'],
+    dependencies: [RADIX, '@velobits-dev/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/dropdown-menu.tsx', type: 'registry:ui' }],
   },
@@ -339,8 +339,8 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'SidePanel',
     description:
-      'The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — ADR-0032. The bottom variant needs a definite 75dvh.',
-    dependencies: [CVA, RADIX, '@velobits/icons'],
+      'The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — the two focus policies are opposites, so do not merge them behind a `side` variant. The bottom variant needs a definite 75dvh.',
+    dependencies: [CVA, RADIX, '@velobits-dev/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/side-panel.tsx', type: 'registry:ui' }],
   },
@@ -350,7 +350,7 @@ const ui: RegistryItem[] = [
     title: 'Toast',
     description:
       'Variants use a logical border stripe, not a soft wash: bg-*-soft is a utility and beats --glass-bg from the components layer, flattening the tier.',
-    dependencies: [CVA, RADIX, '@velobits/icons'],
+    dependencies: [CVA, RADIX, '@velobits-dev/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/toast.tsx', type: 'registry:ui' }],
   },
@@ -362,7 +362,7 @@ const ui: RegistryItem[] = [
     title: 'Accordion',
     description:
       'The one sanctioned height animation: Radix measures --radix-accordion-content-height, so it does not thrash layout the way an unbounded height:auto transition would.',
-    dependencies: [RADIX, '@velobits/icons'],
+    dependencies: [RADIX, '@velobits-dev/icons'],
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/accordion.tsx', type: 'registry:ui' }],
   },
@@ -403,7 +403,7 @@ const themes: RegistryItem[] = [
     type: 'registry:theme',
     title: 'VeloBits theme',
     description:
-      'The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits/tokens test suite.',
+      'The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits-dev/tokens test suite.',
     cssVars: {
       // Static scales. `@theme` in a consumer's CSS, so these become utilities.
       theme: {
@@ -443,7 +443,7 @@ const styles: RegistryItem[] = [
       RADIX,
       'cmdk',
       'framer-motion',
-      '@velobits/icons',
+      '@velobits-dev/icons',
     ],
     devDependencies: ['tw-animate-css'],
     registryDependencies: [

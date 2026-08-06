@@ -1,12 +1,12 @@
 /*
- * @velobits/tokens/theme.css — THE single Tailwind entry every VeloBits app
+ * @velobits-dev/tokens/theme.css — THE single Tailwind entry every VeloBits app
  * imports. One line in your app CSS:
  *
- *   @import '@velobits/tokens/theme.css';
- *   @source "../node_modules/@velobits/ui/dist";   ← see note at the bottom
+ *   @import '@velobits-dev/tokens/theme.css';
+ *   @source "../node_modules/@velobits-dev/ui/dist";   ← see note at the bottom
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * FOUR TRAPS INHERITED FROM ADR-0031. Do not rediscover these.
+ * FOUR TRAPS, ALREADY PAID FOR IN DEBUGGING TIME. Do not rediscover these.
  *
  * 1. The base border reset must say `var(--border)`, NEVER `var(--color-border)`.
  *    A `@theme` variable is emitted as a real `:root` declaration, so
@@ -32,12 +32,12 @@
 @import './glass.css' layer(components);
 
 /* Tailwind v4's replacement for tailwindcss-animate: the enter/exit keyframes
- * Radix-backed portals animate with. Already a ToggleFlow dependency. */
+ * Radix-backed portals animate with. Already a dashboard-app dependency. */
 @import 'tw-animate-css';
 
 /*
  * Matches `.dark` on the element ITSELF plus its descendants. Both halves
- * matter: FixMyText and the ToggleFlow dashboard toggle `body.dark`, the
+ * matter: the editor app and the dashboard app toggle `body.dark`, the
  * Keycloak login theme toggles `html.dark`. The KC theme's current
  * `&:is(.dark *)` misses the element itself, which is why its own root-level
  * dark styles never applied.
@@ -303,9 +303,9 @@
  * ── CONSUMERS: THE @source LINE IS NOT OPTIONAL ──────────────────────────────
  *
  * Tailwind v4 does not scan node_modules, so utilities used INSIDE
- * @velobits/ui are never generated. Each consuming app must add:
+ * @velobits-dev/ui are never generated. Each consuming app must add:
  *
- *   @source "../node_modules/@velobits/ui/dist";
+ *   @source "../node_modules/@velobits-dev/ui/dist";
  *
  * (adjust the depth for your workspace layout). `cva` class strings survive
  * into `dist` as string literals, which is what makes this work. Without it the

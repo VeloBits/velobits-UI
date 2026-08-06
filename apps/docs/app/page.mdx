@@ -1,7 +1,7 @@
 # VeloBits UI
 
 One token and component layer for every VeloBits surface — the marketing site,
-FixMyText, the ToggleFlow dashboard, and the shared Keycloak login theme.
+the editor app, the the dashboard app dashboard, and the shared Keycloak login theme.
 
 Before this existed, those four had grown **four token vocabularies on the same
 Tailwind v4 foundation**, and ~19 icons were byte-identical across two repos.
@@ -13,20 +13,20 @@ Two distributions, one source. Which you want is not a matter of taste:
 ### npm — for federated and token-only consumers
 
 ```bash
-npm i @velobits/tokens @velobits/icons @velobits/ui
+npm i @velobits-dev/tokens @velobits-dev/icons @velobits-dev/ui
 ```
 
 ```css
 /* your app's CSS — one import */
-@import '@velobits/tokens/theme.css';
-@source "../node_modules/@velobits/ui/dist";
+@import '@velobits-dev/tokens/theme.css';
+@source "../node_modules/@velobits-dev/ui/dist";
 ```
 
 That `@source` line is **not optional**. Tailwind v4 does not scan
-`node_modules`, so utilities used inside `@velobits/ui` are never generated and
+`node_modules`, so utilities used inside `@velobits-dev/ui` are never generated and
 the components arrive unstyled with no warning anywhere.
 
-**FixMyText must use npm.** Module Federation needs `@velobits/ui` to be a real
+**the editor app must use npm.** Module Federation needs `@velobits-dev/ui` to be a real
 singleton so the shell's `TooltipProvider` context reaches into each remote.
 
 ### shadcn CLI — for greenfield surfaces
@@ -41,14 +41,14 @@ which is exactly why federated apps should not use this path.
 
 ## The three packages
 
-| Package            | What it is                                  | Depends on                   |
-| ------------------ | ------------------------------------------- | ---------------------------- |
-| `@velobits/tokens` | CSS + TS tokens. **Zero deps, zero React.** | nothing                      |
-| `@velobits/icons`  | 88 hand-drawn stroke icons                  | `react` (peer)               |
-| `@velobits/ui`     | Components                                  | tokens, icons, react (peers) |
+| Package                | What it is                                  | Depends on                   |
+| ---------------------- | ------------------------------------------- | ---------------------------- |
+| `@velobits-dev/tokens` | CSS + TS tokens. **Zero deps, zero React.** | nothing                      |
+| `@velobits-dev/icons`  | 88 hand-drawn stroke icons                  | `react` (peer)               |
+| `@velobits-dev/ui`     | Components                                  | tokens, icons, react (peers) |
 
 `tokens` is split out because the **Keycloak login theme cannot consume
-`@velobits/ui`**: its component sources are git-ignored and re-vended by a
+`@velobits-dev/ui`**: its component sources are git-ignored and re-vended by a
 `keycloakify sync-extensions` postinstall hook, so an edit to an unclaimed file
 is silently reverted on the next `npm install`. Shared _tokens_ is a clean seam
 there; shared _components_ would mean fighting the upstream extension forever.

@@ -123,8 +123,8 @@ export const dark: SemanticTokens = {
   fg: neutral[100],
   mutedFg: neutral[400],
   mutedOnGlass: neutral[200],
-  // neutral-750 exists for this token. The value inherited from ToggleFlow
-  // (#2E2E2E) was tuned against its darker #252526 panel; against this
+  // neutral-750 exists for this token. The value inherited from the dashboard
+  // app (#2E2E2E) was tuned against its darker #252526 panel; against this
   // palette's #2C2D2C it lands at 1.02:1 — an invisible border.
   border: neutral[750],
   fieldBorder: neutral[500],

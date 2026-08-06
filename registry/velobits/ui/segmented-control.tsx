@@ -56,11 +56,14 @@ export type SegmentedControlProps = {
  * rather than access. `segmented-control.test.tsx` pins the actual behaviour.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * ## TWO BUGS FIXED RELATIVE TO ToggleFlow'S `src/ui/segmented-control.tsx`
+ * ## TWO TRAPS FIXED HERE, AND FIXED INDEPENDENTLY IN THE CONSUMER
  *
- * The consumer currently relies on the broken behaviour of both, so its
- * `apps/dashboard/test/ui.test.tsx` SegmentedControl block will need updating at
- * migration.
+ * The dashboard app's own segmented control hit both of the bugs below and was
+ * repaired separately, reaching the same two conclusions this implementation did:
+ * a `div` root leaves an external `htmlFor` dangling, and `pointer-events-none`
+ * is a fake disable. Two implementations converging on the same pair of fixes is
+ * why both are written down here rather than treated as local trivia. What this
+ * one adds on top is per-segment `disabled`.
  *
  * ### 1. `htmlFor` could never label this, and now there is a path that can
  *

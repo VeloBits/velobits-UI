@@ -223,7 +223,7 @@ describe('Accordion, headings', () => {
 describe('Accordion, styling contract', () => {
   it('keeps the four utilities that fight the consumer bare-button rule', () => {
     /**
-     * ToggleFlow's styles.css styles bare `button` (border, background, radius,
+     * the dashboard app's styles.css styles bare `button` (border, background, radius,
      * padding) in Tailwind's components layer. Utilities win that cascade only for
      * properties one is actually written for — drop `rounded-none` and the row
      * grows a 6px-rounded panel-coloured box inside the container.
@@ -338,7 +338,7 @@ describe('Accordion, the one sanctioned height animation', () => {
   it('unmounts a closed panel — the one original behaviour NOT carried over', () => {
     /**
      * The hand-rolled version kept collapsed panels in the DOM (with `aria-hidden`
-     * + `inert`) because ToggleFlow's landing page is the product's only crawlable
+     * + `inert`) because the dashboard app's landing page is the product's only crawlable
      * surface. Radix unmounts them, and `forceMount` is not a substitute: with it
      * Radix never applies `hidden` and always renders children, so the panel does
      * not collapse and the height var is never set. A crawlable FAQ is a

@@ -14,7 +14,7 @@ const OPTIONS: SegmentOption[] = [
   { value: 'prod', label: 'Production', tone: 'danger' },
 ];
 
-describe('SegmentedControl, behaviour carried over from ToggleFlow', () => {
+describe('SegmentedControl, behaviour carried over from the dashboard app', () => {
   it('reports a new selection', async () => {
     const onValueChange = vi.fn();
     render(
@@ -57,7 +57,7 @@ describe('SegmentedControl, behaviour carried over from ToggleFlow', () => {
     const [dev, prod] = screen.getAllByRole('radio');
     expect(prod!.getAttribute('aria-checked')).toBe('true');
     expect(dev!.getAttribute('aria-checked')).toBe('false');
-    // The data-state hook ToggleFlow's own tests assert on still exists.
+    // The data-state hook the dashboard app's own tests assert on still exists.
     expect(prod!.getAttribute('data-state')).toBe('on');
     expect(dev!.getAttribute('data-state')).toBe('off');
   });
@@ -131,7 +131,7 @@ describe('SegmentedControl, behaviour carried over from ToggleFlow', () => {
 
 describe('SegmentedControl, FIX 1 — an accessible name that actually resolves', () => {
   /**
-   * These fail against ToggleFlow's `src/ui/segmented-control.tsx`: it accepts
+   * These fail against the dashboard app's `src/ui/segmented-control.tsx`: it accepts
    * only `aria-label`, and its `<div>` root makes any external `<label htmlFor>`
    * dangle with nothing to warn you.
    */
@@ -204,7 +204,7 @@ describe('SegmentedControl, FIX 1 — an accessible name that actually resolves'
 
 describe('SegmentedControl, FIX 2 — a real disable, not pointer-events-none', () => {
   /**
-   * All of these fail against ToggleFlow's version, which has no `disabled` prop
+   * All of these fail against the dashboard app's version, which has no `disabled` prop
    * at all: a `pointer-events-none` "disable" leaves the control focusable,
    * keyboard-operable and unannounced.
    */

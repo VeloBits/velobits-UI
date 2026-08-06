@@ -1,5 +1,5 @@
 /*
- * @velobits/tokens — raw runtime values.
+ * @velobits-dev/tokens — raw runtime values.
  *
  * THIS IS THE ONLY PLACE IN THE DESIGN SYSTEM WHERE A COLOUR IS LITERAL.
  *
@@ -9,7 +9,7 @@
  *
  * ## Why the dark selector is `.dark, body.dark`
  *
- * FixMyText and the ToggleFlow dashboard toggle `body.dark`; the Keycloak login
+ * The editor app and the dashboard app toggle `body.dark`; the Keycloak login
  * theme toggles `html.dark`. Listing both means one token file serves all four
  * surfaces. The matching `@custom-variant` in theme.css uses
  * `&:where(.dark, .dark *)` for the same reason.
@@ -132,7 +132,7 @@
    * than recessed into it. */
   --glass-surface-shadow: 0 1px 2px rgba(42, 43, 42, 0.05), 0 8px 16px -6px rgba(42, 43, 42, 0.14);
 
-  /* ── elevation: real shadows in light, borders in dark (ADR-0024) ───────── */
+  /* ── elevation: real shadows in light, borders in dark ──────────────────── */
   --shadow-sm: 0 1px 2px rgba(42, 43, 42, 0.06);
   --shadow-md: 0 2px 8px rgba(42, 43, 42, 0.08);
   --shadow-lg: 0 8px 24px rgba(42, 43, 42, 0.1);
@@ -153,8 +153,9 @@ body.dark {
   --muted-on-glass: #e4dedb;
 
   /* neutral-750 exists for this one token. #2E2E2E — the value this palette
-   * inherited from ToggleFlow — was tuned against that app's darker #252526
-   * panel; against #2C2D2C it lands at 1.02:1, i.e. an invisible border. */
+   * inherited from the dashboard app — was tuned against that app's darker
+   * #252526 panel; against #2C2D2C it lands at 1.02:1, i.e. an invisible
+   * border. */
   --border: #383635;
   /* Same value as light mode: neutral-500 is the ONLY ramp step clearing 3:1
    * against both themes' surfaces. */
@@ -210,14 +211,14 @@ body.dark {
   /* THE dark-mode material: a lit top edge at 3.18:1 over #232423. This is the
    * half of the asymmetry that light mode cannot have. */
   --glass-surface-highlight: rgba(255, 255, 255, 0.35);
-  /* Dark delineates with borders and the lit edge, not shadows (ADR-0024).
+  /* Dark delineates with borders and the lit edge, not shadows.
    * NOT `none`: .glass-surface composes this into a box-shadow LIST with the
    * highlight, and `none` inside a comma list invalidates the whole
    * declaration — dark mode would silently lose its specular edge. */
   --glass-surface-shadow: 0 0 0 transparent;
 
-  /* Dark mode delineates with borders, not shadows (ADR-0024) — except the
-   * glass tier, which floats over content and needs the separation. */
+  /* Dark mode delineates with borders, not shadows — except the glass tier,
+   * which floats over content and needs the separation. */
   --shadow-sm: none;
   --shadow-md: none;
   --shadow-lg: none;

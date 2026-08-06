@@ -2,12 +2,12 @@
 
 import { Accordion as AccordionPrimitive } from 'radix-ui';
 
-import { ChevronDownIcon } from '@velobits/icons';
+import { ChevronDownIcon } from '@velobits-dev/icons';
 
 import { cn } from '../lib/cn';
 
 /**
- * Radix Accordion, replacing ToggleFlow's hand-rolled `src/ui/accordion.tsx`.
+ * Radix Accordion, replacing a consumer's hand-rolled accordion.
  *
  * The hand-rolled version was careful and its keyboard handling was correct, but
  * it re-implemented roving focus, wrapping, Home/End and the trigger/panel ARIA
@@ -25,7 +25,7 @@ import { cn } from '../lib/cn';
  *  - **`min-h-11`** on the trigger — the 44px touch minimum, even if a title
  *    renders unusually short.
  *  - **`border-0`, `bg-transparent`, own padding, own radius** on the trigger.
- *    These look redundant and are not: ToggleFlow's `styles.css` styles bare
+ *    These look redundant and are not: the dashboard app's `styles.css` styles bare
  *    `button` (border, background, radius, padding) in Tailwind's `components`
  *    layer. Utilities win that cascade, but only for properties one is actually
  *    written for. Drop `rounded-none` and the row grows a 6px-rounded
@@ -93,8 +93,8 @@ export interface AccordionTriggerProps extends React.ComponentProps<
 }
 
 /**
- * The heading needs `m-0`: ToggleFlow's `styles.css` gives h1–h3 a 0.5rem bottom
- * margin, which would push every row off its divider. `flex` on the heading is
+ * The heading needs `m-0`: the dashboard app's `styles.css` gives h1–h3 a 0.5rem
+ * bottom margin, which would push every row off its divider. `flex` on the heading is
  * what lets the trigger fill the row — a heading is `display: block` and its
  * button child would otherwise shrink to its text.
  *
@@ -156,7 +156,7 @@ function AccordionTrigger({
  * ## The one sanctioned height animation in the system
  *
  * `animate-accordion-down` / `animate-accordion-up` (from `tw-animate-css`, which
- * `@velobits/tokens/theme.css` already imports) interpolate `height` from `0` to
+ * `@velobits-dev/tokens/theme.css` already imports) interpolate `height` from `0` to
  * `var(--radix-accordion-content-height)`.
  *
  * Animating height is normally banned here because it invalidates layout on every

@@ -3,13 +3,14 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 
-import { XIcon } from '@velobits/icons';
+import { XIcon } from '@velobits-dev/icons';
 
 import { cn } from '../lib/cn';
 
 /**
  * The centred, modal, Tier-O glass box. Forms live here; long-form reading lives
- * in `SidePanel`, which is a different component on purpose (ADR-0032).
+ * in `SidePanel`, which is a different component on purpose: the two must not be
+ * collapsed into one `side`-variant component (`SidePanel` documents why).
  *
  * ```tsx
  * <Dialog>
@@ -149,8 +150,8 @@ const dialogContentVariants = cva(
 );
 
 /**
- * Matches an enabled form field, in DOM order. Carried verbatim from
- * ToggleFlow's dialog — see `focusFirstField` below for why it exists.
+ * Matches an enabled form field, in DOM order. Carried verbatim from the
+ * dashboard app's dialog — see `focusFirstField` below for why it exists.
  */
 const FIRST_FORM_FIELD =
   'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
@@ -170,8 +171,8 @@ export interface DialogContentProps
    * AFTER React has honoured `autoFocus`. So `autoFocus` on a field has never
    * worked inside a Radix Dialog, in any version, and it fails with no warning:
    * the dialog opens, the caret is nowhere, and Enter activates the close button
-   * instead of submitting. ToggleFlow hit this on "New environment" and the fix
-   * below is the one that repaired every form dialog in that app at once.
+   * instead of submitting. The dashboard app hit this on "New environment" and the
+   * fix below is the one that repaired every form dialog in that app at once.
    *
    * Preventing `onOpenAutoFocus`'s default and focusing the field ourselves is
    * the ONLY reliable route. `autoFocus` inside a Radix Dialog is not.
@@ -180,7 +181,7 @@ export interface DialogContentProps
    *
    * A dialog with no field to focus — a confirmation, a reveal-once API key —
    * wants Radix's default, and so does anything long enough to read rather than
-   * fill in (that is `SidePanel`, which never redirects; ADR-0032).
+   * fill in (that is `SidePanel`, which never redirects).
    *
    * A caller's own `onOpenAutoFocus` runs first and can opt out entirely by
    * calling `preventDefault()`, which is how the scope switcher focuses its

@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
-import { MoonIcon, SunIcon } from '@velobits/icons';
-import { Button, useTheme } from '@velobits/ui';
+import { MoonIcon, SunIcon } from '@velobits-dev/icons';
+import { Button, useTheme } from '@velobits-dev/ui';
 
 const NAV = [
   { href: '/', label: 'Overview' },

@@ -3,7 +3,7 @@ import { defineConfig, type Options } from 'tsup';
 const R = '../../registry/velobits';
 
 /**
- * Per-component entry points, so `import { Button } from '@velobits/ui/button'`
+ * Per-component entry points, so `import { Button } from '@velobits-dev/ui/button'`
  * pulls in Button and nothing else. `size-limit` asserts that rather than
  * assuming it — a barrel-only build would quietly ship all 28 components to a
  * consumer that imported one.
@@ -105,7 +105,7 @@ const shared: Options = {
   splitting: false,
   // Peers stay external so a consumer's copy is the only copy — also what makes
   // the Module Federation singleton arrangement possible at all.
-  external: ['react', 'react-dom', 'framer-motion', '@velobits/icons', '@velobits/tokens'],
+  external: ['react', 'react-dom', 'framer-motion', '@velobits-dev/icons', '@velobits-dev/tokens'],
   /*
    * Both configs run CONCURRENTLY, so neither may clean: whichever starts second
    * would wipe the other's finished output, non-deterministically. `npm run

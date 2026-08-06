@@ -19,14 +19,12 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-          # Needed even to READ @velobits/* from a consumer's perspective; this
-          # repo's own @velobits deps are workspace links, but the registry
-          # mapping in .npmrc still has to resolve.
-          registry-url: https://npm.pkg.github.com
+          registry-url: https://registry.npmjs.org
 
+      # No token here: every @velobits-dev/* dep in this repo is a workspace
+      # link, resolved locally and never fetched. Only `release.yml` publishes,
+      # and that is the one job needing the NPM_TOKEN secret.
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
         run: npm run lint
@@ -46,7 +44,7 @@ jobs:
         run: npm run test
 
       # publint + attw are what catch the TS-version skew across consumers:
-      # FixMyText is on TS 6.0.3, the Keycloak theme ~6.0.2, ToggleFlow 5.9.3.
+      # the editor app is on TS 6.0.3, the Keycloak theme ~6.0.2, the dashboard app 5.9.3.
       # A .d.ts that fails to resolve under one of them breaks quietly, which is
       # why this is a gate and not a nice-to-have.
       - name: Package exports and types
@@ -62,4 +60,4 @@ jobs:
         run: npm run registry:build
 
       - name: Docs build
-        run: npm run build -w @velobits/docs
+        run: npm run build -w @velobits-dev/docs

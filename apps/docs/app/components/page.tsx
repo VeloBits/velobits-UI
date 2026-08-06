@@ -30,8 +30,8 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@velobits/ui';
-import { AlertTriangleIcon, FlagIcon, TrashIcon } from '@velobits/icons';
+} from '@velobits-dev/ui';
+import { AlertTriangleIcon, FlagIcon, TrashIcon } from '@velobits-dev/icons';
 
 export const metadata = { title: 'Components — VeloBits UI' };
 

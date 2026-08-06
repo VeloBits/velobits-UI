@@ -1,6 +1,6 @@
 {
-  "name": "@velobits/ui",
-  "version": "0.1.0",
+  "name": "@velobits-dev/ui",
+  "version": "1.0.0",
   "description": "VeloBits shared React components. Built from registry/velobits, the same source the shadcn CLI serves.",
   "license": "UNLICENSED",
   "repository": {
@@ -9,8 +9,8 @@
     "directory": "packages/ui"
   },
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "type": "module",
   "sideEffects": false,
@@ -382,8 +382,8 @@
     "tailwind-merge": "^3.6.0"
   },
   "peerDependencies": {
-    "@velobits/icons": "^0.1.0",
-    "@velobits/tokens": "^0.1.0",
+    "@velobits-dev/icons": "^0.2.0",
+    "@velobits-dev/tokens": "^0.2.0",
     "framer-motion": ">=12.0.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
@@ -396,8 +396,8 @@
     "@testing-library/user-event": "^14.6.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "@velobits/icons": "*",
-    "@velobits/tokens": "*",
+    "@velobits-dev/icons": "*",
+    "@velobits-dev/tokens": "*",
     "axe-core": "^4.12.1",
     "framer-motion": "^12.43.0",
     "happy-dom": "^20.11.1",
@@ -418,8 +418,8 @@
         "react",
         "react-dom",
         "framer-motion",
-        "@velobits/icons",
-        "@velobits/tokens",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens",
         "radix-ui",
         "class-variance-authority",
         "clsx",
@@ -434,8 +434,8 @@
         "react",
         "react-dom",
         "framer-motion",
-        "@velobits/icons",
-        "@velobits/tokens",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens",
         "radix-ui",
         "class-variance-authority",
         "clsx",
@@ -450,8 +450,8 @@
         "react",
         "react-dom",
         "framer-motion",
-        "@velobits/icons",
-        "@velobits/tokens",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens",
         "radix-ui",
         "class-variance-authority",
         "clsx",

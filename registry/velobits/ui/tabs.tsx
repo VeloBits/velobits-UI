@@ -28,8 +28,8 @@ import { cn } from '../lib/cn';
  *
  * The `line` variant's underline is an `::after` pseudo-element whose *opacity*
  * crossfades — not a sliding indicator whose position is animated, and not a
- * border that would change the trigger's box. `transition-colors` rather than
- * ToggleFlow's `transition-all` for the same reason: `transition-all` will
+ * border that would change the trigger's box. `transition-colors` rather than the
+ * dashboard app's `transition-all` for the same reason: `transition-all` will
  * happily animate whatever layout property a caller adds via `className`.
  */
 function Tabs({
@@ -54,8 +54,9 @@ function Tabs({
  *  - `default` — a filled track with the active tab as a raised pill. Reads as a
  *    control, so it suits a small in-panel switch.
  *  - `line` — a transparent track with an underline under the active tab. Reads
- *    as page structure, which is why ToggleFlow's Flag detail and Audit detail
- *    panels both use it: those tabs switch *sections of a record*, not a setting.
+ *    as page structure, which is why the dashboard app's Flag detail and Audit
+ *    detail panels both use it: those tabs switch *sections of a record*, not a
+ *    setting.
  *
  * The variant is mirrored onto `data-variant` because the triggers style
  * themselves from it through `group-data-[variant=…]/tabs-list:`. A trigger has
@@ -98,14 +99,14 @@ function TabsList({
 }
 
 /**
- * The inactive step is `text-muted-foreground`, not ToggleFlow's
+ * The inactive step is `text-muted-foreground`, not the dashboard app's
  * `text-foreground/60`.
  *
  * That alpha was an un-gated guess: 60% of `--fg` over `--bg2` computes to
- * roughly 3:1, under AA for 14px text, and ToggleFlow patched around it with a
- * `dark:text-muted-foreground` override that made the two themes disagree about
- * what an inactive tab is. `--muted-fg` is measured against both themes'
- * surfaces by `@velobits/tokens`' contrast suite, so one class covers both.
+ * roughly 3:1, under AA for 14px text, and the dashboard app patched around it
+ * with a `dark:text-muted-foreground` override that made the two themes disagree
+ * about what an inactive tab is. `--muted-fg` is measured against both themes'
+ * surfaces by `@velobits-dev/tokens`' contrast suite, so one class covers both.
  *
  * The underline for `line` is positioned with **logical** inset on the vertical
  * axis (`end-[-4px]`, i.e. `inset-inline-end`) rather than `-right-1`, so it

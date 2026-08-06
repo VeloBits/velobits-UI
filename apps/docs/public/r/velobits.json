@@ -10,7 +10,7 @@
     "radix-ui",
     "cmdk",
     "framer-motion",
-    "@velobits/icons"
+    "@velobits-dev/icons"
   ],
   "devDependencies": [
     "tw-animate-css"
