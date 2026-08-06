@@ -161,12 +161,13 @@ export const CONTRAST_EXEMPT: Readonly<Record<string, string>> = {
     'decorative separators only (table rules, card outlines). WCAG 1.4.11 applies to visuals REQUIRED to identify a component — a divider is not one. Control edges use fieldBorder, which IS gated.',
   primaryHover:
     'a hover state of an already-gated fill; 1.4.11 exempts states reachable only by pointer hover where the base state is conformant',
-  primarySoft: 'translucent wash behind gated text; measured as a composite in the glass suite',
-  brandSoft: 'translucent wash',
-  successSoft: 'translucent wash',
-  dangerSoft: 'translucent wash',
-  warningSoft: 'translucent wash',
-  infoSoft: 'translucent wash',
+  primarySoft: 'gated by the soft-chip composite suite, not by a flat pair',
+  brandSoft:
+    'translucent wash with no text-on-wash pairing: Badge deliberately has no soft-lime-with-lime-text variant (lime on cream is 1.13:1), so there is nothing to composite',
+  successSoft: 'gated by the soft-chip composite suite, not by a flat pair',
+  dangerSoft: 'gated by the soft-chip composite suite, not by a flat pair',
+  warningSoft: 'gated by the soft-chip composite suite, not by a flat pair',
+  infoSoft: 'gated by the soft-chip composite suite, not by a flat pair',
   highlight: 'translucent hover wash on an otherwise transparent control',
   overlay: 'a scrim; its job is to reduce contrast behind a modal',
   mutedOnGlass: 'gated by the glass composite suite, not by a flat pair',
@@ -250,5 +251,89 @@ export function resolveGlassSurface(pair: GlassSurfacePair): {
     bg: theme.bg,
     fg: theme.fg,
     mutedFg: theme.mutedFg,
+  };
+}
+
+/* ── the soft chips: text over a translucent wash over a surface ───────────── */
+
+/**
+ * Badge's `*-soft` variants pair a translucent wash with the matching TEXT
+ * token — `bg-success-soft text-success` — and `StatusChip` composes those same
+ * variants. Chip text is 12px, so WCAG 1.4.3's full 4.5:1 applies, and the
+ * colour the text actually sits on is not the wash: it is the wash FLATTENED
+ * over whatever surface the chip is placed on. A wash at α 0.10–0.12 barely
+ * moves the backdrop, which is exactly the problem — the composite inherits the
+ * backdrop's luminance, and the page is the worst case in light mode (cream is
+ * darker than the white panel) while the panel is the worst case in dark
+ * (lighter than the page).
+ *
+ * Each pairing is therefore measured over THREE backdrops in both themes: the
+ * page, the panel, and the tier-S glass composite (a chip inside a Card). Same
+ * registry-as-data spirit as {@link CONTRAST_PAIRS} and
+ * {@link GLASS_SURFACE_PAIRS}; the assertions live in `test/contrast.test.ts`.
+ *
+ * `brandSoft` is deliberately absent: there is no soft-lime-with-lime-text
+ * Badge variant, because lime on cream is 1.13:1 — see {@link CONTRAST_EXEMPT}.
+ */
+export interface SoftChipPair {
+  /** Human-readable, and what the failure message prints. */
+  label: string;
+  /** The text token the chip pairs with the wash. */
+  fg: keyof SemanticTokens;
+  /** The translucent wash behind it. */
+  wash: keyof SemanticTokens;
+}
+
+export const SOFT_CHIP_PAIRS: readonly SoftChipPair[] = [
+  { label: 'primary soft chip (Badge `primary`)', fg: 'primaryText', wash: 'primarySoft' },
+  { label: 'success soft chip (Badge `success`)', fg: 'success', wash: 'successSoft' },
+  { label: 'danger soft chip (Badge `danger`)', fg: 'danger', wash: 'dangerSoft' },
+  { label: 'warning soft chip (Badge `warning`)', fg: 'warning', wash: 'warningSoft' },
+  { label: 'info soft chip (Badge `info`)', fg: 'info', wash: 'infoSoft' },
+];
+
+/** The surfaces a chip plausibly sits on, resolved per theme. */
+export type SoftChipBackdropName = 'page' | 'panel' | 'glass surface';
+
+/** Parse `rgba(r, g, b, a)` — the only translucent spelling these tokens use. */
+function parseRgba(css: string): { hex: string; alpha: number } {
+  const m = /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/.exec(css);
+  if (!m) throw new Error(`Not an rgba() colour: ${css}`);
+  const hex =
+    '#' +
+    [1, 2, 3]
+      .map((i) => Number(m[i]).toString(16).padStart(2, '0'))
+      .join('')
+      .toUpperCase();
+  return { hex, alpha: Number(m[4]!) };
+}
+
+/**
+ * Flatten a soft-chip entry into the opaque colours the gate measures: the
+ * wash composited over each backdrop, in GAMMA-encoded sRGB like everything
+ * else in this file — see the note on `compositeOver`. The glass backdrop is
+ * itself a composite (the tier-S surface flattened over the page, i.e. the
+ * same colour {@link resolveGlassSurface} reports), so a chip in a Card is a
+ * wash-over-glass-over-page stack, flattened in order.
+ */
+export function resolveSoftChip(
+  pair: SoftChipPair,
+  theme: ThemeName,
+): {
+  fg: string;
+  /** The opaque colour the chip text actually sits on, per backdrop. */
+  backdrops: { name: SoftChipBackdropName; composite: string }[];
+} {
+  const t = themes[theme];
+  const tier = glass[theme === 'light' ? 'surfaceLight' : 'surfaceDark'];
+  const wash = parseRgba(t[pair.wash]);
+  const flatten = (backdrop: string) => compositeOver(wash.hex, backdrop, wash.alpha);
+  return {
+    fg: t[pair.fg],
+    backdrops: [
+      { name: 'page', composite: flatten(t.bg) },
+      { name: 'panel', composite: flatten(t.panel) },
+      { name: 'glass surface', composite: flatten(compositeOver(tier.surface, t.bg, tier.alpha)) },
+    ],
   };
 }

@@ -35,11 +35,12 @@ import { Badge, type BadgeProps } from './badge';
  *
  * The hand-rolled version in the dashboard app writes `bg-*-soft text-*` pairs
  * inline. Those pairs are already `Badge`'s variants and are already gated, so
- * this maps status → variant and stops. One consequence worth knowing: the
- * composited soft-wash pairs are a known open item — at 12px the 4.5 target
- * applies and `success` measures 4.16:1 on the light page. The fix is a token
- * re-tune, tracked as an open decision, and it lands for `Badge` and this
- * component at the same time precisely because there is only one set of values.
+ * this maps status → variant and stops. The gate includes the composite: at
+ * 12px the 4.5:1 target applies, and each text-over-wash pairing is measured
+ * flattened over the page, the panel and the tier-S glass surface in both
+ * themes — the soft-chip suite in `@velobits-dev/tokens`. The token re-tune
+ * that made those composites pass landed for `Badge` and this component at the
+ * same time, precisely because there is only one set of values.
  *
  * ## The DOM text is sentence case; the uppercase is CSS
  *

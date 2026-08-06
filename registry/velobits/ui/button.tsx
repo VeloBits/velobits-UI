@@ -10,7 +10,7 @@ import { cn } from '../lib/cn';
  *
  * `--primary` (#007ACC) measures 3.90:1 on the cream page — fine as a fill
  * behind white text (4.51:1), failing AA as text. The `link` variant therefore
- * uses `text-link` (`--primary-text`, 4.68:1), and no variant paints
+ * uses `text-link` (`--primary-text`, 5.34:1), and no variant paints
  * `--primary` on a page background.
  *
  * ## Radius

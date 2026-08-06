@@ -30,10 +30,20 @@ export const seed = {
  * **never use `--primary` for a link, an icon beside text, or body copy.**
  */
 export const blueSteps = {
-  /** L=.525 — 4.68:1 on cream, 5.41:1 on white. */
-  text: '#006CBD',
-  /** L=.700 — 6.51:1 on the dark page. */
-  textDark: '#42A4F9',
+  /**
+   * L=.495 — 5.34:1 on cream, 6.18:1 on white. Darker than flat-pair AA alone
+   * would need: this step also has to clear 4.5:1 *inside a soft chip*, i.e.
+   * composited over `primarySoft`/`infoSoft` on the cream page — the soft-chip
+   * suite in `test/contrast.test.ts`. The previous `#006CBD` measured 4.08:1
+   * there.
+   */
+  text: '#0062B3',
+  /**
+   * L=.723 — 7.10:1 on the dark page. Lifted for the same reason `text` was
+   * darkened: over `primarySoft` on the dark panel the previous `#42A4F9`
+   * measured 4.23:1.
+   */
+  textDark: '#4AACFF',
   /** Light hover/pressed fill. */
   hover: '#0062A3',
   /** Dark hover fill, matching the dashboard app's existing `--accent-hover`. */

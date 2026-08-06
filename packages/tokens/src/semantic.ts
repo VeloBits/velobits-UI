@@ -112,17 +112,21 @@ export const light: SemanticTokens = {
   ring: seed.blue,
   highlight: 'rgba(42, 43, 42, 0.05)',
   overlay: 'rgba(26, 27, 26, 0.45)',
-  // #2B762D, not a lighter green: the obvious `#2F7D31` measures 4.86:1 on
-  // white but only 4.43:1 on cream, and cream is the page. Anything tuned
-  // against a white panel has to be re-checked against the warm background.
-  success: '#2B762D',
-  successSoft: 'rgba(43, 118, 45, 0.12)',
-  danger: '#C0322B',
-  dangerSoft: 'rgba(192, 50, 43, 0.10)',
-  warning: '#8A5B00',
-  warningSoft: 'rgba(138, 91, 0, 0.12)',
+  // The status text steps are tuned against the WORST composite they sit on,
+  // not against the page: a soft chip (`bg-*-soft text-*`) flattens its wash
+  // over the cream page, and 12px chip text holds the 4.5:1 target there —
+  // the soft-chip suite in `test/contrast.test.ts`. That is why `success` is
+  // #226E25 and not the flat-pair-sufficient #2B762D (4.16:1 inside the chip),
+  // and the same one-step darkening applies to `danger` and `warning`. Each
+  // `*Soft` wash restates its text token's rgb at a fixed alpha.
+  success: '#226E25',
+  successSoft: 'rgba(34, 110, 37, 0.12)',
+  danger: '#B82A24',
+  dangerSoft: 'rgba(184, 42, 36, 0.10)',
+  warning: '#855600',
+  warningSoft: 'rgba(133, 86, 0, 0.12)',
   info: blueSteps.text,
-  infoSoft: 'rgba(0, 108, 189, 0.10)',
+  infoSoft: 'rgba(0, 98, 179, 0.10)',
   chart1: '#1D82D2',
   chart2: '#6F8714',
   chart3: '#BC5F8D',
@@ -165,14 +169,20 @@ export const dark: SemanticTokens = {
   ring: blueSteps.ringDark,
   highlight: 'rgba(242, 235, 232, 0.06)',
   overlay: 'rgba(14, 15, 14, 0.60)',
+  // The four status washes run THINNER than light mode's story would suggest
+  // (0.12, down from 0.16): in dark mode a wash LIGHTENS its backdrop, and the
+  // soft-chip composite over the panel is where these pairs bottom out — the
+  // soft-chip suite in `test/contrast.test.ts`. `danger` moved lighter than the
+  // inherited #F1706B for the same reason (3.77:1 inside the chip on the
+  // panel); `success` and `warning` cleared the gate on the thinner wash alone.
   success: '#7FB86B',
-  successSoft: 'rgba(127, 184, 107, 0.16)',
-  danger: '#F1706B',
-  dangerSoft: 'rgba(241, 112, 107, 0.16)',
+  successSoft: 'rgba(127, 184, 107, 0.12)',
+  danger: '#FF7F79',
+  dangerSoft: 'rgba(255, 127, 121, 0.12)',
   warning: '#E0C060',
-  warningSoft: 'rgba(224, 192, 96, 0.16)',
+  warningSoft: 'rgba(224, 192, 96, 0.12)',
   info: blueSteps.textDark,
-  infoSoft: 'rgba(66, 164, 249, 0.16)',
+  infoSoft: 'rgba(74, 172, 255, 0.12)',
   // Lifted relative to light so each series clears 4.5:1 against the darker
   // page instead of resting on the 3:1 floor.
   chart1: '#2387D7',

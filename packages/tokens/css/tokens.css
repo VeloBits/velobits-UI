@@ -67,7 +67,7 @@
   --on-primary: #ffffff;
   /* Links, inline icons, active nav labels. --primary itself measures 3.90:1 on
    * the cream page, which fails AA for text. NEVER use --primary for a link. */
-  --primary-text: #006cbd;
+  --primary-text: #0062b3;
   --primary-soft: rgba(0, 122, 204, 0.1);
 
   /* ── brand lime: fill-only in this theme ────────────────────────────────── */
@@ -92,14 +92,17 @@
   --overlay: rgba(26, 27, 26, 0.45);
 
   /* ── status ─────────────────────────────────────────────────────────────── */
-  --success: #2b762d;
-  --success-soft: rgba(43, 118, 45, 0.12);
-  --danger: #c0322b;
-  --danger-soft: rgba(192, 50, 43, 0.1);
-  --warning: #8a5b00;
-  --warning-soft: rgba(138, 91, 0, 0.12);
-  --info: #006cbd;
-  --info-soft: rgba(0, 108, 189, 0.1);
+  /* Text steps tuned against the soft-chip COMPOSITE (wash over the cream
+   * page), not the flat page — 12px chip text holds 4.5:1 there. See the
+   * soft-chip suite in test/contrast.test.ts. */
+  --success: #226e25;
+  --success-soft: rgba(34, 110, 37, 0.12);
+  --danger: #b82a24;
+  --danger-soft: rgba(184, 42, 36, 0.1);
+  --warning: #855600;
+  --warning-soft: rgba(133, 86, 0, 0.12);
+  --info: #0062b3;
+  --info-soft: rgba(0, 98, 179, 0.1);
 
   /* ── chart series ───────────────────────────────────────────────────────── */
   /* Isoluminant by construction: each clears 3.5:1 against the page, but they
@@ -170,7 +173,7 @@ body.dark {
   --primary: #007acc;
   --primary-hover: #1177bb;
   --on-primary: #ffffff;
-  --primary-text: #42a4f9;
+  --primary-text: #4aacff;
   --primary-soft: rgba(0, 122, 204, 0.22);
 
   --brand: #c8f135;
@@ -189,14 +192,18 @@ body.dark {
   --highlight: rgba(242, 235, 232, 0.06);
   --overlay: rgba(14, 15, 14, 0.6);
 
+  /* The washes run thinner than light mode (0.12): in dark mode a wash
+   * LIGHTENS its backdrop, and the soft-chip composite over the panel is where
+   * these pairs bottom out. --danger moved lighter than the inherited #f1706b
+   * for the same reason (3.77:1 inside the chip on the panel). */
   --success: #7fb86b;
-  --success-soft: rgba(127, 184, 107, 0.16);
-  --danger: #f1706b;
-  --danger-soft: rgba(241, 112, 107, 0.16);
+  --success-soft: rgba(127, 184, 107, 0.12);
+  --danger: #ff7f79;
+  --danger-soft: rgba(255, 127, 121, 0.12);
   --warning: #e0c060;
-  --warning-soft: rgba(224, 192, 96, 0.16);
-  --info: #42a4f9;
-  --info-soft: rgba(66, 164, 249, 0.16);
+  --warning-soft: rgba(224, 192, 96, 0.12);
+  --info: #4aacff;
+  --info-soft: rgba(74, 172, 255, 0.12);
 
   /* Lifted relative to the light theme so each series clears 4.5:1 against the
    * darker page rather than sitting at the 3:1 floor. */

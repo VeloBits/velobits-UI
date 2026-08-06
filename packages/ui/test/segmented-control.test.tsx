@@ -202,6 +202,63 @@ describe('SegmentedControl, FIX 1 — an accessible name that actually resolves'
   });
 });
 
+describe('SegmentedControl, id + aria-describedby — the wiring the dashboard app added', () => {
+  /**
+   * The dashboard app's repaired control grew `id` and description wiring; this
+   * is the same pair under the native ARIA spelling (`aria-describedby`, not a
+   * camelCase `describedBy`).
+   */
+
+  it('forwards id onto the radiogroup root', () => {
+    render(
+      <SegmentedControl
+        id="env-switch"
+        value="dev"
+        onValueChange={vi.fn()}
+        options={OPTIONS}
+        aria-label="Environment"
+      />,
+    );
+    expect(screen.getByRole('radiogroup').id).toBe('env-switch');
+  });
+
+  it('takes its description from real hint text via aria-describedby', () => {
+    render(
+      <>
+        <SegmentedControl
+          value="dev"
+          onValueChange={vi.fn()}
+          options={OPTIONS}
+          aria-label="Environment"
+          aria-describedby="env-hint"
+        />
+        <p id="env-hint">Production changes apply immediately.</p>
+      </>,
+    );
+    // Same rule as the name: not "the attribute is present" — the description
+    // has to RESOLVE. `getByRole` runs the real accessible-description
+    // computation, so a dangling id fails here.
+    expect(
+      screen.getByRole('radiogroup', { description: 'Production changes apply immediately.' }),
+    ).toBeTruthy();
+  });
+
+  it('a dangling aria-describedby leaves the group undescribed, exactly like a dangling aria-labelledby', () => {
+    render(
+      <SegmentedControl
+        value="dev"
+        onValueChange={vi.fn()}
+        options={OPTIONS}
+        aria-label="Environment"
+        aria-describedby="no-such-hint"
+      />,
+    );
+    expect(screen.getByRole('radiogroup').getAttribute('aria-describedby')).toBe('no-such-hint');
+    // No description at all — the failure mode a presence-only assertion would miss.
+    expect(screen.queryByRole('radiogroup', { description: /./ })).toBeNull();
+  });
+});
+
 describe('SegmentedControl, FIX 2 — a real disable, not pointer-events-none', () => {
   /**
    * All of these fail against the dashboard app's version, which has no `disabled` prop

@@ -9,9 +9,11 @@ import {
   CONTRAST_PAIRS,
   GLASS_SURFACE_PAIRS,
   PERCEPTIBILITY_FLOOR,
+  SOFT_CHIP_PAIRS,
   TARGET,
   resolveGlassSurface,
   resolvePair,
+  resolveSoftChip,
   type ContrastPair,
 } from '../src/contrast-pairs';
 
@@ -81,6 +83,39 @@ describe('no semantic token escapes measurement', () => {
   });
 });
 
+describe('soft chips clear AA on every surface they sit on', () => {
+  /**
+   * Badge's `*-soft` variants (and StatusChip, which composes them) put a TEXT
+   * token over a translucent wash, and the wash barely moves whatever surface
+   * is underneath — so the colour the 12px text actually sits on is dominated
+   * by the backdrop, not the wash. Each pairing is flattened over the page, the
+   * panel and the tier-S glass composite, and asserted at the full 4.5:1.
+   *
+   * This suite is what the `*Soft` entries in CONTRAST_EXEMPT point at: the
+   * washes are exempt from a FLAT pair because a flat ratio against a
+   * translucent value is meaningless, not because they are unmeasured.
+   */
+  for (const theme of THEMES) {
+    describe(theme, () => {
+      for (const pair of SOFT_CHIP_PAIRS) {
+        const resolved = resolveSoftChip(pair, theme);
+        for (const { name, composite } of resolved.backdrops) {
+          it(`${pair.label} on ${name} (≥${TARGET.text}:1)`, () => {
+            const ratio = contrastRatio(resolved.fg, composite);
+            expect(
+              ratio,
+              `${pair.fg} (${resolved.fg}) over ${pair.wash} flattened onto the ${name} ` +
+                `(${composite}) = ${round2(ratio)}:1, needs ≥${TARGET.text}:1. Chip text is ` +
+                `12px, so the large-text discount does not apply — retune the text token or ` +
+                `thin the wash; do not lower the target.`,
+            ).toBeGreaterThanOrEqual(TARGET.text);
+          });
+        }
+      }
+    });
+  }
+});
+
 describe('the specific claims the palette was designed around', () => {
   /**
    * These are not redundant with the pair sweep — they are the measurements the
@@ -134,8 +169,8 @@ describe('the specific claims the palette was designed around', () => {
   });
 
   it('the blue text steps clear AA in their own theme', () => {
-    expect(contrastRatio('#006CBD', '#F4EDEA')).toBeGreaterThanOrEqual(TARGET.text);
-    expect(contrastRatio('#42A4F9', themes.dark.bg)).toBeGreaterThanOrEqual(TARGET.text);
+    expect(contrastRatio('#0062B3', '#F4EDEA')).toBeGreaterThanOrEqual(TARGET.text);
+    expect(contrastRatio('#4AACFF', themes.dark.bg)).toBeGreaterThanOrEqual(TARGET.text);
   });
 
   it('field-border clears 1.4.11 in BOTH themes from a single value', () => {
