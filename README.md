@@ -1,7 +1,7 @@
 # velobits-ui
 
 The VeloBits design system. One token and component layer for every VeloBits
-surface: the marketing site, the editor app, the the dashboard app dashboard, and the shared
+surface: the marketing site, the editor app, the dashboard app, and the shared
 Keycloak login theme.
 
 > Implementation notes and the full plan live at workspace

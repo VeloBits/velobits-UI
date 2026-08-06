@@ -38,7 +38,8 @@
   },
   "files": [
     "dist",
-    "css"
+    "css",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup",
