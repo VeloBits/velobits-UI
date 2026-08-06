@@ -1,8 +1,11 @@
 /**
- * Layout scaffolding shared by `/components` (the showcase) and `/preview` (the
- * glass verification harness). One copy, deliberately — the two pages have
- * different jobs but the same skeleton, and a second copy is a second thing to
- * keep in step.
+ * Layout scaffolding for `/components`, the one surface that shows the system.
+ *
+ * It was shared with a `/preview` diagnostics route until that route was deleted:
+ * once `/components` covered all 37 with the page as their backdrop, four of
+ * `/preview`'s five sections were either duplicated here or pinned by a test, and
+ * the fifth — `.glass-elevated` stacked on `.glass` — moved into `DialogDemo`,
+ * where a picker inside a creation dialog is a real pattern rather than a rig.
  *
  * ── WHY `Demo` HAS NO BACKGROUND ────────────────────────────────────────────
  *
@@ -66,7 +69,7 @@ export function Group({
   );
 }
 
-/** A labelled block with no frame. What `/preview` uses, so nothing sits between a surface and the page. */
+/** A labelled block with no frame, for a demo that supplies its own container. */
 export function Section({
   title,
   note,

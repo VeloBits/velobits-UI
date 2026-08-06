@@ -17,8 +17,8 @@ const NAV = [
  * `/components/button` still lights up "Components", while `/tokens` does not
  * light up "Overview" the way a bare `startsWith('/')` would.
  *
- * `/preview` matches nothing on purpose: it is not in this nav, and a header
- * that highlights nothing is the honest answer for a page that is not listed.
+ * A route absent from `NAV` matches nothing and highlights nothing, which is the
+ * honest answer for a page this header does not list.
  */
 function isCurrent(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);

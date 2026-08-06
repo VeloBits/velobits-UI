@@ -67,6 +67,7 @@ import {
 } from '@velobits-dev/ui';
 import {
   AlertTriangleIcon,
+  ChevronDownIcon,
   CircleCheckIcon,
   EllipsisIcon,
   FlagIcon,
@@ -85,11 +86,26 @@ import { Demo, Row } from '../section';
  * backdrop layers until something is opened. That is what keeps the page at 5.
  */
 
+/**
+ * The Dialog carries a Popover inside it, and that is load-bearing rather than
+ * decorative.
+ *
+ * `.glass-elevated` — Tier O stacked on Tier O — is the one composite in the
+ * system that **no gate measures**. `GLASS_OVERLAY_PAIRS` excludes it by name
+ * ("it stacks on another overlay, so the page is not its backdrop"), and a
+ * `GlassSurface tier="elevated"` sitting on the page forms a different composite
+ * from the one that matters. Nesting is the only way to see the real thing.
+ *
+ * It is here rather than on a diagnostics route because a picker inside a
+ * creation dialog is a genuine product pattern — the check rides along on a
+ * demo that earns its place anyway. Removing the Popover silently removes the
+ * only coverage the elevated tier has.
+ */
 export function DialogDemo() {
   return (
     <Demo
       title="Dialog"
-      note="Tier-O glass over a scrim. Focus is trapped while open, Escape closes, and focus returns to the trigger. `focusFirstField` is a prop because autoFocus is silently swallowed by Radix's FocusScope."
+      note="Tier-O glass over a scrim. Focus is trapped while open, Escape closes, and focus returns to the trigger. `focusFirstField` is a prop because autoFocus is silently swallowed by Radix's FocusScope. The environment picker inside opens on the ELEVATED tier — plum-tinted in dark so it does not sink into the dialog beneath it."
     >
       <Row>
         <Dialog>
@@ -120,6 +136,30 @@ export function DialogDemo() {
                   <Textarea placeholder="What does this flag control?" />
                 </FieldControl>
               </Field>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="secondary" className="w-full justify-between">
+                    Rollout: off everywhere
+                    <ChevronDownIcon />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverHeader>
+                    <PopoverTitle>Initial rollout</PopoverTitle>
+                    <PopoverDescription>
+                      Elevated glass, over the dialog&apos;s own Tier-O surface.
+                    </PopoverDescription>
+                  </PopoverHeader>
+                  <div className="space-y-2 pt-2">
+                    <Label htmlFor="cx-dialog-env">Enable in</Label>
+                    <NativeSelect id="cx-dialog-env" defaultValue="none">
+                      <option value="none">No environment</option>
+                      <option value="dev">Development only</option>
+                      <option value="all">All environments</option>
+                    </NativeSelect>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
             <DialogFooter>
               <DialogClose asChild>

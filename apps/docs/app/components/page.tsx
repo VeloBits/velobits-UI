@@ -68,12 +68,17 @@ export const metadata = { title: 'Components — VeloBits UI' };
  * Card, Table, Accordion and EmptyState never blur in any `surface` mode. Adding
  * anything here that blurs means removing one of the five.
  *
- * ## Not here, deliberately
+ * ## This is the only surface, and it carries the glass checks
  *
- * Per-component MDX pages (Open Decision 5, deferred), and the glass TORTURE
- * targets — the 20-card grid, the sticky-under-blur scroll box, the nested
- * Dialog+Popover. Those are diagnostics, not demos, and they live on `/preview`,
- * which is the surface the verification checklist runs against.
+ * A separate `/preview` diagnostics route existed while this page showed 17 of
+ * 37. It is gone: Tier-S-on-the-page is `CardDemo`, the tier swatches are
+ * `GlassSurfaceDemo`, sticky-under-blur is `AppShellDemo`'s Tier-O header over
+ * its scrolling main region, and the 20-card grid tested a claim now pinned by
+ * `glass-css.test.ts` (only `.glass` and `.glass-surface-blur` may declare a
+ * blur). The one thing it held that nothing else measured — `.glass-elevated`
+ * stacked on `.glass` — is the Popover inside `DialogDemo`. Do not remove it.
+ *
+ * Per-component MDX pages remain deferred (Open Decision 5).
  */
 export default function ComponentsPage() {
   return (
