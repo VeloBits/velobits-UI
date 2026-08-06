@@ -135,7 +135,14 @@ export const light: SemanticTokens = {
 };
 
 export const dark: SemanticTokens = {
-  bg: neutral[900],
+  // neutral-925 exists for this token, the same way 750 exists for the dark
+  // border. A tier-S surface must clear 8/255 from the page AND from `panel`,
+  // so the page↔panel distance is its whole budget; with the page at 900 that
+  // was 18/255 and the glass was pinned at 9/255 either side. `panel` cannot
+  // move up to widen it (at #2E2F2E the gated `primary fill vs panel` pair
+  // falls to 2.98:1), so the page moved down — the free direction, since every
+  // dark pair measured against the page is light-on-dark and only improves.
+  bg: neutral[925],
   bg2: neutral[800],
   panel: neutral[800],
   // Plum, not a lighter grey: its OKLCH lightness (0.355) is above charcoal's

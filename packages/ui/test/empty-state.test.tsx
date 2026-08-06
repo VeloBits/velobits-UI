@@ -93,3 +93,25 @@ describe('EmptyState', () => {
     expect(violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
 });
+
+describe('EmptyState, the surface default', () => {
+  const root = () => document.querySelector('[data-slot="empty-state"]')!.className;
+
+  it('has NO surface by default — it is normally already inside one', () => {
+    /**
+     * The deliberate odd one out. Table, Accordion and Card default to glass
+     * because they are usually outermost; an EmptyState is usually inside a
+     * table body, a card body or a popover, all of which are already glass.
+     * Nesting the tier composites the two ~2/255 apart and both vanish.
+     */
+    render(<EmptyState title="Nothing here" />);
+    expect(root()).not.toContain('glass-surface');
+    expect(root()).not.toContain('bg-panel');
+  });
+
+  it('opts in for the page-level first-run case', () => {
+    render(<EmptyState title="Nothing here" surface="glass" />);
+    expect(root()).toContain('glass-surface');
+    expect(root()).not.toContain('glass-surface-blur');
+  });
+});

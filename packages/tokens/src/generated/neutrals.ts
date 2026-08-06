@@ -20,6 +20,7 @@ export const neutral = {
   750: '#383635',
   800: '#2C2D2C',
   900: '#1A1B1A',
+  925: '#151615',
   950: '#0E0F0E',
 } as const;
 
@@ -38,5 +39,6 @@ export const neutralMeta = {
   750: { oklch: 'oklch(0.3350 0.0030 44.9)', luminance: 0.037361 },
   800: { oklch: 'oklch(0.2958 0.0023 145.5)', luminance: 0.025941 },
   900: { oklch: 'oklch(0.2206 0.0024 145.5)', luminance: 0.010781 },
+  925: { oklch: 'oklch(0.1987 0.0025 145.5)', luminance: 0.007874 },
   950: { oklch: 'oklch(0.1668 0.0026 145.5)', luminance: 0.004667 },
 } as const;

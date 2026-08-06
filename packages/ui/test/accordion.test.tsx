@@ -361,3 +361,45 @@ describe('Accordion, axe', () => {
     expect(violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
 });
+
+describe('Accordion, the container surface', () => {
+  const root = () => document.querySelector('[data-slot="accordion"]')!.className;
+
+  const Fixture = (props: { surface?: 'glass' | 'panel' | 'none' }) => (
+    <Accordion type="single" {...props}>
+      <AccordionItem value="a">
+        <AccordionTrigger>Q</AccordionTrigger>
+        <AccordionContent>A</AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+
+  it('carries the Tier-S material by default', () => {
+    render(<Fixture />);
+    expect(root()).toContain('glass-surface');
+  });
+
+  it('does NOT add a border-* utility alongside the glass', () => {
+    /**
+     * `.glass-surface` lives in the components layer, so a `border-border`
+     * utility would beat it and silently replace the material's own edge —
+     * the exact failure the Card docblock warns about.
+     */
+    render(<Fixture />);
+    expect(root()).not.toMatch(/\bborder-border\b/);
+  });
+
+  it('falls back to the opaque panel, and to nothing when nested', () => {
+    const { unmount } = render(<Fixture surface="panel" />);
+    expect(root()).toContain('bg-panel');
+    unmount();
+    render(<Fixture surface="none" />);
+    expect(root()).not.toContain('glass-surface');
+    expect(root()).not.toContain('bg-panel');
+  });
+
+  it('never leaks `surface` to the DOM', () => {
+    render(<Fixture surface="glass" />);
+    expect(document.querySelector('[data-slot="accordion"]')!.hasAttribute('surface')).toBe(false);
+  });
+});

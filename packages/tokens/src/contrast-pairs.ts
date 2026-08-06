@@ -254,6 +254,53 @@ export function resolveGlassSurface(pair: GlassSurfacePair): {
   };
 }
 
+/* ── tier O: the overlay must not BE the page it floats over ──────────────── */
+
+/**
+ * The tier-O counterpart to {@link GLASS_SURFACE_PAIRS}, and it exists because
+ * of a shipped bug this file's gates did not catch.
+ *
+ * Tier O's dark surface was `neutral[900]` — which is also what `--bg` was — so
+ * a Popover or DropdownMenu composited to **exactly** the page colour, 0/255,
+ * and was carried entirely by a 1.33:1 border. Every WCAG pair was green
+ * throughout: an invisible overlay has *better* text contrast than a visible
+ * one, which is the same blind spot {@link PERCEPTIBILITY_FLOOR} was introduced
+ * for on tier S. The gate simply never covered tier O.
+ *
+ * **Deliberately one-sided: this measures against `--bg` only, never `--panel`.**
+ * A tier-S surface has to differ from the opaque panel, because "glass Card" and
+ * "panel Card" are two materials a caller chooses between. A tier-O overlay has
+ * no such twin — a light Dialog composites 3/255 from `--panel` and that is
+ * *correct*, it is meant to read as paper. What an overlay must never be is
+ * indistinguishable from the page underneath it.
+ *
+ * The seven-backdrop legibility sweep in `test/contrast.test.ts` stays where it
+ * is; this asks the orthogonal question that sweep cannot.
+ */
+export interface GlassOverlayPair {
+  /** Human-readable, and what the failure message prints. */
+  label: string;
+  theme: ThemeName;
+  /** The tier-O entry in {@link glass}. `darkElevated` is excluded — it stacks
+   *  on another overlay, so the page is not its backdrop. */
+  tier: 'light' | 'dark';
+}
+
+export const GLASS_OVERLAY_PAIRS: readonly GlassOverlayPair[] = [
+  { label: 'light overlay (Dialog, Popover, Toast)', theme: 'light', tier: 'light' },
+  { label: 'dark overlay (Dialog, Popover, Toast)', theme: 'dark', tier: 'dark' },
+];
+
+/** Flatten a tier-O entry over the page — the one backdrop it must differ from. */
+export function resolveGlassOverlay(pair: GlassOverlayPair): {
+  composite: string;
+  bg: string;
+} {
+  const theme = themes[pair.theme];
+  const tier = glass[pair.tier];
+  return { composite: compositeOver(tier.surface, theme.bg, tier.alpha), bg: theme.bg };
+}
+
 /* ── the soft chips: text over a translucent wash over a surface ───────────── */
 
 /**

@@ -100,6 +100,21 @@ export interface EmptyStateProps
    * click.
    */
   children?: React.ReactNode;
+  /**
+   * The material behind the state. **Defaults to `none`, and that default is
+   * deliberate — it is the odd one out among the surface-bearing components.**
+   *
+   * `Table`, `Accordion` and `Card` all default to `glass` because they are
+   * normally the outermost thing on a page. An EmptyState almost never is: the
+   * `default` size exists for a table body, and `compact` is documented for a
+   * card body, a popover, an empty sub-list. Every one of those is already a
+   * glass surface, and glass inside glass composites ~2/255 apart — both layers
+   * disappear and the caller sees a bug they cannot explain.
+   *
+   * Pass `surface="glass"` for the case that genuinely wants it: a page-level
+   * first-run state sitting directly on `--bg` with no container around it.
+   */
+  surface?: 'glass' | 'panel' | 'none';
 }
 
 function EmptyState({
@@ -111,12 +126,22 @@ function EmptyState({
   action,
   headingLevel,
   children,
+  surface = 'none',
   ...props
 }: EmptyStateProps) {
   const Title = headingLevel ? (`h${headingLevel}` as 'h2' | 'h3' | 'h4') : 'p';
 
   return (
-    <div data-slot="empty-state" className={cn(emptyStateVariants({ size }), className)} {...props}>
+    <div
+      data-slot="empty-state"
+      className={cn(
+        emptyStateVariants({ size }),
+        surface === 'glass' && 'glass-surface rounded-xl',
+        surface === 'panel' && 'rounded-xl border border-border bg-panel shadow-sm',
+        className,
+      )}
+      {...props}
+    >
       {icon && (
         /**
          * `aria-hidden` on the wrapper rather than trusting the caller's icon to

@@ -8,6 +8,16 @@ export interface TableProps extends React.ComponentProps<'table'> {
    * surface treatment belongs. See the glass rule in the docblock.
    */
   containerClassName?: string;
+  /**
+   * The wrapper's material. `glass` (the default) is Tier S — the same
+   * `.glass-surface` a `Card` uses, and **never** `.glass-surface-blur`: this
+   * wrapper is a scroll container, so a live backdrop layer here re-samples on
+   * every scroll frame. `panel` is the opaque fallback, and `none` leaves the
+   * wrapper bare for a table already sitting inside a Card or a Dialog — which
+   * is the case that matters, because a surface inside a surface is nested
+   * glass and both layers cancel.
+   */
+  surface?: 'glass' | 'panel' | 'none';
 }
 
 /**
@@ -34,10 +44,20 @@ export interface TableProps extends React.ComponentProps<'table'> {
  * same repaint reason — so if this table sits *inside* a glass Dialog, the glass
  * stops at the Dialog panel.
  *
- * What that leaves: put the panel, border, radius and shadow on the wrapper via
- * `containerClassName`, and let rows use the opaque wash tokens
- * (`--highlight` for hover, `--bg2` for selected) that the implementation below
- * already uses. Those are flat colours — no filter, no compositing layer.
+ * What that leaves: the wrapper carries the surface, and rows use the opaque
+ * wash tokens (`--highlight` for hover, `--bg2` for selected) that the
+ * implementation below already uses. Those are flat colours — no filter, no
+ * compositing layer.
+ *
+ * Since 2026-08-06 the wrapper does that by DEFAULT (`surface="glass"`) rather
+ * than leaving it to `containerClassName` at every call site. It is Tier S
+ * without the blur, for the reason above — a scroll container is the one place
+ * `.glass-surface-blur` must never appear, and `glass.css` forbids it.
+ *
+ * **Pass `surface="none"` for a table already inside a Card or a Dialog.** That
+ * is nested glass: the inner surface composites over the outer one and the two
+ * land ~2/255 apart, so the table shell vanishes and the Card looks like it has
+ * a hole in it.
  * ─────────────────────────────────────────────────────────────────────────────
  *
  * ## `caption-bottom`
@@ -47,11 +67,16 @@ export interface TableProps extends React.ComponentProps<'table'> {
  * below the data costs nothing semantically and keeps a visible caption from
  * competing with the page heading above the table.
  */
-function Table({ className, containerClassName, ...props }: TableProps) {
+function Table({ className, containerClassName, surface = 'glass', ...props }: TableProps) {
   return (
     <div
       data-slot="table-container"
-      className={cn('relative w-full overflow-x-auto', containerClassName)}
+      className={cn(
+        'relative w-full overflow-x-auto',
+        surface === 'glass' && 'glass-surface rounded-xl',
+        surface === 'panel' && 'rounded-xl border border-border bg-panel shadow-sm',
+        containerClassName,
+      )}
     >
       <table
         data-slot="table"

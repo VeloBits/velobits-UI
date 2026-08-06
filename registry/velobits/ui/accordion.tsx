@@ -54,20 +54,36 @@ import { cn } from '../lib/cn';
  *    FAQ is therefore a page-level requirement this shared component
  *    deliberately does not carry.
  */
-type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root>;
+type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root> & {
+  /**
+   * The container's material. `glass` (the default since 2026-08-06) is Tier S,
+   * the same `.glass-surface` a `Card` uses. `panel` is the opaque fallback,
+   * and `none` is for an accordion nested inside a Card or a Dialog — glass
+   * inside glass composites ~2/255 apart and both layers disappear.
+   *
+   * Note the border comes from `.glass-surface` itself in the `glass` case, so
+   * no `border-border` utility is applied: a `border-*` utility beats the
+   * components layer and would silently replace the material's own edge.
+   */
+  surface?: 'glass' | 'panel' | 'none';
+};
 
-function Accordion({ className, ...props }: AccordionProps) {
+function Accordion({ className, surface = 'glass', ...props }: AccordionProps) {
   // `collapsible` exists only on the single-value variant, hence the narrow. The
   // spread comes second so an explicit `collapsible={false}` still wins.
+  // Cast to Root's own props, not AccordionProps — `surface` is ours and is
+  // already destructured out above; it must not reach the Radix element.
   const rootProps = (
     props.type === 'single' ? { collapsible: true, ...props } : props
-  ) as AccordionProps;
+  ) as React.ComponentProps<typeof AccordionPrimitive.Root>;
 
   return (
     <AccordionPrimitive.Root
       data-slot="accordion"
       className={cn(
-        'divide-y divide-border/60 overflow-hidden rounded-xl border border-border bg-panel',
+        'divide-y divide-border/60 overflow-hidden rounded-xl',
+        surface === 'glass' && 'glass-surface',
+        surface === 'panel' && 'border border-border bg-panel shadow-sm',
         className,
       )}
       {...rootProps}
