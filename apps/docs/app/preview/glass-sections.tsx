@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
 } from '@velobits-dev/ui';
 
-import { Row, Section } from './section';
+import { Row, Section } from '../section';
 
 export function GlassSurfaceSection() {
   return (

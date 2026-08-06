@@ -33,8 +33,14 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldLabel,
   Input,
+  Kbd,
   Label,
+  NativeSelect,
   Popover,
   PopoverContent,
   PopoverDescription,
@@ -49,6 +55,8 @@ import {
   SidePanelHeader,
   SidePanelTitle,
   SidePanelTrigger,
+  StatusChip,
+  Textarea,
   Toast,
   ToastAction,
   ToastClose,
@@ -57,103 +65,164 @@ import {
   ToastTitle,
   ToastViewport,
 } from '@velobits-dev/ui';
-import { CircleCheckIcon, AlertTriangleIcon, FlagIcon, PlusIcon } from '@velobits-dev/icons';
+import {
+  AlertTriangleIcon,
+  CircleCheckIcon,
+  EllipsisIcon,
+  FlagIcon,
+  PlusIcon,
+  SlidersIcon,
+} from '@velobits-dev/icons';
 
-import { Row, Section } from './section';
+import { Demo, Row } from '../section';
 
-export function DialogSection() {
+/*
+ * Tier 2 — the six overlays. Every one opens from a real trigger: a screenshot
+ * of an overlay proves nothing about focus, Escape, or the material, which is
+ * the entire content of this tier.
+ *
+ * BLUR BUDGET: all six are closed at rest, so this file contributes ZERO live
+ * backdrop layers until something is opened. That is what keeps the page at 5.
+ */
+
+export function DialogDemo() {
   return (
-    <Section title="Dialog">
+    <Demo
+      title="Dialog"
+      note="Tier-O glass over a scrim. Focus is trapped while open, Escape closes, and focus returns to the trigger. `focusFirstField` is a prop because autoFocus is silently swallowed by Radix's FocusScope."
+    >
       <Row>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="primary">Open dialog</Button>
+            <Button variant="primary">
+              <PlusIcon />
+              Create flag
+            </Button>
           </DialogTrigger>
           <DialogContent focusFirstField>
             <DialogHeader>
               <DialogTitle>Create flag</DialogTitle>
-              <DialogDescription>A Tier-O glass surface over the page.</DialogDescription>
+              <DialogDescription>
+                It starts off in every environment. You can roll it out afterwards.
+              </DialogDescription>
             </DialogHeader>
-            <div className="space-y-2 py-2">
-              <Label htmlFor="pv-dialog-key">Flag key</Label>
-              <Input id="pv-dialog-key" placeholder="new-checkout" />
+            <div className="space-y-4 py-2">
+              <Field>
+                <FieldLabel>Flag key</FieldLabel>
+                <FieldControl>
+                  <Input placeholder="new-checkout" />
+                </FieldControl>
+                <FieldDescription>Lowercase letters, digits and dashes only.</FieldDescription>
+              </Field>
+              <Field>
+                <FieldLabel>Description</FieldLabel>
+                <FieldControl>
+                  <Textarea placeholder="What does this flag control?" />
+                </FieldControl>
+              </Field>
             </div>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="ghost">Cancel</Button>
               </DialogClose>
-              <Button variant="primary">Create</Button>
+              <Button variant="primary">Create flag</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </Row>
-    </Section>
+    </Demo>
   );
 }
 
-export function SidePanelSection() {
+export function SidePanelDemo() {
   return (
-    <Section title="SidePanel">
+    <Demo
+      title="SidePanel"
+      note="A separate component, not a Dialog variant — the two differ in where focus lands on open, which is not a thing a variant flag can carry honestly."
+    >
       <Row>
         <SidePanel>
           <SidePanelTrigger asChild>
-            <Button variant="secondary">Open side panel</Button>
+            <Button variant="secondary">Open flag detail</Button>
           </SidePanelTrigger>
           <SidePanelContent>
             <SidePanelHeader>
-              <SidePanelTitle>Flag detail</SidePanelTitle>
+              <SidePanelTitle>new-checkout</SidePanelTitle>
               <SidePanelDescription>Slides in from the inline end.</SidePanelDescription>
             </SidePanelHeader>
-            <p className="px-4 text-sm text-muted-foreground">
-              Body content. Esc closes; focus returns to the trigger.
-            </p>
+            <div className="space-y-4 px-4 text-sm">
+              <div className="flex items-center gap-2">
+                <StatusChip status="partial">40%</StatusChip>
+                <span className="text-muted-foreground">in Production</span>
+              </div>
+              <p className="text-muted-foreground">
+                Escape closes the panel and focus returns to the trigger. Below the md breakpoint
+                this same component is what AppShell uses for its nav drawer.
+              </p>
+            </div>
             <SidePanelFooter>
               <SidePanelClose asChild>
-                <Button variant="secondary">Close</Button>
+                <Button variant="ghost">Close</Button>
               </SidePanelClose>
+              <Button variant="primary">Save</Button>
             </SidePanelFooter>
           </SidePanelContent>
         </SidePanel>
       </Row>
-    </Section>
+    </Demo>
   );
 }
 
-export function PopoverSection() {
+export function PopoverDemo() {
   return (
-    <Section title="Popover">
+    <Demo
+      title="Popover"
+      note="Anchored and non-modal, on the elevated tier. Wires aria-labelledby, so it is never an unnamed dialog."
+    >
       <Row>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="secondary">Open popover</Button>
+            <Button variant="secondary">Rollout summary</Button>
           </PopoverTrigger>
           <PopoverContent>
             <PopoverHeader>
-              <PopoverTitle>Rollout summary</PopoverTitle>
-              <PopoverDescription>
-                Anchored, non-modal, on the elevated glass tier.
-              </PopoverDescription>
+              <PopoverTitle>Rollout</PopoverTitle>
+              <PopoverDescription>40% of traffic, seeded on checkout-2026.</PopoverDescription>
             </PopoverHeader>
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="cx-pop-env">Environment</Label>
+              <NativeSelect id="cx-pop-env" defaultValue="prod">
+                <option value="dev">Development</option>
+                <option value="staging">Staging</option>
+                <option value="prod">Production</option>
+              </NativeSelect>
+            </div>
           </PopoverContent>
         </Popover>
       </Row>
-    </Section>
+    </Demo>
   );
 }
 
-export function DropdownMenuSection() {
+export function DropdownMenuDemo() {
   const [withArchived, setWithArchived] = useState(true);
   const [env, setEnv] = useState('prod');
 
   return (
-    <Section title="DropdownMenu">
+    <Demo
+      title="DropdownMenu"
+      note="Items, checkbox items, a radio group and a submenu. Highlighting is data-[highlighted], not :hover — keyboard and pointer must look identical."
+    >
       <Row>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary">Open menu</Button>
+            <Button variant="secondary">
+              <SlidersIcon />
+              Flag actions
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuLabel>Flag actions</DropdownMenuLabel>
+            <DropdownMenuLabel>new-checkout</DropdownMenuLabel>
             <DropdownMenuItem>
               Edit
               <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
@@ -164,6 +233,7 @@ export function DropdownMenuSection() {
               Show archived
             </DropdownMenuCheckboxItem>
             <DropdownMenuSeparator />
+            <DropdownMenuLabel>Environment</DropdownMenuLabel>
             <DropdownMenuRadioGroup value={env} onValueChange={setEnv}>
               <DropdownMenuRadioItem value="dev">Development</DropdownMenuRadioItem>
               <DropdownMenuRadioItem value="staging">Staging</DropdownMenuRadioItem>
@@ -173,14 +243,28 @@ export function DropdownMenuSection() {
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                <DropdownMenuItem>Export</DropdownMenuItem>
-                <DropdownMenuItem variant="danger">Delete</DropdownMenuItem>
+                <DropdownMenuItem>Export as JSON</DropdownMenuItem>
+                <DropdownMenuItem>Copy key</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="danger">Archive flag</DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="icon" variant="ghost" aria-label="Row actions">
+              <EllipsisIcon />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem variant="danger">Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </Row>
-    </Section>
+    </Demo>
   );
 }
 
@@ -189,7 +273,7 @@ interface ToastEntry {
   variant: 'success' | 'danger';
 }
 
-export function ToastSection() {
+export function ToastDemo() {
   const [toasts, setToasts] = useState<ToastEntry[]>([]);
   const [nextId, setNextId] = useState(0);
 
@@ -199,9 +283,9 @@ export function ToastSection() {
   };
 
   return (
-    <Section
+    <Demo
       title="Toast"
-      note="Provider and viewport are mounted in this section, outside any glass ancestor."
+      note="Swipe direction defaults to `down`, not `right` — the viewport sits at the inline end, so a rightward swipe would push it further off screen. Provider and viewport are mounted here, outside any glass ancestor."
     >
       <ToastProvider>
         <Row>
@@ -224,7 +308,7 @@ export function ToastSection() {
             <ToastTitle>{toast.variant === 'success' ? 'Flag saved' : 'Save failed'}</ToastTitle>
             <ToastDescription>
               {toast.variant === 'success'
-                ? 'Your changes are live in Production.'
+                ? 'new-checkout is live in Production.'
                 : 'The server rejected the change.'}
             </ToastDescription>
             <ToastAction altText="Open the flag's history to undo this change">Undo</ToastAction>
@@ -233,30 +317,39 @@ export function ToastSection() {
         ))}
         <ToastViewport />
       </ToastProvider>
-    </Section>
+    </Demo>
   );
 }
 
-export function CommandPaletteSection() {
+export function CommandPaletteDemo() {
   const [open, setOpen] = useState(false);
 
   return (
-    <Section title="CommandPalette" note="Also bound to ⌘K / Ctrl+K while this page is open.">
+    <Demo
+      title="CommandPalette"
+      note="Also bound to ⌘K / Ctrl+K while this page is open — try it without touching the button."
+    >
       <Row>
         <Button variant="secondary" onClick={() => setOpen(true)}>
           Open command palette
         </Button>
+        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+          or press <Kbd>⌘</Kbd> <Kbd>K</Kbd>
+        </span>
       </Row>
       <CommandDialog open={open} onOpenChange={setOpen} shortcut="k">
         <CommandInput placeholder="Search flags, environments, docs…" />
         <CommandList>
           <CommandEmpty>No results.</CommandEmpty>
-          <CommandGroup heading="Flags">
+          <CommandGroup heading="Actions">
             <CommandItem>
               <PlusIcon />
               New flag
               <CommandShortcut>⌘N</CommandShortcut>
             </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Flags">
             <CommandItem>
               <FlagIcon />
               new-checkout
@@ -264,6 +357,10 @@ export function CommandPaletteSection() {
             <CommandItem>
               <FlagIcon />
               dark-mode-rollout
+            </CommandItem>
+            <CommandItem>
+              <FlagIcon />
+              beta-search
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
@@ -274,6 +371,6 @@ export function CommandPaletteSection() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
-    </Section>
+    </Demo>
   );
 }

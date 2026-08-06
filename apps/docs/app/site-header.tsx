@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { MoonIcon, SunIcon } from '@velobits-dev/icons';
-import { Button, useTheme } from '@velobits-dev/ui';
+import { Button, cn, useTheme } from '@velobits-dev/ui';
 
 const NAV = [
   { href: '/', label: 'Overview' },
@@ -11,8 +12,21 @@ const NAV = [
   { href: '/components', label: 'Components' },
 ];
 
+/**
+ * Exact match for the root, prefix match for everything else — so a future
+ * `/components/button` still lights up "Components", while `/tokens` does not
+ * light up "Overview" the way a bare `startsWith('/')` would.
+ *
+ * `/preview` matches nothing on purpose: it is not in this nav, and a header
+ * that highlights nothing is the honest answer for a page that is not listed.
+ */
+function isCurrent(pathname: string, href: string) {
+  return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function SiteHeader() {
   const { toggle } = useTheme();
+  const pathname = usePathname();
 
   return (
     /*
@@ -25,12 +39,59 @@ export function SiteHeader() {
         <Link href="/" className="font-semibold tracking-tight">
           VeloBits <span className="text-link">UI</span>
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
-          {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="text-muted-foreground hover:text-fg">
-              {item.label}
-            </Link>
-          ))}
+        {/*
+         * The current page is signalled THREE ways, and that is not belt-and-
+         * braces — it is 1.4.1. A colour shift alone leaves the answer invisible
+         * to anyone who cannot separate `--fg` from `--muted-fg`, and invisible
+         * to a screen reader entirely.
+         *
+         *   aria-current="page"   the machine-readable one; the only channel AT has
+         *   text-link             muted → the AA-safe blue step (never `--primary`,
+         *                         which is 3.90:1 on cream and is a FILL colour)
+         *   bg-primary-soft       a filled shape, so colour never carries it alone
+         *
+         * `bg-primary-soft` + `text-link` is not a new pairing — it is exactly
+         * `Badge variant="primary"`, which the `SOFT_CHIP_PAIRS` suite gates over
+         * the page, the panel and the Tier-S composite. This header is Tier **O**,
+         * which that suite does not cover, so it was measured directly: the chip
+         * composites to #e4eff7 light / #163243 dark and `--primary-text` on it
+         * holds **5.30–5.49:1** across both themes and both plausible backdrops
+         * (page and panel scrolling under the blur). Comfortably over AA.
+         *
+         * The chip reads at 25/255 light and 39/255 dark against the header —
+         * visible as a shape. Its ~1.2:1 edge ratio is deliberately not held to
+         * 1.4.11's 3:1: nothing here is identified BY the chip. The link is named
+         * by its own text and its state is carried by `aria-current`; the fill is
+         * redundant emphasis, the same reasoning that makes `--border` contrast-
+         * exempt.
+         *
+         * EVERY item carries the padding and radius; only the fill and the text
+         * colour change. Nothing is inserted, moved or resized when the route
+         * changes — the same rule that keeps `TabsTrigger` from gaining weight
+         * when it activates.
+         */}
+        <nav className="flex items-center gap-1 text-sm">
+          {NAV.map((item) => {
+            const current = isCurrent(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={current ? 'page' : undefined}
+                className={cn(
+                  // `font-medium` on EVERY item, not just the active one:
+                  // 400 → 500 changes the glyph advance, so the strip would
+                  // reflow on every navigation. `TabsTrigger` does the same.
+                  'rounded-md px-3 py-1.5 font-medium transition-colors duration-micro ease-out',
+                  current
+                    ? 'bg-primary-soft text-link'
+                    : 'text-muted-foreground hover:bg-highlight hover:text-fg',
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
         {/*
          * Both icons are rendered and CSS picks one, rather than

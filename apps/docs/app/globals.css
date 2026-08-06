@@ -27,3 +27,16 @@
  */
 @source "../../../packages/ui/dist";
 @source "../../../registry/velobits";
+
+/*
+ * The registry JSON is auto-scanned (it is committed, so .gitignore does not
+ * exclude it) and every file in it carries a JSON-ESCAPED copy of a component's
+ * full source. Tailwind scans plain text, so a `"` that a component legitimately
+ * has inside an arbitrary value arrives here as `\"` — and Lightning CSS rejects
+ * the resulting declaration as `BadUrl`, taking the entire stylesheet down with
+ * a 500 rather than dropping one rule.
+ *
+ * Nothing is lost by excluding it: these files are copies of `registry/velobits`,
+ * which is already scanned above in its real, unescaped form.
+ */
+@source not "../public/r";
