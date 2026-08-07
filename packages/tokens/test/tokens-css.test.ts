@@ -30,9 +30,19 @@ function block(selector: string): Record<string, string> {
   const body = css.slice(open + 1, close);
 
   const out: Record<string, string> = {};
-  // Strip comments first so a commented-out example is never read as a value.
-  for (const line of body.replace(/\/\*[\s\S]*?\*\//g, '').split('\n')) {
-    const m = /^\s*(--[a-z0-9-]+)\s*:\s*(.+?);\s*$/i.exec(line);
+  /**
+   * Strip comments first so a commented-out example is never read as a value,
+   * then split on `;` — NOT on newlines.
+   *
+   * A line-based parse silently drops any declaration prettier has wrapped, and
+   * it wraps anything past 100 characters, which the three-stop tier-S shadows
+   * are. "Silently" is the whole problem: a wrapped token disappears from this
+   * parity check AND from the "no token escapes measurement" sweep at the same
+   * time, so the CSS could drift from the TS with every test still green. Cost
+   * paid once, 2026-08-06.
+   */
+  for (const declaration of body.replace(/\/\*[\s\S]*?\*\//g, '').split(';')) {
+    const m = /^\s*(--[a-z0-9-]+)\s*:\s*([\s\S]+?)\s*$/i.exec(declaration);
     if (m) out[m[1]!] = m[2]!;
   }
   return out;
@@ -258,7 +268,12 @@ describe('glass CSS agrees with glass.ts', () => {
      * `backdrop-filter`. The tier degrades as ONE material — a sticky bar going
      * opaque while the cards under it stay translucent is worse than either.
      */
-    const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8');
+    // Comments stripped first: glass.css documents both markers in prose, and
+    // a raw indexOf finds the sentence ABOUT the block before the block itself.
+    const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8').replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
     for (const marker of ['@supports not', 'prefers-reduced-transparency']) {
       const start = glassCss.indexOf(marker);
       expect(start, `${marker} block is missing from glass.css`).toBeGreaterThan(-1);
@@ -274,7 +289,7 @@ describe('glass CSS agrees with glass.ts', () => {
 describe('the dark selector list covers both toggle conventions', () => {
   it('matches body.dark (apps) AND bare .dark (Keycloak html.dark)', () => {
     /**
-     * FixMyText and ToggleFlow toggle `body.dark`; the Keycloak login theme
+     * the editor app and the dashboard app toggle `body.dark`; the Keycloak login theme
      * toggles `html.dark`. Dropping either half silently breaks dark mode for
      * one of the four surfaces.
      */
@@ -288,7 +303,7 @@ describe('the dark selector list covers both toggle conventions', () => {
 
   it('the base border reset uses --border, NOT --color-border', () => {
     /**
-     * ADR-0031 trap 1, and the single most expensive mistake in this file. A
+     * trap 1, and the single most expensive mistake in this file. A
      * `@theme` variable is emitted as a real `:root` declaration, so
      * `var(--color-border)` resolves against `:root` — the light value — and
      * then inherits everywhere, so `body.dark` never reaches it.

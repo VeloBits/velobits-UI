@@ -2,7 +2,7 @@
 
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
-import { CheckIcon, ChevronRightIcon, DotIcon } from '@velobits/icons';
+import { CheckIcon, ChevronRightIcon, DotIcon } from '@velobits-dev/icons';
 
 import { cn } from '../lib/cn';
 
@@ -11,7 +11,8 @@ import { cn } from '../lib/cn';
  * table row and topbar in these dashboards reaches for.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * THREE REFUSALS CARRIED FROM ADR-0031. All three were paid for once already.
+ * THREE REFUSALS THIS COMPONENT TREATS AS RULES, NOT PREFERENCES. All three were
+ * paid for once already.
  *
  * ## 1. Highlight styling is `data-[highlighted]`, never `:hover`
  *
@@ -42,7 +43,7 @@ import { cn } from '../lib/cn';
  *     Dialog underneath) or a **Popover**. Both are designed to contain focus
  *     rather than manage it, so an input inside them behaves normally.
  *
- * This is the same conclusion ToggleFlow reached when it tried to put an
+ * This is the same conclusion the dashboard app reached when it tried to put an
  * environment filter in a DropdownMenu and shipped a Dialog instead.
  *
  * ## 3. Testing: `keyDown Enter`, not `click` — and Playwright cannot do it
@@ -69,7 +70,7 @@ import { cn } from '../lib/cn';
  *
  * The content sits at `z-dropdown` (1000), which is above `z-sticky` (100). A
  * sticky topbar raised to 1100 "to be safe" swallows its own menu — see the
- * z-ladder note in `@velobits/tokens/theme.css`.
+ * z-ladder note in `@velobits-dev/tokens/theme.css`.
  *
  * Submenus use `glass glass-elevated`, the plum-tinted tier, because a plain
  * glass panel over another plain glass panel composites to a single indistinct

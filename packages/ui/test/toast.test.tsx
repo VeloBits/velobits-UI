@@ -5,7 +5,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { CircleCheckIcon } from '@velobits/icons';
+import { CircleCheckIcon } from '@velobits-dev/icons';
 
 import {
   Toast,
@@ -239,7 +239,7 @@ describe('Toast, variants', () => {
   it('never puts a *-soft wash on the glass surface', () => {
     /**
      * THE variant trap. The soft tokens are low-alpha washes meant for an OPAQUE
-     * panel — `--success-soft` is `rgba(43,118,45,0.12)`. `.glass` sits in
+     * panel — `--success-soft` is `rgba(34,110,37,0.12)`. `.glass` sits in
      * Tailwind's `components` layer, so a `bg-success-soft` utility WINS and
      * replaces `--glass-bg` (alpha 0.85) with alpha 0.12. The toast becomes a
      * blurred smear of the page behind it, and nothing warns you because both

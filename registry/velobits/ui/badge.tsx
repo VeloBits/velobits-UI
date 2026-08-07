@@ -8,8 +8,12 @@ import { cn } from '../lib/cn';
 /**
  * The `*-soft` variants pair a tinted wash with the matching *text* token, never
  * with the solid fill — `bg-success-soft text-success`, not
- * `bg-success text-success`. Each text token is gated at AA against the page and
- * the panel, and the washes are low-alpha enough not to move that materially.
+ * `bg-success text-success`. Badge text is 12px, so the full 4.5:1 applies, and
+ * the colour the text actually sits on is the wash FLATTENED over the surface
+ * beneath the chip — so each pairing is gated as a composite over the page, the
+ * panel and the tier-S glass surface, in both themes: the soft-chip suite in
+ * `@velobits-dev/tokens` (`test/contrast.test.ts`, driven by `SOFT_CHIP_PAIRS`).
+ * The token values were tuned to hold that gate.
  *
  * `brand` is the exception that proves the palette's asymmetry: lime is a fill
  * with charcoal on it in both themes. There is no soft-lime-with-lime-text

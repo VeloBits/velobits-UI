@@ -28,6 +28,13 @@ export type SegmentedControlProps = {
   value: string;
   onValueChange: (value: string) => void;
   options: SegmentOption[];
+  /** Forwarded to the radiogroup root so other elements can reference the group. */
+  id?: string;
+  /**
+   * id(s) of the hint or error text describing the group. A dangling id fails as
+   * silently as a dangling `aria-labelledby` — see the docblock.
+   */
+  'aria-describedby'?: string;
   /**
    * Disables every segment. This is a REAL disable — see the docblock; it is not
    * `pointer-events-none`.
@@ -56,11 +63,14 @@ export type SegmentedControlProps = {
  * rather than access. `segmented-control.test.tsx` pins the actual behaviour.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * ## TWO BUGS FIXED RELATIVE TO ToggleFlow'S `src/ui/segmented-control.tsx`
+ * ## TWO TRAPS FIXED HERE, AND FIXED INDEPENDENTLY IN THE CONSUMER
  *
- * The consumer currently relies on the broken behaviour of both, so its
- * `apps/dashboard/test/ui.test.tsx` SegmentedControl block will need updating at
- * migration.
+ * The dashboard app's own segmented control hit both of the bugs below and was
+ * repaired separately, reaching the same two conclusions this implementation did:
+ * a `div` root leaves an external `htmlFor` dangling, and `pointer-events-none`
+ * is a fake disable. Two implementations converging on the same pair of fixes is
+ * why both are written down here rather than treated as local trivia. What this
+ * one adds on top is per-segment `disabled`.
  *
  * ### 1. `htmlFor` could never label this, and now there is a path that can
  *
@@ -86,6 +96,13 @@ export type SegmentedControlProps = {
  * fails just as silently as the `htmlFor` did, so the accompanying test asserts
  * that the name actually *resolves*, not merely that the attribute is present.
  *
+ * The dashboard app's repaired control also grew the matching wiring in the
+ * other direction, and so does this one: `id` is forwarded onto the root so
+ * other elements can point at the group, and `aria-describedby` associates hint
+ * or error text with it — both under their native ARIA spelling. A dangling
+ * `aria-describedby` fails exactly as silently as a dangling `aria-labelledby`,
+ * so its test asserts that the description resolves too.
+ *
  * ### 2. `pointer-events-none` is not a disable
  *
  * It removes the mouse and nothing else. The control keeps its `tabindex`, so it
@@ -105,6 +122,8 @@ export function SegmentedControl({
   value,
   onValueChange,
   options,
+  id,
+  'aria-describedby': ariaDescribedBy,
   disabled = false,
   className,
   ...nameProps
@@ -125,6 +144,9 @@ export function SegmentedControl({
       // duplicate makes some screen readers announce it twice.
       data-disabled={disabled ? '' : undefined}
       className={cn('inline-flex rounded-md border border-border bg-bg2 p-0.5', className)}
+      id={id}
+      // Description wiring — same native ARIA spelling as the name props below.
+      aria-describedby={ariaDescribedBy}
       {...nameProps}
     >
       {options.map((option) => (

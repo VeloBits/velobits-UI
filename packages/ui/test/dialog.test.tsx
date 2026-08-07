@@ -145,13 +145,13 @@ describe('Dialog', () => {
 });
 
 /**
- * ## What this block can and cannot prove (ADR-0031)
+ * ## What this block can and cannot prove (the consumer ADR)
  *
  * The behaviour `focusFirstField` exists for — Radix's `FocusScope` focusing the
  * first tabbable node and beating a field's `autoFocus` — is a RACE between
  * React's autofocus commit and the scope's mount effect, and happy-dom with React
  * 19 resolves it the other way round: `autoFocus` appears to work here, and does
- * not in Chrome, which is where ToggleFlow met it on "New environment".
+ * not in Chrome, which is where the dashboard app met it on "New environment".
  *
  * So there is deliberately no "autoFocus is ignored" test. Writing one would pin
  * an environment quirk and would go green through a regression. What IS asserted

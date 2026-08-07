@@ -3,7 +3,7 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Toast as ToastPrimitive } from 'radix-ui';
 
-import { XIcon } from '@velobits/icons';
+import { XIcon } from '@velobits-dev/icons';
 
 import { cn } from '../lib/cn';
 
@@ -109,7 +109,7 @@ function ToastViewport({
  * and that is load-bearing rather than aesthetic.
  *
  * The soft tokens are low-alpha washes designed to sit on an OPAQUE panel
- * (`--success-soft` is `rgba(43,118,45,0.12)`). `.glass` lives in Tailwind's
+ * (`--success-soft` is `rgba(34,110,37,0.12)`). `.glass` lives in Tailwind's
  * `components` layer, so a `bg-success-soft` utility overrides
  * `background: var(--glass-bg)` — replacing an alpha-0.85 surface with an
  * alpha-0.12 one. The result is a blurred smear of whatever is behind it: the

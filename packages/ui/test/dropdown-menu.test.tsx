@@ -351,7 +351,7 @@ describe('DropdownMenu, submenus', () => {
 describe('DropdownMenu, the styling refusals', () => {
   it('styles the highlight through data-[highlighted], never :hover', () => {
     /**
-     * REFUSAL 1 (ADR-0031). Radix moves real DOM focus for both the pointer and
+     * REFUSAL 1 (the consumer ADR). Radix moves real DOM focus for both the pointer and
      * the keyboard path and mirrors it onto `data-highlighted`. A `hover:`
      * highlight looks perfect with a mouse and is invisible to arrow keys.
      */
@@ -407,7 +407,7 @@ describe('DropdownMenu, the styling refusals', () => {
 
   it('contains no text input, and says so', () => {
     /**
-     * REFUSAL 2 (ADR-0031). A filter field inside a menu cannot keep focus —
+     * REFUSAL 2 (the consumer ADR). A filter field inside a menu cannot keep focus —
      * Radix's content pulls focus back to the item list and typeahead swallows
      * the keystrokes — and the only lever that would hold it,
      * `onOpenAutoFocus`, is a private escape hatch on this primitive. The

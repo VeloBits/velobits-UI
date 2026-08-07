@@ -223,7 +223,7 @@ describe('Accordion, headings', () => {
 describe('Accordion, styling contract', () => {
   it('keeps the four utilities that fight the consumer bare-button rule', () => {
     /**
-     * ToggleFlow's styles.css styles bare `button` (border, background, radius,
+     * the dashboard app's styles.css styles bare `button` (border, background, radius,
      * padding) in Tailwind's components layer. Utilities win that cascade only for
      * properties one is actually written for — drop `rounded-none` and the row
      * grows a 6px-rounded panel-coloured box inside the container.
@@ -338,7 +338,7 @@ describe('Accordion, the one sanctioned height animation', () => {
   it('unmounts a closed panel — the one original behaviour NOT carried over', () => {
     /**
      * The hand-rolled version kept collapsed panels in the DOM (with `aria-hidden`
-     * + `inert`) because ToggleFlow's landing page is the product's only crawlable
+     * + `inert`) because the dashboard app's landing page is the product's only crawlable
      * surface. Radix unmounts them, and `forceMount` is not a substitute: with it
      * Radix never applies `hidden` and always renders children, so the panel does
      * not collapse and the height var is never set. A crawlable FAQ is a
@@ -359,5 +359,47 @@ describe('Accordion, axe', () => {
   it('finds no structural violations, one row open', async () => {
     const violations = await audit(<Fixture defaultValue="flags" />);
     expect(violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+  });
+});
+
+describe('Accordion, the container surface', () => {
+  const root = () => document.querySelector('[data-slot="accordion"]')!.className;
+
+  const Fixture = (props: { surface?: 'glass' | 'panel' | 'none' }) => (
+    <Accordion type="single" {...props}>
+      <AccordionItem value="a">
+        <AccordionTrigger>Q</AccordionTrigger>
+        <AccordionContent>A</AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+
+  it('carries the Tier-S material by default', () => {
+    render(<Fixture />);
+    expect(root()).toContain('glass-surface');
+  });
+
+  it('does NOT add a border-* utility alongside the glass', () => {
+    /**
+     * `.glass-surface` lives in the components layer, so a `border-border`
+     * utility would beat it and silently replace the material's own edge —
+     * the exact failure the Card docblock warns about.
+     */
+    render(<Fixture />);
+    expect(root()).not.toMatch(/\bborder-border\b/);
+  });
+
+  it('falls back to the opaque panel, and to nothing when nested', () => {
+    const { unmount } = render(<Fixture surface="panel" />);
+    expect(root()).toContain('bg-panel');
+    unmount();
+    render(<Fixture surface="none" />);
+    expect(root()).not.toContain('glass-surface');
+    expect(root()).not.toContain('bg-panel');
+  });
+
+  it('never leaks `surface` to the DOM', () => {
+    render(<Fixture surface="glass" />);
+    expect(document.querySelector('[data-slot="accordion"]')!.hasAttribute('surface')).toBe(false);
   });
 });

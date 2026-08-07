@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits/ui/theme';
+import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits-dev/ui/theme';
 
 import { Providers } from './providers';
 import { SiteHeader } from './site-header';
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           this script mutates the html element that React is about to hydrate.
         */}
         <script
-          dangerouslySetInnerHTML={{ __html: themeInitScript(THEME_STORAGE_KEYS.toggleflow) }}
+          dangerouslySetInnerHTML={{ __html: themeInitScript(THEME_STORAGE_KEYS.dashboard) }}
         />
       </head>
       <body className="min-h-dvh bg-bg text-fg antialiased">

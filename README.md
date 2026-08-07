@@ -1,7 +1,7 @@
 # velobits-ui
 
 The VeloBits design system. One token and component layer for every VeloBits
-surface: the marketing site, FixMyText, the ToggleFlow dashboard, and the shared
+surface: the marketing site, the editor app, the dashboard app, and the shared
 Keycloak login theme.
 
 > Implementation notes and the full plan live at workspace
@@ -26,20 +26,20 @@ velobits-UI/
 │   └── providers/            VelobitsProvider
 ├── registry/registry.ts      → registry.json → apps/docs/public/r/*.json
 ├── packages/
-│   ├── tokens/  @velobits/tokens   CSS + TS. ZERO deps, ZERO React.
-│   ├── icons/   @velobits/icons    88 hand-drawn stroke icons
-│   └── ui/      @velobits/ui       builds from registry/velobits
+│   ├── tokens/  @velobits-dev/tokens   CSS + TS. ZERO deps, ZERO React.
+│   ├── icons/   @velobits-dev/icons    88 hand-drawn stroke icons
+│   └── ui/      @velobits-dev/ui       builds from registry/velobits
 └── apps/docs/                Next.js + MDX. Also hosts the registry.
 ```
 
 ## Two distributions, and which one to use is not taste
 
-| Consumer                      | Path                        | Why                                                                                                                                                                                                                   |
-| ----------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FixMyText                     | **npm**                     | Module Federation needs `@velobits/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                        |
-| ToggleFlow dashboard          | **npm**                     | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
-| Keycloak login theme          | **`@velobits/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
-| Greenfield / one-off surfaces | **shadcn CLI**              | `npx shadcn@latest add https://ui.velobits.dev/r/button.json`. You own the source; no dependency to bump.                                                                                                             |
+| Consumer                      | Path                            | Why                                                                                                                                                                                                                   |
+| ----------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| the editor app                | **npm**                         | Module Federation needs `@velobits-dev/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                    |
+| the dashboard app dashboard   | **npm**                         | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
+| Keycloak login theme          | **`@velobits-dev/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
+| Greenfield / one-off surfaces | **shadcn CLI**                  | `npx shadcn@latest add https://ui.velobits.dev/r/button.json`. You own the source; no dependency to bump.                                                                                                             |
 
 Adding a component means touching four lists, and
 `packages/ui/test/registry-parity.test.ts` fails if you miss one:
@@ -50,23 +50,23 @@ Adding a component means touching four lists, and
 
 ```css
 /* your app's CSS — one import */
-@import '@velobits/tokens/theme.css';
+@import '@velobits-dev/tokens/theme.css';
 
 /* NOT OPTIONAL: Tailwind v4 does not scan node_modules, so utilities used
-   INSIDE @velobits/ui are never generated and the components arrive completely
+   INSIDE @velobits-dev/ui are never generated and the components arrive completely
    unstyled with no warning anywhere. */
-@source "../node_modules/@velobits/ui/dist";
+@source "../node_modules/@velobits-dev/ui/dist";
 ```
 
 ```tsx
-import { THEME_STORAGE_KEYS, VelobitsProvider } from '@velobits/ui';
+import { THEME_STORAGE_KEYS, VelobitsProvider } from '@velobits-dev/ui';
 
 // Once, at the shell root. Radix's Tooltip THROWS without a provider ancestor.
-<VelobitsProvider storageKey={THEME_STORAGE_KEYS.toggleflow}>{children}</VelobitsProvider>;
+<VelobitsProvider storageKey={THEME_STORAGE_KEYS.dashboard}>{children}</VelobitsProvider>;
 ```
 
-The storage key is required and deliberately not defaulted: FixMyText persists
-to `fmx_theme_mode` and ToggleFlow to `tf.theme`, both with live user data, so a
+The storage key is required and deliberately not defaulted: the editor app persists
+to `fmx_theme_mode` and the dashboard app to `tf.theme`, both with live user data, so a
 default would silently orphan one app's preferences.
 
 ## Three things that will bite you
@@ -119,15 +119,15 @@ inside a scroll container, or nested.
 
 ## Publishing
 
-GitHub Packages, private, `@velobits/*`. Every published change needs a
-changeset (`npm run changeset`). `@velobits/tokens` versions independently so a
+GitHub Packages, private, `@velobits-dev/*`. Every published change needs a
+changeset (`npm run changeset`). `@velobits-dev/tokens` versions independently so a
 palette tweak does not force a component release.
 
 Reads require auth even for consumers. In Docker use a **BuildKit secret**
 (`RUN --mount=type=secret,id=npmrc`), never an `ARG` — an `ARG` is recorded in
 the image history.
 
-When `@velobits/ui` gets a new version, FixMyText's Federation
+When `@velobits-dev/ui` gets a new version, the editor app's Federation
 `requiredVersion` pins in `apps/shell`, `apps/editor-remote` and
 `apps/analytics-remote` must move in lockstep. Overshooting the pin gives
 `does not satisfy` warnings and then a fatal

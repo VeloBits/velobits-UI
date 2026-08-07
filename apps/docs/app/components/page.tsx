@@ -1,240 +1,158 @@
+import { Group } from '../section';
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Avatar,
-  AvatarFallback,
-  Badge,
-  Button,
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Checkbox,
-  Field,
-  FieldControl,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Input,
-  Kbd,
-  Label,
-  NativeSelect,
-  Separator,
-  Skeleton,
-  Spinner,
-  Switch,
-  Textarea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@velobits/ui';
-import { AlertTriangleIcon, FlagIcon, TrashIcon } from '@velobits/icons';
+  AlertDemo,
+  AvatarDemo,
+  BadgeDemo,
+  ButtonDemo,
+  CardDemo,
+  CheckboxDemo,
+  FieldDemo,
+  GlassSurfaceDemo,
+  InputDemo,
+  KbdDemo,
+  LabelDemo,
+  NativeSelectDemo,
+  SeparatorDemo,
+  SkeletonDemo,
+  SpinnerDemo,
+  SwitchDemo,
+  TextareaDemo,
+  TooltipDemo,
+} from './tier1-sections';
+import {
+  CommandPaletteDemo,
+  DialogDemo,
+  DropdownMenuDemo,
+  PopoverDemo,
+  SidePanelDemo,
+  ToastDemo,
+} from './overlay-sections';
+import {
+  AccordionDemo,
+  AppShellDemo,
+  BreadcrumbDemo,
+  CodeBlockDemo,
+  DataTableDemo,
+  DiffViewerDemo,
+  EmptyStateDemo,
+  PaginationDemo,
+  SegmentedControlDemo,
+  StatusChipDemo,
+  TableDemo,
+  TabsDemo,
+} from './composite-sections';
+import { FormDemo } from './form-section';
+import { RtlDemo } from './rtl-section';
 
 export const metadata = { title: 'Components — VeloBits UI' };
 
-function Demo({
-  title,
-  note,
-  children,
-}: {
-  title: string;
-  note?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="space-y-3">
-      <div>
-        <h2 className="text-xl font-semibold">{title}</h2>
-        {note && <p className="mt-1 text-sm text-muted-foreground">{note}</p>}
-      </div>
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-panel p-6">
-        {children}
-      </div>
-    </section>
-  );
-}
-
+/**
+ * The showcase: all 37 components the system ships, grouped by tier.
+ *
+ * ## Why every demo sits on a transparent canvas
+ *
+ * See the docblock on `app/section.tsx`. Short version: `--panel` is not neutral
+ * chrome, it is a fill components paint on themselves — an Input on a `bg-panel`
+ * frame is 0/255 against its own backdrop in both themes, and a Tier-S surface
+ * re-composited over `--panel` is no longer the composite `contrast.test.ts`
+ * gates. `--bg` is the one value in the ramp no component uses as a fill, so it
+ * is the only frame that can never collide.
+ *
+ * ## Blur budget — 5 live layers at rest, against a documented cap of ~6
+ *
+ *   1  SiteHeader (`.glass`, sticky)
+ *   3  GlassSurfaceDemo — tier="surface" blur · tier="overlay" · tier="elevated"
+ *   1  AppShellDemo's AppShellHeader (`.glass`)
+ *
+ * All six Tier-2 overlays are closed at rest and cost nothing until opened.
+ * Card, Table, Accordion and EmptyState never blur in any `surface` mode. Adding
+ * anything here that blurs means removing one of the five.
+ *
+ * ## This is the only surface, and it carries the glass checks
+ *
+ * A separate `/preview` diagnostics route existed while this page showed 17 of
+ * 37. It is gone: Tier-S-on-the-page is `CardDemo`, the tier swatches are
+ * `GlassSurfaceDemo`, sticky-under-blur is `AppShellDemo`'s Tier-O header over
+ * its scrolling main region, and the 20-card grid tested a claim now pinned by
+ * `glass-css.test.ts` (only `.glass` and `.glass-surface-blur` may declare a
+ * blur). The one thing it held that nothing else measured — `.glass-elevated`
+ * stacked on `.glass` — is the Popover inside `DialogDemo`. Do not remove it.
+ *
+ * Per-component MDX pages remain deferred (Open Decision 5).
+ */
 export default function ComponentsPage() {
   return (
-    <div className="space-y-12">
-      <div>
-        <h1 className="mt-8 mb-2 text-3xl font-semibold tracking-tight">Components</h1>
-        <p className="text-muted-foreground">
-          Tier 1 — the primitives that cover roughly 80% of usage. Toggle the theme in the header;
-          every surface below should follow without a stale colour anywhere.
+    <div className="space-y-16">
+      <div className="mt-8">
+        <h1 className="mb-2 text-3xl font-semibold tracking-tight">Components</h1>
+        <p className="max-w-3xl text-muted-foreground">
+          All 37, grouped by tier. Every demo sits directly on the page background — the backdrop
+          the glass material is measured against — so what you see here is what the gate asserts.
+          Toggle the theme in the header and nothing below should carry a stale colour.
         </p>
       </div>
 
-      <Demo
-        title="Button"
-        note="No variant paints --primary as text. `link` uses --primary-text, which is the AA-safe blue step."
+      <Group
+        title="Tier 1 — primitives"
+        note="Eighteen components, one job each, mostly stateless. Ordered material-first: GlassSurface, Card and Alert are what the system looks like; the controls follow."
       >
-        <Button variant="primary">Primary</Button>
-        <Button variant="brand">Brand</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="destructive">Delete</Button>
-        <Button variant="link">Docs</Button>
-        <Button variant="primary" size="sm">
-          Small
-        </Button>
-        <Button variant="primary" size="lg">
-          Large
-        </Button>
-        <Button size="icon" aria-label="Delete flag">
-          <TrashIcon />
-        </Button>
-        <Button variant="primary" disabled>
-          Disabled
-        </Button>
-        <Button variant="primary">
-          <FlagIcon />
-          With icon
-        </Button>
-      </Demo>
+        <GlassSurfaceDemo />
+        <CardDemo />
+        <AlertDemo />
+        <ButtonDemo />
+        <BadgeDemo />
+        <InputDemo />
+        <TextareaDemo />
+        <NativeSelectDemo />
+        <CheckboxDemo />
+        <SwitchDemo />
+        <LabelDemo />
+        <FieldDemo />
+        <AvatarDemo />
+        <KbdDemo />
+        <SeparatorDemo />
+        <SkeletonDemo />
+        <SpinnerDemo />
+        <TooltipDemo />
+      </Group>
 
-      <Demo
-        title="Badge"
-        note="Soft washes pair with the matching text token, never the solid fill."
+      <Group
+        title="Tier 2 — overlays"
+        note="Six components that float above the page on Tier-O glass, each managing focus. Every one opens from a real trigger — a still of an overlay proves nothing about focus, Escape or the material, which is the entire content of this tier."
       >
-        <Badge>Neutral</Badge>
-        <Badge variant="primary">Primary</Badge>
-        <Badge variant="brand">Brand</Badge>
-        <Badge variant="success">Live</Badge>
-        <Badge variant="danger">Failed</Badge>
-        <Badge variant="warning">Rollout</Badge>
-        <Badge variant="info">Info</Badge>
-        <Badge variant="outline">Outline</Badge>
-      </Demo>
+        <DialogDemo />
+        <SidePanelDemo />
+        <PopoverDemo />
+        <DropdownMenuDemo />
+        <ToastDemo />
+        <CommandPaletteDemo />
+      </Group>
 
-      <Demo title="Card">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>Production</CardTitle>
-            <CardDescription>12 flags enabled</CardDescription>
-            <CardAction>
-              <Badge variant="success">Healthy</Badge>
-            </CardAction>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            Last deploy 4 minutes ago.
-          </CardContent>
-        </Card>
-      </Demo>
-
-      <Demo
-        title="Alert"
-        note="Colour is never the only signal — every variant expects a title in words."
+      <Group
+        title="Tier 3 — composites"
+        note="Thirteen components assembled from the tiers below, each encoding one opinionated workflow. Product-shaped demos first."
       >
-        <div className="w-full space-y-3">
-          <Alert>
-            <AlertTitle>Saved</AlertTitle>
-            <AlertDescription>Your changes are live.</AlertDescription>
-          </Alert>
-          <Alert variant="warning">
-            <AlertTriangleIcon />
-            <AlertTitle>Partial rollout</AlertTitle>
-            <AlertDescription>This flag is enabled for 40% of users.</AlertDescription>
-          </Alert>
-          <Alert variant="danger" role="alert">
-            <AlertTriangleIcon />
-            <AlertTitle>Rollout failed</AlertTitle>
-            <AlertDescription>Check the target environment and retry.</AlertDescription>
-          </Alert>
-        </div>
-      </Demo>
+        <AppShellDemo />
+        <DataTableDemo />
+        <TableDemo />
+        <FormDemo />
+        <AccordionDemo />
+        <TabsDemo />
+        <SegmentedControlDemo />
+        <StatusChipDemo />
+        <EmptyStateDemo />
+        <PaginationDemo />
+        <BreadcrumbDemo />
+        <CodeBlockDemo />
+        <DiffViewerDemo />
+      </Group>
 
-      <Demo title="Form primitives">
-        <div className="grid w-full gap-5 sm:grid-cols-2">
-          <Field>
-            <FieldLabel>Flag key</FieldLabel>
-            <FieldControl>
-              <Input placeholder="new-checkout" />
-            </FieldControl>
-            <FieldDescription>Lowercase and dashes only.</FieldDescription>
-          </Field>
-
-          <Field error="That key is already taken">
-            <FieldLabel>Flag key</FieldLabel>
-            <FieldControl>
-              <Input defaultValue="new-checkout" />
-            </FieldControl>
-            <FieldDescription>Lowercase and dashes only.</FieldDescription>
-            <FieldError>That key is already taken</FieldError>
-          </Field>
-
-          <div className="space-y-2">
-            <Label htmlFor="env">Environment</Label>
-            <NativeSelect id="env" defaultValue="prod">
-              <option value="dev">Development</option>
-              <option value="staging">Staging</option>
-              <option value="prod">Production</option>
-            </NativeSelect>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="desc">Description</Label>
-            <Textarea id="desc" placeholder="What does this flag control?" />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Checkbox id="c1" defaultChecked />
-            <Label htmlFor="c1">Enable in production</Label>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Checkbox id="c2" checked="indeterminate" />
-            <Label htmlFor="c2">Select all (indeterminate)</Label>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Switch id="s1" defaultChecked />
-            <Label htmlFor="s1">Auto run</Label>
-          </div>
-        </div>
-      </Demo>
-
-      <Demo title="Feedback and misc">
-        <Spinner />
-        <Skeleton className="h-9 w-40" />
-        <Avatar>
-          <AvatarFallback>NS</AvatarFallback>
-        </Avatar>
-        <Separator orientation="vertical" className="h-8" />
-        <Kbd>⌘</Kbd>
-        <Kbd>K</Kbd>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="secondary">Hover me</Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            A tooltip is never the only source of information — it does not appear on touch.
-          </TooltipContent>
-        </Tooltip>
-      </Demo>
-
-      <Demo
-        title="RTL"
-        note="Logical properties throughout, so this needs no per-component work. Directional icons are still the caller's job."
+      <Group
+        title="Right-to-left"
+        note="Not a tier — a property every component above already has, because the system uses logical properties throughout."
       >
-        <div dir="rtl" className="w-full space-y-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>لوحة التحكم</CardTitle>
-              <CardAction>
-                <Badge variant="success">مباشر</Badge>
-              </CardAction>
-            </CardHeader>
-          </Card>
-          <div className="flex items-center gap-2">
-            <Switch id="rtl-switch" defaultChecked />
-            <Label htmlFor="rtl-switch">تشغيل تلقائي</Label>
-          </div>
-        </div>
-      </Demo>
+        <RtlDemo />
+      </Group>
     </div>
   );
 }

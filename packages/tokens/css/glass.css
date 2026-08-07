@@ -29,15 +29,32 @@
  * the panel. The blur buys a backdrop repaint and zero visual change.
  *
  * So Tier S is TINTED off both the page and the panel (10-11/255 in light,
- * 9/255 in dark; gated in test/contrast.test.ts), and the two themes carry the
- * material differently, because a white top-edge specular highlight at α 0.35
- * measures 3.18:1 over the dark composite and 1.02:1 over the light one:
+ * 11-12/255 in dark; gated in test/contrast.test.ts), and the two themes carry
+ * the material differently, because a white top-edge specular highlight at
+ * α 0.50 measures 5.05:1 over the dark composite and 1.03:1 over the light one:
  *
- *   dark   the specular highlight is the material. Border 1.50:1, no shadow.
+ *   dark   the specular highlight is the material — a lit top edge, a 2.18:1
+ *          border, and (since 2026-08-06) a REAL drop shadow.
  *   light  NO highlight. The material is the tint (#FFFAF7 → composite
- *          #FDF8F5), a firmer 1.60:1 hairline — matching what `--border` shows
- *          on `--panel`, where the tier-O border manages only 1.21:1 — and a
- *          bottom-weighted shadow so the surface reads as raised off the cream.
+ *          #FDF8F5), a firmer 1.81:1 hairline — stronger than what `--border`
+ *          shows on `--panel` (1.61:1), where the tier-O border manages only
+ *          1.21:1 — and a bottom-weighted shadow so the surface reads as raised
+ *          off the cream.
+ *
+ * ── WHY THE TINT CANNOT SIMPLY BE PUSHED FURTHER ────────────────────────────
+ *
+ * A tier-S composite must clear 8/255 from the page BELOW it and from the
+ * opaque `--panel` ABOVE it, so the page↔panel distance is the entire budget.
+ * In light the composite is boxed between cream and pure white and is already
+ * at its optimum — every one of the 3,303 legal integer composites was
+ * enumerated, and none on the warm axis beats #FDF8F5's 11/10. Cooling the
+ * tint moves it TOWARD the neutral panel, which the panel side then rejects.
+ *
+ * Dark had 18/255 to work with, leaving a legal window of exactly three
+ * values. `--panel` cannot be lightened to widen it — at #2E2F2E the gated
+ * `primary fill vs panel` pair drops to 2.98:1 — so on 2026-08-06 the PAGE was
+ * darkened instead, to `neutral-925` #151615. That is the only free direction:
+ * all 17 dark pairs measured against `--bg` improved and none regressed.
  *
  * ── PERFORMANCE ─────────────────────────────────────────────────────────────
  *
@@ -61,8 +78,26 @@
 
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  /* ── PREFIX ORDER IS LOAD-BEARING. `-webkit-` FIRST, STANDARD LAST. ────────
+   *
+   * The CSS pipeline (Lightning CSS, via Tailwind v4 and Next) treats the two
+   * spellings as ONE logical property and keeps whichever is written last.
+   * Written standard-first, the only declaration that survives into the served
+   * stylesheet is `-webkit-backdrop-filter` — and Chrome REMOVED that alias
+   * (`CSS.supports('-webkit-backdrop-filter','blur(1px)')` is false from ~150).
+   *
+   * That is not a graceful degradation, it is a silent total failure: every
+   * tier-O overlay in the system rendered as a flat translucent fill for as
+   * long as the order was wrong, and the `@supports not (…)` fallback below
+   * CANNOT catch it — that condition asks whether the BROWSER supports blur
+   * (it does), not whether our declaration survived the build.
+   *
+   * Tailwind's own generated `.backdrop-filter` utility writes `-webkit-`
+   * first, which is why it never had this bug. `test/glass-css.test.ts` now
+   * asserts the ordering here. Do not "tidy" these two lines.
+   * ──────────────────────────────────────────────────────────────────────── */
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
   /* The one sanctioned translucent border in the system: a glass surface has no
    * fixed backdrop, so an opaque edge would read as a hard seam against some
    * backdrops and vanish against others. */
@@ -104,8 +139,18 @@ body.dark .glass-elevated {
  * an inset, rather than on a pseudo-element — it then follows `border-radius`
  * for free and cannot collide with a component's own ::before. The cost of that
  * choice: `--glass-surface-shadow` can never be `none`, because `none` inside a
- * comma-separated shadow list invalidates the whole declaration. Dark mode
- * spells its absent shadow `0 0 0 transparent` for exactly this reason.
+ * comma-separated shadow list invalidates the WHOLE declaration — which would
+ * take the specular highlight with it. Both themes now ship a real shadow, so
+ * nothing currently relies on the `0 0 0 transparent` spelling, but the hazard
+ * is permanent and `tokens-css.test.ts` still asserts against `none`.
+ *
+ * Dark mode HAD no shadow at all until 2026-08-06 (`0 0 0 transparent`), on the
+ * reasoning that dark delineates with borders. Measured, that reasoning was
+ * half right: a black shadow over the dark page can only move it ~12/255 at
+ * α 0.50, because the page is already near-black. It is a modest signal — but
+ * a dark card was carrying a 1.50:1 border, a 3.18:1 lit edge and 9/255 of
+ * tint, and nothing else. Three weak signals and no strong one is what "flat"
+ * measures as.
  */
 .glass-surface,
 .glass-surface-blur {
@@ -134,8 +179,9 @@ body.dark .glass-elevated {
  * behaviours with it.
  */
 .glass-surface-blur {
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  /* `-webkit-` first — see the block comment on `.glass`. */
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
 }
 
 /*
@@ -165,7 +211,8 @@ body.dark .glass-elevated {
   .glass-surface,
   .glass-surface-blur {
     background: var(--panel);
-    backdrop-filter: none;
+    /* `-webkit-` first — see the block comment on `.glass`. */
     -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }

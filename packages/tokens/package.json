@@ -1,5 +1,5 @@
 {
-  "name": "@velobits/tokens",
+  "name": "@velobits-dev/tokens",
   "version": "0.1.0",
   "description": "VeloBits design tokens — colour, type, spacing, motion and glass, as CSS and TypeScript. Zero dependencies.",
   "license": "UNLICENSED",
@@ -9,8 +9,8 @@
     "directory": "packages/tokens"
   },
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "type": "module",
   "sideEffects": [
@@ -38,7 +38,8 @@
   },
   "files": [
     "dist",
-    "css"
+    "css",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup",

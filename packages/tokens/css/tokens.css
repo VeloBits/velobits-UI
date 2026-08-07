@@ -1,5 +1,5 @@
 /*
- * @velobits/tokens — raw runtime values.
+ * @velobits-dev/tokens — raw runtime values.
  *
  * THIS IS THE ONLY PLACE IN THE DESIGN SYSTEM WHERE A COLOUR IS LITERAL.
  *
@@ -9,7 +9,7 @@
  *
  * ## Why the dark selector is `.dark, body.dark`
  *
- * FixMyText and the ToggleFlow dashboard toggle `body.dark`; the Keycloak login
+ * The editor app and the dashboard app toggle `body.dark`; the Keycloak login
  * theme toggles `html.dark`. Listing both means one token file serves all four
  * surfaces. The matching `@custom-variant` in theme.css uses
  * `&:where(.dark, .dark *)` for the same reason.
@@ -39,6 +39,7 @@
   --neutral-750: #383635;
   --neutral-800: #2c2d2c;
   --neutral-900: #1a1b1a;
+  --neutral-925: #151615;
   --neutral-950: #0e0f0e;
 
   /* ── surfaces ───────────────────────────────────────────────────────────── */
@@ -67,7 +68,7 @@
   --on-primary: #ffffff;
   /* Links, inline icons, active nav labels. --primary itself measures 3.90:1 on
    * the cream page, which fails AA for text. NEVER use --primary for a link. */
-  --primary-text: #006cbd;
+  --primary-text: #0062b3;
   --primary-soft: rgba(0, 122, 204, 0.1);
 
   /* ── brand lime: fill-only in this theme ────────────────────────────────── */
@@ -81,19 +82,28 @@
    * text-safe (13.24:1) and plum is not (1.23:1 on charcoal). */
   --accent-text: #582840;
 
+  /* The terminal surface — a CodeBlock in its `terminal` variant, which is what
+   * a one-time secret is revealed on. 12.95:1. THEME-INVARIANT: the dark block
+   * restates the identical pair, deliberately. See semantic.ts. */
+  --code: #101828;
+  --on-code: #7df3b1;
+
   --ring: #007acc;
   --highlight: rgba(42, 43, 42, 0.05);
   --overlay: rgba(26, 27, 26, 0.45);
 
   /* ── status ─────────────────────────────────────────────────────────────── */
-  --success: #2b762d;
-  --success-soft: rgba(43, 118, 45, 0.12);
-  --danger: #c0322b;
-  --danger-soft: rgba(192, 50, 43, 0.1);
-  --warning: #8a5b00;
-  --warning-soft: rgba(138, 91, 0, 0.12);
-  --info: #006cbd;
-  --info-soft: rgba(0, 108, 189, 0.1);
+  /* Text steps tuned against the soft-chip COMPOSITE (wash over the cream
+   * page), not the flat page — 12px chip text holds 4.5:1 there. See the
+   * soft-chip suite in test/contrast.test.ts. */
+  --success: #226e25;
+  --success-soft: rgba(34, 110, 37, 0.12);
+  --danger: #b82a24;
+  --danger-soft: rgba(184, 42, 36, 0.1);
+  --warning: #855600;
+  --warning-soft: rgba(133, 86, 0, 0.12);
+  --info: #0062b3;
+  --info-soft: rgba(0, 98, 179, 0.1);
 
   /* ── chart series ───────────────────────────────────────────────────────── */
   /* Isoluminant by construction: each clears 3.5:1 against the page, but they
@@ -121,18 +131,28 @@
    * composites to #FDF8F5 — 11/255 off the page, 10/255 off the panel.
    * fg 13.48:1, --muted-fg 5.57:1 (so NOT --muted-on-glass on this tier). */
   --glass-surface-bg: rgba(255, 250, 247, 0.85);
-  /* 1.60:1 over that composite, matching what --border shows on --panel
-   * (1.61:1). In light mode the edge is most of the material — the tier-O
-   * border at α 0.10 measures only 1.21:1 here. */
-  --glass-surface-border: rgba(42, 43, 42, 0.24);
-  /* No specular highlight in light mode. The same white at α 0.35 measures
-   * 1.02:1 over the composite: you cannot lighten white. */
+  /* 1.81:1 over that composite — deliberately FIRMER than what --border shows
+   * on --panel (1.61:1), because the light tint is capped by the gate and the
+   * edge has to carry the difference. The tier-O border at α 0.10 measures
+   * only 1.21:1 here. Not a 1.4.11 pair (a card outline is decorative), so the
+   * gate only asserts a >1.4:1 floor — this is a design choice, not a limit. */
+  --glass-surface-border: rgba(42, 43, 42, 0.3);
+  /* No specular highlight in light mode. The same white measures 1.02:1 over
+   * the composite at α 0.35 and 1.03:1 at α 0.50: you cannot lighten white.
+   * Raising GLASS_SPECULAR_ALPHA does not change that, which is why the
+   * asymmetry survives the re-tune. */
   --glass-surface-highlight: transparent;
   /* Bottom-weighted, so the surface reads as raised off the cream page rather
-   * than recessed into it. */
-  --glass-surface-shadow: 0 1px 2px rgba(42, 43, 42, 0.05), 0 8px 16px -6px rgba(42, 43, 42, 0.14);
+   * than recessed into it. Three stops, not two: a 1px contact shadow for the
+   * edge, a short mid stop for near-field separation, and a long soft stop for
+   * the actual lift. Shadows are the one lever with no contrast ceiling — black
+   * at α 0.08 already moves the cream page 20/255 — and the previous two-stop
+   * ramp was using a small fraction of that. */
+  --glass-surface-shadow:
+    0 1px 2px rgba(42, 43, 42, 0.06), 0 4px 10px -3px rgba(42, 43, 42, 0.1),
+    0 18px 36px -14px rgba(42, 43, 42, 0.22);
 
-  /* ── elevation: real shadows in light, borders in dark (ADR-0024) ───────── */
+  /* ── elevation: real shadows in light, borders in dark ──────────────────── */
   --shadow-sm: 0 1px 2px rgba(42, 43, 42, 0.06);
   --shadow-md: 0 2px 8px rgba(42, 43, 42, 0.08);
   --shadow-lg: 0 8px 24px rgba(42, 43, 42, 0.1);
@@ -141,7 +161,12 @@
 
 .dark,
 body.dark {
-  --bg: #1a1b1a;
+  /* neutral-925, not -900. The page dropped one step on 2026-08-06 to widen the
+   * page↔panel budget from 18/255 to 23/255, which is what the tier-S glass has
+   * to fit inside. Every dark pair measured against the page improved — a
+   * darker page can only help light-on-dark text — and --panel could not move
+   * the other way (at #2E2F2E `primary fill vs panel` falls to 2.98:1). */
+  --bg: #151615;
   --bg2: #2c2d2c;
   --panel: #2c2d2c;
   /* Plum, not a lighter grey. Its OKLCH lightness (0.355) sits ABOVE
@@ -153,8 +178,9 @@ body.dark {
   --muted-on-glass: #e4dedb;
 
   /* neutral-750 exists for this one token. #2E2E2E — the value this palette
-   * inherited from ToggleFlow — was tuned against that app's darker #252526
-   * panel; against #2C2D2C it lands at 1.02:1, i.e. an invisible border. */
+   * inherited from the dashboard app — was tuned against that app's darker
+   * #252526 panel; against #2C2D2C it lands at 1.02:1, i.e. an invisible
+   * border. */
   --border: #383635;
   /* Same value as light mode: neutral-500 is the ONLY ramp step clearing 3:1
    * against both themes' surfaces. */
@@ -163,7 +189,7 @@ body.dark {
   --primary: #007acc;
   --primary-hover: #1177bb;
   --on-primary: #ffffff;
-  --primary-text: #42a4f9;
+  --primary-text: #4aacff;
   --primary-soft: rgba(0, 122, 204, 0.22);
 
   --brand: #c8f135;
@@ -174,18 +200,26 @@ body.dark {
    * that makes --accent-text a token rather than a hardcoded plum. */
   --accent-text: #c8f135;
 
+  /* Identical to light, and restated rather than inherited — see semantic.ts. */
+  --code: #101828;
+  --on-code: #7df3b1;
+
   --ring: #3094e8;
   --highlight: rgba(242, 235, 232, 0.06);
   --overlay: rgba(14, 15, 14, 0.6);
 
+  /* The washes run thinner than light mode (0.12): in dark mode a wash
+   * LIGHTENS its backdrop, and the soft-chip composite over the panel is where
+   * these pairs bottom out. --danger moved lighter than the inherited #f1706b
+   * for the same reason (3.77:1 inside the chip on the panel). */
   --success: #7fb86b;
-  --success-soft: rgba(127, 184, 107, 0.16);
-  --danger: #f1706b;
-  --danger-soft: rgba(241, 112, 107, 0.16);
+  --success-soft: rgba(127, 184, 107, 0.12);
+  --danger: #ff7f79;
+  --danger-soft: rgba(255, 127, 121, 0.12);
   --warning: #e0c060;
-  --warning-soft: rgba(224, 192, 96, 0.16);
-  --info: #42a4f9;
-  --info-soft: rgba(66, 164, 249, 0.16);
+  --warning-soft: rgba(224, 192, 96, 0.12);
+  --info: #4aacff;
+  --info-soft: rgba(74, 172, 255, 0.12);
 
   /* Lifted relative to the light theme so each series clears 4.5:1 against the
    * darker page rather than sitting at the 3:1 floor. */
@@ -195,29 +229,41 @@ body.dark {
   --chart-4: #b37519;
   --chart-5: #3b8f8e;
 
-  --glass-bg: rgba(26, 27, 26, 0.85);
+  /* #1E1F1E, NOT neutral-900. Tier O's dark surface used to BE the page token,
+   * so a Popover or DropdownMenu composited to exactly #1A1B1A over an #1A1B1A
+   * page — 0/255, carried entirely by a 1.33:1 border. The perceptibility gate
+   * never saw it because that gate only covered tier S; it now covers both.
+   * This value composites 8/255 off the page and still holds fg 5.53:1 /
+   * --muted-on-glass 4.89:1 against the worst of the seven backdrops. */
+  --glass-bg: rgba(30, 31, 30, 0.85);
   --glass-blur: 16px;
   --glass-border: rgba(242, 235, 232, 0.12);
 
-  /* Tier S, dark. #252625 is mix(neutral-900 → neutral-800, 0.6) — on the
-   * ramp's axis between the page and the panel, because that 18/255 gap is the
-   * entire budget dark mode has. Composites to #232423: 9/255 off the page and
-   * 9/255 off the panel, the balanced midpoint. fg 13.22:1, --muted-fg 6.19:1.
+  /* Tier S, dark. #232423 sits on the ramp's axis between the page and the
+   * panel. Composites to #212221: 12/255 off the page and 11/255 off the
+   * panel. fg 13.55:1, --muted-fg 6.34:1. Cross-backdrop drift 3/255 (gate ≤4).
    * The naive choice — --panel at α 0.85 — lands on #292A29, 3/255 from the
-   * opaque panel, i.e. an invisible material. */
-  --glass-surface-bg: rgba(37, 38, 37, 0.85);
-  --glass-surface-border: rgba(242, 235, 232, 0.14);
-  /* THE dark-mode material: a lit top edge at 3.18:1 over #232423. This is the
-   * half of the asymmetry that light mode cannot have. */
-  --glass-surface-highlight: rgba(255, 255, 255, 0.35);
-  /* Dark delineates with borders and the lit edge, not shadows (ADR-0024).
-   * NOT `none`: .glass-surface composes this into a box-shadow LIST with the
-   * highlight, and `none` inside a comma list invalidates the whole
+   * opaque panel, i.e. an invisible material.
+   * Was 9/255 either side until the page dropped to neutral-925; see the
+   * budget note in css/glass.css. */
+  --glass-surface-bg: rgba(35, 36, 35, 0.85);
+  /* 2.18:1 over the composite, against 1.15:1 for the opaque --border on
+   * --panel. Firmer than a divider on purpose. */
+  --glass-surface-border: rgba(242, 235, 232, 0.26);
+  /* THE dark-mode material: a lit top edge at 5.05:1 over #212221. This is the
+   * half of the asymmetry that light mode cannot have — the same white over the
+   * light composite measures 1.03:1 at this alpha. */
+  --glass-surface-highlight: rgba(255, 255, 255, 0.5);
+  /* A real shadow since 2026-08-06. It is a MODEST signal — black at α 0.50
+   * only moves the near-black page ~12/255 — but "dark delineates with borders"
+   * had left a dark card with three weak signals and no strong one.
+   * Still never `none`: .glass-surface composes this into a box-shadow LIST
+   * with the highlight, and `none` inside a comma list invalidates the whole
    * declaration — dark mode would silently lose its specular edge. */
-  --glass-surface-shadow: 0 0 0 transparent;
+  --glass-surface-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 14px 32px -10px rgba(0, 0, 0, 0.65);
 
-  /* Dark mode delineates with borders, not shadows (ADR-0024) — except the
-   * glass tier, which floats over content and needs the separation. */
+  /* Dark mode delineates with borders, not shadows — except the glass tier,
+   * which floats over content and needs the separation. */
   --shadow-sm: none;
   --shadow-md: none;
   --shadow-lg: none;

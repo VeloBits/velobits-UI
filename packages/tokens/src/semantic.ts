@@ -41,6 +41,21 @@ export interface SemanticTokens {
   brandSoft: string;
   /** Plum text accent (light) / plum elevated tint (dark). */
   accentText: string;
+  /**
+   * The terminal surface: a `CodeBlock` in its `terminal` variant, which is what
+   * a one-time secret is shown on.
+   *
+   * **Identical in both themes, deliberately.** Everything else in this object
+   * flips; this pair does not, and that is the point. A revealed API key is the
+   * one string in the product that must be transcribed *exactly*, and a surface
+   * that changes colour with the theme changes which characters are easiest to
+   * misread. Pinning it also makes the block unmistakably "not part of the page"
+   * in light mode, which is the visual cue that this content is different in
+   * kind.
+   */
+  code: string;
+  /** Text on a `code` fill — 12.95:1. */
+  onCode: string;
   /** Focus ring. */
   ring: string;
   /** Hover wash on an otherwise transparent control. */
@@ -92,20 +107,26 @@ export const light: SemanticTokens = {
   onBrand: seed.charcoal,
   brandSoft: 'rgba(200, 241, 53, 0.18)',
   accentText: plumSteps.text,
+  code: '#101828',
+  onCode: '#7DF3B1',
   ring: seed.blue,
   highlight: 'rgba(42, 43, 42, 0.05)',
   overlay: 'rgba(26, 27, 26, 0.45)',
-  // #2B762D, not a lighter green: the obvious `#2F7D31` measures 4.86:1 on
-  // white but only 4.43:1 on cream, and cream is the page. Anything tuned
-  // against a white panel has to be re-checked against the warm background.
-  success: '#2B762D',
-  successSoft: 'rgba(43, 118, 45, 0.12)',
-  danger: '#C0322B',
-  dangerSoft: 'rgba(192, 50, 43, 0.10)',
-  warning: '#8A5B00',
-  warningSoft: 'rgba(138, 91, 0, 0.12)',
+  // The status text steps are tuned against the WORST composite they sit on,
+  // not against the page: a soft chip (`bg-*-soft text-*`) flattens its wash
+  // over the cream page, and 12px chip text holds the 4.5:1 target there —
+  // the soft-chip suite in `test/contrast.test.ts`. That is why `success` is
+  // #226E25 and not the flat-pair-sufficient #2B762D (4.16:1 inside the chip),
+  // and the same one-step darkening applies to `danger` and `warning`. Each
+  // `*Soft` wash restates its text token's rgb at a fixed alpha.
+  success: '#226E25',
+  successSoft: 'rgba(34, 110, 37, 0.12)',
+  danger: '#B82A24',
+  dangerSoft: 'rgba(184, 42, 36, 0.10)',
+  warning: '#855600',
+  warningSoft: 'rgba(133, 86, 0, 0.12)',
   info: blueSteps.text,
-  infoSoft: 'rgba(0, 108, 189, 0.10)',
+  infoSoft: 'rgba(0, 98, 179, 0.10)',
   chart1: '#1D82D2',
   chart2: '#6F8714',
   chart3: '#BC5F8D',
@@ -114,7 +135,14 @@ export const light: SemanticTokens = {
 };
 
 export const dark: SemanticTokens = {
-  bg: neutral[900],
+  // neutral-925 exists for this token, the same way 750 exists for the dark
+  // border. A tier-S surface must clear 8/255 from the page AND from `panel`,
+  // so the page↔panel distance is its whole budget; with the page at 900 that
+  // was 18/255 and the glass was pinned at 9/255 either side. `panel` cannot
+  // move up to widen it (at #2E2F2E the gated `primary fill vs panel` pair
+  // falls to 2.98:1), so the page moved down — the free direction, since every
+  // dark pair measured against the page is light-on-dark and only improves.
+  bg: neutral[925],
   bg2: neutral[800],
   panel: neutral[800],
   // Plum, not a lighter grey: its OKLCH lightness (0.355) is above charcoal's
@@ -123,8 +151,8 @@ export const dark: SemanticTokens = {
   fg: neutral[100],
   mutedFg: neutral[400],
   mutedOnGlass: neutral[200],
-  // neutral-750 exists for this token. The value inherited from ToggleFlow
-  // (#2E2E2E) was tuned against its darker #252526 panel; against this
+  // neutral-750 exists for this token. The value inherited from the dashboard
+  // app (#2E2E2E) was tuned against its darker #252526 panel; against this
   // palette's #2C2D2C it lands at 1.02:1 — an invisible border.
   border: neutral[750],
   fieldBorder: neutral[500],
@@ -139,17 +167,29 @@ export const dark: SemanticTokens = {
   // Lime IS a valid text accent in dark mode (13.24:1 on the page). In light
   // mode the same token as text measures 1.13:1 — hence the asymmetry.
   accentText: seed.lime,
+  // Same values as light — see the docblock on `code`. Restated rather than
+  // omitted: a token declared only for light inherits the light value into dark,
+  // which works by accident here and would stop working the day someone edits
+  // one half. The CSS parity test requires both blocks to declare it anyway.
+  code: '#101828',
+  onCode: '#7DF3B1',
   ring: blueSteps.ringDark,
   highlight: 'rgba(242, 235, 232, 0.06)',
   overlay: 'rgba(14, 15, 14, 0.60)',
+  // The four status washes run THINNER than light mode's story would suggest
+  // (0.12, down from 0.16): in dark mode a wash LIGHTENS its backdrop, and the
+  // soft-chip composite over the panel is where these pairs bottom out — the
+  // soft-chip suite in `test/contrast.test.ts`. `danger` moved lighter than the
+  // inherited #F1706B for the same reason (3.77:1 inside the chip on the
+  // panel); `success` and `warning` cleared the gate on the thinner wash alone.
   success: '#7FB86B',
-  successSoft: 'rgba(127, 184, 107, 0.16)',
-  danger: '#F1706B',
-  dangerSoft: 'rgba(241, 112, 107, 0.16)',
+  successSoft: 'rgba(127, 184, 107, 0.12)',
+  danger: '#FF7F79',
+  dangerSoft: 'rgba(255, 127, 121, 0.12)',
   warning: '#E0C060',
-  warningSoft: 'rgba(224, 192, 96, 0.16)',
+  warningSoft: 'rgba(224, 192, 96, 0.12)',
   info: blueSteps.textDark,
-  infoSoft: 'rgba(66, 164, 249, 0.16)',
+  infoSoft: 'rgba(74, 172, 255, 0.12)',
   // Lifted relative to light so each series clears 4.5:1 against the darker
   // page instead of resting on the 3:1 floor.
   chart1: '#2387D7',

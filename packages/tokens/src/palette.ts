@@ -3,9 +3,8 @@ import { neutral } from './generated/neutrals';
 /**
  * The five brand seeds, in the only place they are literal.
  *
- * Both product logos corroborate the two chromatic seeds:
- * `vb-assets/Velobits/velobits.svg` is a single `#c8f135` fill, and
- * `vb-assets/ToggleFlow/ToggleFlow-svg-logo.svg` is `#007acc`.
+ * Both product logos corroborate the two chromatic seeds: the VeloBits mark is
+ * a single `#c8f135` fill, and the dashboard app's mark is `#007acc`.
  *
  * Their OKLCH values and every contrast pairing derived from them are asserted
  * in `test/contrast.test.ts` — see `docs/VelobitsUI/VELOBITS_DESIGN_SYSTEM.md`
@@ -31,13 +30,23 @@ export const seed = {
  * **never use `--primary` for a link, an icon beside text, or body copy.**
  */
 export const blueSteps = {
-  /** L=.525 — 4.68:1 on cream, 5.41:1 on white. */
-  text: '#006CBD',
-  /** L=.700 — 6.51:1 on the dark page. */
-  textDark: '#42A4F9',
+  /**
+   * L=.495 — 5.34:1 on cream, 6.18:1 on white. Darker than flat-pair AA alone
+   * would need: this step also has to clear 4.5:1 *inside a soft chip*, i.e.
+   * composited over `primarySoft`/`infoSoft` on the cream page — the soft-chip
+   * suite in `test/contrast.test.ts`. The previous `#006CBD` measured 4.08:1
+   * there.
+   */
+  text: '#0062B3',
+  /**
+   * L=.723 — 7.10:1 on the dark page. Lifted for the same reason `text` was
+   * darkened: over `primarySoft` on the dark panel the previous `#42A4F9`
+   * measured 4.23:1.
+   */
+  textDark: '#4AACFF',
   /** Light hover/pressed fill. */
   hover: '#0062A3',
-  /** Dark hover fill, matching ToggleFlow's existing `--accent-hover`. */
+  /** Dark hover fill, matching the dashboard app's existing `--accent-hover`. */
   hoverDark: '#1177BB',
   /** Dark focus ring — 5.37:1 on the dark page, well past the 3:1 floor. */
   ringDark: '#3094E8',

@@ -1,5 +1,5 @@
 {
-  "name": "@velobits/icons",
+  "name": "@velobits-dev/icons",
   "version": "0.1.0",
   "description": "VeloBits icon set — 88 hand-drawn stroke icons on a 24×24 grid, tuned for 13-18px rendering.",
   "license": "UNLICENSED",
@@ -9,8 +9,8 @@
     "directory": "packages/icons"
   },
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "type": "module",
   "sideEffects": false,
@@ -31,7 +31,8 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup",
