@@ -1,8 +1,20 @@
 name: Release
 
+# Versioning is automatic; publishing is not.
+#
+#   push to main       → open/update the "Version Packages" PR. Never publishes.
+#   workflow_dispatch  → publish whatever main currently declares.
+#
+# The split is deliberate. `@velobits-dev/ui` peers on tokens and icons at
+# `^0.1.0`, and on a 0.x version a caret pins the MINOR — so changesets treats a
+# bump of either sibling as a MAJOR for `ui`. Keeping the version step automatic
+# means that shows up as a reviewable PR diff (`ui` jumping to 1.0.0) *before*
+# anything reaches the registry, while the publish itself stays a decision
+# somebody makes on purpose. See "Known" in packages/ui/CHANGELOG.md.
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -36,11 +48,18 @@ jobs:
       - name: Verify publishable output before releasing
         run: npm run package:check
 
-      - name: Create release PR or publish
+      # changesets/action@v1 branches on `hasPublishScript = !!getInput("publish")`
+      # (src/index.ts:61). An empty string is falsy, so on a plain push this
+      # reaches `case !hasChangesets && !hasPublishScript` (:68), which logs
+      # "No changesets present …" and returns SUCCESS — a green no-op, not a
+      # failure. With changesets pending it takes `case hasChangesets` (:157) and
+      # opens the version PR regardless of this input. Only a manual dispatch
+      # reaches the publish path (:73).
+      - name: Open version PR (push) or publish (manual dispatch)
         uses: changesets/action@v1
         with:
           version: npm run version-packages
-          publish: npm run release
+          publish: ${{ github.event_name == 'workflow_dispatch' && 'npm run release' || '' }}
           commit: 'chore: version packages'
           title: 'chore: version packages'
         env:
