@@ -12,8 +12,8 @@ import { cn } from '../lib/cn';
  * `neutral-500`, the only ramp step clearing 3:1 in both themes.
  *
  * `aria-invalid` styling is driven by the attribute rather than a prop, so
- * whatever form library the app uses (react-hook-form + zod, in ToggleFlow's
- * case) gets error styling by setting the attribute it already sets.
+ * whatever form library the app uses (react-hook-form + zod, in the dashboard
+ * app's case) gets error styling by setting the attribute it already sets.
  *
  * ## Why this stayed on the opaque `--panel` when Card and Alert went to Tier S
  *
@@ -29,7 +29,7 @@ import { cn } from '../lib/cn';
  *  2. **1.4.11 stays PROVABLE.** `--field-border` is opaque by token policy, so
  *     over an opaque fill it has one value per surface — 3.86:1 on `--panel` and
  *     3.33:1 on the page in light, 3.58:1 and 4.48:1 in dark — and those are the
- *     pairs `@velobits/tokens` gates. On Tier S the same border still passes
+ *     pairs `@velobits-dev/tokens` gates. On Tier S the same border still passes
  *     everywhere (3.66:1 light over the page, 3.75:1 light over a panel, 4.04:1
  *     and 3.89:1 dark, 3.71:1 in the worst nested case), so the gate is not what
  *     stopped this — but the measurement becomes a function of the whole ancestor

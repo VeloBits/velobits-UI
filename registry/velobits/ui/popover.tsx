@@ -57,7 +57,7 @@ function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitiv
  * Radix Popover has no `Title` part, so it never sets `aria-labelledby`. The
  * result is a dialog announced as just "dialog", with the heading only reachable
  * once the user is already inside it. axe catches it as `aria-dialog-name`;
- * ToggleFlow's copy has been shipping it.
+ * the dashboard app's copy has been shipping it.
  *
  * The title REGISTERS the id it actually rendered, rather than the content
  * unconditionally pointing at a generated one. Two reasons: a popover with no
@@ -149,9 +149,9 @@ function PopoverContent({
 /**
  * The Header/Title/Description trio is hand-rolled div/h2/p rather than Radix
  * parts, because Radix Popover ships no `Title` or `Description` of its own. Kept
- * at the same names and `data-slot`s ToggleFlow already uses so its call sites
- * migrate without edits — the only change in the rendered DOM is the `id` the
- * title now carries so it can name the panel.
+ * at the same names and `data-slot`s the dashboard app already uses so its call
+ * sites migrate without edits — the only change in the rendered DOM is the `id`
+ * the title now carries so it can name the panel.
  */
 function PopoverHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -166,10 +166,10 @@ function PopoverHeader({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * A real `<h2>`, and the panel's accessible name.
  *
- * ToggleFlow's copy typed its props as `'h2'` while rendering a `div` — the sort
- * of drift nothing catches, because it looks identical and leaves the heading out
- * of a screen reader's heading list. Rendering the element the type promised also
- * makes it a legitimate `aria-labelledby` target, which is what
+ * The dashboard app's copy typed its props as `'h2'` while rendering a `div` —
+ * the sort of drift nothing catches, because it looks identical and leaves the
+ * heading out of a screen reader's heading list. Rendering the element the type
+ * promised also makes it a legitimate `aria-labelledby` target, which is what
  * `PopoverContent` now points at.
  *
  * The weight is `font-medium` rather than a heading scale, so nothing moves

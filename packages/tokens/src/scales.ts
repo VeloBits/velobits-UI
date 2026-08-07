@@ -72,7 +72,7 @@ export const zIndex = {
 } as const;
 
 /**
- * Light mode uses real shadows; dark mode uses 1px borders instead (ADR-0024),
+ * Light mode uses real shadows; dark mode delineates with 1px borders instead,
  * with `overlay` carved out for the glass tier — a floating surface needs
  * separation from the page in both themes.
  */
@@ -84,7 +84,7 @@ export const shadow = {
   none: 'none',
 } as const;
 
-/** Aligns with `TOGGLEFLOW_UX_DESIGN.md` §5's "120-180ms ease-out". */
+/** Aligns with the dashboard app's motion spec: "120-180ms ease-out". */
 export const duration = {
   micro: '120ms',
   enter: '180ms',
@@ -103,9 +103,9 @@ export const easing = {
 export const container = { page: '72rem' } as const;
 
 /**
- * Kept in sync with the `editor.css` media query in FixMyText by ADR-0017 —
- * `useMediaQuery('(max-width: 768px)')` and the CSS breakpoint must agree or
- * the two-surface mobile IA desynchronises mid-resize.
+ * Kept in sync with the `editor.css` media query in the editor app: the rule is
+ * that `useMediaQuery('(max-width: 768px)')` and the CSS breakpoint must agree,
+ * or the two-surface mobile IA desynchronises mid-resize.
  */
 export const breakpoint = {
   sm: '640px',
@@ -114,3 +114,32 @@ export const breakpoint = {
   xl: '1280px',
   '2xl': '1536px',
 } as const;
+
+/** One scale's entries. Values are CSS strings, or plain numbers for `zIndex`. */
+export type Scale = Readonly<Record<string, string | number>>;
+
+/**
+ * Every scale above, as one enumerable registry.
+ *
+ * This exists so nothing has to hand-list them. `/tokens` previously rendered
+ * the scales as nine literal `<ScaleTable>` calls, which meant a tenth scale
+ * added here would silently never appear on the page — the same class of drift
+ * the contrast tables were restructured to eliminate. `scales.test.ts` asserts
+ * this registry holds every scale the module exports, so the omission is a test
+ * failure rather than a missing section.
+ *
+ * Deliberately typed as a plain `Record` rather than `as const`: this is the
+ * *enumeration* API. Callers who want literal types (`radius.md` narrowing to
+ * `'6px'`) should use the individual named exports, which are unchanged.
+ */
+export const SCALES: Readonly<Record<string, Scale>> = {
+  radius,
+  duration,
+  easing,
+  zIndex,
+  shadow,
+  font,
+  breakpoint,
+  container,
+  spacing,
+};

@@ -12,9 +12,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      # Required to publish to GitHub Packages. Without it, `changeset publish`
-      # fails with a 403 that reads like an auth-token problem.
-      packages: write
     steps:
       - uses: actions/checkout@v5
         with:
@@ -27,11 +24,11 @@ jobs:
           # This is what writes the auth line into a temporary .npmrc. The
           # committed .npmrc deliberately carries only the registry mapping —
           # npm hard-fails on an unresolvable ${VAR} in it.
-          registry-url: https://npm.pkg.github.com
+          registry-url: https://registry.npmjs.org
 
+      # No auth needed to install: every @velobits-dev/* dep here is a workspace
+      # link, resolved locally and never fetched.
       - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
         run: npm run build
@@ -47,5 +44,8 @@ jobs:
           commit: 'chore: version packages'
           title: 'chore: version packages'
         env:
+          # GITHUB_TOKEN opens the "Version Packages" PR. NODE_AUTH_TOKEN is a
+          # separate npm automation token — publishing to npmjs.org does NOT
+          # accept GITHUB_TOKEN, which is what makes this the one required secret.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

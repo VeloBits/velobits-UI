@@ -10,7 +10,9 @@
     "radix-ui",
     "cmdk",
     "framer-motion",
-    "@velobits/icons"
+    "react-hook-form",
+    "@velobits-dev/icons",
+    "@velobits-dev/tokens"
   ],
   "devDependencies": [
     "tw-animate-css"
@@ -21,6 +23,7 @@
     "theme",
     "use-theme",
     "use-media-query",
+    "use-row-selection",
     "velobits-provider",
     "alert",
     "avatar",
@@ -47,7 +50,16 @@
     "side-panel",
     "toast",
     "accordion",
+    "app-shell",
+    "breadcrumb",
+    "code-block",
+    "data-table",
+    "diff-viewer",
+    "empty-state",
+    "form",
+    "pagination",
     "segmented-control",
+    "status-chip",
     "table",
     "tabs"
   ],

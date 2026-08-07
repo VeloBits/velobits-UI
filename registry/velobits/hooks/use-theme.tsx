@@ -54,9 +54,9 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 export interface ThemeProviderProps {
   children: React.ReactNode;
   /**
-   * Where the choice persists. REQUIRED and intentionally not defaulted —
-   * FixMyText uses `fmx_theme_mode` and ToggleFlow uses `tf.theme`, both with
-   * live user data, so a default here would silently orphan one app's
+   * Where the choice persists. REQUIRED and intentionally not defaulted — the
+   * editor app uses `fmx_theme_mode` and the dashboard app uses `tf.theme`, both
+   * with live user data, so a default here would silently orphan one app's
    * preferences. `THEME_STORAGE_KEYS` has the constants.
    */
   storageKey: string;
@@ -64,8 +64,8 @@ export interface ThemeProviderProps {
   defaultMode?: ThemeMode;
   /**
    * Called after every change, for consumers where the server is authoritative.
-   * FixMyText syncs the mode to its backend through RTK Query; the local value
-   * is only a cache to prevent a flash on refresh.
+   * The editor app syncs the mode to its backend through RTK Query; the local
+   * value is only a cache to prevent a flash on refresh.
    */
   onModeChange?: (mode: ThemeMode) => void;
   /**
@@ -151,7 +151,7 @@ export function ThemeProvider({
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
-    throw new Error('useTheme must be used within a <ThemeProvider>. See @velobits/ui docs.');
+    throw new Error('useTheme must be used within a <ThemeProvider>. See @velobits-dev/ui docs.');
   }
   return ctx;
 }

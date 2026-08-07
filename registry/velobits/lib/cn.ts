@@ -45,10 +45,10 @@ const twMerge = extendTailwindMerge({
  * Merge class names, Tailwind-aware: later utilities win over earlier
  * conflicting ones.
  *
- * The signature is `twMerge(clsx(...))` and must stay that way. ToggleFlow's
- * `components.json` points `utils` at `@/ui/cn`, so anything `npx shadcn add`
- * generates in that app calls exactly this function — changing the shape here
- * breaks every vendored primitive there at once.
+ * The signature is `twMerge(clsx(...))` and must stay that way. The dashboard
+ * app's `components.json` points `utils` at `@/ui/cn`, so anything
+ * `npx shadcn add` generates in that app calls exactly this function — changing
+ * the shape here breaks every vendored primitive there at once.
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

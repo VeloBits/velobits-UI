@@ -4,8 +4,8 @@ import { createIcon } from './create-icon';
  * The unified VeloBits icon set — 88 stroke icons on a 24×24 grid.
  *
  * Merged from the two hand-drawn sets that had diverged across the workspace:
- * ToggleFlow's `src/ui/icons.tsx` (52) and FixMyText's
- * `@velobits/design-system` (55), which shared 19 names. EVERY existing
+ * the dashboard app's own `src/ui/icons.tsx` (52) and the editor app's
+ * `@velobits-dev/design-system` (55), which shared 19 names. EVERY existing
  * name is preserved, so no consumer has to rename anything at migration time.
  *
  * Both sets already shared an identical `createIcon` factory and `IconProps`,
@@ -21,13 +21,13 @@ import { createIcon } from './create-icon';
  * ## Where the two sets disagreed
  *
  * 19 names existed in both; ten were byte-identical. For the nine that
- * differed, ToggleFlow's geometry won — it is the set with recorded
- * small-size tuning. The exception is `AlertTriangleIcon`, where FixMyText
- * closes the triangle with `Z` and ToggleFlow leaves it open; the closed path
- * is simply more correct.
+ * differed, the dashboard app's geometry won — it is the set with recorded
+ * small-size tuning. The exception is `AlertTriangleIcon`, where the editor
+ * app closes the triangle with `Z` and the dashboard app leaves it open; the
+ * closed path is simply more correct.
  *
- * FixMyText will therefore see a small visual change on those eight glyphs at
- * migration. They are the same shapes drawn slightly tighter.
+ * The editor app will therefore see a small visual change on those eight glyphs
+ * at migration. They are the same shapes drawn slightly tighter.
  *
  * ## Why every call carries `/*#__PURE__*\/`
  *

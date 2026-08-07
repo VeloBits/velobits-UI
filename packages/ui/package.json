@@ -1,5 +1,5 @@
 {
-  "name": "@velobits/ui",
+  "name": "@velobits-dev/ui",
   "version": "0.1.0",
   "description": "VeloBits shared React components. Built from registry/velobits, the same source the shadcn CLI serves.",
   "license": "UNLICENSED",
@@ -9,8 +9,8 @@
     "directory": "packages/ui"
   },
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "type": "module",
   "sideEffects": false,
@@ -66,6 +66,16 @@
       "require": {
         "types": "./dist/use-media-query.d.cts",
         "default": "./dist/use-media-query.cjs"
+      }
+    },
+    "./use-row-selection": {
+      "import": {
+        "types": "./dist/use-row-selection.d.ts",
+        "default": "./dist/use-row-selection.js"
+      },
+      "require": {
+        "types": "./dist/use-row-selection.d.cts",
+        "default": "./dist/use-row-selection.cjs"
       }
     },
     "./velobits-provider": {
@@ -358,10 +368,101 @@
         "default": "./dist/tabs.cjs"
       }
     },
+    "./app-shell": {
+      "import": {
+        "types": "./dist/app-shell.d.ts",
+        "default": "./dist/app-shell.js"
+      },
+      "require": {
+        "types": "./dist/app-shell.d.cts",
+        "default": "./dist/app-shell.cjs"
+      }
+    },
+    "./breadcrumb": {
+      "import": {
+        "types": "./dist/breadcrumb.d.ts",
+        "default": "./dist/breadcrumb.js"
+      },
+      "require": {
+        "types": "./dist/breadcrumb.d.cts",
+        "default": "./dist/breadcrumb.cjs"
+      }
+    },
+    "./code-block": {
+      "import": {
+        "types": "./dist/code-block.d.ts",
+        "default": "./dist/code-block.js"
+      },
+      "require": {
+        "types": "./dist/code-block.d.cts",
+        "default": "./dist/code-block.cjs"
+      }
+    },
+    "./data-table": {
+      "import": {
+        "types": "./dist/data-table.d.ts",
+        "default": "./dist/data-table.js"
+      },
+      "require": {
+        "types": "./dist/data-table.d.cts",
+        "default": "./dist/data-table.cjs"
+      }
+    },
+    "./diff-viewer": {
+      "import": {
+        "types": "./dist/diff-viewer.d.ts",
+        "default": "./dist/diff-viewer.js"
+      },
+      "require": {
+        "types": "./dist/diff-viewer.d.cts",
+        "default": "./dist/diff-viewer.cjs"
+      }
+    },
+    "./empty-state": {
+      "import": {
+        "types": "./dist/empty-state.d.ts",
+        "default": "./dist/empty-state.js"
+      },
+      "require": {
+        "types": "./dist/empty-state.d.cts",
+        "default": "./dist/empty-state.cjs"
+      }
+    },
+    "./form": {
+      "import": {
+        "types": "./dist/form.d.ts",
+        "default": "./dist/form.js"
+      },
+      "require": {
+        "types": "./dist/form.d.cts",
+        "default": "./dist/form.cjs"
+      }
+    },
+    "./pagination": {
+      "import": {
+        "types": "./dist/pagination.d.ts",
+        "default": "./dist/pagination.js"
+      },
+      "require": {
+        "types": "./dist/pagination.d.cts",
+        "default": "./dist/pagination.cjs"
+      }
+    },
+    "./status-chip": {
+      "import": {
+        "types": "./dist/status-chip.d.ts",
+        "default": "./dist/status-chip.js"
+      },
+      "require": {
+        "types": "./dist/status-chip.d.cts",
+        "default": "./dist/status-chip.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "rm -rf dist && tsup",
@@ -382,11 +483,17 @@
     "tailwind-merge": "^3.6.0"
   },
   "peerDependencies": {
-    "@velobits/icons": "^0.1.0",
-    "@velobits/tokens": "^0.1.0",
+    "@velobits-dev/icons": "^0.1.0",
+    "@velobits-dev/tokens": "^0.1.0",
     "framer-motion": ">=12.0.0",
     "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
+    "react-dom": ">=19.0.0",
+    "react-hook-form": ">=7.50.0"
+  },
+  "peerDependenciesMeta": {
+    "react-hook-form": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
@@ -396,14 +503,15 @@
     "@testing-library/user-event": "^14.6.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "@velobits/icons": "*",
-    "@velobits/tokens": "*",
+    "@velobits-dev/icons": "*",
+    "@velobits-dev/tokens": "*",
     "axe-core": "^4.12.1",
     "framer-motion": "^12.43.0",
     "happy-dom": "^20.11.1",
     "publint": "^0.3.23",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-hook-form": "^7.84.0",
     "size-limit": "^13.0.3",
     "tsup": "^8.5.1",
     "typescript": "~5.9.3",
@@ -418,8 +526,8 @@
         "react",
         "react-dom",
         "framer-motion",
-        "@velobits/icons",
-        "@velobits/tokens",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens",
         "radix-ui",
         "class-variance-authority",
         "clsx",
@@ -434,8 +542,8 @@
         "react",
         "react-dom",
         "framer-motion",
-        "@velobits/icons",
-        "@velobits/tokens",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens",
         "radix-ui",
         "class-variance-authority",
         "clsx",
@@ -443,15 +551,15 @@
       ]
     },
     {
-      "name": "the whole barrel, our code only",
-      "path": "dist/index.js",
-      "limit": "26 kB",
+      "name": "DataTable alone, our code only (the composite tier's per-entry proof)",
+      "path": "dist/data-table.js",
+      "limit": "3 kB",
       "ignore": [
         "react",
         "react-dom",
         "framer-motion",
-        "@velobits/icons",
-        "@velobits/tokens",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens",
         "radix-ui",
         "class-variance-authority",
         "clsx",
@@ -459,9 +567,25 @@
       ]
     },
     {
-      "name": "the whole barrel, with every dependency (what a consumer pays)",
+      "name": "the whole barrel, our code only (37 components; raised from 26 kB at T3)",
       "path": "dist/index.js",
-      "limit": "64 kB",
+      "limit": "32 kB",
+      "ignore": [
+        "react",
+        "react-dom",
+        "framer-motion",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens",
+        "radix-ui",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "name": "the whole barrel, with every dependency (what a consumer pays; raised from 64 kB at T3)",
+      "path": "dist/index.js",
+      "limit": "68 kB",
       "ignore": [
         "react",
         "react-dom"

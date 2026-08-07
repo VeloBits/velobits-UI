@@ -205,3 +205,57 @@ describe('Table, axe', () => {
     expect(violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
 });
+
+describe('Table, the wrapper surface', () => {
+  const wrapper = () => document.querySelector('[data-slot="table-container"]')!.className;
+
+  it('carries the Tier-S material by default', () => {
+    render(
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell>x</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>,
+    );
+    expect(wrapper()).toContain('glass-surface');
+  });
+
+  it('NEVER blurs — the wrapper is the scroll container', () => {
+    /**
+     * `.glass-surface-blur` here would mount a live backdrop layer on an
+     * element that scrolls, re-sampling its own backdrop region every frame.
+     * `glass.css` forbids it, and this is the one component whose surface sits
+     * on a scroll container, so it is the one that would get it wrong.
+     */
+    for (const surface of ['glass', 'panel', 'none'] as const) {
+      const { unmount } = render(
+        <Table surface={surface}>
+          <TableBody>
+            <TableRow>
+              <TableCell>x</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>,
+      );
+      expect(wrapper(), `surface="${surface}"`).not.toContain('glass-surface-blur');
+      unmount();
+    }
+  });
+
+  it('leaves the wrapper bare on surface="none", for a table inside a Card', () => {
+    /** Glass inside glass composites ~2/255 apart: both layers disappear. */
+    render(
+      <Table surface="none">
+        <TableBody>
+          <TableRow>
+            <TableCell>x</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>,
+    );
+    expect(wrapper()).not.toContain('glass-surface');
+    expect(wrapper()).not.toContain('bg-panel');
+  });
+});

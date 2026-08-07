@@ -163,7 +163,7 @@ describe('Tabs, styling contract', () => {
     expect(screen.getByRole('tablist').getAttribute('data-variant')).toBe('line');
   });
 
-  it('keeps ToggleFlow variant names, and they are visually distinct', () => {
+  it('keeps the dashboard app variant names, and they are visually distinct', () => {
     // `default` is a filled track with a raised pill; `line` is bare with an
     // underline. Renaming either breaks FlagDetailPage and AuditDetailPanel.
     expect(tabsListVariants({ variant: 'default' })).toContain('bg-bg2');
@@ -175,10 +175,10 @@ describe('Tabs, styling contract', () => {
 
   it('uses the AA-gated muted step for an inactive tab, not an alpha guess', () => {
     /**
-     * ToggleFlow used `text-foreground/60`, which computes to roughly 3:1 over
+     * the dashboard app used `text-foreground/60`, which computes to roughly 3:1 over
      * `--bg2` — under AA for 14px text — and then needed a `dark:` override that
      * made the themes disagree. `--muted-fg` is measured against both themes'
-     * surfaces by @velobits/tokens.
+     * surfaces by @velobits-dev/tokens.
      */
     render(<Fixture />);
     const cls = screen.getByRole('tab', { name: 'Overview' }).className;

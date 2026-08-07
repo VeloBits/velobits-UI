@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Dialog as DialogPrimitive, VisuallyHidden } from 'radix-ui';
 
-import { SearchIcon } from '@velobits/icons';
+import { SearchIcon } from '@velobits-dev/icons';
 
 import { cn } from '../lib/cn';
 
@@ -226,10 +226,9 @@ function CommandShortcut({ className, ...props }: React.ComponentProps<'span'>) 
  * The global shortcut, and it is OPT-IN.
  *
  * A design system that attaches a `document` keydown listener the moment a
- * component is imported is a design system that fights the host app: FixMyText's
- * editor already owns ⌘K, and a library that hijacks it silently is a bug
- * report nobody can locate. So the listener exists only while `shortcut` is a
- * string.
+ * component is imported is a design system that fights the host app: the editor
+ * app already owns ⌘K, and a library that hijacks it silently is a bug report
+ * nobody can locate. So the listener exists only while `shortcut` is a string.
  *
  * The callback and the current open state are read through refs, and the effect
  * depends ONLY on `key`. Depending on `onOpenChange` would tear down and

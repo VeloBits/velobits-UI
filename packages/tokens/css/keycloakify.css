@@ -1,9 +1,9 @@
 /*
- * @velobits/tokens/keycloakify.css — the Keycloak login theme's seam.
+ * @velobits-dev/tokens/keycloakify.css — the Keycloak login theme's seam.
  *
  * ## Why this file exists at all
  *
- * The login theme CANNOT consume @velobits/ui. Its component sources are
+ * The login theme CANNOT consume @velobits-dev/ui. Its component sources are
  * git-ignored and vended by `@oussemasahbeni/keycloakify-login-shadcn` through a
  * `keycloakify sync-extensions` postinstall hook. Files must be claimed one at a
  * time with `npx keycloakify own --path …`, and editing an unclaimed file is
@@ -15,8 +15,8 @@
  *
  *   1. npx keycloakify own --path "login/index.css"
  *   2. In that now-owned file:
- *        @import '@velobits/tokens/theme.css';
- *        @import '@velobits/tokens/keycloakify.css';
+ *        @import '@velobits-dev/tokens/theme.css';
+ *        @import '@velobits-dev/tokens/keycloakify.css';
  *   3. Update the owned `velobits` base + accent presets in
  *      src/login/components/Template/theme/Themes.ts to reference these vars.
  *
@@ -90,7 +90,7 @@
  * re-declares under `.dark, body.dark` — and that selector list deliberately
  * includes the bare `.dark` so it matches this theme's `html.dark` as well as
  * the apps' `body.dark`. A second block here would be a duplicate palette to
- * keep in sync, which is exactly the failure mode ADR-0031's single bridge
+ * keep in sync, which is exactly the failure mode a single shared bridge
  * exists to prevent.
  *
  * Verify with `?dark=true` and `?dark=false` on login, register,

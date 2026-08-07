@@ -1,10 +1,14 @@
 # VeloBits UI
 
 One token and component layer for every VeloBits surface — the marketing site,
-FixMyText, the ToggleFlow dashboard, and the shared Keycloak login theme.
+the editor app, the dashboard app, and the shared Keycloak login theme.
 
 Before this existed, those four had grown **four token vocabularies on the same
 Tailwind v4 foundation**, and ~19 icons were byte-identical across two repos.
+
+**37 components** across three tiers — 18 primitives, 6 overlays, 13 composites —
+on 36 semantic tokens, every one of which is either contrast-gated or carries a
+recorded exemption.
 
 ## Install
 
@@ -13,20 +17,25 @@ Two distributions, one source. Which you want is not a matter of taste:
 ### npm — for federated and token-only consumers
 
 ```bash
-npm i @velobits/tokens @velobits/icons @velobits/ui
+npm i @velobits-dev/tokens @velobits-dev/icons @velobits-dev/ui framer-motion
 ```
+
+`framer-motion` is a **required** peer, not an optional one — the barrel imports
+`MotionConfig` through `VelobitsProvider`, so an install without it fails to
+resolve. `react-hook-form` is the only optional peer; it is needed solely by
+`Form`, which is why `Form` ships on its own subpath and never in the barrel.
 
 ```css
 /* your app's CSS — one import */
-@import '@velobits/tokens/theme.css';
-@source "../node_modules/@velobits/ui/dist";
+@import '@velobits-dev/tokens/theme.css';
+@source "../node_modules/@velobits-dev/ui/dist";
 ```
 
 That `@source` line is **not optional**. Tailwind v4 does not scan
-`node_modules`, so utilities used inside `@velobits/ui` are never generated and
+`node_modules`, so utilities used inside `@velobits-dev/ui` are never generated and
 the components arrive unstyled with no warning anywhere.
 
-**FixMyText must use npm.** Module Federation needs `@velobits/ui` to be a real
+**the editor app must use npm.** Module Federation needs `@velobits-dev/ui` to be a real
 singleton so the shell's `TooltipProvider` context reaches into each remote.
 
 ### shadcn CLI — for greenfield surfaces
@@ -41,14 +50,14 @@ which is exactly why federated apps should not use this path.
 
 ## The three packages
 
-| Package            | What it is                                  | Depends on                   |
-| ------------------ | ------------------------------------------- | ---------------------------- |
-| `@velobits/tokens` | CSS + TS tokens. **Zero deps, zero React.** | nothing                      |
-| `@velobits/icons`  | 88 hand-drawn stroke icons                  | `react` (peer)               |
-| `@velobits/ui`     | Components                                  | tokens, icons, react (peers) |
+| Package                | What it is                                  | Depends on                                                                                |
+| ---------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `@velobits-dev/tokens` | CSS + TS tokens. **Zero deps, zero React.** | nothing                                                                                   |
+| `@velobits-dev/icons`  | 88 hand-drawn stroke icons                  | `react` (peer)                                                                            |
+| `@velobits-dev/ui`     | 37 components                               | tokens, icons, react, react-dom, **framer-motion** (peers) · `react-hook-form` (optional) |
 
 `tokens` is split out because the **Keycloak login theme cannot consume
-`@velobits/ui`**: its component sources are git-ignored and re-vended by a
+`@velobits-dev/ui`**: its component sources are git-ignored and re-vended by a
 `keycloakify sync-extensions` postinstall hook, so an edit to an unclaimed file
 is silently reverted on the next `npm install`. Shared _tokens_ is a clean seam
 there; shared _components_ would mean fighting the upstream extension forever.
@@ -60,18 +69,37 @@ page — a fill behind white text (4.51:1), and a WCAG failure as text. Links us
 `text-link`.
 
 **Lime is asymmetric.** `bg-brand` with `text-on-brand` (charcoal) is 10.89:1 and
-is the only sanctioned pairing. Lime _as text_ is 13.24:1 in dark mode and
+is the only sanctioned pairing. Lime _as text_ is 13.9:1 in dark mode and
 1.13:1 in light — so `--accent-text` is lime in dark and plum in light.
 
-**Glass is the overlay tier only.** Dialogs, popovers, menus, toasts, sticky
-headers. Never page backgrounds, table rows, or anything inside a scroll
-container.
+**Glass has two tiers, and they are not the same material.** Tier O (`.glass`)
+is for surfaces floating over arbitrary content — dialogs, popovers, menus,
+toasts, sticky headers. Tier S (`.glass-surface`) is for component surfaces
+whose backdrop is known to be the page: `Card`, `Alert`, and the `Table`,
+`Accordion` and `EmptyState` shells. Tier S carries **no `backdrop-filter`** by
+default, so a 20-card grid does not mount 20 blur layers.
+
+Forbidden on both: page backgrounds, and **nested glass** — two instances of one
+tier composite about 2/255 apart and cancel each other out.
 
 ## The gate that matters
 
 Every semantic colour pair is asserted against its WCAG target in both themes,
-and every glass tier against the seven worst-case backdrops in the palette —
-composited in **gamma-encoded sRGB**, because that is what browsers actually do.
-Measuring in linear light overstates glass legibility by a wide margin.
+and every **Tier-O** glass tier against the seven worst-case backdrops in the
+palette — composited in **gamma-encoded sRGB**, because that is what browsers
+actually do. Measuring in linear light overstates glass legibility by a wide
+margin. Tier S is not in that sweep and does not need to be: its backdrop is
+known to be the page, so it is measured against the page and the panel instead.
+
+Three registries carry it, and [/tokens](/tokens) renders all of them:
+
+- **34 flat pairs** — a token against a token.
+- **5 soft-chip pairs**, each composited over the page, the panel _and_ the
+  Tier-S glass composite, in both themes. A chip is never seen against the
+  colour it is declared with, which a flat pair cannot express.
+- **4 perceptibility pairs** — translucency is worthless if the result is the
+  colour underneath it, so every tier must clear 8/255 max-channel distance from
+  what it sits on. This is the gate that caught a dark overlay compositing to
+  byte-identical with the page.
 
 A palette edit that breaks contrast fails CI instead of shipping.

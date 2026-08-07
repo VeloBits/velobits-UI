@@ -29,7 +29,7 @@ import { auditElement } from './axe';
 
 /**
  * A detail sheet that also happens to contain a field — the shape that makes the
- * ADR-0032 assertions meaningful, because it is where a focus redirect would be
+ * the consumer ADR assertions meaningful, because it is where a focus redirect would be
  * *possible* and must not happen.
  */
 function DetailPanel(props: Omit<React.ComponentProps<typeof SidePanelContent>, 'children'>) {
@@ -126,7 +126,7 @@ describe('SidePanel', () => {
 });
 
 /**
- * ## The ADR-0032 split, asserted rather than commented
+ * ## The the consumer ADR split, asserted rather than commented
  *
  * `Dialog` is the ~480px centred FORM box and it offers `focusFirstField`.
  * `SidePanel` is the edge-anchored READING sheet and it keeps Radix's default —
@@ -139,7 +139,7 @@ describe('SidePanel', () => {
  * merge them, pick one focus policy, and break half the call sites — with nothing
  * failing.
  */
-describe('SidePanel does not redirect focus (ADR-0032)', () => {
+describe('SidePanel does not redirect focus (the consumer ADR)', () => {
   it('leaves initial focus on the ✕ even when the panel contains a field', async () => {
     render(<DetailPanel />);
     await open();
@@ -160,7 +160,7 @@ describe('SidePanel does not redirect focus (ADR-0032)', () => {
   });
 
   it('is the only one of the pair without it, which is the split itself', () => {
-    // If this ever fails, the two were merged and ADR-0032 needs revisiting first.
+    // If this ever fails, the two were merged and the consumer ADR needs revisiting first.
     expect(codeOf('dialog')).toContain('focusFirstField');
     expect(codeOf('dialog')).toContain('onOpenAutoFocus');
   });
@@ -204,7 +204,7 @@ describe('SidePanel sides', () => {
 
   it('gives the bottom sheet a DEFINITE height in dvh, not a percentage', async () => {
     /**
-     * FixMyText's ADR-0017 constraint. `h-[75%]` resolves against a
+     * the editor app's mobile-IA constraint. `h-[75%]` resolves against a
      * fixed-position containing block that is not always what you expect, and
      * `max-h` with an auto height leaves an inner `flex-1`/`min-h-0` scroll region
      * nothing to measure — the sheet then either collapses to its content or

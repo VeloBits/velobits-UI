@@ -269,7 +269,7 @@ describe('CommandDialog, the ⌘K shortcut', () => {
 
   it('installs NO global listener unless asked', async () => {
     /**
-     * The refusal that matters for a shared library: FixMyText's editor already
+     * The refusal that matters for a shared library: the editor app's editor already
      * owns ⌘K. A design system that grabs it on import produces a bug nobody can
      * locate, so the binding is opt-in.
      */

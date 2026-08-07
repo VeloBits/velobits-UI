@@ -1,4 +1,8 @@
-import { neutral, seed } from './palette';
+// `neutral` is deliberately NOT imported any more. Every tier here is a literal
+// now, because the one tier that referenced a ramp step (`dark: neutral[900]`)
+// silently became the page colour when `--bg` was also `neutral[900]` — see the
+// docblock on `dark` below. Reaching for the ramp again is how that returns.
+import { seed } from './palette';
 
 /**
  * TWO TIERS, AND THEY ARE NOT THE SAME MATERIAL.
@@ -9,10 +13,11 @@ import { neutral, seed } from './palette';
  * {@link worstCaseBackdrops}, and muted text steps up to `--muted-on-glass`.
  * Tiers `light` / `dark` / `darkElevated` below.
  *
- * **Tier S — component surface.** Card · Panel · Table shell · Sidebar · sticky
- * TopBar. The backdrop is KNOWN — it is the page — so the values are measured
- * against exactly one thing and `--muted-fg` is safe on it (5.57:1 in light,
- * 6.19:1 in dark). Tiers `surfaceLight` / `surfaceDark` below.
+ * **Tier S — component surface.** Card · Panel · Table shell · Accordion ·
+ * EmptyState · Sidebar · sticky TopBar. The backdrop is KNOWN — it is the page
+ * — so the values are measured against exactly one thing and `--muted-fg` is
+ * safe on it (5.57:1 in light, 6.34:1 in dark). Tiers `surfaceLight` /
+ * `surfaceDark` below.
  *
  * Forbidden on both tiers: page and body backgrounds (nothing behind them to
  * see), and nested glass.
@@ -34,7 +39,7 @@ import { neutral, seed } from './palette';
  * ## The treatment is asymmetric, because light cannot be lightened
  *
  * A white top-edge specular highlight at {@link GLASS_SPECULAR_ALPHA} measures
- * **1.02:1** over the light composite and **3.18:1** over the dark one — the
+ * **1.03:1** over the light composite and **5.05:1** over the dark one — the
  * single most important number in this file. It means:
  *
  *   dark   the specular highlight carries the material. It is what reads as
@@ -42,12 +47,26 @@ import { neutral, seed } from './palette';
  *   light  no highlight at all (`transparent`). The material comes from the
  *          tint (#FFFAF7 — neutral-50's own hue and chroma pushed to L 0.99,
  *          the only direction with room left in the gamut), a FIRMER hairline
- *          border (1.60:1, matching the opaque `--border`'s 1.61:1 on `--panel`
+ *          border (1.81:1, against the opaque `--border`'s 1.61:1 on `--panel`
  *          where the Tier-O border manages only 1.21:1), and a bottom-weighted
  *          shadow.
  *
- * Do not "fix" the asymmetry by giving light a highlight and dark a shadow. Both
- * are invisible in the theme they are missing from; that is why they are missing.
+ * Do not "fix" the asymmetry by giving light a highlight. It is invisible there
+ * at ANY alpha — that is the point of the 1.03:1 figure, and a test pins it.
+ * Dark's missing *shadow* was a different case and it was simply wrong: dark
+ * now has one (a modest ~12/255 of lift, which is all a near-black page allows,
+ * but more than the nothing it had).
+ *
+ * ## Why the tint is not the lever
+ *
+ * A Tier-S composite must clear {@link PERCEPTIBILITY_FLOOR} from the page
+ * BELOW it and from the opaque `--panel` ABOVE it, so the page↔panel distance
+ * is the whole budget and the tint is boxed in from both sides. In light,
+ * enumerating all 3,303 legal integer composites finds nothing on the warm axis
+ * better than the shipped 11/10 — cooling the tint only moves it toward the
+ * neutral white panel. In dark the budget itself was widened (page → 925) to
+ * buy 9/9 → 12/11. Past that, the material has to come from edge, light and
+ * elevation, and all three are effectively ungated.
  *
  * ## Performance rules
  *
@@ -88,14 +107,18 @@ export interface GlassSurfaceTier extends GlassTier {
   /**
    * Top-edge specular highlight, applied as an INSET box-shadow so it follows
    * the border radius without a pseudo-element. `transparent` in light mode,
-   * where the same white at α 0.35 measures 1.02:1 — a repaint for nothing.
+   * where the same white measures 1.03:1 at {@link GLASS_SPECULAR_ALPHA} — a
+   * repaint for nothing, at that alpha or any other.
    */
   highlight: string;
   /**
-   * Bottom-weighted drop shadow. `0 0 0 transparent` in dark mode rather than
-   * `none`: `.glass-surface` composes this into a box-shadow LIST with
-   * `highlight`, and `none` inside a comma-separated list invalidates the whole
-   * declaration. Same nothing, in a form that can sit in a list.
+   * Bottom-weighted drop shadow. **Never `none`**, in either theme:
+   * `.glass-surface` composes this into a box-shadow LIST with `highlight`, and
+   * `none` inside a comma-separated list invalidates the whole declaration —
+   * taking the specular highlight, i.e. dark mode's material, with it. An
+   * absent shadow is spelled `0 0 0 transparent`. Both themes ship a real
+   * shadow today, so nothing relies on that spelling, but the hazard is
+   * permanent and `tokens-css.test.ts` asserts against `none`.
    */
   shadow: string;
 }
@@ -109,11 +132,15 @@ export const GLASS_ALPHA_FLOOR = 0.72;
 
 /**
  * The alpha of the white top-edge specular highlight. One number, both themes,
- * and the whole asymmetry lives in what it measures: 3.18:1 over the dark Tier-S
- * composite (#232423) and 1.02:1 over the light one (#FDF8F5). Light mode
- * therefore sets `highlight` to `transparent` instead of using it.
+ * and the whole asymmetry lives in what it measures: **5.05:1** over the dark
+ * Tier-S composite (#212221) and **1.03:1** over the light one (#FDF8F5). Light
+ * mode therefore sets `highlight` to `transparent` instead of using it.
+ *
+ * Raised 0.35 → 0.50 on 2026-08-06. The light figure barely moves (1.02 → 1.03)
+ * because you cannot lighten a near-white surface with white at any alpha —
+ * which is precisely why raising this is free, and why the asymmetry survives.
  */
-export const GLASS_SPECULAR_ALPHA = 0.35;
+export const GLASS_SPECULAR_ALPHA = 0.5;
 
 export const glass = {
   light: {
@@ -122,8 +149,25 @@ export const glass = {
     blur: '16px',
     border: 'rgba(42, 43, 42, 0.10)',
   },
+  /**
+   * Tier O, dark. **#1E1F1E is a literal on purpose — it must NOT be
+   * `neutral[900]`.**
+   *
+   * It was `neutral[900]`, which is also what `--bg` was, so a Popover or
+   * DropdownMenu composited to *exactly* the page colour: **0/255**, separated
+   * only by a 1.33:1 border. A Dialog got away with it because the `--overlay`
+   * scrim darkens its backdrop first; the unscrimmed overlays did not. The
+   * perceptibility gate never caught it because it only covered Tier S — it now
+   * covers both tiers, which is the assertion that keeps this value honest.
+   *
+   * At α 0.85 this composites 8/255 off the page, and against the worst of the
+   * seven {@link worstCaseBackdrops} still holds fg 5.53:1 and
+   * `--muted-on-glass` 4.89:1. Lifting it further is possible but not free:
+   * `neutral[800]` would reach 20/255 and drop muted-on-glass to 4.20:1, below
+   * AA.
+   */
   dark: {
-    surface: neutral[900],
+    surface: '#1E1F1E',
     alpha: 0.85,
     blur: '16px',
     border: 'rgba(242, 235, 232, 0.12)',
@@ -161,45 +205,59 @@ export const glass = {
     surface: '#FFFAF7',
     alpha: 0.85,
     blur: '16px',
-    // 1.60:1 over the composite. The Tier-O border at α 0.10 manages 1.21:1 and
-    // the opaque `--border` dropped onto the same glass only 1.53:1 — in light
-    // mode the edge is most of the material, so it is tuned to match what an
-    // opaque card already shows (`--border` on `--panel`, 1.61:1).
-    border: 'rgba(42, 43, 42, 0.24)',
-    // You cannot lighten white: this same value at α 0.35 measures 1.02:1 here.
+    // 1.81:1 over the composite, deliberately FIRMER than what an opaque card
+    // shows (`--border` on `--panel`, 1.61:1). The Tier-O border at α 0.10
+    // manages 1.21:1 here. The tint is capped by the gate (see the note above),
+    // so in light mode the edge and the shadow are the whole re-tune.
+    border: 'rgba(42, 43, 42, 0.30)',
+    // You cannot lighten white: this same value measures 1.02:1 here at α 0.35
+    // and 1.03:1 at α 0.50.
     highlight: 'transparent',
-    shadow: '0 1px 2px rgba(42, 43, 42, 0.05), 0 8px 16px -6px rgba(42, 43, 42, 0.14)',
+    // Three stops: a 1px contact shadow, a short mid stop for near-field
+    // separation, and a long soft stop for the lift. Shadows are the only lever
+    // with no contrast ceiling at all — black at α 0.08 already moves the cream
+    // page 20/255 — and the previous two-stop ramp used a fraction of it.
+    shadow:
+      '0 1px 2px rgba(42, 43, 42, 0.06), 0 4px 10px -3px rgba(42, 43, 42, 0.10), 0 18px 36px -14px rgba(42, 43, 42, 0.22)',
   },
 
   /**
-   * Tier S, dark. #252625 is `mix(neutral-900 → neutral-800, 0.6)` —
-   * `oklch(0.2672 0.0023 145.5)`, on the ramp's axis between the page (0.2206)
-   * and the panel (0.2958), which is where a surface has to sit to be
-   * distinguishable from both.
+   * Tier S, dark. #232423 is on the ramp's axis between the page
+   * (`neutral-925`, L 0.1987) and the panel (`neutral-800`, L 0.2958), which is
+   * where a surface has to sit to be distinguishable from both.
    *
-   * Composites to **#232423** over the page: 9/255 from `--bg` AND 9/255 from
-   * `--panel`, the balanced midpoint of an 18/255 gap — that gap is the whole
-   * budget dark mode has, which is why this tier has the least room of the four
-   * and why widening the page/panel distance would be the fix if it ever fails.
-   * fg 13.22:1, `--muted-fg` 6.19:1.
+   * Composites to **#212221** over the page: **12/255 from `--bg` and 11/255
+   * from `--panel`**, inside a 23/255 gap.
+   * fg 13.55:1, `--muted-fg` 6.34:1.
    *
-   * Same reasoning as light on the alpha: `--panel` at α 0.50 reaches the same
-   * #232423 but drifts 31/255 over other backdrops against this tier's 3/255
+   * **That gap is the whole budget, and widening it was the 2026-08-06 fix.**
+   * It used to be 18/255, which left a legal window of exactly three values and
+   * pinned this tier at 9/255 either side — provably visible, and flat. The
+   * page dropped one ramp step rather than the panel rising, because `--panel`
+   * is pinned twice: at #2E2F2E the gated `primary fill vs panel` pair falls to
+   * 2.98:1, and the soft-chip suite fails just past it.
+   *
+   * Same reasoning as light on the alpha: `--panel` at α 0.50 reaches a similar
+   * composite but drifts 31/255 over other backdrops against this tier's 3/255
    * (10/255 over the plum `--elevated`).
    */
   surfaceDark: {
-    surface: '#252625',
+    surface: '#232423',
     alpha: 0.85,
     blur: '16px',
-    // 1.50:1 over the composite, against 1.15:1 for the opaque `--border` on
-    // `--panel`. Firmer than a divider, but the highlight below is what
-    // actually carries this theme.
-    border: 'rgba(242, 235, 232, 0.14)',
-    // 3.18:1 over #232423. THE dark-mode material.
-    highlight: 'rgba(255, 255, 255, 0.35)',
-    // Dark delineates with borders and the lit edge, not shadows (ADR-0024).
+    // 2.18:1 over the composite, against 1.15:1 for the opaque `--border` on
+    // `--panel`. Firmer than a divider on purpose — a card outline is
+    // decorative, so 1.4.11 does not cap it and the gate only sets a floor.
+    border: 'rgba(242, 235, 232, 0.26)',
+    // 5.05:1 over #212221. THE dark-mode material.
+    highlight: 'rgba(255, 255, 255, 0.50)',
+    // A real shadow since 2026-08-06. Measured, it is a MODEST signal: black at
+    // α 0.50 moves the near-black page only ~12/255, which is the honest reason
+    // "dark delineates with borders, not shadows" was ever written. It was
+    // still wrong — that left a dark card with a 1.50:1 edge, a 3.18:1
+    // highlight and 9/255 of tint, three weak signals and no strong one.
     // Not `none` — see {@link GlassSurfaceTier.shadow}.
-    shadow: '0 0 0 transparent',
+    shadow: '0 2px 4px rgba(0, 0, 0, 0.40), 0 14px 32px -10px rgba(0, 0, 0, 0.65)',
   },
   // The union, not `Record<string, GlassTier>`: an index signature makes TS
   // excess-property-check every value against GlassTier alone, so `highlight`

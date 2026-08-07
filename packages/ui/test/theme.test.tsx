@@ -63,7 +63,7 @@ function Probe() {
   );
 }
 
-const KEY = THEME_STORAGE_KEYS.toggleflow;
+const KEY = THEME_STORAGE_KEYS.dashboard;
 
 beforeEach(() => {
   localStorage.clear();
@@ -84,8 +84,8 @@ describe('storage keys', () => {
      * every existing preference in that app, which is why the provider requires
      * the key rather than defaulting it.
      */
-    expect(THEME_STORAGE_KEYS.fixmytext).toBe('fmx_theme_mode');
-    expect(THEME_STORAGE_KEYS.toggleflow).toBe('tf.theme');
+    expect(THEME_STORAGE_KEYS.editor).toBe('fmx_theme_mode');
+    expect(THEME_STORAGE_KEYS.dashboard).toBe('tf.theme');
   });
 
   it('accepts the legacy bare values both apps already persisted', () => {
@@ -161,7 +161,7 @@ describe('ThemeProvider', () => {
   });
 
   it('notifies onModeChange, for consumers where the server is authoritative', async () => {
-    /** FixMyText syncs to its backend via RTK Query; local storage is a cache. */
+    /** the editor app syncs to its backend via RTK Query; local storage is a cache. */
     const onModeChange = vi.fn();
     render(
       <ThemeProvider storageKey={KEY} onModeChange={onModeChange}>

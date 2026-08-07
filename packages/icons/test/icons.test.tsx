@@ -20,7 +20,7 @@ const entries = Object.entries(iconsModule).filter(
 describe('the icon set', () => {
   it('exports exactly 88 icons', () => {
     /**
-     * 52 from ToggleFlow + 55 from FixMyText, sharing 19 names. If this number
+     * 52 from the dashboard app + 55 from the editor app, sharing 19 names. If this number
      * changes without a changeset, an icon was added or lost by accident.
      */
     expect(entries.length).toBe(88);
@@ -38,7 +38,7 @@ describe('the icon set', () => {
      * dropping one is a test failure rather than a runtime crash in a
      * downstream app.
      */
-    const fromToggleFlow = [
+    const fromDashboardApp = [
       'MenuIcon',
       'MoonIcon',
       'SunIcon',
@@ -92,7 +92,7 @@ describe('the icon set', () => {
       'RotateCcwIcon',
       'UploadIcon',
     ];
-    const fromFixMyText = [
+    const fromEditorApp = [
       'AlertTriangleIcon',
       'ArrowRightIcon',
       'BarChart3Icon',
@@ -150,11 +150,11 @@ describe('the icon set', () => {
       'ZapIcon',
     ];
 
-    expect(new Set(fromToggleFlow).size).toBe(52);
-    expect(new Set(fromFixMyText).size).toBe(55);
+    expect(new Set(fromDashboardApp).size).toBe(52);
+    expect(new Set(fromEditorApp).size).toBe(55);
 
     const exported = new Set(entries.map(([n]) => n));
-    const missing = [...new Set([...fromToggleFlow, ...fromFixMyText])].filter(
+    const missing = [...new Set([...fromDashboardApp, ...fromEditorApp])].filter(
       (n) => !exported.has(n),
     );
     expect(missing, `names lost in the merge: ${missing.join(', ')}`).toEqual([]);

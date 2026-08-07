@@ -15,7 +15,9 @@
         "radix-ui",
         "cmdk",
         "framer-motion",
-        "@velobits/icons"
+        "react-hook-form",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens"
       ],
       "devDependencies": [
         "tw-animate-css"
@@ -26,6 +28,7 @@
         "theme",
         "use-theme",
         "use-media-query",
+        "use-row-selection",
         "velobits-provider",
         "alert",
         "avatar",
@@ -52,7 +55,16 @@
         "side-panel",
         "toast",
         "accordion",
+        "app-shell",
+        "breadcrumb",
+        "code-block",
+        "data-table",
+        "diff-viewer",
+        "empty-state",
+        "form",
+        "pagination",
         "segmented-control",
+        "status-chip",
         "table",
         "tabs"
       ],
@@ -62,7 +74,7 @@
       "name": "velobits-theme",
       "type": "registry:theme",
       "title": "VeloBits theme",
-      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits/tokens test suite.",
+      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits-dev/tokens test suite.",
       "cssVars": {
         "theme": {
           "radius-sm": "4px",
@@ -92,23 +104,25 @@
           "primary": "#007ACC",
           "primary-hover": "#0062A3",
           "on-primary": "#FFFFFF",
-          "primary-text": "#006CBD",
+          "primary-text": "#0062B3",
           "primary-soft": "rgba(0, 122, 204, 0.10)",
           "brand": "#C8F135",
           "on-brand": "#2A2B2A",
           "brand-soft": "rgba(200, 241, 53, 0.18)",
           "accent-text": "#582840",
+          "code": "#101828",
+          "on-code": "#7DF3B1",
           "ring": "#007ACC",
           "highlight": "rgba(42, 43, 42, 0.05)",
           "overlay": "rgba(26, 27, 26, 0.45)",
-          "success": "#2B762D",
-          "success-soft": "rgba(43, 118, 45, 0.12)",
-          "danger": "#C0322B",
-          "danger-soft": "rgba(192, 50, 43, 0.10)",
-          "warning": "#8A5B00",
-          "warning-soft": "rgba(138, 91, 0, 0.12)",
-          "info": "#006CBD",
-          "info-soft": "rgba(0, 108, 189, 0.10)",
+          "success": "#226E25",
+          "success-soft": "rgba(34, 110, 37, 0.12)",
+          "danger": "#B82A24",
+          "danger-soft": "rgba(184, 42, 36, 0.10)",
+          "warning": "#855600",
+          "warning-soft": "rgba(133, 86, 0, 0.12)",
+          "info": "#0062B3",
+          "info-soft": "rgba(0, 98, 179, 0.10)",
           "chart-1": "#1D82D2",
           "chart-2": "#6F8714",
           "chart-3": "#BC5F8D",
@@ -116,7 +130,7 @@
           "chart-5": "#368A8A"
         },
         "dark": {
-          "bg": "#1A1B1A",
+          "bg": "#151615",
           "bg2": "#2C2D2C",
           "panel": "#2C2D2C",
           "elevated": "#592941",
@@ -128,23 +142,25 @@
           "primary": "#007ACC",
           "primary-hover": "#1177BB",
           "on-primary": "#FFFFFF",
-          "primary-text": "#42A4F9",
+          "primary-text": "#4AACFF",
           "primary-soft": "rgba(0, 122, 204, 0.22)",
           "brand": "#C8F135",
           "on-brand": "#2A2B2A",
           "brand-soft": "rgba(200, 241, 53, 0.16)",
           "accent-text": "#C8F135",
+          "code": "#101828",
+          "on-code": "#7DF3B1",
           "ring": "#3094E8",
           "highlight": "rgba(242, 235, 232, 0.06)",
           "overlay": "rgba(14, 15, 14, 0.60)",
           "success": "#7FB86B",
-          "success-soft": "rgba(127, 184, 107, 0.16)",
-          "danger": "#F1706B",
-          "danger-soft": "rgba(241, 112, 107, 0.16)",
+          "success-soft": "rgba(127, 184, 107, 0.12)",
+          "danger": "#FF7F79",
+          "danger-soft": "rgba(255, 127, 121, 0.12)",
           "warning": "#E0C060",
-          "warning-soft": "rgba(224, 192, 96, 0.16)",
-          "info": "#42A4F9",
-          "info-soft": "rgba(66, 164, 249, 0.16)",
+          "warning-soft": "rgba(224, 192, 96, 0.12)",
+          "info": "#4AACFF",
+          "info-soft": "rgba(74, 172, 255, 0.12)",
           "chart-1": "#2387D7",
           "chart-2": "#738C1B",
           "chart-3": "#C06492",
@@ -157,7 +173,7 @@
       "name": "cn",
       "type": "registry:lib",
       "title": "cn",
-      "description": "Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — ToggleFlow points components.json `utils` at it.",
+      "description": "Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — the dashboard app points components.json `utils` at it.",
       "dependencies": [
         "clsx",
         "tailwind-merge"
@@ -200,10 +216,22 @@
       "name": "use-media-query",
       "type": "registry:hook",
       "title": "useMediaQuery",
-      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits/tokens — ADR-0017.",
+      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits-dev/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.",
       "files": [
         {
           "path": "registry/velobits/hooks/use-media-query.ts",
+          "type": "registry:hook"
+        }
+      ]
+    },
+    {
+      "name": "use-row-selection",
+      "type": "registry:hook",
+      "title": "useRowSelection",
+      "description": "Row selection for DataTable. The selection is DERIVED — the stored set intersected with the rows on screen — so a bulk action can never point at a row the filter has hidden. Returns a stable object identity, which is what keeps DataTable’s memoised rows from re-rendering per keystroke.",
+      "files": [
+        {
+          "path": "registry/velobits/hooks/use-row-selection.ts",
           "type": "registry:hook"
         }
       ]
@@ -324,7 +352,7 @@
       "description": "Includes the indeterminate state bulk-selection headers need.",
       "dependencies": [
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn"
@@ -535,7 +563,7 @@
       "dependencies": [
         "cmdk",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -552,11 +580,11 @@
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
-      "description": "The centred form modal. `focusFirstField` exists because autoFocus is silently swallowed by Radix FocusScope — ADR-0031.",
+      "description": "The centred form modal. `focusFirstField` exists because autoFocus is silently swallowed by Radix FocusScope.",
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -576,7 +604,7 @@
       "description": "Highlight is data-[highlighted], never :hover — Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.",
       "dependencies": [
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -612,11 +640,11 @@
       "name": "side-panel",
       "type": "registry:ui",
       "title": "SidePanel",
-      "description": "The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — ADR-0032. The bottom variant needs a definite 75dvh.",
+      "description": "The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — the two focus policies are opposites, so do not merge them behind a `side` variant. The bottom variant needs a definite 75dvh.",
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -637,7 +665,7 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn",
@@ -657,7 +685,7 @@
       "description": "The one sanctioned height animation: Radix measures --radix-accordion-content-height, so it does not thrash layout the way an unbounded height:auto transition would.",
       "dependencies": [
         "radix-ui",
-        "@velobits/icons"
+        "@velobits-dev/icons"
       ],
       "registryDependencies": [
         "cn"
@@ -665,6 +693,162 @@
       "files": [
         {
           "path": "registry/velobits/ui/accordion.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "app-shell",
+      "type": "registry:ui",
+      "title": "AppShell",
+      "description": "The authenticated chrome. `sidebar` is a prop rather than a child because it is rendered TWICE — as a rail at md and up, and inside a drawer below it — so a nav item cannot exist in one and not the other. Ships the skip link, which is the most-skipped WCAG requirement in an admin UI.",
+      "dependencies": [
+        "radix-ui",
+        "@velobits-dev/icons",
+        "@velobits-dev/tokens"
+      ],
+      "registryDependencies": [
+        "cn",
+        "use-media-query",
+        "button",
+        "side-panel",
+        "velobits-theme"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/app-shell.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "A named nav landmark around an ordered list. The leaf is a plain span with aria-current=\"page\" — NOT shadcn’s role=\"link\" aria-disabled, which announces static text as a broken link.",
+      "dependencies": [
+        "radix-ui",
+        "@velobits-dev/icons"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/breadcrumb.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "code-block",
+      "type": "registry:ui",
+      "title": "CodeBlock",
+      "description": "Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on.",
+      "dependencies": [
+        "class-variance-authority",
+        "@velobits-dev/icons"
+      ],
+      "registryDependencies": [
+        "cn",
+        "button",
+        "velobits-theme"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/code-block.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "DataTable",
+      "description": "Sorting, selection and row activation over a column registry — deliberately not TanStack, whose grouping and pivoting nothing here uses. aria-sort goes on the th, not the sort button, and an activatable row needs tabIndex + Enter/Space + a target check or it is mouse-only.",
+      "dependencies": [
+        "@velobits-dev/icons"
+      ],
+      "registryDependencies": [
+        "cn",
+        "table",
+        "use-row-selection"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/data-table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "diff-viewer",
+      "type": "registry:ui",
+      "title": "DiffViewer",
+      "description": "A unified line diff. The +/− gutter is the primary channel and the green/red wash the secondary — colour alone fails 1.4.1, and the gutter is also the only channel that survives greyscale. Ships `diffLines`, with a guard: LCS is O(n·m) in MEMORY.",
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/diff-viewer.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "empty-state",
+      "type": "registry:ui",
+      "title": "EmptyState",
+      "description": "First-run, filtered-to-nothing and failed-to-load are three different states; this covers the first two and an Alert covers the third. The title is a <p> unless headingLevel is set, because an empty state usually sits inside a container that already has the heading.",
+      "dependencies": [
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/empty-state.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "form",
+      "type": "registry:ui",
+      "title": "Form",
+      "description": "react-hook-form bound to Field’s ARIA wiring. label and description are PROPS, not children, because aria-describedby is assembled before children render — a description left out while its id is still listed is a dangling reference. NOT exported from the npm barrel: react-hook-form is an optional peer.",
+      "dependencies": [
+        "react-hook-form"
+      ],
+      "registryDependencies": [
+        "cn",
+        "field"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/form.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "Pagination",
+      "description": "Numbers are links, previous/next are buttons: an <a> cannot express \"unavailable\" without ceasing to be focusable. Unavailability is aria-disabled plus a guard, so focus is not lost at the ends of the range. `paginationRange` returns a CONSTANT number of slots so the control never reflows as you page.",
+      "dependencies": [
+        "radix-ui",
+        "@velobits-dev/icons"
+      ],
+      "registryDependencies": [
+        "cn",
+        "button"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/pagination.tsx",
           "type": "registry:ui"
         }
       ]
@@ -683,6 +867,27 @@
       "files": [
         {
           "path": "registry/velobits/ui/segmented-control.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "status-chip",
+      "type": "registry:ui",
+      "title": "StatusChip",
+      "description": "On/off/partial/pending/archived as one chip. Every status ships a DISTINCT glyph, because colour alone fails 1.4.1 and on-versus-off is the distinction a control plane exists to make unambiguous. Composes Badge rather than re-deriving the soft-wash pairs.",
+      "dependencies": [
+        "class-variance-authority",
+        "radix-ui",
+        "@velobits-dev/icons"
+      ],
+      "registryDependencies": [
+        "cn",
+        "badge"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/status-chip.tsx",
           "type": "registry:ui"
         }
       ]

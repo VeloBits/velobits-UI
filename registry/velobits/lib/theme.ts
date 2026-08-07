@@ -5,23 +5,28 @@
  *
  * ## Storage keys are NOT interchangeable
  *
- * FixMyText reads `fmx_theme_mode` and ToggleFlow reads `tf.theme`. Both stores
- * already contain real user choices, so the shared layer has to keep reading
- * whichever key its host app uses rather than migrating anyone to a new one. A
- * consumer passes its key in; there is no default that silently picks wrong.
+ * The editor app reads `fmx_theme_mode` and the dashboard app reads `tf.theme`.
+ * Both stores already contain real user choices, so the shared layer has to keep
+ * reading whichever key its host app uses rather than migrating anyone to a new
+ * one. A consumer passes its key in; there is no default that silently picks
+ * wrong.
  *
- * FixMyText additionally syncs the mode to the backend through RTK Query, where
- * the database is authoritative. For that app, localStorage is a cache to avoid
- * the flash — not the source of truth. Do not "simplify" it to local-only.
+ * The editor app additionally syncs the mode to the backend through RTK Query,
+ * where the database is authoritative. For that app, localStorage is a cache to
+ * avoid the flash — not the source of truth. Do not "simplify" it to local-only.
  */
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ResolvedTheme = 'light' | 'dark';
 
-/** The keys already in use across the products. */
+/**
+ * The storage keys already in use across the consuming apps. The VALUES are
+ * load-bearing — they are the live localStorage keys, so changing one silently
+ * discards every existing user's saved theme preference. Only ever add.
+ */
 export const THEME_STORAGE_KEYS = {
-  fixmytext: 'fmx_theme_mode',
-  toggleflow: 'tf.theme',
+  editor: 'fmx_theme_mode',
+  dashboard: 'tf.theme',
 } as const;
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
@@ -39,10 +44,10 @@ export function resolveTheme(mode: ThemeMode): ResolvedTheme {
 /**
  * Read a stored mode, tolerating anything unexpected.
  *
- * Legacy values are accepted on purpose: ToggleFlow persisted the bare strings
- * `'dark'` / `'light'`, and FixMyText has `'system'` too. An unrecognised value
- * resolves to `'system'` rather than throwing — a corrupt preference should not
- * white-screen an app.
+ * Legacy values are accepted on purpose: the dashboard app persisted the bare
+ * strings `'dark'` / `'light'`, and the editor app has `'system'` too. An
+ * unrecognised value resolves to `'system'` rather than throwing — a corrupt
+ * preference should not white-screen an app.
  */
 export function readStoredMode(storageKey: string): ThemeMode {
   if (typeof window === 'undefined') return 'system';
@@ -99,8 +104,8 @@ export function watchSystemTheme(onChange: (theme: ResolvedTheme) => void): () =
  * The inline script to drop in `<head>` before first paint, so the correct
  * theme is applied before the app boots.
  *
- * FixMyText's auth work already established that a flash on refresh is a real
- * defect and not cosmetic; this is the same fix for theme. Must be rendered
+ * The editor app's auth work already established that a flash on refresh is a
+ * real defect and not cosmetic; this is the same fix for theme. Must be rendered
  * synchronously — as a `<script dangerouslySetInnerHTML>` in an SSR document,
  * or inline in `index.html`. Deferring it defeats the point entirely.
  */

@@ -294,6 +294,65 @@ describe('NativeSelect', () => {
     expect(cls).toContain('ps-3');
     expect(cls).toContain('pe-8');
   });
+
+  /**
+   * Both halves of one bug, and neither is visible to any other assertion here.
+   *
+   * `cn()` is clsx + tailwind-merge, and tailwind-merge SPLITS ITS INPUT ON
+   * WHITESPACE. A literal space inside an arbitrary value does not stay inside
+   * it — the class is torn into fragments which are then merged against each
+   * other as though they were utilities. With raw spaces in the chevron data URI
+   * this shipped for months:
+   *
+   *   - `stroke-width='2'` / `stroke-linecap='round'` / `stroke-linejoin='round'`
+   *     were deduped as conflicting `stroke-*` utilities, leaving an SVG with no
+   *     `<path>` and an unclosed `<svg>`. No chevron rendered, and
+   *     `appearance-none` had already removed the native one.
+   *   - the leading `bg-[url("data:…` fragment was classified as a background
+   *     COLOUR and evicted `bg-panel`, so the control had a transparent fill.
+   *     Chromium paints a select's option popup from the select's own
+   *     background and falls back to WHITE when it is transparent — which put
+   *     near-white `--fg` option text on a white popup in dark mode.
+   *
+   * A quote is the second banned character, for an unrelated reason: Tailwind v4
+   * scans source files as PLAIN TEXT, so `url(\"…\")` written in a JS string is
+   * read with its backslashes intact and emits `url(\"…\")`, which Lightning CSS
+   * rejects as `BadUrl` — taking the whole stylesheet down with a 500.
+   *
+   * Asserting the rendered class attribute rather than the source is the point:
+   * the source always looked correct. The encoding is what makes it survive.
+   */
+  it('keeps its fill and a whole chevron through tailwind-merge', () => {
+    const { container } = render(
+      <NativeSelect aria-label="x">
+        <option>a</option>
+      </NativeSelect>,
+    );
+    const cls = container.querySelector('select')!.className;
+
+    // The fill. Without it the native option popup renders white.
+    expect(cls).toContain('bg-panel');
+
+    const chevrons = cls.match(/(?:dark:)?bg-\[url\([^)]*\)\]/g) ?? [];
+    expect(chevrons).toHaveLength(2);
+
+    for (const chevron of chevrons) {
+      // Neither banned character may reach the class name.
+      expect(chevron).not.toMatch(/\s/);
+      expect(chevron).not.toMatch(/["']/);
+
+      // Decode to the SVG the browser will actually parse, and assert it is
+      // whole — the three attributes that were being eaten, and the element
+      // that draws the line at all.
+      const svg = decodeURIComponent(chevron.replace(/^.*?,/, '').replace(/\)\]$/, ''));
+      expect(svg).toMatch(/^<svg\b/);
+      expect(svg).toContain('<path');
+      expect(svg).toContain('</svg>');
+      expect(svg).toContain("stroke-width='2'");
+      expect(svg).toContain("stroke-linecap='round'");
+      expect(svg).toContain("stroke-linejoin='round'");
+    }
+  });
 });
 
 describe('Checkbox', () => {
