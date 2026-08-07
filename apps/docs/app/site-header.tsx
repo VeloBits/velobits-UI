@@ -9,6 +9,7 @@ import { Button, cn, useTheme } from '@velobits-dev/ui';
 const NAV = [
   { href: '/', label: 'Overview' },
   { href: '/tokens', label: 'Tokens' },
+  { href: '/icons', label: 'Icons' },
   { href: '/components', label: 'Components' },
 ];
 

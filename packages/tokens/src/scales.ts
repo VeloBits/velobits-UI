@@ -114,3 +114,32 @@ export const breakpoint = {
   xl: '1280px',
   '2xl': '1536px',
 } as const;
+
+/** One scale's entries. Values are CSS strings, or plain numbers for `zIndex`. */
+export type Scale = Readonly<Record<string, string | number>>;
+
+/**
+ * Every scale above, as one enumerable registry.
+ *
+ * This exists so nothing has to hand-list them. `/tokens` previously rendered
+ * the scales as nine literal `<ScaleTable>` calls, which meant a tenth scale
+ * added here would silently never appear on the page — the same class of drift
+ * the contrast tables were restructured to eliminate. `scales.test.ts` asserts
+ * this registry holds every scale the module exports, so the omission is a test
+ * failure rather than a missing section.
+ *
+ * Deliberately typed as a plain `Record` rather than `as const`: this is the
+ * *enumeration* API. Callers who want literal types (`radius.md` narrowing to
+ * `'6px'`) should use the individual named exports, which are unchanged.
+ */
+export const SCALES: Readonly<Record<string, Scale>> = {
+  radius,
+  duration,
+  easing,
+  zIndex,
+  shadow,
+  font,
+  breakpoint,
+  container,
+  spacing,
+};

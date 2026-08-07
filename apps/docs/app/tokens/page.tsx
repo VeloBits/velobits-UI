@@ -1,13 +1,8 @@
 import {
-  breakpoint,
-  container,
   CONTRAST_EXEMPT,
   CONTRAST_PAIRS,
   contrastRatio,
   dark,
-  duration,
-  easing,
-  font,
   GLASS_ALPHA_FLOOR,
   GLASS_OVERLAY_PAIRS,
   GLASS_SPECULAR_ALPHA,
@@ -17,17 +12,15 @@ import {
   light,
   neutral,
   PERCEPTIBILITY_FLOOR,
-  radius,
   resolveGlassOverlay,
   resolveGlassSurface,
   resolvePair,
   resolveSoftChip,
   round2,
+  SCALES,
   seed,
-  shadow,
   SOFT_CHIP_PAIRS,
-  spacing,
-  zIndex,
+  TARGET,
   type SemanticTokens,
 } from '@velobits-dev/tokens';
 import { Badge } from '@velobits-dev/ui';
@@ -306,15 +299,9 @@ export default function TokensPage() {
         intro="Non-colour tokens. Motion durations and easings are the ones most often re-invented at a call site, which is why they are named rather than inlined."
       >
         <div className="grid gap-8 lg:grid-cols-2">
-          <ScaleTable title="Radius" entries={Object.entries(radius)} />
-          <ScaleTable title="Duration" entries={Object.entries(duration)} />
-          <ScaleTable title="Easing" entries={Object.entries(easing)} mono />
-          <ScaleTable title="Z-index" entries={Object.entries(zIndex)} />
-          <ScaleTable title="Shadow" entries={Object.entries(shadow)} mono />
-          <ScaleTable title="Font" entries={Object.entries(font)} mono />
-          <ScaleTable title="Breakpoint" entries={Object.entries(breakpoint)} />
-          <ScaleTable title="Container" entries={Object.entries(container)} />
-          <ScaleTable title="Spacing" entries={Object.entries(spacing)} />
+          {Object.entries(SCALES).map(([name, scale]) => (
+            <ScaleTable key={name} title={scaleLabel(name)} entries={Object.entries(scale)} />
+          ))}
         </div>
       </Section>
 
@@ -397,7 +384,7 @@ export default function TokensPage() {
                   <Td>
                     <Ratio
                       value={round2(contrastRatio(resolved.fg, backdrop.composite))}
-                      target={4.5}
+                      target={TARGET.text}
                     />
                   </Td>
                 </tr>
@@ -444,7 +431,7 @@ export default function TokensPage() {
                   </Badge>
                 </Td>
                 <Td>
-                  <Ratio value={round2(contrastRatio(r.fg, r.composite))} target={4.5} />
+                  <Ratio value={round2(contrastRatio(r.fg, r.composite))} target={TARGET.text} />
                 </Td>
               </tr>
             );
@@ -481,15 +468,25 @@ export default function TokensPage() {
   );
 }
 
-function ScaleTable({
-  title,
-  entries,
-  mono,
-}: {
-  title: string;
-  entries: [string, string | number][];
-  mono?: boolean;
-}) {
+/**
+ * Display names only, and every scale renders whether or not it appears here —
+ * an unlisted one just gets its key capitalised. That asymmetry is the point:
+ * this map can get a label wrong, but it can never hide a scale the way the
+ * nine hand-written `<ScaleTable>` calls it replaced could.
+ */
+const SCALE_LABELS: Record<string, string> = { zIndex: 'Z-index' };
+
+const scaleLabel = (name: string) =>
+  SCALE_LABELS[name] ?? name.charAt(0).toUpperCase() + name.slice(1);
+
+function ScaleTable({ title, entries }: { title: string; entries: [string, string | number][] }) {
+  /**
+   * Derived rather than passed: the mono column is for values too long to read
+   * as prose — easings, shadows, font stacks — and length is the actual reason,
+   * so measuring it keeps a new long-valued scale from arriving unformatted.
+   */
+  const mono = entries.some(([, value]) => String(value).length > 24);
+
   return (
     <div>
       <h3 className="mb-2 text-sm font-semibold">{title}</h3>
