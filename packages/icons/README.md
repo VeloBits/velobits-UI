@@ -1,6 +1,6 @@
 # @velobits-dev/icons
 
-The VeloBits icon set — 89 hand-drawn stroke icons on a 24×24 grid, tuned to
+The VeloBits icon set — 88 hand-drawn stroke icons on a 24×24 grid, tuned to
 read at 13–18px, which is where they actually get used.
 
 Merged from the two sets that had independently diverged across the VeloBits

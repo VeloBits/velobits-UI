@@ -5,7 +5,7 @@ const R = '../../registry/velobits';
 /**
  * Per-component entry points, so `import { Button } from '@velobits-dev/ui/button'`
  * pulls in Button and nothing else. `size-limit` asserts that rather than
- * assuming it — a barrel-only build would quietly ship all 28 components to a
+ * assuming it — a barrel-only build would quietly ship all 37 components to a
  * consumer that imported one.
  *
  * The entries live OUTSIDE this package, in `registry/velobits/`, because that
