@@ -143,7 +143,10 @@ export function SegmentedControl({
       // each segment already reports its own disabled state, and a group-level
       // duplicate makes some screen readers announce it twice.
       data-disabled={disabled ? '' : undefined}
-      className={cn('inline-flex rounded-md border border-border bg-bg2 p-0.5', className)}
+      className={cn(
+        'inline-flex rounded-md border border-border bg-bg2 control-recessed p-0.5',
+        className,
+      )}
       id={id}
       // Description wiring — same native ARIA spelling as the name props below.
       aria-describedby={ariaDescribedBy}
@@ -165,7 +168,7 @@ export function SegmentedControl({
             // activation, and removing pointer events would also remove the
             // `not-allowed` cursor that tells a mouse user why nothing happened.
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'data-[state=on]:bg-panel data-[state=on]:shadow-sm',
+            'data-[state=on]:bg-panel data-[state=on]:control-raised',
             option.tone === 'danger' ? 'data-[state=on]:text-danger' : 'data-[state=on]:text-fg',
           )}
         >

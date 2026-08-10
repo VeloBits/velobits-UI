@@ -38,7 +38,7 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
         className={cn(
-          'pointer-events-none block size-4 rounded-full bg-panel ring-0',
+          'pointer-events-none block size-4 rounded-full bg-panel ring-0 control-raised',
           'transition-transform duration-micro ease-out',
           'data-[state=unchecked]:translate-x-0.5 data-[state=checked]:translate-x-4',
           // Backgrounds and transforms are not logical properties.

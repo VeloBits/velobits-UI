@@ -438,6 +438,16 @@
         "default": "./dist/form.cjs"
       }
     },
+    "./motion": {
+      "import": {
+        "types": "./dist/motion.d.ts",
+        "default": "./dist/motion.js"
+      },
+      "require": {
+        "types": "./dist/motion.d.cts",
+        "default": "./dist/motion.cjs"
+      }
+    },
     "./pagination": {
       "import": {
         "types": "./dist/pagination.d.ts",
@@ -483,8 +493,8 @@
     "tailwind-merge": "^3.6.0"
   },
   "peerDependencies": {
-    "@velobits-dev/icons": "^0.1.0",
-    "@velobits-dev/tokens": "^0.1.0",
+    "@velobits-dev/icons": ">=0.1.0",
+    "@velobits-dev/tokens": ">=0.1.0",
     "framer-motion": ">=12.0.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0",

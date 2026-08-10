@@ -36,6 +36,17 @@ const badgeVariants = cva(
         danger: 'border-transparent bg-danger-soft text-danger',
         warning: 'border-transparent bg-warning-soft text-warning',
         info: 'border-transparent bg-info-soft text-info',
+        /**
+         * A CATEGORY, not a status — the point of it.
+         *
+         * `success`/`danger`/`warning`/`info` all assert a severity, so an axis
+         * whose values are *kinds* (a flag's value type, a resource class, an
+         * environment that is neither production nor staging) had to borrow
+         * `primary` and came out blue. This is the variant to reach for there, and
+         * `neutral` is the one to reach for when the value genuinely has no
+         * category either.
+         */
+        rose: 'border-transparent bg-rose-soft text-rose',
         outline: 'border-field-border text-fg',
       },
     },

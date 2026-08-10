@@ -60,6 +60,22 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   },
   { label: 'link / primary-text on panel', fg: 'primaryText', bg: 'panel', target: 'text' },
   { label: 'on-primary over a primary fill', fg: 'onPrimary', bg: 'primary', target: 'text' },
+  /*
+   * The pair whose absence let a 2.45:1 button ship.
+   *
+   * `Button variant="destructive"` is a `--danger` fill with text on it, and until
+   * `--on-danger` existed that text was `--on-primary` (white). The flat pairs
+   * gated `danger` as TEXT and the soft-chip suite gated the WASH; the
+   * fill-with-text-on-it combination had no pair at all, in either theme.
+   */
+  { label: 'on-danger over a danger fill', fg: 'onDanger', bg: 'danger', target: 'text' },
+  {
+    label: 'on-danger over the danger HOVER fill',
+    fg: 'onDanger',
+    bg: 'dangerHover',
+    target: 'text',
+  },
+  { label: 'on-brand over the brand HOVER fill', fg: 'onBrand', bg: 'brandHover', target: 'text' },
   { label: 'primary fill vs page', fg: 'primary', bg: 'bg', target: 'nonText' },
   { label: 'primary fill vs panel', fg: 'primary', bg: 'panel', target: 'nonText' },
 
@@ -133,6 +149,8 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   { label: 'warning text on panel', fg: 'warning', bg: 'panel', target: 'text' },
   { label: 'info text on page', fg: 'info', bg: 'bg', target: 'text' },
   { label: 'info text on panel', fg: 'info', bg: 'panel', target: 'text' },
+  { label: 'rose text on page', fg: 'rose', bg: 'bg', target: 'text' },
+  { label: 'rose text on panel', fg: 'rose', bg: 'panel', target: 'text' },
 
   /* ── chart series vs the page they are drawn on ───────────────────────────
    * `nonText`, because a series mark is a graphical object, not text. Note this
@@ -161,6 +179,10 @@ export const CONTRAST_EXEMPT: Readonly<Record<string, string>> = {
     'decorative separators only (table rules, card outlines). WCAG 1.4.11 applies to visuals REQUIRED to identify a component — a divider is not one. Control edges use fieldBorder, which IS gated.',
   primaryHover:
     'a hover state of an already-gated fill; 1.4.11 exempts states reachable only by pointer hover where the base state is conformant',
+  brandHover:
+    'a backdrop, and gated as one: it is the `bg` side of the "on-brand over the brand HOVER fill" pair. Not exempt in the 1.4.11 sense the way `primaryHover` is — lime flips its only legal text colour, so a hover that drifts light enough to break charcoal must fail',
+  dangerHover:
+    'a backdrop, and gated as one: the `bg` side of the "on-danger over the danger HOVER fill" pair. Measured rather than hover-exempted because dark mode lifts this fill, and lifting it is what broke white text on the base token in the first place',
   primarySoft: 'gated by the soft-chip composite suite, not by a flat pair',
   brandSoft:
     'translucent wash with no text-on-wash pairing: Badge deliberately has no soft-lime-with-lime-text variant (lime on cream is 1.13:1), so there is nothing to composite',
@@ -168,6 +190,7 @@ export const CONTRAST_EXEMPT: Readonly<Record<string, string>> = {
   dangerSoft: 'gated by the soft-chip composite suite, not by a flat pair',
   warningSoft: 'gated by the soft-chip composite suite, not by a flat pair',
   infoSoft: 'gated by the soft-chip composite suite, not by a flat pair',
+  roseSoft: 'gated by the soft-chip composite suite, not by a flat pair',
   highlight: 'translucent hover wash on an otherwise transparent control',
   overlay: 'a scrim; its job is to reduce contrast behind a modal',
   mutedOnGlass: 'gated by the glass composite suite, not by a flat pair',
@@ -187,6 +210,106 @@ export function resolvePair(
 }
 
 /* ── tier S: the glass that IS the component surface ──────────────────────── */
+
+/* ── two roles that must never be the same colour ──────────────────────────── */
+
+/**
+ * Token pairs that are semantically distinct and must therefore be visually
+ * distinct, asserted in `test/contrast.test.ts`.
+ *
+ * ## The bug this exists for
+ *
+ * `--info` was defined as `blueSteps.text`, which made it **byte-identical** to
+ * `--primary-text` in both themes: `#0062B3` light, `#4AACFF` dark. So an info
+ * chip and a link were the same colour, and there was no way to render the
+ * difference between "this is informational" and "this is something you can
+ * click".
+ *
+ * **Every other gate in this file passed throughout**, and would have kept
+ * passing forever. That is the point: each token was individually legible against
+ * every surface it sits on, and legibility is all the WCAG sweep and the
+ * perceptibility gate measure. Neither asks whether two tokens are the same as
+ * *each other* — a question that only has an answer once you know their roles,
+ * which is what this registry supplies.
+ *
+ * It survived to ship only because `Badge variant="info"` happened to be unused
+ * in the one consumer. A latent collision, not a harmless one.
+ *
+ * ## Membership rule
+ *
+ * A pair belongs here when the two tokens can appear **in the same view** and a
+ * reader is expected to tell them apart. Tokens that share a value on purpose are
+ * NOT collisions and must stay out: `--bg2` IS `--panel` in dark mode, `--primary`
+ * and `--field-border` are deliberately identical across both themes, and
+ * `--code`/`--on-code` are pinned theme-invariant.
+ */
+export interface DistinctRolePair {
+  /** Human-readable, and what the failure message prints. */
+  label: string;
+  a: keyof SemanticTokens;
+  b: keyof SemanticTokens;
+  /** Why a reader has to tell these two apart. Printed on failure. */
+  because: string;
+}
+
+export const DISTINCT_ROLE_PAIRS: readonly DistinctRolePair[] = [
+  {
+    label: 'info vs link',
+    a: 'info',
+    b: 'primaryText',
+    because:
+      'an info chip and a hyperlink appear in the same paragraph; identical colour means ' +
+      '"informational" and "clickable" cannot be distinguished. This pair shipped identical.',
+  },
+  {
+    label: 'rose vs danger',
+    a: 'rose',
+    b: 'danger',
+    because:
+      'rose is a CATEGORY colour with no severity reading. If it drifts toward danger it ' +
+      'starts implying destructiveness, which is the one thing it exists not to do.',
+  },
+  {
+    label: 'rose vs accent text',
+    a: 'rose',
+    b: 'accentText',
+    because:
+      'both are magenta-adjacent in light mode (rose from chart3, accentText from the plum ' +
+      'seed) and both can label a row in the same table.',
+  },
+  {
+    label: 'info vs primary fill',
+    a: 'info',
+    b: 'primary',
+    because: 'an info chip beside a primary button is the commonest toolbar layout in the product.',
+  },
+  {
+    label: 'warning vs brand',
+    a: 'warning',
+    b: 'brand',
+    because:
+      'amber and lime are neighbours on the hue wheel, and a warning chip next to a brand ' +
+      'fill must not read as two shades of the same thing.',
+  },
+];
+
+/**
+ * The minimum perceptual distance a {@link DISTINCT_ROLE_PAIRS} entry must hold,
+ * as OKLab ΔE.
+ *
+ * OKLab rather than a channel delta or a contrast ratio, because the question is
+ * "do these look like different colours", not "is one readable on the other" —
+ * and contrast ratio is blind to hue entirely: teal `#256262` and a blue of the
+ * same lightness have a contrast ratio of ~1.0 against each other while being
+ * obviously different colours. ΔE is the measure that matches the question.
+ *
+ * 0.04 is deliberately a *low bar*. It is a collision detector, not a design
+ * guideline: it catches "these are the same token wearing two names", which is
+ * the failure that actually shipped, without dictating how far apart a palette's
+ * hues ought to sit. Every shipped pair clears it by a wide margin; the old
+ * `info`/`primaryText` pair measured exactly 0.
+ */
+export const ROLE_DISTINCTION_FLOOR = 0.04;
 
 /**
  * The minimum 8-bit channel separation a tier-S composite must hold against
@@ -225,6 +348,9 @@ export const GLASS_SURFACE_PAIRS: readonly GlassSurfacePair[] = [
   { label: 'dark component surface (Card, Panel, Sidebar)', theme: 'dark', tier: 'surfaceDark' },
 ];
 
+/** The two stops of the tier-S sheen. `top` is the lit stop, `bottom` the far one. */
+export type GlassStopName = 'top' | 'bottom';
+
 /**
  * Flatten a tier-S entry into the opaque colours the gates measure.
  *
@@ -232,10 +358,22 @@ export const GLASS_SURFACE_PAIRS: readonly GlassSurfacePair[] = [
  * `rgba()`. Measuring these in linear light reports every composite several 8-bit
  * steps lighter and would report the perceptibility gate as passing on values
  * that are invisible in a browser — see the note on `compositeOver`.
+ *
+ * ## Why this returns `stops` and not one `composite`
+ *
+ * Tier S paints a two-stop gradient (see {@link GlassSurfaceTier.surfaceBottom}).
+ * A gate that measured one colour would leave the other stop unmeasured — and
+ * the unmeasured one is the FAR stop, which is precisely the one that approaches
+ * a wall: light's bottom lands on {@link PERCEPTIBILITY_FLOOR} exactly, and dark's
+ * bottom is the stop nearest the page. Every caller walks `stops`, so adding a
+ * third stop later cannot silently escape measurement either.
  */
 export function resolveGlassSurface(pair: GlassSurfacePair): {
-  /** The tier-S surface flattened over the page: the colour text actually sits on. */
-  composite: string;
+  /**
+   * Both gradient stops flattened over the page — the colours text actually sits
+   * on, one per stop, in paint order.
+   */
+  stops: { name: GlassStopName; composite: string }[];
   /** The opaque panel this tier has to look different from. */
   panel: string;
   /** The page it has to look different from in the other direction. */
@@ -246,7 +384,10 @@ export function resolveGlassSurface(pair: GlassSurfacePair): {
   const theme = themes[pair.theme];
   const tier = glass[pair.tier];
   return {
-    composite: compositeOver(tier.surface, theme.bg, tier.alpha),
+    stops: [
+      { name: 'top', composite: compositeOver(tier.surface, theme.bg, tier.alpha) },
+      { name: 'bottom', composite: compositeOver(tier.surfaceBottom, theme.bg, tier.alpha) },
+    ],
     panel: theme.panel,
     bg: theme.bg,
     fg: theme.fg,
@@ -337,10 +478,21 @@ export const SOFT_CHIP_PAIRS: readonly SoftChipPair[] = [
   { label: 'danger soft chip (Badge `danger`)', fg: 'danger', wash: 'dangerSoft' },
   { label: 'warning soft chip (Badge `warning`)', fg: 'warning', wash: 'warningSoft' },
   { label: 'info soft chip (Badge `info`)', fg: 'info', wash: 'infoSoft' },
+  { label: 'rose soft chip (Badge `rose`)', fg: 'rose', wash: 'roseSoft' },
 ];
 
-/** The surfaces a chip plausibly sits on, resolved per theme. */
-export type SoftChipBackdropName = 'page' | 'panel' | 'glass surface';
+/**
+ * The surfaces a chip plausibly sits on, resolved per theme.
+ *
+ * The glass surface counts **twice**, once per sheen stop, and which stop is the
+ * worst case flips with the theme — so neither can be dropped as redundant.
+ * Light-mode chip text is dark, so its worst backdrop is the DARKER stop
+ * (`bottom`); dark-mode chip text is light, so its worst backdrop is the LIGHTER
+ * one (`top`). A gate that measured a single stop would test the safe end in one
+ * theme and the safe end in the other.
+ */
+export type SoftChipBackdropName =
+  'page' | 'panel' | 'glass surface (top)' | 'glass surface (bottom)';
 
 /** Parse `rgba(r, g, b, a)` — the only translucent spelling these tokens use. */
 function parseRgba(css: string): { hex: string; alpha: number } {
@@ -375,12 +527,15 @@ export function resolveSoftChip(
   const tier = glass[theme === 'light' ? 'surfaceLight' : 'surfaceDark'];
   const wash = parseRgba(t[pair.wash]);
   const flatten = (backdrop: string) => compositeOver(wash.hex, backdrop, wash.alpha);
+  /** The tier-S stop itself flattened over the page, before the wash goes on top. */
+  const onGlass = (stop: string) => flatten(compositeOver(stop, t.bg, tier.alpha));
   return {
     fg: t[pair.fg],
     backdrops: [
       { name: 'page', composite: flatten(t.bg) },
       { name: 'panel', composite: flatten(t.panel) },
-      { name: 'glass surface', composite: flatten(compositeOver(tier.surface, t.bg, tier.alpha)) },
+      { name: 'glass surface (top)', composite: onGlass(tier.surface) },
+      { name: 'glass surface (bottom)', composite: onGlass(tier.surfaceBottom) },
     ],
   };
 }
