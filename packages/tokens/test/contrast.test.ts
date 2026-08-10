@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { compositeOver, contrastRatio, hexToRgb, round2 } from '../src/color';
+import { compositeOver, contrastRatio, hexToOklch, hexToRgb, round2 } from '../src/color';
 import { GLASS_ALPHA_FLOOR, GLASS_SPECULAR_ALPHA, glass } from '../src/glass';
 import { worstCaseBackdrops } from '../src/palette';
 import { themes, type SemanticTokens, type ThemeName } from '../src/semantic';
 import {
   CONTRAST_EXEMPT,
   CONTRAST_PAIRS,
+  DISTINCT_ROLE_PAIRS,
   GLASS_OVERLAY_PAIRS,
   GLASS_SURFACE_PAIRS,
   PERCEPTIBILITY_FLOOR,
+  ROLE_DISTINCTION_FLOOR,
   SOFT_CHIP_PAIRS,
   TARGET,
   resolveGlassOverlay,
@@ -116,6 +118,77 @@ describe('soft chips clear AA on every surface they sit on', () => {
       }
     });
   }
+});
+
+describe('TWO ROLES ARE NEVER THE SAME COLOUR', () => {
+  /**
+   * The gate that every other gate in this file is structurally blind to.
+   *
+   * Everything else measures a token against a SURFACE — is it readable, is it
+   * visible. Nothing else measures a token against ANOTHER TOKEN, and that is how
+   * `--info` shipped as the exact bytes of `--primary-text` (`#0062B3` light,
+   * `#4AACFF` dark) with a fully green suite: both were individually legible
+   * everywhere, so nothing was wrong by any question being asked.
+   *
+   * Measured in OKLab ΔE rather than contrast ratio on purpose — see
+   * {@link ROLE_DISTINCTION_FLOOR}. Contrast ratio cannot answer this question at
+   * all: two colours of equal lightness and opposite hue have a ratio of ~1.0,
+   * which is what "identical" also scores.
+   */
+  const deltaE = (a: string, b: string): number => {
+    // OKLab, not OKLCH, for the distance: hue is angular and undefined at zero
+    // chroma, so a polar distance misreports near-neutral pairs.
+    const toLab = (hex: string) => {
+      const { l, c, h } = hexToOklch(hex);
+      const rad = (h * Math.PI) / 180;
+      return [l, c * Math.cos(rad), c * Math.sin(rad)] as const;
+    };
+    const [l1, a1, b1] = toLab(a);
+    const [l2, a2, b2] = toLab(b);
+    return Math.hypot(l1 - l2, a1 - a2, b1 - b2);
+  };
+
+  for (const theme of THEMES) {
+    describe(theme, () => {
+      for (const pair of DISTINCT_ROLE_PAIRS) {
+        it(`${pair.label} are different colours`, () => {
+          const a = themes[theme][pair.a];
+          const b = themes[theme][pair.b];
+
+          expect(
+            a,
+            `--${pair.a} and --${pair.b} are the SAME VALUE (${a}) in ${theme} mode.\n\n` +
+              `${pair.because}\n\n` +
+              `No other gate in this file can catch this: both tokens are individually legible ` +
+              `against every surface they sit on, which is all the WCAG sweep and the ` +
+              `perceptibility gate measure.`,
+          ).not.toBe(b);
+
+          const distance = deltaE(a, b);
+          expect(
+            round2(distance),
+            `--${pair.a} (${a}) and --${pair.b} (${b}) are ${distance.toFixed(3)} apart in OKLab ` +
+              `ΔE, below the ${ROLE_DISTINCTION_FLOOR} collision floor, in ${theme} mode.\n\n` +
+              `${pair.because}`,
+          ).toBeGreaterThanOrEqual(ROLE_DISTINCTION_FLOOR);
+        });
+      }
+    });
+  }
+
+  it('every registered role pair refers to tokens that still exist', () => {
+    /**
+     * The registry names tokens as strings through `keyof SemanticTokens`, so a
+     * rename is caught by the compiler — but a token being DELETED while its pair
+     * stays behind would leave an entry silently comparing two undefineds.
+     */
+    for (const pair of DISTINCT_ROLE_PAIRS) {
+      for (const key of [pair.a, pair.b]) {
+        expect(themes.light[key], `${key} in role pair "${pair.label}"`).toBeDefined();
+        expect(themes.dark[key], `${key} in role pair "${pair.label}"`).toBeDefined();
+      }
+    }
+  });
 });
 
 describe('the specific claims the palette was designed around', () => {
@@ -309,89 +382,139 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
     const r = resolveGlassSurface(pair);
     const tier = glass[pair.tier];
 
-    describe(`${pair.label} — ${tier.surface} @α${tier.alpha} → ${r.composite}`, () => {
-      it(`differs from --panel by ≥${PERCEPTIBILITY_FLOOR}/255 on some channel`, () => {
-        const delta = maxChannelDelta(r.composite, r.panel);
-        expect(
-          delta,
-          `Tier-S glass (${tier.surface} @α${tier.alpha}) composites over the page to ` +
-            `${r.composite}, which is ${delta}/255 from the opaque --panel (${r.panel}).\n\n` +
-            `THAT MEANS THE GLASS IS VISUALLY IDENTICAL TO AN OPAQUE PANEL: the blur costs a ` +
-            `backdrop repaint per surface for no visual change, and blurring a uniform page ` +
-            `returns that same uniform page.\n\n` +
-            `Fix it by TINTING the tier-S surface further off the panel — not by lowering the ` +
-            `alpha, which makes the composite drift over any backdrop that is not the page ` +
-            `(--panel at α 0.50 lands on the same colour and drifts 11/255 in light, 31/255 ` +
-            `in dark, against this tier's 3/255).`,
-        ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
-      });
+    /**
+     * EVERY assertion below runs once PER SHEEN STOP.
+     *
+     * Tier S paints a two-stop gradient, and a gate that measured one colour
+     * would leave the other unmeasured — specifically the far stop, which is the
+     * one that approaches a wall in both themes (light's bottom lands on the
+     * floor exactly; dark's bottom is the stop nearest the page). Both stops are
+     * real surfaces that real text sits on, so both owe every measurement the
+     * flat fill used to owe.
+     */
+    for (const { name: stopName, composite } of r.stops) {
+      describe(`${pair.label} — ${stopName} stop @α${tier.alpha} → ${composite}`, () => {
+        it(`differs from --panel by ≥${PERCEPTIBILITY_FLOOR}/255 on some channel`, () => {
+          const delta = maxChannelDelta(composite, r.panel);
+          expect(
+            delta,
+            `The ${stopName} stop of the tier-S sheen composites over the page to ` +
+              `${composite}, which is ${delta}/255 from the opaque --panel (${r.panel}).\n\n` +
+              `THAT MEANS THE GLASS IS VISUALLY IDENTICAL TO AN OPAQUE PANEL: the blur costs a ` +
+              `backdrop repaint per surface for no visual change, and blurring a uniform page ` +
+              `returns that same uniform page.\n\n` +
+              `Fix it by TINTING that stop further off the panel — not by lowering the ` +
+              `alpha, which makes the composite drift over any backdrop that is not the page ` +
+              `(--panel at α 0.50 lands on the same colour and drifts 11/255 in light, 31/255 ` +
+              `in dark, against this tier's 3/255).`,
+          ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
+        });
 
-      it(`differs from --bg by ≥${PERCEPTIBILITY_FLOOR}/255 on some channel`, () => {
-        const delta = maxChannelDelta(r.composite, r.bg);
-        expect(
-          delta,
-          `Tier-S glass composites to ${r.composite}, only ${delta}/255 off the page ` +
-            `(${r.bg}) it is drawn on. A surface that matches the page is not a surface — ` +
-            `the card boundary would be carried entirely by its 1px border.`,
-        ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
-      });
+        it(`differs from --bg by ≥${PERCEPTIBILITY_FLOOR}/255 on some channel`, () => {
+          const delta = maxChannelDelta(composite, r.bg);
+          expect(
+            delta,
+            `The ${stopName} stop composites to ${composite}, only ${delta}/255 off the page ` +
+              `(${r.bg}) it is drawn on. A surface that matches the page is not a surface — ` +
+              `the card boundary would be carried entirely by its 1px border.\n\n` +
+              `Light's BOTTOM stop sits on this floor by design: it is the widest sheen light ` +
+              `mode has. If you are here after moving --bg or --panel, the sheen has to narrow, ` +
+              `not the floor.`,
+          ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
+        });
 
-      it('reads as RAISED off the page, not recessed into it', () => {
-        /**
-         * Direction matters as much as magnitude. A tier-S composite DARKER than
-         * the page satisfies both deltas above and still looks wrong — a card is
-         * elevation, and elevation reads lighter in both themes. Light lands at
-         * +9/+11/+11 over cream, dark at +9/+9/+9 over the charcoal page.
-         */
-        const lift = channels(r.composite).map((v, i) => v - channels(r.bg)[i]!);
-        expect(
-          Math.min(...lift),
-          `${r.composite} sits BELOW the page ${r.bg} on some channel (${lift.join('/')}), ` +
-            `so the surface reads as a well rather than a card.`,
-        ).toBeGreaterThan(0);
-      });
+        it('reads as RAISED off the page, not recessed into it', () => {
+          /**
+           * Direction matters as much as magnitude. A tier-S composite DARKER than
+           * the page satisfies both deltas above and still looks wrong — a card is
+           * elevation, and elevation reads lighter in both themes.
+           *
+           * This is the assertion the sheen is most likely to break, and the
+           * reason the gradient darkens toward the BOTTOM rather than fading out:
+           * a far stop pushed past the page turns the lower half of every card
+           * into a well.
+           */
+          const lift = channels(composite).map((v, i) => v - channels(r.bg)[i]!);
+          expect(
+            Math.min(...lift),
+            `${composite} sits BELOW the page ${r.bg} on some channel (${lift.join('/')}), ` +
+              `so the ${stopName} of the surface reads as a well rather than a card.`,
+          ).toBeGreaterThan(0);
+        });
 
-      it(`body text clears AA on the composite (≥${TARGET.text}:1)`, () => {
-        const ratio = contrastRatio(r.fg, r.composite);
-        expect(ratio, `${round2(ratio)}:1 on ${r.composite}`).toBeGreaterThanOrEqual(TARGET.text);
-      });
+        it(`body text clears AA on the composite (≥${TARGET.text}:1)`, () => {
+          const ratio = contrastRatio(r.fg, composite);
+          expect(ratio, `${round2(ratio)}:1 on ${composite}`).toBeGreaterThanOrEqual(TARGET.text);
+        });
 
-      it(`--muted-fg clears AA on the composite, so --muted-on-glass is NOT needed here`, () => {
-        /**
-         * The load-bearing difference between the tiers. Tier O has to step muted
-         * text up to `--muted-on-glass` because its backdrop is unknown and the
-         * ordinary token sinks to 3.09:1 against the worst of them. Tier S knows
-         * its backdrop, and the ordinary token measures 5.57:1 (light) / 6.19:1
-         * (dark) — so `.glass-surface` deliberately does NOT set the override,
-         * and darkening every secondary label in the product is not the price of
-         * this retrofit.
-         */
-        const ratio = contrastRatio(r.mutedFg, r.composite);
-        expect(
-          ratio,
-          `--muted-fg (${r.mutedFg}) on ${r.composite} = ${round2(ratio)}:1. If this drops ` +
-            `below ${TARGET.text}:1, .glass-surface has to start overriding --muted-fg the ` +
-            `way .glass does — see css/glass.css.`,
-        ).toBeGreaterThanOrEqual(TARGET.text);
-      });
+        it(`--muted-fg clears AA on the composite, so --muted-on-glass is NOT needed here`, () => {
+          /**
+           * The load-bearing difference between the tiers. Tier O has to step muted
+           * text up to `--muted-on-glass` because its backdrop is unknown and the
+           * ordinary token sinks to 3.09:1 against the worst of them. Tier S knows
+           * its backdrop, and the ordinary token clears AA on both stops — so
+           * `.glass-surface` deliberately does NOT set the override, and darkening
+           * every secondary label in the product is not the price of this retrofit.
+           */
+          const ratio = contrastRatio(r.mutedFg, composite);
+          expect(
+            ratio,
+            `--muted-fg (${r.mutedFg}) on ${composite} = ${round2(ratio)}:1. If this drops ` +
+              `below ${TARGET.text}:1, .glass-surface has to start overriding --muted-fg the ` +
+              `way .glass does — see css/glass.css.`,
+          ).toBeGreaterThanOrEqual(TARGET.text);
+        });
 
-      it('the hairline border stays visible against its own surface', () => {
-        /**
-         * NOT a 1.4.11 gate: `--border` is CONTRAST_EXEMPT because a card
-         * outline is decorative, and the tier-S border is the same kind of line.
-         * It is asserted anyway because in LIGHT mode it is most of the material
-         * — measured 1.60:1, tuned to match what the opaque `--border` shows on
-         * `--panel` (1.61:1), where the tier-O border at α 0.10 would give only
-         * 1.21:1. Dark measures 1.50:1 against the opaque pairing's 1.15:1.
-         */
-        const { hex, alpha } = parseRgba(tier.border);
-        const line = compositeOver(hex, r.composite, alpha);
-        const ratio = contrastRatio(line, r.composite);
-        expect(
-          ratio,
-          `border ${tier.border} over ${r.composite} = ${line}, ${round2(ratio)}:1`,
-        ).toBeGreaterThan(1.4);
+        it('the hairline border stays visible against its own surface', () => {
+          /**
+           * NOT a 1.4.11 gate: `--border` is CONTRAST_EXEMPT because a card
+           * outline is decorative, and the tier-S border is the same kind of line.
+           * It is asserted anyway because in LIGHT mode it is most of the material
+           * — measured 1.60:1, tuned to match what the opaque `--border` shows on
+           * `--panel` (1.61:1), where the tier-O border at α 0.10 would give only
+           * 1.21:1. Dark measures 1.50:1 against the opaque pairing's 1.15:1.
+           *
+           * One border serves both stops, so it is measured against both: the edge
+           * runs the full height of the surface and cannot be tuned per stop.
+           */
+          const { hex, alpha } = parseRgba(tier.border);
+          const line = compositeOver(hex, composite, alpha);
+          const ratio = contrastRatio(line, composite);
+          expect(
+            ratio,
+            `border ${tier.border} over the ${stopName} stop ${composite} = ${line}, ` +
+              `${round2(ratio)}:1`,
+          ).toBeGreaterThan(1.4);
+        });
       });
+    }
+
+    it(`${pair.label}: the sheen's two stops are actually different colours`, () => {
+      /**
+       * The gradient's own no-op check, and the mirror image of the gate above.
+       *
+       * Everything else here asks whether each stop is distinguishable from the
+       * page and the panel. Nothing else asks whether the stops are
+       * distinguishable from EACH OTHER — and two identical stops satisfy every
+       * assertion in this file while rendering exactly the flat fill the sheen
+       * replaced. Same failure shape as an invisible glass card: green suite,
+       * absent feature.
+       *
+       * Deliberately asserted as ≥2/255 rather than the perceptibility floor of 8.
+       * A sheen is a RAMP across a whole surface, not an edge between two
+       * adjacent patches, and gradient detection runs well below step-edge
+       * detection — 8/255 is simply not available here (the legal maximum is 5 in
+       * light and 4 in dark, both walls being spent twice). 2/255 is the floor
+       * below which the ramp is arithmetic rather than something a person sees.
+       */
+      const [top, bottom] = r.stops;
+      const separation = maxChannelDelta(top!.composite, bottom!.composite);
+      expect(
+        separation,
+        `Both sheen stops composite to within ${separation}/255 of each other ` +
+          `(${top!.composite} → ${bottom!.composite}), so .glass-surface renders as a flat ` +
+          `fill and the gradient is decoration in the stylesheet only.`,
+      ).toBeGreaterThanOrEqual(2);
     });
   }
 
@@ -432,8 +555,16 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
      *
      * If a future palette edit ever made the light figure meaningful, this test
      * failing is the signal to give light mode a highlight too.
+     *
+     * Measured against the TOP stop of the sheen, and only that one: the
+     * highlight is an `inset 0 1px 0` box-shadow, so the single row of pixels it
+     * paints is the top edge of the surface. It is also the lightest stop, which
+     * makes it the hardest place for a white highlight to show — so light mode
+     * failing to be invisible here would mean it is visible everywhere.
      */
-    const [light, dark] = GLASS_SURFACE_PAIRS.map((p) => resolveGlassSurface(p).composite);
+    const [light, dark] = GLASS_SURFACE_PAIRS.map(
+      (p) => resolveGlassSurface(p).stops.find((s) => s.name === 'top')!.composite,
+    );
     const lit = (base: string) =>
       contrastRatio(compositeOver('#FFFFFF', base, GLASS_SPECULAR_ALPHA), base);
 

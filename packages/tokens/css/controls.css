@@ -1,0 +1,75 @@
+/*
+ * THE CONTROL MATERIAL. Imported by theme.css into Tailwind's `components` layer,
+ * so a call site can still override with a `shadow-*` utility (a later layer)
+ * without `!important`.
+ *
+ * See `src/controls.ts` for the reasoning and every measurement. The three facts
+ * that matter if you are only reading the CSS:
+ *
+ *   1. This is the glass language applied to CONTROLS. Before it, every control
+ *      was a flat fill — so a Card read as glass and everything inside it read as
+ *      paper, which is why the product did not feel glassmorphic even though the
+ *      surfaces were correct.
+ *
+ *   2. It is edge, light and depth — NOT transparency. A tier-S surface transmits
+ *      only 15% of its backdrop at α 0.85, so more translucency cannot deliver a
+ *      visible material here; the perceptibility gate and see-through-ness pull in
+ *      opposite directions. Edges cost nothing from that budget.
+ *
+ *   3. NEITHER CLASS MAY EVER COMPOSE `--shadow-sm`. It is `none` in dark mode, and
+ *      `none` inside a comma-separated box-shadow list invalidates the whole
+ *      declaration — which would silently delete dark mode's lit edge, i.e. its
+ *      only material. That is what `--control-shadow` exists for, and why it is
+ *      never spelled `none`.
+ */
+
+/*
+ * RAISED — buttons, the switch thumb, the active tab, the active segment.
+ *
+ * A lit top edge plus a drop shadow. The edge is an inset box-shadow rather than a
+ * pseudo-element so it follows `border-radius` for free and cannot collide with a
+ * component's own ::before (Tabs uses an ::after for its active underline).
+ *
+ * In light mode `--control-lit` is `transparent` and this is shadow-only: a white
+ * highlight on a white fill measures 1.00:1 at every alpha. Do not raise it.
+ */
+.control-raised {
+  box-shadow:
+    inset 0 1px 0 var(--control-lit),
+    var(--control-shadow);
+}
+
+/*
+ * RECESSED — inputs, textareas, selects, checkboxes, and the tracks that active
+ * segments slide within.
+ *
+ * A short inner well at the TOP edge only, which is what distinguishes "type into
+ * me" from "press me". A symmetric inset reads as a hole rather than a field.
+ *
+ * No drop shadow, deliberately: a recessed element that also casts a shadow is
+ * physically contradictory, and at control scale it just muddies the edge.
+ */
+.control-recessed {
+  box-shadow: inset 0 1px 2px var(--control-inset);
+}
+
+/*
+ * Reduced transparency drops the translucent EDGES and keeps the opaque shadow.
+ *
+ * Both `--control-lit` and `--control-inset` are translucent by construction —
+ * they have to be, since they composite over whatever fill the control carries. A
+ * user asking for less transparency still needs raised and recessed to be
+ * distinguishable, so the raised shadow stays and only the inner edges go.
+ *
+ * Kept in step with the same query in glass.css and texture.css: one preference,
+ * one coherent answer across all three layers.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .control-raised {
+    box-shadow: var(--control-shadow);
+  }
+
+  .control-recessed {
+    box-shadow: none;
+  }
+}

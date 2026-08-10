@@ -5,7 +5,15 @@ import { memo, useMemo } from 'react';
 import { ArrowDownIcon, ArrowUpDownIcon } from '@velobits-dev/icons';
 
 import { cn } from '../lib/cn';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  type TableProps,
+} from './table';
 
 /**
  * A sortable, selectable, activatable table built from a **column registry**.
@@ -165,6 +173,22 @@ export interface DataTableProps<TRow, TContext = undefined> extends Omit<
   empty?: React.ReactNode;
   /** Classes for the scroll wrapper. Surface treatment belongs here. */
   containerClassName?: string;
+  /**
+   * Forwarded to the underlying {@link Table} — `'glass'` (default), `'panel'` or
+   * `'none'`.
+   *
+   * **Pass `'none'` for a DataTable already inside a Card, Dialog or SidePanel.**
+   * That is the nested-glass case `glass.css` forbids: the inner surface
+   * composites over the outer one, the two land ~2/255 apart, and both stop
+   * reading as a material while costing two paints.
+   *
+   * This existed on `Table` from the start and was missing here, so the one
+   * component most likely to be dropped inside a Card was also the one that could
+   * not opt out — `surface` is not part of `React.ComponentProps<'table'>`, so it
+   * was not reachable through the prop spread either. It is declared explicitly
+   * rather than left to `...props` so the compiler can see it.
+   */
+  surface?: TableProps['surface'];
 }
 
 function DataTable<TRow, TContext = undefined>({
@@ -182,6 +206,7 @@ function DataTable<TRow, TContext = undefined>({
   rowClassName,
   empty,
   containerClassName,
+  surface,
   className,
   ...props
 }: DataTableProps<TRow, TContext>) {
@@ -191,7 +216,12 @@ function DataTable<TRow, TContext = undefined>({
   );
 
   return (
-    <Table className={className} containerClassName={containerClassName} {...props}>
+    <Table
+      className={className}
+      containerClassName={containerClassName}
+      surface={surface}
+      {...props}
+    >
       {/*
        * The caption IS the accessible name, and it is announced wherever it is
        * painted — so `sr-only` costs nothing semantically. A table with neither

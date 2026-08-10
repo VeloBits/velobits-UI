@@ -58,6 +58,64 @@ export const blueSteps = {
  */
 export const plumSteps = { text: '#582840' } as const;
 
+/**
+ * Teal — the hue `info` is built from, and the reason `info` is no longer blue.
+ *
+ * ## Why this exists at all
+ *
+ * `--info` used to be `blueSteps.text`, which made it **byte-identical** to
+ * `--primary-text` in both themes (`#0062B3` light, `#4AACFF` dark). "This is
+ * informational" and "this is a link" were the same colour, so the distinction
+ * could not be rendered — and no gate caught it, because every pair each token
+ * belongs to passed on its own. It stayed invisible only because
+ * `Badge variant="info"` happened to be unused.
+ *
+ * Teal rather than a re-tuned blue: two blues one step apart would fail the same
+ * way the first time anyone put a link inside an info chip. The hue is taken from
+ * `chart5` (#368A8A / #3B8F8E), which already proves this family clears the
+ * non-text floor against both pages — the steps below are that hue pushed to
+ * clear *text* AA, which the isoluminant chart values are not required to do.
+ *
+ * ## Both steps are tuned against the SOFT CHIP, not the page
+ *
+ * Same discipline as the status tokens: the worst composite a teal chip sits on
+ * is not the page but the wash flattened over its darkest/lightest backdrop —
+ * for light that is the page, for dark the panel. The seed itself measures
+ * 3.08:1 (light) and 3.13:1 (dark) inside a chip and is not usable as text.
+ */
+export const tealSteps = {
+  /** 5.08:1 inside a soft chip on cream, 6.05:1 flat. `#2A6E6E` measures 4.37 in the chip. */
+  text: '#256262',
+  /** 4.94:1 inside a soft chip on the dark panel, 6.19:1 flat. `#59A8A7` measures 4.12. */
+  textDark: '#6FBAB9',
+} as const;
+
+/**
+ * Rose — the one genuinely new hue in the palette, for tone assignment where the
+ * meaning is categorical rather than a status.
+ *
+ * The five status/accent families the system had (blue, lime, green, red, amber)
+ * are all either a status or the brand, so anything needing a *neutral category
+ * colour* had to borrow one and imply a severity it did not mean. Rose carries no
+ * status reading in either theme, which is the whole point of it.
+ *
+ * Hue taken from `chart3` (#BC5F8D / #C06492) for the same reason teal comes from
+ * `chart5`: that value is already measured against both pages, so this is an
+ * existing hue promoted to a text-safe tone rather than a sixth seed invented
+ * from nothing. It is deliberately NOT plum — plum is `--elevated` in dark mode
+ * and `--accent-text` flips to lime there, so the plum family cannot carry a
+ * symmetric tone without colliding with a surface.
+ *
+ * Both steps land on ~4.6:1 inside a soft chip, which is the house standard the
+ * status tokens were re-tuned to on 2026-08-06 (worst composite 4.61).
+ */
+export const roseSteps = {
+  /** 4.65:1 inside a soft chip on cream, 5.51:1 flat. */
+  text: '#9B3E6B',
+  /** 4.56:1 inside a soft chip on the dark panel, 5.63:1 flat. */
+  textDark: '#DA8FB2',
+} as const;
+
 export { neutral };
 export type { NeutralStep } from './generated/neutrals';
 

@@ -109,7 +109,7 @@ describe('tokens.css agrees with semantic.ts', () => {
      * and looks like a palette bug. The exceptions are the static, non-colour
      * values that are genuinely theme-independent.
      */
-    const themeIndependent = new Set(['--glass-blur']);
+    const themeIndependent = new Set(['--glass-blur', '--page-texture-grid']);
     const rampNames = Object.keys(neutral).map((s) => `--neutral-${s}`);
 
     const missing = Object.keys(cssLight).filter(
@@ -128,7 +128,8 @@ describe('tokens.css agrees with semantic.ts', () => {
       '--glass-bg',
       '--glass-blur',
       '--glass-border',
-      '--glass-surface-bg',
+      '--glass-surface-bg-top',
+      '--glass-surface-bg-bottom',
       '--glass-surface-border',
       '--glass-surface-highlight',
       '--glass-surface-shadow',
@@ -136,6 +137,22 @@ describe('tokens.css agrees with semantic.ts', () => {
       '--shadow-md',
       '--shadow-lg',
       '--shadow-overlay',
+      // The page texture. Gated in `texture-css.test.ts` rather than here — it is
+      // measured against a different thing from everything else in this file (the
+      // page it REPLACES, per channel and per direction), because it is the only
+      // token group that can invalidate other tokens' numbers without changing
+      // their values. Listing it here says "has a TypeScript counterpart", which
+      // is what this test actually checks; `src/texture.ts` is that counterpart.
+      '--page-texture-dot',
+      '--page-texture-field',
+      '--page-texture-grid',
+      // The control material. Gated in `controls-css.test.ts` — it is edge, light
+      // and depth rather than a fill, so what needs asserting there is the
+      // `none`-in-a-shadow-list trap and the light-mode asymmetry, not a ratio
+      // against a surface. `src/controls.ts` is the TypeScript counterpart.
+      '--control-lit',
+      '--control-inset',
+      '--control-shadow',
     ]);
     const unknown = Object.keys({ ...cssLight, ...cssDark }).filter((n) => !known.has(n));
     expect(
@@ -185,7 +202,7 @@ describe('glass CSS agrees with glass.ts', () => {
   });
 
   /**
-   * Tier S is four variables per theme rather than tier O's three, and the
+   * Tier S is five variables per theme rather than tier O's three, and the
    * loop above only walks `SemanticTokens` — so none of them are auto-discovered
    * and each has to be named here. The `known` set in the test above is what
    * stops the reverse mistake (a CSS-only variable that never reaches the TS
@@ -197,9 +214,15 @@ describe('glass CSS agrees with glass.ts', () => {
   ] as const;
 
   for (const [theme, declarations, tier] of SURFACE_THEMES) {
-    it(`${theme} --glass-surface-bg matches the tier-S surface`, () => {
-      expect(normalise(declarations['--glass-surface-bg']!)).toBe(
+    it(`${theme} --glass-surface-bg-top matches the tier-S near stop`, () => {
+      expect(normalise(declarations['--glass-surface-bg-top']!)).toBe(
         normalise(rgba(tier.surface, tier.alpha)),
+      );
+    });
+
+    it(`${theme} --glass-surface-bg-bottom matches the tier-S far stop`, () => {
+      expect(normalise(declarations['--glass-surface-bg-bottom']!)).toBe(
+        normalise(rgba(tier.surfaceBottom, tier.alpha)),
       );
     });
 
@@ -215,6 +238,54 @@ describe('glass CSS agrees with glass.ts', () => {
       expect(normalise(declarations['--glass-surface-shadow']!)).toBe(normalise(tier.shadow));
     });
   }
+
+  it('glass.css composes BOTH sheen stops into the tier-S gradient', () => {
+    /**
+     * The two stops are gated individually, which is the point of them being two
+     * variables — but a stop that is declared and never referenced is gated and
+     * invisible at the same time, which is worse than an ungated one: the suite
+     * goes green while the surface renders as a flat fill of whichever stop the
+     * gradient does mention.
+     */
+    const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8').replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    expect(glassCss).toContain('linear-gradient(');
+    for (const stop of ['--glass-surface-bg-top', '--glass-surface-bg-bottom']) {
+      expect(glassCss, `${stop} is declared in tokens.css but never painted`).toContain(
+        `var(${stop})`,
+      );
+    }
+  });
+
+  it('both degradation paths neutralise the sheen, not just the blur', () => {
+    /**
+     * The degradation blocks fall the tier back to an opaque `--panel`. They do
+     * that with the `background` SHORTHAND, which resets `background-image` to
+     * `none` and takes the gradient with it.
+     *
+     * Spelled `background-color` instead, the translucent gradient would survive
+     * on top of the opaque colour and the fallback would render as glass over
+     * panel — for users on a browser without `backdrop-filter`, or users who
+     * explicitly asked for less transparency. Both are the cases the fallback
+     * exists for, and neither would be seen by anyone developing on Chrome with
+     * default settings.
+     */
+    const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8').replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    for (const marker of ['@supports not', 'prefers-reduced-transparency']) {
+      const start = glassCss.indexOf(marker);
+      const body = glassCss.slice(start, glassCss.indexOf('\n}', start));
+      expect(
+        /(^|[\s;{])background:\s*var\(--panel\)/.test(body),
+        `the ${marker} block must use the \`background\` shorthand to clear the sheen gradient; ` +
+          `\`background-color\` would leave the translucent stops painted over it`,
+      ).toBe(true);
+    }
+  });
 
   it('no tier-S shadow is spelled `none`', () => {
     /**

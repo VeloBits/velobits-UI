@@ -377,6 +377,62 @@ describe('useRowSelection, the selection is DERIVED', () => {
   });
 });
 
+describe('DataTable, the surface passthrough', () => {
+  /**
+   * `surface` existed on `Table` from the start and was missing here, which meant
+   * the component MOST likely to be dropped inside a Card was the one that could
+   * not opt out of glass. It was not reachable through the prop spread either:
+   * `surface` is not part of `React.ComponentProps<'table'>`, so there was no
+   * type-level path to it at all.
+   */
+  const wrapper = (container: HTMLElement) =>
+    container.querySelector('[data-slot="table-container"]')!.className;
+
+  const renderWith = (surface?: 'glass' | 'panel' | 'none') =>
+    render(
+      <DataTable
+        label="Flags"
+        columns={COLUMNS}
+        rows={ROWS}
+        rowKey={(row: Row) => row.id}
+        context={CTX}
+        surface={surface}
+      />,
+    );
+
+  it('still defaults to glass when the prop is omitted', () => {
+    expect(wrapper(renderWith().container)).toContain('glass-surface');
+  });
+
+  it('drops the surface on surface="none", for a table inside a Card or Dialog', () => {
+    /**
+     * The nested-glass case `glass.css` forbids: an inner glass surface composites
+     * over the outer one, the two land ~2/255 apart, and both stop reading as a
+     * material while costing two paints.
+     */
+    expect(wrapper(renderWith('none').container)).not.toContain('glass-surface');
+  });
+
+  it('takes the opaque panel on surface="panel"', () => {
+    const cls = wrapper(renderWith('panel').container);
+    expect(cls).toContain('bg-panel');
+    expect(cls).not.toContain('glass-surface');
+  });
+
+  it('never mounts a blur, at any surface value', () => {
+    /**
+     * The wrapper is `overflow-x-auto`. `backdrop-filter` on a scroll container
+     * establishes a containing block for fixed descendants and forms a stacking
+     * context, which is why `glass.css` forbids blur here specifically.
+     */
+    for (const surface of [undefined, 'glass', 'panel', 'none'] as const) {
+      expect(wrapper(renderWith(surface).container), `surface="${surface}"`).not.toContain(
+        'glass-surface-blur',
+      );
+    }
+  });
+});
+
 describe('DataTable, axe', () => {
   it('finds no violations on a sortable, selectable, activatable table', async () => {
     const columns: DataTableColumn<Row, Ctx>[] = [

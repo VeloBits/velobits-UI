@@ -76,6 +76,11 @@
   /* Charcoal, at 10.89:1 — the only sanctioned pairing on a lime fill.
    * White on lime is 1.31:1. */
   --on-brand: #2a2b2a;
+  /* Replaces `hover:brightness-95` on Button variant="brand". A filter escapes the
+   * palette entirely — nothing measures it, and it composites differently over a
+   * glass surface than over an opaque one. Charcoal on this is 9.73:1, so lime's
+   * only legal pairing survives the hover. One value serves both themes. */
+  --brand-hover: #bce52b;
   --brand-soft: rgba(200, 241, 53, 0.18);
 
   /* Plum in light mode; lime takes this role in dark mode, where lime is
@@ -100,10 +105,24 @@
   --success-soft: rgba(34, 110, 37, 0.12);
   --danger: #b82a24;
   --danger-soft: rgba(184, 42, 36, 0.1);
+  /* White, 6.19:1. Light mode's danger fill is dark enough for white text;
+   * dark mode's is not, which is the whole reason this token exists. */
+  --on-danger: #ffffff;
+  --danger-hover: #9e231e;
   --warning: #855600;
   --warning-soft: rgba(133, 86, 0, 0.12);
-  --info: #0062b3;
-  --info-soft: rgba(0, 98, 179, 0.1);
+  /* TEAL, not blue. This was #0062b3 — the same bytes as --primary-text — so
+   * "informational" and "this is a link" rendered identically. Hue from chart5,
+   * pushed until it clears text AA inside its own chip: 5.08:1 on the cream page
+   * (the seed #368A8A measures 3.08 there and is not usable as text). */
+  --info: #256262;
+  --info-soft: rgba(37, 98, 98, 0.12);
+  /* A category colour with no status reading — for axes whose values are kinds,
+   * not severities. Hue from chart3. 4.65:1 inside its chip, the same house
+   * standard the status tokens were re-tuned to. NOT plum: plum is --elevated in
+   * dark mode and --accent-text flips to lime there. */
+  --rose: #9b3e6b;
+  --rose-soft: rgba(155, 62, 107, 0.12);
 
   /* ── chart series ───────────────────────────────────────────────────────── */
   /* Isoluminant by construction: each clears 3.5:1 against the page, but they
@@ -129,8 +148,17 @@
    * this alpha composites to #FDFCFC over the page, 3/255 from the opaque
    * --panel, so the blur costs a repaint and changes nothing. This tint
    * composites to #FDF8F5 — 11/255 off the page, 10/255 off the panel.
-   * fg 13.48:1, --muted-fg 5.57:1 (so NOT --muted-on-glass on this tier). */
-  --glass-surface-bg: rgba(255, 250, 247, 0.85);
+   * fg 13.48:1, --muted-fg 5.57:1 (so NOT --muted-on-glass on this tier).
+   *
+   * TWO STOPS, and they are separate variables on purpose: glass.css composes
+   * them into the gradient, and the perceptibility gate measures each one over
+   * the page. A gradient written as a single value would be opaque to that gate,
+   * and the stop it would hide is the far one — the stop that sits ON the floor.
+   * The far stop composites to #FCF5F0: 8/255 off the page (the floor exactly),
+   * 15/255 off the panel. 5/255 of separation is all light mode has; see the
+   * docblock on GlassSurfaceTier.surfaceBottom for why that still reads. */
+  --glass-surface-bg-top: rgba(255, 250, 247, 0.85);
+  --glass-surface-bg-bottom: rgba(253, 246, 241, 0.85);
   /* 1.81:1 over that composite — deliberately FIRMER than what --border shows
    * on --panel (1.61:1), because the light tint is capped by the gate and the
    * edge has to carry the difference. The tier-O border at α 0.10 measures
@@ -151,6 +179,40 @@
   --glass-surface-shadow:
     0 1px 2px rgba(42, 43, 42, 0.06), 0 4px 10px -3px rgba(42, 43, 42, 0.1),
     0 18px 36px -14px rgba(42, 43, 42, 0.22);
+
+  /* ── control material: the glass language on controls — see css/controls.css ──
+   * Every control was a flat fill before this, so a Card read as glass and
+   * everything inside it read as paper. Also fixes a measured bug: a --panel
+   * control on a --panel surface is 0/255 in BOTH themes (an Input inside a Panel
+   * is its backdrop's exact colour, identified by its border alone).
+   *
+   * TRANSPARENT, and not a bug. A white lit edge on light's #FFFFFF --panel
+   * measures 1.00:1 at EVERY alpha — you cannot lighten white, the same reason
+   * --glass-surface-highlight is transparent here. Light's raised material is its
+   * shadow. Do not raise this. */
+  --control-lit: transparent;
+  /* 1.16:1 over the track fill. The well that reads as "type into me". */
+  --control-inset: rgba(42, 43, 42, 0.07);
+  /* NEVER `none`, in either theme: .control-raised composes this into a box-shadow
+   * LIST with --control-lit, and `none` in such a list invalidates the whole
+   * declaration — silently deleting dark mode's lit edge, its only material. This
+   * is exactly why the class cannot reuse --shadow-sm, which IS none in dark. */
+  --control-shadow: 0 1px 2px rgba(42, 43, 42, 0.06);
+
+  /* ── page texture: the ONE thing allowed to paint the page — see css/texture.css ── */
+  /* Charcoal, the light theme's own ink, at the dot centre: 6/255 below the page.
+   * MAY ONLY DARKEN. A glass surface is lighter than its page, so darkening
+   * widens the perceptibility gap (top 11→20, bottom 8→17) and no other token
+   * needs re-tuning; lightening would push the bottom sheen stop under the
+   * 8/255 floor it already sits on. Asserted per channel in texture-css.test.ts. */
+  --page-texture-dot: rgba(42, 43, 42, 0.03);
+  /* The plum seed — a non-blue hue under everything. 5/255 at the bloom's peak.
+   * The binding constraint on both light layers is --muted-fg where they STACK:
+   * #EAE2E0 at 4.60:1 against AA's 4.5. Deepening either fails there first. */
+  --page-texture-field: rgba(89, 41, 65, 0.025);
+  /* Theme-independent, and the only texture value that is not a colour. 48px
+   * matches velobits-website, whose grid is why its glass always read correctly. */
+  --page-texture-grid: 48px;
 
   /* ── elevation: real shadows in light, borders in dark ──────────────────── */
   --shadow-sm: 0 1px 2px rgba(42, 43, 42, 0.06);
@@ -194,6 +256,10 @@ body.dark {
 
   --brand: #c8f135;
   --on-brand: #2a2b2a;
+  /* Replaces `hover:brightness-95` on Button variant="brand" — a filter escapes
+   * the palette and composites differently over glass than over an opaque fill.
+   * Charcoal on it is 9.73:1, so lime's only legal pairing survives the hover. */
+  --brand-hover: #bce52b;
   --brand-soft: rgba(200, 241, 53, 0.16);
 
   /* Lime IS a text accent here — 13.24:1 on the page. This is the asymmetry
@@ -216,10 +282,20 @@ body.dark {
   --success-soft: rgba(127, 184, 107, 0.12);
   --danger: #ff7f79;
   --danger-soft: rgba(255, 127, 121, 0.12);
+  /* CHARCOAL, not white. White on this fill measures 2.45:1 and is what shipped;
+   * charcoal is 5.80:1. Dark's danger is a LIGHT red because the same token has
+   * to work as text on a dark surface — the two roles want opposite things. */
+  --on-danger: #2a2b2a;
+  /* Lighter, not darker: dark hovers move up, and this raises charcoal 5.80 -> 6.98. */
+  --danger-hover: #ff9a95;
   --warning: #e0c060;
   --warning-soft: rgba(224, 192, 96, 0.12);
-  --info: #4aacff;
-  --info-soft: rgba(74, 172, 255, 0.12);
+  /* TEAL, not blue — see the light block. 4.94:1 inside its own chip on the dark
+   * panel, which is where every dark soft chip bottoms out. */
+  --info: #6fbab9;
+  --info-soft: rgba(111, 186, 185, 0.12);
+  --rose: #da8fb2;
+  --rose-soft: rgba(218, 143, 178, 0.12);
 
   /* Lifted relative to the light theme so each series clears 4.5:1 against the
    * darker page rather than sitting at the 3:1 floor. */
@@ -245,8 +321,17 @@ body.dark {
    * The naive choice — --panel at α 0.85 — lands on #292A29, 3/255 from the
    * opaque panel, i.e. an invisible material.
    * Was 9/255 either side until the page dropped to neutral-925; see the
-   * budget note in css/glass.css. */
-  --glass-surface-bg: rgba(35, 36, 35, 0.85);
+   * budget note in css/glass.css.
+   *
+   * TWO STOPS — see the light block for why they are separate variables. Dark
+   * builds its sheen by pushing the FAR stop down rather than this one up: the
+   * near stop's 12/255-either-side composite is the 2026-08-06 re-tune and there
+   * is nothing to gain by spending it on the --panel wall. The far stop
+   * composites to #1E1E1E: 9/255 off the page, 15/255 off the panel,
+   * --muted-fg 6.62:1 — every figure at or better than the flat fill. 4/255 of
+   * separation. */
+  --glass-surface-bg-top: rgba(35, 36, 35, 0.85);
+  --glass-surface-bg-bottom: rgba(31, 32, 31, 0.85);
   /* 2.18:1 over the composite, against 1.15:1 for the opaque --border on
    * --panel. Firmer than a divider on purpose. */
   --glass-surface-border: rgba(242, 235, 232, 0.26);
@@ -261,6 +346,33 @@ body.dark {
    * with the highlight, and `none` inside a comma list invalidates the whole
    * declaration — dark mode would silently lose its specular edge. */
   --glass-surface-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 14px 32px -10px rgba(0, 0, 0, 0.65);
+
+  /* ── control material, dark — see css/controls.css and src/controls.ts ────── */
+  /* 1.56:1 over --panel: the dark-mode material, exactly as on a tier-S surface.
+   * Far below tier S's α 0.50 on purpose — that value lives on a large surface,
+   * whereas on a 36px control it is a bright white line across every button. */
+  --control-lit: rgba(255, 255, 255, 0.14);
+  /* ~3x light's alpha. --bg2 IS --panel in dark and both are already dark, so
+   * α 0.07 measures 1.04:1 here and does nothing at all. */
+  --control-inset: rgba(0, 0, 0, 0.3);
+  /* A REAL shadow, and never `none` — see the light block. */
+  --control-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+
+  /* ── page texture, dark — see css/texture.css and src/texture.ts ─────────── */
+  /* Black, not a ramp step: the page is already neutral-925, so the only
+   * direction with room is straight down and any ramp step would LIGHTEN it.
+   *
+   * 13/255 below the page — TWICE light's 6, and the asymmetry is deliberate.
+   * Light is pinned at its WCAG ceiling (--muted-fg 4.60:1, and 1.5x these alphas
+   * fails AA). Dark has no accessibility ceiling at all, because darkening a
+   * near-black page RAISES text contrast: --muted-fg measures 8.04:1 here, better
+   * than the 7.72:1 a shallower texture gave. Do not "restore consistency"
+   * between the two — see TEXTURE_DEPTH_CEILING. */
+  --page-texture-dot: rgba(0, 0, 0, 0.6);
+  /* A plum-BLACK, not the plum seed. The seed over this page lifts it +7/+2/+4,
+   * which the darkens-only invariant forbids; this darkens on all three channels
+   * while still leaning the hue toward magenta rather than grey. 8/255 at peak. */
+  --page-texture-field: rgba(14, 6, 11, 0.5);
 
   /* Dark mode delineates with borders, not shadows — except the glass tier,
    * which floats over content and needs the separation. */

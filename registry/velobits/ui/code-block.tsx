@@ -58,7 +58,7 @@ const codeBlockVariants = cva(
     variants: {
       variant: {
         /** The default: an inset well on the surrounding surface. */
-        panel: 'border border-border bg-bg2 p-3 text-fg',
+        panel: 'border border-border bg-bg2 control-recessed p-3 text-fg',
         /** The pinned dark surface. See the docblock. */
         terminal: 'bg-code p-3 text-on-code',
       },
