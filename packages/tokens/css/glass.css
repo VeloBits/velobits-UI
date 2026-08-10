@@ -154,7 +154,37 @@ body.dark .glass-elevated {
  */
 .glass-surface,
 .glass-surface-blur {
-  background: var(--glass-surface-bg);
+  /* ── THE DIRECTIONAL SHEEN ────────────────────────────────────────────────
+   *
+   * Two stops, not one fill, so a surface has a direction: lit near the top,
+   * falling away toward the bottom. Both stops live in `tokens.css` as separate
+   * variables and are composited and gated individually — a `linear-gradient()`
+   * baked into one token would be opaque to the perceptibility gate, and the
+   * stop it would hide is the far one, which is the stop that approaches a wall.
+   *
+   * 165deg, not 135deg. A true diagonal reads as a left-to-right wash on a wide,
+   * short surface (a table shell, a sticky bar), which looks like a rendering
+   * artefact rather than light. 165deg is mostly top-to-bottom with enough lean
+   * to put the bright corner up and to the left, and it holds that reading at
+   * any aspect ratio.
+   *
+   * `background-image`, NOT `background`. The shorthand would reset
+   * `background-color` to transparent, and the two degradation blocks at the
+   * bottom of this file rely on setting a flat `background` — which must win, and
+   * does, because they come later. It also leaves `background-color` free for a
+   * consumer that wants an opaque underlay behind the translucent stops.
+   *
+   * The separation is 5/255 in light and 4/255 in dark, which is the whole legal
+   * budget. That is small; it is also the reason it must be a RAMP and not a
+   * step — gradient detection runs well below step-edge detection. This is not
+   * the surface's primary material and was never meant to be: light's is tint,
+   * edge and shadow; dark's is the specular highlight below.
+   * ─────────────────────────────────────────────────────────────────────────── */
+  background-image: linear-gradient(
+    165deg,
+    var(--glass-surface-bg-top) 0%,
+    var(--glass-surface-bg-bottom) 100%
+  );
   border: 1px solid var(--glass-surface-border);
   box-shadow:
     inset 0 1px 0 var(--glass-surface-highlight),

@@ -444,6 +444,16 @@ const ui: RegistryItem[] = [
     files: [{ path: 'registry/velobits/ui/form.tsx', type: 'registry:ui' }],
   },
   {
+    name: 'motion',
+    type: 'registry:ui',
+    title: 'Motion',
+    description:
+      'Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobits-dev/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer — do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.',
+    dependencies: ['framer-motion'],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/motion.tsx', type: 'registry:ui' }],
+  },
+  {
     name: 'pagination',
     type: 'registry:ui',
     title: 'Pagination',

@@ -407,34 +407,44 @@ export default function TokensPage() {
         }
       >
         <Table head={['Surface', 'Composite', 'vs page', 'vs panel', 'Body text']}>
-          {GLASS_SURFACE_PAIRS.map((pair) => {
+          {/*
+           * One row PER SHEEN STOP, not per tier. Tier S paints a two-stop
+           * gradient, and the far stop is the one that approaches a wall — light's
+           * bottom sits on the floor exactly. A table showing one composite per
+           * tier would be showing the safe half.
+           */}
+          {GLASS_SURFACE_PAIRS.flatMap((pair) => {
             const r = resolveGlassSurface(pair);
-            const vsBg = channelDistance(r.composite, r.bg);
-            const vsPanel = channelDistance(r.composite, r.panel);
-            return (
-              <tr key={pair.label}>
-                <Td>{pair.label}</Td>
-                <Td>
-                  <div className="flex items-center gap-2">
-                    <Chip value={r.composite} />
-                    <span className="font-mono text-xs text-muted-foreground">{r.composite}</span>
-                  </div>
-                </Td>
-                <Td>
-                  <Badge variant={vsBg >= PERCEPTIBILITY_FLOOR ? 'success' : 'danger'}>
-                    {vsBg}/255
-                  </Badge>
-                </Td>
-                <Td>
-                  <Badge variant={vsPanel >= PERCEPTIBILITY_FLOOR ? 'success' : 'danger'}>
-                    {vsPanel}/255
-                  </Badge>
-                </Td>
-                <Td>
-                  <Ratio value={round2(contrastRatio(r.fg, r.composite))} target={TARGET.text} />
-                </Td>
-              </tr>
-            );
+            return r.stops.map(({ name, composite }) => {
+              const vsBg = channelDistance(composite, r.bg);
+              const vsPanel = channelDistance(composite, r.panel);
+              return (
+                <tr key={`${pair.label} ${name}`}>
+                  <Td>
+                    {pair.label} <span className="text-muted-foreground">· {name} stop</span>
+                  </Td>
+                  <Td>
+                    <div className="flex items-center gap-2">
+                      <Chip value={composite} />
+                      <span className="font-mono text-xs text-muted-foreground">{composite}</span>
+                    </div>
+                  </Td>
+                  <Td>
+                    <Badge variant={vsBg >= PERCEPTIBILITY_FLOOR ? 'success' : 'danger'}>
+                      {vsBg}/255
+                    </Badge>
+                  </Td>
+                  <Td>
+                    <Badge variant={vsPanel >= PERCEPTIBILITY_FLOOR ? 'success' : 'danger'}>
+                      {vsPanel}/255
+                    </Badge>
+                  </Td>
+                  <Td>
+                    <Ratio value={round2(contrastRatio(r.fg, composite))} target={TARGET.text} />
+                  </Td>
+                </tr>
+              );
+            });
           })}
           {GLASS_OVERLAY_PAIRS.map((pair) => {
             const r = resolveGlassOverlay(pair);

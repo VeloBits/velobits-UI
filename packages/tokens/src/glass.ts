@@ -105,6 +105,40 @@ export interface GlassTier {
  */
 export interface GlassSurfaceTier extends GlassTier {
   /**
+   * The FAR stop of the directional sheen — `surface` is the near/lit stop.
+   *
+   * Tier S paints a two-stop gradient rather than a flat fill, so a surface has
+   * a direction: lit at the top-left corner, falling away to the bottom-right.
+   * Both stops are composited over the page and gated exactly like a flat fill
+   * was — see {@link GLASS_SURFACE_PAIRS}, which walks `stops`, not a single
+   * colour. That is the whole reason this is a second token and not a
+   * `linear-gradient()` string: a gradient baked into one value would be opaque
+   * to the perceptibility gate, and the sheen would become an ungated hole in
+   * exactly the place the gate exists to protect.
+   *
+   * ## The measured magnitude, stated plainly
+   *
+   * **This effect is small, and it cannot be made large.** A Tier-S composite is
+   * boxed between the page below and the opaque `--panel` above, and the sheen
+   * has to spend that same budget twice — once per stop. Enumerated, the widest
+   * legal separation is **5/255 in light and 4/255 in dark**:
+   *
+   *   light  top #FDF8F5 (Δbg 11, Δpanel 10) → bottom #FCF5F0 (Δbg  8, Δpanel 15)
+   *   dark   top #232423 (Δbg 14, Δpanel  9) → bottom #1F201F (Δbg 10, Δpanel 13)
+   *
+   * A 5/255 *step* would be invisible. A 5/255 *ramp* across a card-sized area is
+   * not, because gradient detection runs well below step-edge detection — which
+   * is the only reason this is worth a token at all. Do not expect it to carry a
+   * surface on its own: in light the material is still tint + edge + shadow, and
+   * in dark it is still the specular highlight.
+   *
+   * Light's bottom stop sits **exactly on** {@link PERCEPTIBILITY_FLOOR}. That is
+   * deliberate, not an oversight: it is the widest sheen light mode has, and if
+   * `--bg` or `--panel` ever move the gate is supposed to fail loudly rather than
+   * let the bottom of every card quietly merge into the page.
+   */
+  surfaceBottom: string;
+  /**
    * Top-edge specular highlight, applied as an INSET box-shadow so it follows
    * the border radius without a pseudo-element. `transparent` in light mode,
    * where the same white measures 1.03:1 at {@link GLASS_SPECULAR_ALPHA} — a
@@ -203,6 +237,12 @@ export const glass = {
    */
   surfaceLight: {
     surface: '#FFFAF7',
+    // The sheen's far stop. Composites to #FCF5F0: 8/255 from `--bg` — ON the
+    // floor, see {@link GlassSurfaceTier.surfaceBottom} — and 15/255 from
+    // `--panel`, which is the wall with room to spare in this direction. Still
+    // lighter than the page on all three channels, so the surface reads as
+    // raised along its whole height and not just at the top.
+    surfaceBottom: '#FDF6F1',
     alpha: 0.85,
     blur: '16px',
     // 1.81:1 over the composite, deliberately FIRMER than what an opaque card
@@ -243,6 +283,21 @@ export const glass = {
    */
   surfaceDark: {
     surface: '#232423',
+    /*
+     * The sheen's far stop. Composites to #1E1E1E: 9/255 from `--bg`, 15/255
+     * from `--panel`, `--muted-fg` 6.62:1 — every figure at or better than the
+     * flat fill it replaces.
+     *
+     * Dark builds its sheen by pushing this stop DOWN rather than pushing
+     * `surface` up, and that asymmetry with light is deliberate. Both directions
+     * reach the same 4-5/255 separation, but `surface` here was measured and
+     * re-tuned on 2026-08-06 against the widened page↔panel budget — its
+     * composite (#212221, 12/255 either side) is the value that made a dark card
+     * stop reading as flat. Lifting it to buy sheen would spend that gain on the
+     * `--panel` wall (Δpanel 11 → 9) to no benefit, because the far stop had the
+     * slack all along.
+     */
+    surfaceBottom: '#1F201F',
     alpha: 0.85,
     blur: '16px',
     // 2.18:1 over the composite, against 1.15:1 for the opaque `--border` on

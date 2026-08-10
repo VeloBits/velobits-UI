@@ -8,6 +8,7 @@ import {
   AlertTitle,
   alertVariants,
 } from '../../../registry/velobits/ui/alert';
+import { cn } from '../../../registry/velobits/lib/cn';
 import { Badge } from '../../../registry/velobits/ui/badge';
 import { Button } from '../../../registry/velobits/ui/button';
 import {
@@ -85,6 +86,90 @@ describe('Button', () => {
     expect(cls).toContain('rounded-pill');
     expect(cls).not.toMatch(/\brounded-md\b/);
   });
+
+  it('pairs the destructive fill with --on-danger, NOT --on-primary', () => {
+    /**
+     * The regression guard for a 2.45:1 button that shipped.
+     *
+     * `destructive` was `bg-danger text-on-primary`, i.e. WHITE on `--danger`. In
+     * dark mode `--danger` is a light red (#FF7F79) — it has to be, because the
+     * same token also serves as text on a dark surface — so white on it measured
+     * 2.45:1 against AA's 4.5. `--on-danger` is white in light and charcoal in
+     * dark, exactly like `--on-brand` is charcoal on lime.
+     *
+     * The token pairing is now gated in `contrast.test.ts`; this asserts the
+     * component reaches for the gated token rather than the wrong one.
+     */
+    const { container } = render(<Button variant="destructive">Delete</Button>);
+    const cls = container.firstElementChild!.className;
+    expect(cls).toContain('text-on-danger');
+    expect(cls).not.toContain('text-on-primary');
+  });
+
+  it('uses hover TOKENS, never a brightness filter', () => {
+    /**
+     * `brand` and `destructive` used `hover:brightness-95`. A filter is outside the
+     * palette in a way that matters: nothing measures it, and it composites against
+     * whatever sits behind the button — so the same hover rendered one colour on an
+     * opaque panel and a different one on a glass surface.
+     */
+    for (const variant of ['brand', 'destructive'] as const) {
+      const { container } = render(<Button variant={variant}>x</Button>);
+      const cls = container.firstElementChild!.className;
+      expect(cls, `${variant} must not use a filter for its hover`).not.toContain('brightness');
+      expect(cls, `${variant} hover fill`).toMatch(/hover:bg-(brand|danger)-hover/);
+    }
+  });
+
+  it('carries the raised control material on every filled variant', () => {
+    /**
+     * The control material is what stops a Card reading as glass while everything
+     * inside it reads as paper. It is edge + light + depth, deliberately NOT more
+     * translucency: a tier-S surface transmits only 15% of its backdrop at α 0.85,
+     * so transparency cannot deliver a visible material at control scale — the
+     * perceptibility gate and see-through-ness pull in opposite directions.
+     *
+     * `control-raised` REPLACES `shadow-sm` rather than joining it. It owns the
+     * shadow and adds the lit top edge; leaving both would let the `shadow-sm`
+     * utility (a later layer) win the box-shadow and silently drop the edge.
+     */
+    for (const variant of ['primary', 'brand', 'secondary', 'destructive'] as const) {
+      const { container } = render(<Button variant={variant}>x</Button>);
+      const cls = container.firstElementChild!.className;
+      expect(cls, `${variant} should carry the raised material`).toContain('control-raised');
+      expect(cls, `${variant} must not also carry shadow-sm`).not.toMatch(/\bshadow-sm\b/);
+    }
+  });
+
+  it('leaves ghost and link flat — they are not physical objects', () => {
+    /**
+     * A ghost button has no fill, so a lit edge and a drop shadow would describe a
+     * raised surface that is not there. `link` is text.
+     */
+    for (const variant of ['ghost', 'link'] as const) {
+      const { container } = render(<Button variant={variant}>x</Button>);
+      expect(container.firstElementChild!.className).not.toContain('control-raised');
+    }
+  });
+
+  it('presses with a transform, and not at all under reduced motion', () => {
+    /**
+     * `transform` because it composites on the GPU — no layout, no paint — which is
+     * what keeps a twenty-button toolbar cheap.
+     *
+     * The `motion-reduce:` variant is not redundant with the token layer's global
+     * reduced-motion block: that block clamps transition DURATION, so without this
+     * the press would still happen, just instantly. Someone who asked for no motion
+     * should get no movement, not faster movement.
+     */
+    const { container } = render(<Button>x</Button>);
+    const cls = container.firstElementChild!.className;
+    expect(cls).toContain('active:scale-[0.985]');
+    expect(cls).toContain('motion-reduce:active:scale-100');
+    // `transition-all` would also animate the box when a label changes, which reads
+    // as the button inflating rather than as a press.
+    expect(cls).not.toMatch(/\btransition-all\b/);
+  });
 });
 
 describe('Badge', () => {
@@ -99,6 +184,22 @@ describe('Badge', () => {
     /** White on lime is 1.31:1; charcoal is 10.89:1 and the only valid pairing. */
     const { container } = render(<Badge variant="brand">New</Badge>);
     expect(container.firstElementChild!.className).toContain('text-on-brand');
+  });
+
+  it('offers a CATEGORY tone that is not a status', () => {
+    /**
+     * `rose` exists because every other chromatic variant asserts something.
+     * success/danger/warning/info all carry a severity and `brand` means the
+     * product — so an axis whose values are *kinds* (a flag's value type, a
+     * resource class) had to borrow `primary`, and every such axis came out blue.
+     *
+     * Same soft-wash-with-matching-text shape as the status variants, so it is
+     * covered by the soft-chip composite suite in `contrast.test.ts`.
+     */
+    const { container } = render(<Badge variant="rose">string_enum</Badge>);
+    const cls = container.firstElementChild!.className;
+    expect(cls).toContain('bg-rose-soft');
+    expect(cls).toContain('text-rose');
   });
 });
 
@@ -497,5 +598,60 @@ describe('Separator, Skeleton, Spinner', () => {
     const { container } = render(<Spinner label={null} />);
     expect(container.firstElementChild!.getAttribute('aria-hidden')).toBe('true');
     expect(screen.queryByRole('status')).toBeNull();
+  });
+});
+
+describe('the control material, as a system', () => {
+  /**
+   * The material is only coherent if RAISED and RECESSED stay distinguishable, and
+   * if `cn` can actually resolve between them. Both classes set `box-shadow`, and
+   * they are component classes rather than utilities with a recognisable prefix —
+   * so tailwind-merge cannot infer the conflict and needs it declared.
+   */
+  it('cn resolves raised vs recessed last-one-wins, in both directions', () => {
+    expect(cn('control-raised', 'control-recessed')).toBe('control-recessed');
+    expect(cn('control-recessed', 'control-raised')).toBe('control-raised');
+  });
+
+  it('cn lets a call-site shadow utility win, and the material clear an inherited one', () => {
+    /**
+     * Without the conflict declared in both directions, tailwind-merge keeps BOTH
+     * classes and the winner is whichever `controls.css` declares last — i.e. always
+     * `control-recessed`, regardless of what the caller asked for. Exactly the
+     * failure that made `rounded-pill` come out a rectangle half the time.
+     */
+    expect(cn('control-raised', 'shadow-none')).toBe('shadow-none');
+    expect(cn('shadow-sm', 'control-raised')).toBe('control-raised');
+  });
+
+  it('recessed controls are the ones you type into; raised are the ones you press', () => {
+    /**
+     * The pairing is the whole point: a track is recessed and the thing sliding
+     * inside it is raised, which is what makes a segmented control read as a
+     * physical object rather than two adjacent fills.
+     */
+    const recessed = [
+      ['Input', <Input aria-label="q" />],
+      [
+        'NativeSelect',
+        <NativeSelect aria-label="env">
+          <option>Production</option>
+        </NativeSelect>,
+      ],
+      ['Checkbox', <Checkbox aria-label="on" />],
+    ] as const;
+
+    for (const [name, node] of recessed) {
+      const { container } = render(node);
+      const el = container.querySelector('[data-slot]')!;
+      expect(el.className, `${name} should be recessed`).toContain('control-recessed');
+      expect(el.className, `${name} must not be both`).not.toContain('control-raised');
+    }
+  });
+
+  it('the Switch thumb is raised inside its track', () => {
+    const { container } = render(<Switch aria-label="on" />);
+    const thumb = container.querySelector('[data-slot="switch-thumb"]');
+    expect(thumb?.className).toContain('control-raised');
   });
 });

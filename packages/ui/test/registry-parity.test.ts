@@ -52,7 +52,19 @@ function sourcePath(item: { files?: { path: string }[] }): string {
  * so the bar for adding to this set is an optional peer dependency that would
  * otherwise become mandatory for everyone. See the suite below.
  */
-const BARREL_EXCLUDED = new Set(['form']);
+/**
+ * Subpath-only components. Two entries, two different reasons — both deliberate.
+ *
+ *   form    `react-hook-form` is an OPTIONAL peer, and the barrel is one bundled
+ *           module, so a re-export would put a top-level `import 'react-hook-form'`
+ *           in `dist/index.js` and break every app that never installed it.
+ *
+ *   motion  A budget decision, not a dependency one. The barrel's own-code
+ *           `size-limit` sits at ~28 kB of 32, and anything in the barrel is paid
+ *           for by every consumer whether they import it or not — including
+ *           Framer's runtime, for an app that only wanted a Button.
+ */
+const BARREL_EXCLUDED = new Set(['form', 'motion']);
 
 describe('registry ↔ tsup ↔ exports parity', () => {
   it('every buildable registry item has a tsup entry', () => {
@@ -110,16 +122,18 @@ describe('registry ↔ tsup ↔ exports parity', () => {
 
   describe('the barrel exclusions are a decision, not an oversight', () => {
     /**
-     * `Form` is the only component NOT re-exported from the barrel, because
-     * `react-hook-form` is an OPTIONAL peer dependency and the barrel is one
-     * bundled module: a re-export would put a top-level `import
-     * 'react-hook-form'` at the top of `dist/index.js`, and every app importing
-     * a Button from the barrel would fail to resolve a package it never
-     * installed. The marketing site is exactly that app.
+     * Two components are NOT re-exported from the barrel — see
+     * {@link BARREL_EXCLUDED} for which and why. `Form` is a dependency
+     * constraint: `react-hook-form` is an OPTIONAL peer and the barrel is one
+     * bundled module, so a re-export would put a top-level
+     * `import 'react-hook-form'` at the top of `dist/index.js` and every app
+     * importing a Button from the barrel would fail to resolve a package it never
+     * installed. The marketing site is exactly that app. `Motion` is a budget
+     * constraint, and it drags Framer's runtime with it.
      *
      * Asserted in both directions, because each half fails silently on its own.
-     * Adding the export back would break three consumers' builds; letting the
-     * subpath lapse would make the component unreachable entirely.
+     * Adding the export back would break consumers' builds or blow the size gate;
+     * letting the subpath lapse would make the component unreachable entirely.
      */
     for (const name of BARREL_EXCLUDED) {
       const item = buildableItems.find((i) => i.name === name)!;

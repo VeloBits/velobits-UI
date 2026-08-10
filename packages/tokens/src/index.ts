@@ -10,8 +10,8 @@
  *
  * ## Consuming the CSS
  *
- * One import per app — `theme.css` pulls in Tailwind, the raw tokens and the
- * glass layer:
+ * One import per app — `theme.css` pulls in Tailwind, the raw tokens, the glass
+ * layer and the page texture:
  *
  * ```css
  * @import '@velobits-dev/tokens/theme.css';
@@ -21,6 +21,11 @@
  * That `@source` line is not optional. Tailwind v4 does not scan node_modules,
  * so utilities used *inside* `@velobits-dev/ui` are never generated without it, and
  * the components arrive unstyled with no error anywhere.
+ *
+ * The page texture is the one piece that is **opt-in**: `theme.css` ships the
+ * `.page-texture` class but nothing applies it, because a page treatment is a
+ * product decision and four different consumers share this layer. Put it on the
+ * element that owns the page background — see `src/texture.ts`.
  */
 
 export * from './color';
@@ -28,4 +33,6 @@ export * from './palette';
 export * from './semantic';
 export * from './scales';
 export * from './glass';
+export * from './texture';
+export * from './controls';
 export * from './contrast-pairs';

@@ -62,6 +62,7 @@
         "diff-viewer",
         "empty-state",
         "form",
+        "motion",
         "pagination",
         "segmented-control",
         "status-chip",
@@ -108,6 +109,7 @@
           "primary-soft": "rgba(0, 122, 204, 0.10)",
           "brand": "#C8F135",
           "on-brand": "#2A2B2A",
+          "brand-hover": "#BCE52B",
           "brand-soft": "rgba(200, 241, 53, 0.18)",
           "accent-text": "#582840",
           "code": "#101828",
@@ -119,10 +121,14 @@
           "success-soft": "rgba(34, 110, 37, 0.12)",
           "danger": "#B82A24",
           "danger-soft": "rgba(184, 42, 36, 0.10)",
+          "on-danger": "#FFFFFF",
+          "danger-hover": "#9E231E",
           "warning": "#855600",
           "warning-soft": "rgba(133, 86, 0, 0.12)",
-          "info": "#0062B3",
-          "info-soft": "rgba(0, 98, 179, 0.10)",
+          "info": "#256262",
+          "info-soft": "rgba(37, 98, 98, 0.12)",
+          "rose": "#9B3E6B",
+          "rose-soft": "rgba(155, 62, 107, 0.12)",
           "chart-1": "#1D82D2",
           "chart-2": "#6F8714",
           "chart-3": "#BC5F8D",
@@ -146,6 +152,7 @@
           "primary-soft": "rgba(0, 122, 204, 0.22)",
           "brand": "#C8F135",
           "on-brand": "#2A2B2A",
+          "brand-hover": "#BCE52B",
           "brand-soft": "rgba(200, 241, 53, 0.16)",
           "accent-text": "#C8F135",
           "code": "#101828",
@@ -157,10 +164,14 @@
           "success-soft": "rgba(127, 184, 107, 0.12)",
           "danger": "#FF7F79",
           "danger-soft": "rgba(255, 127, 121, 0.12)",
+          "on-danger": "#2A2B2A",
+          "danger-hover": "#FF9A95",
           "warning": "#E0C060",
           "warning-soft": "rgba(224, 192, 96, 0.12)",
-          "info": "#4AACFF",
-          "info-soft": "rgba(74, 172, 255, 0.12)",
+          "info": "#6FBAB9",
+          "info-soft": "rgba(111, 186, 185, 0.12)",
+          "rose": "#DA8FB2",
+          "rose-soft": "rgba(218, 143, 178, 0.12)",
           "chart-1": "#2387D7",
           "chart-2": "#738C1B",
           "chart-3": "#C06492",
@@ -829,6 +840,24 @@
       "files": [
         {
           "path": "registry/velobits/ui/form.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "motion",
+      "type": "registry:ui",
+      "title": "Motion",
+      "description": "Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobits-dev/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer — do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "cn"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/motion.tsx",
           "type": "registry:ui"
         }
       ]
