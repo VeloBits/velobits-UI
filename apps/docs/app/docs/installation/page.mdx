@@ -1,0 +1,109 @@
+export const metadata = {
+  title: 'Installation',
+  description: 'Two distributions, one source — and which one you want is not a matter of taste.',
+};
+
+# Installation
+
+Two distributions, one source. Every component is authored once in
+`registry/velobits/` and shipped both ways, so they never diverge — but they are
+not interchangeable, and the choice is forced by your architecture rather than by
+preference.
+
+| Your surface                  | Use                             | Because                                                                                                                                                                    |
+| ----------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Module-federated app          | **npm**                         | Federation needs `@velobits-dev/ui` to be a real singleton so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary. |
+| Existing Tailwind v4 + shadcn | **npm**                         | One `@theme inline` bridge; the palette swap is one file.                                                                                                                  |
+| Keycloak login theme          | **`@velobits-dev/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted.               |
+| Greenfield / one-off          | **shadcn CLI**                  | You own the source. No dependency to bump, and no singleton either — which is exactly why federated apps should not use this path.                                         |
+
+## shadcn CLI
+
+Add the registry to your `components.json` once:
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "registries": {
+    "@velobits": "https://ui.velobits.dev/r/{name}.json"
+  }
+}
+```
+
+Then install anything by name:
+
+```bash
+npx shadcn@latest add @velobits/velobits   # the whole system
+npx shadcn@latest add @velobits/button     # one component
+```
+
+Namespaced registries need **shadcn CLI v3 or newer**. On anything older, or for a
+one-off with no config, the full URL works everywhere:
+
+```bash
+npx shadcn@latest add https://ui.velobits.dev/r/button.json
+```
+
+[Registry](/docs/registry) covers the rest — private registries, `view`, `search`,
+and what the JSON actually contains.
+
+## npm
+
+```bash
+npm i @velobits-dev/tokens @velobits-dev/icons @velobits-dev/ui framer-motion
+```
+
+`framer-motion` is a **required** peer, not an optional one — the barrel imports
+`MotionConfig` through `VelobitsProvider`, so an install without it fails to
+resolve. `react-hook-form` is the only optional peer; it is needed solely by
+`Form`, which is why `Form` ships on its own subpath and never in the barrel.
+
+Then, in your app's CSS:
+
+```css
+@import '@velobits-dev/tokens/theme.css';
+@source "../node_modules/@velobits-dev/ui/dist";
+```
+
+That `@source` line is **not optional**. Tailwind v4 does not scan
+`node_modules`, so utilities used inside `@velobits-dev/ui` are never generated
+and the components arrive completely unstyled — with no warning anywhere. `cva`
+class strings survive into `dist` as string literals, which is what makes this
+work.
+
+Finally, mount the provider once at your shell root:
+
+```tsx
+import { VelobitsProvider, THEME_STORAGE_KEYS } from '@velobits-dev/ui';
+
+export function App({ children }) {
+  return <VelobitsProvider storageKey={THEME_STORAGE_KEYS.dashboard}>{children}</VelobitsProvider>;
+}
+```
+
+It supplies three things every component assumes: the theme context, a
+`TooltipProvider` (Radix throws without one on first hover), and
+`MotionConfig reducedMotion="user"`. See [Dark mode](/docs/dark-mode) for the
+blocking init script that goes with it.
+
+## Two subpath-only exports
+
+`Form` and `Motion` are reachable **only** as subpaths, never from the barrel:
+
+```tsx
+import { Form, FormField } from '@velobits-dev/ui/form';
+import { PageTransition, Stagger } from '@velobits-dev/ui/motion';
+```
+
+Two different reasons, both deliberate. `Form` needs `react-hook-form`, an
+optional peer — and the barrel is one bundled module, so a re-export would put a
+top-level `import 'react-hook-form'` in `dist/index.js` and break every app that
+never installed it. `Motion` is a budget decision: anything in the barrel is paid
+for by every consumer whether they import it or not, and nobody should download
+Framer's runtime to render a `Button`.
+
+## Verifying it worked
+
+If components render but look unstyled, you skipped the `@source` line. If they
+throw on first hover, `VelobitsProvider` is not mounted. If the theme flashes on
+load, the [init script](/docs/dark-mode) is missing.

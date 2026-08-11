@@ -4,7 +4,7 @@
   "title": "NativeSelect",
   "description": "A cva-styled native <select>. Deliberately NOT Radix Select, which is undriveable under happy-dom.",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

@@ -1,0 +1,102 @@
+export const metadata = {
+  title: 'Registry',
+  description: 'How the VeloBits shadcn registry is served, addressed and consumed.',
+};
+
+# Registry
+
+`ui.velobits.dev` is two things at one origin: this documentation, and the
+registry the shadcn CLI fetches. Both come out of a single `npm run build`, so
+the docs you are reading and the JSON the CLI installs are always the same
+revision — there is no arrangement in which one is stale.
+
+## Adding the namespace
+
+Once, in your `components.json`:
+
+```json
+{
+  "registries": {
+    "@velobits": "https://ui.velobits.dev/r/{name}.json"
+  }
+}
+```
+
+`{name}` is replaced with the item name. After that:
+
+```bash
+npx shadcn@latest add @velobits/button
+npx shadcn@latest add @velobits/data-table @velobits/use-row-selection
+npx shadcn@latest add @velobits/velobits          # everything
+```
+
+Namespaced registries need **shadcn CLI v3 or newer**.
+
+## Without the namespace
+
+Every item is also addressable by its full URL, which needs no configuration and
+works on any CLI version:
+
+```bash
+npx shadcn@latest add https://ui.velobits.dev/r/button.json
+```
+
+This form is never going away. It is what CI scripts and one-off scaffolds
+should use, since it depends on nothing in the consuming repo.
+
+## Inspecting before installing
+
+```bash
+npx shadcn@latest view @velobits/data-table
+npx shadcn@latest search @velobits --query "table"
+```
+
+`search` reads `https://ui.velobits.dev/r/registry.json`, the index of every item.
+`view` prints what a given item would install — its dependencies, its registry
+dependencies, and the files it writes — without writing anything.
+
+## What is in the JSON
+
+Each item at `/r/<name>.json` carries the [shadcn registry-item
+schema](https://ui.shadcn.com/schema/registry-item.json):
+
+- `dependencies` — npm packages to install
+- `registryDependencies` — other items to pull in first, resolved within this
+  registry
+- `files` — the source, with the target path it lands at
+- `cssVars` — only on `velobits-theme`, which carries the whole token layer
+
+The theme item's variables are **derived** from `@velobits-dev/tokens` at build
+time rather than typed twice, so a palette change flows into the registry on the
+next build and a test fails if the committed JSON is stale.
+
+## Item types
+
+| Type             | Example                       | Lands in         |
+| ---------------- | ----------------------------- | ---------------- |
+| `registry:style` | `@velobits/velobits`          | everything below |
+| `registry:theme` | `@velobits/velobits-theme`    | your CSS         |
+| `registry:ui`    | `@velobits/button`            | `components/ui/` |
+| `registry:hook`  | `@velobits/use-row-selection` | `hooks/`         |
+| `registry:lib`   | `@velobits/cn`                | `lib/`           |
+
+## Caching
+
+`/r/*.json` is served `public, max-age=0, must-revalidate`. A component's source
+changes under a stable URL, so a long-lived cache means installing last month's
+file; the payloads are small and the revalidation is a 304.
+
+The CLI is a Node process and CORS never applied to it, but the files are also
+served `Access-Control-Allow-Origin: *` for browser-based consumers like v0.
+
+## Hosting your own
+
+The pattern here is worth copying: `registry/registry.ts` is the typed source,
+`scripts/build-registry.ts` validates it and compiles it with `shadcn build`, and
+the output lands in the docs app's `public/r/`. Because the docs site is a static
+export, deploying the docs deploys the registry — one artefact, one URL.
+
+Two validations run before the compile, and both exist because the failure they
+prevent happens on a _consumer's_ machine rather than in our CI: every file a
+registry item declares must exist, and every `registryDependency` must resolve to
+something in the registry.

@@ -4,8 +4,8 @@
   "title": "GlassSurface",
   "description": "All three glass tiers behind one prop: surface (Tier S, no blur by default) · overlay · elevated. Never for page backgrounds, table rows, or nested glass.",
   "registryDependencies": [
-    "cn",
-    "velobits-theme"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/velobits-theme.json"
   ],
   "files": [
     {

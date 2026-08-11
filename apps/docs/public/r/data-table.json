@@ -7,9 +7,9 @@
     "@velobits-dev/icons"
   ],
   "registryDependencies": [
-    "cn",
-    "table",
-    "use-row-selection"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/table.json",
+    "https://ui.velobits.dev/r/use-row-selection.json"
   ],
   "files": [
     {

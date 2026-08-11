@@ -577,7 +577,7 @@
       ]
     },
     {
-      "name": "the whole barrel, our code only (37 components; raised from 26 kB at T3)",
+      "name": "the whole barrel, our code only (38 components, minus the 2 subpath-only ones)",
       "path": "dist/index.js",
       "limit": "32 kB",
       "ignore": [

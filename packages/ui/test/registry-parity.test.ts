@@ -198,6 +198,41 @@ describe('registry hygiene', () => {
     expect(dangling, `dangling registryDependencies: ${dangling.join(', ')}`).toEqual([]);
   });
 
+  /**
+   * ## A bare name in the PUBLISHED json is a shadcn/ui item, not one of ours
+   *
+   * The source above writes bare names, which is right — they are readable and
+   * the parity checks work against them. `scripts/build-registry.ts` rewrites
+   * them into absolute URLs on the way out, and this asserts that it did.
+   *
+   * Without that rewrite the CLI resolves `cn` against
+   * `https://ui.shadcn.com/r/styles/new-york-v4/cn.json`, which does not exist —
+   * so `add button` dies on the CONSUMER'S machine, naming a URL they have never
+   * heard of. It affects nearly every item here, and both install paths.
+   *
+   * This reads the committed `registry.json` rather than the TS source on
+   * purpose: the source is not what anyone installs, and the whole class of bug
+   * is "the published artefact disagrees with the thing we validated".
+   */
+  it('publishes self-references as absolute URLs, never as bare names', () => {
+    const published = JSON.parse(readFileSync(join(uiDir, '../../registry.json'), 'utf8')) as {
+      items: { name: string; registryDependencies?: string[] }[];
+    };
+
+    const ours = new Set(registry.items.map((i) => i.name));
+    const bare = published.items.flatMap((item) =>
+      (item.registryDependencies ?? [])
+        .filter((dep) => ours.has(dep))
+        .map((dep) => `${item.name} → ${dep}`),
+    );
+
+    expect(
+      bare,
+      'These would send the CLI to shadcn/ui looking for our items, and 404 on ' +
+        `the consumer's machine. Run \`npm run registry:build\`: ${bare.join(', ')}`,
+    ).toEqual([]);
+  });
+
   it('gives the `velobits` style every component, so one command installs the set', () => {
     const style = registry.items.find((i) => i.name === 'velobits')!;
     const uiNames = registry.items.filter((i) => i.type === 'registry:ui').map((i) => i.name);

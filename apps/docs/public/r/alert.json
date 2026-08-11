@@ -7,8 +7,8 @@
     "class-variance-authority"
   ],
   "registryDependencies": [
-    "cn",
-    "velobits-theme"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/velobits-theme.json"
   ],
   "files": [
     {

@@ -14,9 +14,16 @@ export default tseslint.config(
       // .next/types. Linting generated output produces thousands of errors
       // nobody can act on.
       '**/.next/**',
+      // The static export — the whole deployable, and it is minified JS. Same
+      // reasoning as `.next` above: thousands of errors nobody can act on.
+      'apps/docs/out/**',
       'packages/tokens/src/generated/**',
       // Compiled registry output, written by `npm run registry:build`.
       'apps/docs/public/r/**',
+      // Written by `scripts/build-docs-data.ts` on every dev and build run.
+      // Generated code, and it embeds component sources as escaped literals.
+      'apps/docs/lib/generated/**',
+      'apps/docs/public/search-index.json',
     ],
   },
   js.configs.recommended,

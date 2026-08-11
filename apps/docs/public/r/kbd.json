@@ -3,7 +3,7 @@
   "name": "kbd",
   "title": "Kbd",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

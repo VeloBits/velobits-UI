@@ -7,8 +7,8 @@
     "react-hook-form"
   ],
   "registryDependencies": [
-    "cn",
-    "field"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/field.json"
   ],
   "files": [
     {

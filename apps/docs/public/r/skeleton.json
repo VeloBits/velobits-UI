@@ -4,7 +4,7 @@
   "title": "Skeleton",
   "description": "aria-hidden; pair with ONE sr-only live region rather than announcing each block.",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

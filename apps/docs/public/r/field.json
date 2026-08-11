@@ -4,8 +4,8 @@
   "title": "Field",
   "description": "Label/description/error wiring. Keeps BOTH ids in aria-describedby when a field has an error and a hint.",
   "registryDependencies": [
-    "cn",
-    "label"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/label.json"
   ],
   "files": [
     {

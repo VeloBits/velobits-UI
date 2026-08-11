@@ -4,7 +4,7 @@
   "title": "Input",
   "description": "border-input maps to --field-border, the half WCAG 1.4.11 gates.",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

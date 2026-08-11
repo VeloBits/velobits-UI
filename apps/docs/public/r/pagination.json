@@ -8,8 +8,8 @@
     "@velobits-dev/icons"
   ],
   "registryDependencies": [
-    "cn",
-    "button"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/button.json"
   ],
   "files": [
     {

@@ -7,7 +7,7 @@
     "framer-motion"
   ],
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

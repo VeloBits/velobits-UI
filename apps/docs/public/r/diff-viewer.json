@@ -4,7 +4,7 @@
   "title": "DiffViewer",
   "description": "A unified line diff. The +/− gutter is the primary channel and the green/red wash the secondary — colour alone fails 1.4.1, and the gutter is also the only channel that survives greyscale. Ships `diffLines`, with a guard: LCS is O(n·m) in MEMORY.",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

@@ -9,10 +9,77 @@ Keycloak login theme.
 
 ```bash
 npm install
-npm run build          # all three packages, then the docs site
+npm run build          # EVERYTHING — see below
 npm run test           # includes the contrast gate
-npm run docs           # docs site on :4100
-npm run registry:build # compile the shadcn registry → apps/docs/public/r/
+npm run docs           # docs site on :4100, with codegen
+npm run docs:serve     # serve the built static export on :4100
+npm run registry:build # just the registry, if you want it alone
+```
+
+## One build, one artefact
+
+`npm run build` produces **`apps/docs/out/`**, and that folder is the whole
+deployable — the documentation and the registry the shadcn CLI fetches, at one
+origin. Deploy it to `ui.velobits.dev` and both halves ship together.
+
+```
+npm run build
+  1  packages/{tokens,icons,ui}          tsup → dist/
+  2  scripts/build-registry.ts           registry/registry.ts → registry.json
+                                         → apps/docs/public/r/*.json  (shadcn build)
+  3  scripts/build-docs-data.ts          example sources, prop tables extracted
+                                         from the TS types, search index
+  4  next build (output: 'export')       → apps/docs/out/
+                                              index.html
+                                              docs/components/button/index.html
+                                              r/button.json
+                                              r/registry.json
+                                              _headers
+```
+
+Steps 2 and 3 run from the docs app's own `build` script, and turbo's
+`dependsOn: ["^build"]` guarantees the packages are built first — which step 2
+needs, since it imports `@velobits-dev/tokens`.
+
+### Deploying
+
+Any static host. `apps/docs/public/_headers` is copied into `out/` and is read
+directly by **Cloudflare Pages** and **Netlify**. For other hosts, the two rules
+that matter are CORS on `/r/*` (for browser-based consumers — the CLI is a Node
+process and never needed it) and no long-lived cache on it, since a component's
+source changes under a stable URL:
+
+```nginx
+# nginx
+location /r/ {
+  add_header Access-Control-Allow-Origin *;
+  add_header Cache-Control "public, max-age=0, must-revalidate";
+}
+location / { try_files $uri $uri/ /404.html; }
+```
+
+```json
+// vercel.json
+{
+  "headers": [
+    {
+      "source": "/r/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ]
+}
+```
+
+`REGISTRY_BASE_URL` overrides the origin baked into `registryDependencies` — set
+it to point a build at a local server and verify an install end to end:
+
+```bash
+REGISTRY_BASE_URL=http://localhost:4100 npm run build
+npm run docs:serve
+npx shadcn@latest add http://localhost:4100/r/button.json   # in a scratch app
 ```
 
 ## Layout
@@ -29,8 +96,22 @@ velobits-UI/
 │   ├── tokens/  @velobits-dev/tokens   CSS + TS. ZERO deps, ZERO React.
 │   ├── icons/   @velobits-dev/icons    88 hand-drawn stroke icons
 │   └── ui/      @velobits-dev/ui       builds from registry/velobits
-└── apps/docs/                Next.js + MDX. Also hosts the registry.
+├── scripts/
+│   ├── build-registry.ts     validates + compiles the shadcn registry
+│   └── build-docs-data.ts    docs codegen: examples, prop tables, search index
+└── apps/docs/
+    ├── app/docs/components/[slug]/   ONE route, every registry item
+    ├── content/components.ts         per-component prose (optional, validated)
+    ├── registry/examples/*.tsx       one file per example — preview AND code tab
+    └── lib/generated/                codegen output (gitignored)
 ```
+
+Adding a component means touching four lists — `registry/registry.ts`,
+`packages/ui/tsup.config.ts`, the `exports` map in `packages/ui/package.json`,
+and the barrel — and `packages/ui/test/registry-parity.test.ts` fails if you miss
+one. It then gets a documentation page automatically; `apps/docs/lib/docs-nav.ts`
+only decides which sidebar heading it appears under, and the build fails naming
+any item that file does not place.
 
 ## Two distributions, and which one to use is not taste
 

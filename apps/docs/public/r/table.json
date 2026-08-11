@@ -4,7 +4,7 @@
   "title": "Table",
   "description": "Rows are never glass — one backdrop-filter per row repaints its own backdrop region on every scroll. Surface treatment belongs on the container.",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

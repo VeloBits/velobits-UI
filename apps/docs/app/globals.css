@@ -40,3 +40,55 @@
  * which is already scanned above in its real, unescaped form.
  */
 @source not "../public/r";
+
+/*
+ * `lib/generated/` is the same hazard from the same cause. `build-docs-data.ts`
+ * embeds every example and every component source in it as JSON-escaped string
+ * literals, so it would feed Lightning CSS exactly the input that forced the
+ * exclusion above.
+ *
+ * Nothing is lost here either: those strings are copies of `registry/velobits`
+ * and `registry/examples`, both scanned in their real form.
+ */
+@source not "./lib/generated";
+
+/*
+ * The docs' own chrome and the examples the component pages render. Neither is
+ * under `app/`, so neither is picked up by the default scan of this file's
+ * directory.
+ */
+@source "../components";
+@source "../registry/examples";
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * Shiki, in both themes, from one payload.
+ *
+ * `scripts/build-docs-data.ts` highlights with `defaultColor: false`, so Shiki
+ * emits `--shiki-light` and `--shiki-dark` custom properties per token instead of
+ * a baked-in colour. These four rules pick between them off the `dark` class,
+ * which means the code recolours in the same frame as the rest of the page rather
+ * than after it — and one payload serves both themes instead of two hidden copies.
+ *
+ * No `!important` anywhere: the spans carry the custom properties but never a
+ * `color`, and `.dark .shiki span` outranks `.shiki span` on specificity alone.
+ * ────────────────────────────────────────────────────────────────────────── */
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/*
+ * The <pre> Shiki emits carries its own margin from the UA stylesheet, and the
+ * padding is applied by the wrapper in `components/code-panel.tsx` so the scroll
+ * container is the thing that scrolls rather than the padding scrolling with it.
+ */
+.shiki {
+  margin: 0;
+}

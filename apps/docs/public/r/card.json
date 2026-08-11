@@ -4,8 +4,8 @@
   "title": "Card",
   "description": "Tier-S glass by default; surface=\"panel\" for the opaque original, which writes border-border explicitly so it survives an app that skipped the base layer.",
   "registryDependencies": [
-    "cn",
-    "velobits-theme"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/velobits-theme.json"
   ],
   "files": [
     {

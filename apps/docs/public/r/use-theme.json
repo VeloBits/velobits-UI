@@ -4,7 +4,7 @@
   "title": "useTheme",
   "description": "ThemeProvider + useTheme. Honours the existing fmx_theme_mode and tf.theme keys.",
   "registryDependencies": [
-    "theme"
+    "https://ui.velobits.dev/r/theme.json"
   ],
   "files": [
     {

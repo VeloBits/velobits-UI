@@ -1,0 +1,78 @@
+export const metadata = {
+  title: 'components.json',
+  description:
+    'The config the shadcn CLI reads to know where to write files and which registries to trust.',
+};
+
+# components.json
+
+The file the shadcn CLI reads to decide where to write things, and which
+registries it is allowed to fetch from. It lives at the root of your project.
+Create it with `npx shadcn@latest init`, or write it yourself.
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "ui": "@/components/ui",
+    "utils": "@/lib/cn",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {
+    "@velobits": "https://ui.velobits.dev/r/{name}.json"
+  }
+}
+```
+
+## registries
+
+The field that makes `@velobits/button` resolve. `{name}` is replaced with the
+item name, so `@velobits/button` fetches
+`https://ui.velobits.dev/r/button.json`.
+
+Needs **shadcn CLI v3 or newer**. Without it, install by full URL instead — same
+files, no config. See [Registry](/docs/registry).
+
+## aliases.utils
+
+Point this at wherever `cn` landed. The CLI rewrites every copied component's
+import of `cn` to this alias, so getting it wrong means 38 files importing
+something that is not there.
+
+`cn`'s signature must stay `twMerge(clsx(...))`. Components rely on later classes
+winning over earlier ones — that is how `className` on a call site overrides a
+variant — and a plain `clsx` does not do that.
+
+## tailwind.css
+
+The stylesheet the CLI writes theme variables into. Installing
+`@velobits/velobits-theme` — which every component depends on, so it arrives
+whether or not you ask for it — appends the full token layer here as `:root` and
+`.dark` blocks.
+
+`cssVariables` must be `true`. The token layer is variables; with `false` the CLI
+would try to write literal colour utilities and the theme would not switch.
+
+## tailwind.config
+
+Empty string on Tailwind v4. There is no JS config file any more — `@theme` in
+your CSS replaces it. Leave the key present and blank; the CLI still reads it.
+
+## iconLibrary
+
+Set to whatever you use for your own components. It does not affect anything from
+this registry: VeloBits components import from `@velobits-dev/icons` explicitly,
+which the CLI installs as a dependency rather than rewriting.

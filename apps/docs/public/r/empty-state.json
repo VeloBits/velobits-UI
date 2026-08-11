@@ -7,7 +7,7 @@
     "class-variance-authority"
   ],
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {

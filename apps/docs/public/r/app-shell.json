@@ -9,11 +9,11 @@
     "@velobits-dev/tokens"
   ],
   "registryDependencies": [
-    "cn",
-    "use-media-query",
-    "button",
-    "side-panel",
-    "velobits-theme"
+    "https://ui.velobits.dev/r/cn.json",
+    "https://ui.velobits.dev/r/use-media-query.json",
+    "https://ui.velobits.dev/r/button.json",
+    "https://ui.velobits.dev/r/side-panel.json",
+    "https://ui.velobits.dev/r/velobits-theme.json"
   ],
   "files": [
     {

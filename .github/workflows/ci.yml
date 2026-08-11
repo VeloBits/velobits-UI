@@ -32,6 +32,13 @@ jobs:
       - name: Format
         run: npm run format:check
 
+      # One command, and it is the whole deployable: the three packages, then
+      # `registry.json` → `apps/docs/public/r/*.json`, then the docs codegen, then
+      # the static export into `apps/docs/out/`.
+      #
+      # The registry compile and the docs build used to be two extra steps at the
+      # bottom of this job, which meant `npm run build` alone did not produce
+      # something shippable and nothing said so.
       - name: Build
         run: npm run build
 
@@ -53,11 +60,12 @@ jobs:
       - name: Bundle size
         run: npm run size
 
-      # Proves the shadcn half of the distribution actually resolves: every file
-      # a registry item references exists, and every registryDependency resolves.
-      # Without this, the failure surfaces on a consumer's machine.
-      - name: Registry build
-        run: npm run registry:build
-
-      - name: Docs build
-        run: npm run build -w @velobits-dev/docs
+      # The compiled registry is COMMITTED, so it can be committed stale. `Build`
+      # above regenerates it from `registry/registry.ts`; if that produces a diff,
+      # the repository is publishing something other than what it declares.
+      #
+      # This is a real failure mode rather than a hypothetical one: the JSON under
+      # `apps/docs/public/r/` is what the shadcn CLI actually fetches, and nothing
+      # else in this job reads it.
+      - name: Registry output is in sync with its source
+        run: git diff --exit-code -- registry.json apps/docs/public/r

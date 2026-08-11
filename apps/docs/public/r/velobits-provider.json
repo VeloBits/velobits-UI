@@ -7,8 +7,8 @@
     "framer-motion"
   ],
   "registryDependencies": [
-    "use-theme",
-    "tooltip"
+    "https://ui.velobits.dev/r/use-theme.json",
+    "https://ui.velobits.dev/r/tooltip.json"
   ],
   "files": [
     {

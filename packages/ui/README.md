@@ -1,6 +1,6 @@
 # @velobits-dev/ui
 
-The VeloBits React component library — 37 components sharing one token layer and
+The VeloBits React component library — 38 components sharing one token layer and
 one glass material.
 
 Authored once and shipped twice: as this npm package, and as a shadcn registry

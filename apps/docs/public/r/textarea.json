@@ -3,7 +3,7 @@
   "name": "textarea",
   "title": "Textarea",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {
