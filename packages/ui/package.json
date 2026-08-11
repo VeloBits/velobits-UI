@@ -1,6 +1,6 @@
 {
   "name": "@velobits-dev/ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "VeloBits shared React components. Built from registry/velobits, the same source the shadcn CLI serves.",
   "license": "UNLICENSED",
   "repository": {
