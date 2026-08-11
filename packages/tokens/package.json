@@ -1,6 +1,6 @@
 {
   "name": "@velobits-dev/tokens",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "VeloBits design tokens — colour, type, spacing, motion and glass, as CSS and TypeScript. Zero dependencies.",
   "license": "UNLICENSED",
   "repository": {
