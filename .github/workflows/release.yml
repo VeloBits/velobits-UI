@@ -1,32 +1,46 @@
 name: Release
 
-# Versioning is automatic; publishing is not.
+# Publishes whatever main declares that the registry does not have yet, then tags
+# it and cuts a GitHub Release per package.
 #
-#   push to main       → open/update the "Version Packages" PR. Never publishes.
-#   workflow_dispatch  → publish whatever main currently declares.
+#   push to main       → publish automatically
+#   workflow_dispatch  → identical; a manual retry for a failed or partial publish
 #
-# The split is deliberate. `@velobits-dev/ui` peers on tokens and icons at
-# `^0.1.0`, and on a 0.x version a caret pins the MINOR — so changesets treats a
-# bump of either sibling as a MAJOR for `ui`. Keeping the version step automatic
-# means that shows up as a reviewable PR diff (`ui` jumping to 1.0.0) *before*
-# anything reaches the registry, while the publish itself stays a decision
-# somebody makes on purpose. See "Known" in packages/ui/CHANGELOG.md.
+# Versioning is NOT here. It happens on develop via `prepare-release.yml`, because
+# main's `protect-main` ruleset (pull request + 1 approving review + `verify`,
+# bypass: OrganizationAdmin only) means no workflow can push a version commit to
+# main. The version bump arrives through the develop → main PR instead.
+#
+# Deliberately NOT changesets/action. That action picks version-vs-publish from a
+# switch on its own inputs, and two properties of it broke this pipeline before:
+# an empty `publish` input made the post-merge run a 0-second green no-op, and a
+# non-empty changeset directory routes it to "open a PR" no matter what else is
+# set. Under this design changesets can legitimately be pending on main — feature
+# PRs land on develop after a prepare — so that second branch would hijack every
+# release. `changeset publish` on its own has no such switch: it publishes what is
+# unpublished and skips the rest.
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# No cancel-in-progress: a half-cancelled release publishes some packages and tags
+# none of them.
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
+    # The repo default branch is develop, so the manual "Run workflow" picker
+    # defaults to it. Publishing is only ever correct from main.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v5
         with:
+          # Tags, so the release step can tell what is already published, and so
+          # `changeset publish` does not re-tag.
           fetch-depth: 0
 
       - uses: actions/setup-node@v5
@@ -48,23 +62,131 @@ jobs:
       - name: Verify publishable output before releasing
         run: npm run package:check
 
-      # changesets/action@v1 branches on `hasPublishScript = !!getInput("publish")`
-      # (src/index.ts:61). An empty string is falsy, so on a plain push this
-      # reaches `case !hasChangesets && !hasPublishScript` (:68), which logs
-      # "No changesets present …" and returns SUCCESS — a green no-op, not a
-      # failure. With changesets pending it takes `case hasChangesets` (:157) and
-      # opens the version PR regardless of this input. Only a manual dispatch
-      # reaches the publish path (:73).
-      - name: Open version PR (push) or publish (manual dispatch)
-        uses: changesets/action@v1
-        with:
-          version: npm run version-packages
-          publish: ${{ github.event_name == 'workflow_dispatch' && 'npm run release' || '' }}
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
+      # A notice rather than a failure: under this design pending changesets on
+      # main are normal — they are next cycle's release, queued on develop and
+      # carried along by a develop → main merge. Worth saying out loud though,
+      # because it also describes the mistake of merging to main without running
+      # Prepare release, where this job correctly publishes nothing.
+      - name: Note pending changesets
+        run: |
+          pending=$(find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)
+          if [ "$pending" -gt 0 ]; then
+            echo "::notice::$pending changeset(s) pending on main. They are not part of this release; run Prepare release on develop to version them."
+          fi
+
+      # Does not fail the job. A multi-package publish can fail on one package
+      # after succeeding on another, and when it does, the tags and Releases for
+      # what DID publish still need to be created — otherwise npm has a version
+      # with no tag and no notes. The gate at the end turns this red.
+      - name: Publish to npm
+        id: publish
         env:
-          # GITHUB_TOKEN opens the "Version Packages" PR. NODE_AUTH_TOKEN is a
-          # separate npm automation token — publishing to npmjs.org does NOT
-          # accept GITHUB_TOKEN, which is what makes this the one required secret.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Both point at the same secret: setup-node consumes NODE_AUTH_TOKEN for
+          # the temp .npmrc it writes. NPM_TOKEN is here so anything else in the
+          # release path that reads the conventional name finds it too.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -o pipefail
+          code=0
+          # `release` is `turbo run build && changeset publish`. The rebuild is
+          # deliberate: the Build step above ran before nothing, but turbo keys its
+          # cache on the package version, so this is where post-bump artifacts get
+          # produced. `changeset publish` then skips every version already on npm.
+          npm run release 2>&1 | tee "$RUNNER_TEMP/publish.log" || code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" -ne 0 ]; then
+            echo "::error::changeset publish exited $code. Tags and Releases for whatever did publish are still created below; rerun this workflow to retry the rest."
+          fi
+
+      # `changeset publish` creates tags locally and stops there. Pushing them is
+      # a separate act, and it must happen even after a partial publish.
+      - name: Push tags
+        if: always() && steps.publish.conclusion != 'skipped'
+        run: git push origin --tags
+
+      # Idempotent and self-healing: a Release is created for any tag that exists
+      # without one, so a rerun after a partial failure fills the gaps instead of
+      # erroring on the Releases that already exist.
+      - name: Cut GitHub Releases
+        if: always() && steps.publish.conclusion != 'skipped'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > "$RUNNER_TEMP/notes.cjs" <<'NODEEOF'
+          // Slices one version's section out of a CHANGELOG, for the Release body.
+          const fs = require("fs");
+          const [dir, version] = process.argv.slice(2);
+          const fallback = "See CHANGELOG.md.";
+          let lines;
+          try {
+            lines = fs.readFileSync(dir + "/CHANGELOG.md", "utf8").split("\n");
+          } catch (e) {
+            process.stdout.write(fallback);
+            process.exit(0);
+          }
+          const start = lines.findIndex((l) => l.trim() === "## " + version);
+          if (start === -1) {
+            process.stdout.write(fallback);
+            process.exit(0);
+          }
+          let end = lines.length;
+          for (let i = start + 1; i < lines.length; i++) {
+            if (/^## /.test(lines[i])) {
+              end = i;
+              break;
+            }
+          }
+          const body = lines.slice(start + 1, end).join("\n").trim();
+          process.stdout.write(body || fallback);
+          NODEEOF
+
+          created=0
+          for dir in packages/*; do
+            [ -f "$dir/package.json" ] || continue
+            private=$(node -p "require('./$dir/package.json').private === true")
+            [ "$private" = "false" ] || continue
+
+            name=$(node -p "require('./$dir/package.json').name")
+            version=$(node -p "require('./$dir/package.json').version")
+            tag="$name@$version"
+
+            if ! git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+              echo "No tag $tag — $name@$version was not published by this run."
+              continue
+            fi
+            if gh release view "$tag" > /dev/null 2>&1; then
+              echo "Release $tag already exists."
+              continue
+            fi
+
+            node "$RUNNER_TEMP/notes.cjs" "$dir" "$version" > "$RUNNER_TEMP/notes.md"
+            gh release create "$tag" --title "$tag" --notes-file "$RUNNER_TEMP/notes.md"
+            echo "Created release $tag."
+            created=$((created + 1))
+          done
+          echo "Created $created release(s)."
+
+      # Every outcome above is a green check on its own, including "shipped
+      # nothing". Distinguishing them in the UI is the whole point: the bug this
+      # pipeline had was a silent no-op that looked identical to a success.
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Release"
+            echo
+            if grep -q "New tag:" "$RUNNER_TEMP/publish.log" 2> /dev/null; then
+              echo "Published:"
+              echo
+              grep "New tag:" "$RUNNER_TEMP/publish.log" | sed 's/.*New tag: */- /'
+            else
+              echo "Nothing published — every version main declares is already on npm."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail if the publish failed
+        if: always() && steps.publish.outputs.code != '0'
+        run: |
+          echo "::error::Release failed: changeset publish exited ${{ steps.publish.outputs.code }}."
+          exit 1

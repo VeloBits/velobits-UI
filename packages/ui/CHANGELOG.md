@@ -170,6 +170,8 @@ it fails to resolve. `react-hook-form` is the only optional peer.
 
 ### Known
 
-The sibling peer ranges are `^0.1.0`. On a `0.x` version a caret pins the
-**minor**, so a `0.2.0` release of tokens or icons will force a major bump here
-until those ranges are widened.
+Resolved. The sibling peer ranges were widened to `>=0.1.0`, so the caret-on-0.x
+hazard is gone: a caret pinned the **minor** on a `0.x` version, which meant a
+`0.2.0` release of tokens or icons forced a major bump here. With `>=` ranges and
+`onlyUpdatePeerDependentsWhenOutOfRange` in `.changeset/config.json`, the tokens
+`0.2.0` release bumped this package to `0.2.0` rather than `1.0.0`.
