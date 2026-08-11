@@ -13,7 +13,7 @@
  *
  *   2. THE TEXTURE MAY ONLY DARKEN THE PAGE, NEVER LIGHTEN IT. A glass surface
  *      is lighter than its page in both themes, so darkening widens the gap the
- *      perceptibility gate measures (light 11→20 / 8→17, dark 12→20 / 9→16) and
+ *      perceptibility gate measures (light 11→20 / 8→17, dark 12→25 / 9→22) and
  *      nothing else in the palette needs re-tuning. Lightening would push
  *      light's bottom sheen stop under the 8/255 floor it already sits on.
  *      `texture-css.test.ts` asserts this per channel.
