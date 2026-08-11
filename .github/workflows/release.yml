@@ -74,6 +74,20 @@ jobs:
             echo "::notice::$pending changeset(s) pending on main. They are not part of this release; run Prepare release on develop to version them."
           fi
 
+      # `changeset publish` tags with `git tag <tag> -m <tag>`, and -m makes it an
+      # ANNOTATED tag, which git refuses to write without a committer identity.
+      # changesets discards that call's return value, so the failure surfaces
+      # nowhere: it still prints "New tag: …", and the subsequent push honestly
+      # reports "Everything up-to-date" because no tag was ever created. That is
+      # exactly how 0.2.0 reached npm untagged and unreleased.
+      #
+      # changesets/action did this internally via setupUser(). Hand-rolling the
+      # publish means doing it here.
+      - name: Configure git identity
+        run: |
+          git config user.name  "Saurabh Yadav"
+          git config user.email "sauraj.contact@gmail.com"
+
       # Does not fail the job. A multi-package publish can fail on one package
       # after succeeding on another, and when it does, the tags and Releases for
       # what DID publish still need to be created — otherwise npm has a version
@@ -99,11 +113,50 @@ jobs:
             echo "::error::changeset publish exited $code. Tags and Releases for whatever did publish are still created below; rerun this workflow to retry the rest."
           fi
 
-      # `changeset publish` creates tags locally and stops there. Pushing them is
-      # a separate act, and it must happen even after a partial publish.
-      - name: Push tags
+      # Authoritative, and deliberately not dependent on `changeset publish` having
+      # tagged anything. The rule is "every version the registry has gets a tag",
+      # which covers three cases with one pass: what this run just published, what
+      # a previous run published before failing to tag it, and what changesets
+      # silently failed to tag. Without the npm check it would also tag versions
+      # main declares but never shipped, which is an unfinished release, not a
+      # missing tag.
+      #
+      # This is what recovers an already-published version: `changeset publish`
+      # skips it forever once it is on the registry, so it will never be tagged by
+      # the publish step again, no matter how many times the workflow is rerun.
+      - name: Tag every published version
         if: always() && steps.publish.conclusion != 'skipped'
-        run: git push origin --tags
+        run: |
+          tagged=0
+          for dir in packages/*; do
+            [ -f "$dir/package.json" ] || continue
+            private=$(node -p "require('./$dir/package.json').private === true")
+            [ "$private" = "false" ] || continue
+
+            name=$(node -p "require('./$dir/package.json').name")
+            version=$(node -p "require('./$dir/package.json').version")
+            tag="$name@$version"
+
+            if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+              echo "$tag already tagged."
+              continue
+            fi
+            if ! npm view "$tag" version > /dev/null 2>&1; then
+              echo "$tag is not on npm — not tagging an unshipped version."
+              continue
+            fi
+
+            # Annotated, to match the tags changesets writes.
+            git tag -a "$tag" -m "$tag"
+            echo "Tagged $tag."
+            tagged=$((tagged + 1))
+          done
+
+          if [ "$tagged" -gt 0 ]; then
+            git push origin --tags
+          else
+            echo "No new tags to push."
+          fi
 
       # Idempotent and self-healing: a Release is created for any tag that exists
       # without one, so a rerun after a partial failure fills the gaps instead of
@@ -167,22 +220,36 @@ jobs:
           done
           echo "Created $created release(s)."
 
-      # Every outcome above is a green check on its own, including "shipped
-      # nothing". Distinguishing them in the UI is the whole point: the bug this
-      # pipeline had was a silent no-op that looked identical to a success.
+      # Reports OBSERVED state — the registry, the remote, the Releases API — not
+      # what any tool claimed to have done. `changeset publish` printing
+      # "New tag: …" for a tag it silently failed to create is exactly why: the
+      # earlier version of this step grepped for that line and would have reported
+      # 0.2.0 as fully released. Anything reading NO here is a real gap.
       - name: Summary
-        if: always()
+        if: always() && steps.publish.conclusion != 'skipped'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           {
             echo "### Release"
             echo
-            if grep -q "New tag:" "$RUNNER_TEMP/publish.log" 2> /dev/null; then
-              echo "Published:"
-              echo
-              grep "New tag:" "$RUNNER_TEMP/publish.log" | sed 's/.*New tag: */- /'
-            else
-              echo "Nothing published — every version main declares is already on npm."
-            fi
+            echo "| Package | Version | On npm | Tagged | Release |"
+            echo "| --- | --- | --- | --- | --- |"
+            for dir in packages/*; do
+              [ -f "$dir/package.json" ] || continue
+              private=$(node -p "require('./$dir/package.json').private === true")
+              [ "$private" = "false" ] || continue
+
+              name=$(node -p "require('./$dir/package.json').name")
+              version=$(node -p "require('./$dir/package.json').version")
+              tag="$name@$version"
+
+              if npm view "$tag" version > /dev/null 2>&1; then npm_state="yes"; else npm_state="**NO**"; fi
+              if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null 2>&1; then tag_state="yes"; else tag_state="**NO**"; fi
+              if gh release view "$tag" > /dev/null 2>&1; then rel_state="yes"; else rel_state="**NO**"; fi
+
+              echo "| $name | $version | $npm_state | $tag_state | $rel_state |"
+            done
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail if the publish failed
