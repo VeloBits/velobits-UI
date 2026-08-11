@@ -1,0 +1,135 @@
+name: Prepare release
+
+# Turns the changesets pending on develop into a version bump, on develop.
+#
+# This is what replaces changesets' "Version Packages" PR, and the reason it can:
+# `main` carries the `protect-main` ruleset — pull request + 1 approving review +
+# the `verify` check, with `OrganizationAdmin` as the only bypass actor — so no
+# workflow can push a version commit there, with GITHUB_TOKEN or otherwise.
+# `develop` has no protection and no ruleset, so the bump lands here and rides the
+# develop → main PR that a release already opens. Zero extra PRs, and main keeps
+# every rule it has.
+#
+# Run this when a release is ready. Then approve and merge develop → main;
+# release.yml publishes off that merge.
+
+on:
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}
+
+jobs:
+  prepare:
+    # Versioning anywhere else would bump packages on a branch that never reaches
+    # the registry, and burn the changesets doing it.
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # No registry-url and no npm token: this job never talks to the registry. It
+      # needs a node_modules only to run `changeset version` out of.
+      - run: npm ci
+
+      - name: Version packages
+        run: |
+          pending=$(find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' | wc -l)
+          if [ "$pending" -eq 0 ]; then
+            echo "::error::No changesets are pending on develop, so there is nothing to release. Add one with 'npm run changeset' on a feature branch first."
+            exit 1
+          fi
+          echo "Consuming $pending changeset(s)."
+
+          # version-packages is `changeset version && npm install --package-lock-only`,
+          # so this rewrites the CHANGELOGs, the package.json versions and the lockfile.
+          npm run version-packages
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "::error::changeset version consumed $pending changeset(s) but produced no diff. Are they all empty, or do they only name packages in the .changeset ignore list?"
+            exit 1
+          fi
+
+          git commit -m "chore: version packages"
+          git push origin HEAD:develop
+
+      # What main is about to declare. Surfaced because these are the numbers that
+      # become permanent on npm, and the release PR is the last place to object.
+      - name: Collect versions
+        id: collect
+        run: |
+          {
+            echo 'list<<PKGEOF'
+            node -e '
+              const fs = require("fs");
+              console.log(fs.readdirSync("packages")
+                .map(d => {
+                  try { return JSON.parse(fs.readFileSync("packages/" + d + "/package.json", "utf8")); }
+                  catch (e) { return null; }
+                })
+                .filter(p => p && !p.private)
+                .map(p => "- " + p.name + "@" + p.version)
+                .join("\n"));
+            '
+            echo 'PKGEOF'
+          } >> "$GITHUB_OUTPUT"
+
+      # The develop → main PR *is* the release PR — the one a release already
+      # needed, now carrying the version bump. That is what keeps this at zero
+      # extra PRs. If it is already open the bump simply appears in it.
+      - name: Open or update the release PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSIONS: ${{ steps.collect.outputs.list }}
+        run: |
+          existing=$(gh pr list --base main --head develop --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            echo "Release PR #$existing is already open; the version bump is now part of it."
+            exit 0
+          fi
+
+          # Unquoted delimiter, so $VERSIONS expands. No backticks in the body for
+          # the same reason — the shell would try to run them.
+          cat > "$RUNNER_TEMP/pr-body.md" <<BODY
+          Versioned by the **Prepare release** workflow. Merging this publishes to
+          npm, pushes the tags and cuts the GitHub Releases.
+
+          ### Versions this will publish
+
+          $VERSIONS
+
+          Only packages whose version is not already on the registry get published;
+          the rest are skipped. Per-package detail is in each CHANGELOG.md.
+
+          **These numbers become permanent on merge.** An npm version cannot be
+          reused once published, so this PR is the review point for them.
+          BODY
+
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "release: publish versioned packages" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Versioned on develop"
+            echo
+            echo "${{ steps.collect.outputs.list }}"
+            echo
+            echo "Approve and merge the develop → main PR to publish."
+          } >> "$GITHUB_STEP_SUMMARY"
