@@ -215,7 +215,7 @@ export function BadgeDemo() {
   return (
     <Demo
       title="Badge"
-      note="Each soft wash pairs with its matching text token, never the solid fill. All five pairings are gated over the page, the panel and the glass composite in both themes."
+      note="Each soft wash pairs with its matching text token, never the solid fill. All six pairings are gated over the page, the panel and BOTH sheen stops of the glass composite, in both themes. `info` is teal, not blue — it used to be byte-identical to the link colour, so an info chip and a hyperlink could not be told apart. `rose` is the one variant that asserts no severity: reach for it when the axis is a category rather than a status."
     >
       <Row>
         <Badge>Neutral</Badge>
@@ -225,6 +225,7 @@ export function BadgeDemo() {
         <Badge variant="danger">Failed</Badge>
         <Badge variant="warning">Rollout</Badge>
         <Badge variant="info">Inherited</Badge>
+        <Badge variant="rose">string_enum</Badge>
         <Badge variant="outline">Outline</Badge>
       </Row>
     </Demo>

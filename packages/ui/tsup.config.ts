@@ -92,6 +92,9 @@ const CLIENT = {
   'diff-viewer': `${R}/ui/diff-viewer.tsx`,
   'empty-state': `${R}/ui/empty-state.tsx`,
   form: `${R}/ui/form.tsx`,
+  /* Subpath-only, like `form`: kept OUT of the barrel so Framer's runtime and
+   * these components' bytes are paid for only by consumers that import them. */
+  motion: `${R}/ui/motion.tsx`,
   pagination: `${R}/ui/pagination.tsx`,
   'segmented-control': `${R}/ui/segmented-control.tsx`,
   'status-chip': `${R}/ui/status-chip.tsx`,

@@ -1,4 +1,4 @@
-import { blueSteps, neutral, plumSteps, seed } from './palette';
+import { blueSteps, neutral, plumSteps, roseSteps, seed, tealSteps } from './palette';
 
 /**
  * The semantic layer: the names components actually consume, resolved per
@@ -37,6 +37,13 @@ export interface SemanticTokens {
   brand: string;
   /** Text/icons on a `brand` fill — charcoal, at 10.89:1. White on lime is 1.31:1 and is never correct. */
   onBrand: string;
+  /**
+   * Hover fill for `brand`. Exists so `Button` variant `brand` stops reaching for
+   * `hover:brightness-95`, which is a filter rather than a colour and so escapes
+   * the palette entirely — nothing measures it, and it composites differently
+   * over a glass surface than over an opaque one.
+   */
+  brandHover: string;
   /** Tinted lime wash. */
   brandSoft: string;
   /** Plum text accent (light) / plum elevated tint (dark). */
@@ -67,10 +74,52 @@ export interface SemanticTokens {
   successSoft: string;
   danger: string;
   dangerSoft: string;
+  /**
+   * Text/icons on a `danger` FILL — `Button` variant `destructive`, and nothing
+   * else in the system.
+   *
+   * ## Why this is not just `onPrimary`
+   *
+   * It was, and in dark mode that measured **2.45:1** and shipped.
+   *
+   * `--danger` serves two roles that want opposite things in dark mode. As TEXT
+   * on a dark surface it has to be light, and the 2026-08-06 re-tune pushed it to
+   * `#FF7F79` for exactly that reason. As a FILL under white text it then has to
+   * be dark — and it is not, so white on it fails AA by a wide margin. Nothing
+   * caught it because the flat pairs gate `danger` as text and the soft-chip suite
+   * gates the wash; the fill-with-white-on-it combination had no pair at all.
+   *
+   * The resolution is the one the palette already uses for lime: flip the text
+   * rather than the fill. Charcoal on `#FF7F79` is 5.80:1, so dark mode gets
+   * charcoal here for the same reason {@link SemanticTokens.onBrand} is charcoal —
+   * the fill is too light in that theme for white to sit on it. Light mode keeps
+   * white at 6.19:1.
+   *
+   * Same shape of bug as `--info`, and now gated the same way: as its own pair.
+   */
+  onDanger: string;
+  /** Hover fill for `danger`. Replaces `hover:brightness-95` — see {@link SemanticTokens.brandHover}. */
+  dangerHover: string;
   warning: string;
   warningSoft: string;
+  /**
+   * Informational. **Teal, not blue** — see {@link tealSteps}. It was
+   * `blueSteps.text`, i.e. the same bytes as {@link SemanticTokens.primaryText},
+   * which made "informational" and "this is a link" the same colour.
+   */
   info: string;
   infoSoft: string;
+  /**
+   * A category colour with NO status reading — see {@link roseSteps}.
+   *
+   * For axes where the values are kinds rather than severities: a flag's value
+   * type, an environment that is neither production nor staging, a resource
+   * class. Everything else chromatic in this palette either means a status or
+   * means the brand, so before this existed those axes had to borrow `primary`
+   * and every one of them came out blue.
+   */
+  rose: string;
+  roseSoft: string;
   /**
    * Chart series. Isoluminant by construction — every entry clears the non-text
    * floor against its theme's page, but they differ in hue rather than
@@ -105,6 +154,9 @@ export const light: SemanticTokens = {
   primarySoft: 'rgba(0, 122, 204, 0.10)',
   brand: seed.lime,
   onBrand: seed.charcoal,
+  // Charcoal on it measures 9.73:1, so the only sanctioned pairing on lime
+  // survives the hover. One value serves both themes, like `brand` itself.
+  brandHover: '#BCE52B',
   brandSoft: 'rgba(200, 241, 53, 0.18)',
   accentText: plumSteps.text,
   code: '#101828',
@@ -123,10 +175,18 @@ export const light: SemanticTokens = {
   successSoft: 'rgba(34, 110, 37, 0.12)',
   danger: '#B82A24',
   dangerSoft: 'rgba(184, 42, 36, 0.10)',
+  // White, 6.19:1. Light mode's danger fill is dark enough for it — dark mode's
+  // is not, which is the whole reason this token exists.
+  onDanger: '#FFFFFF',
+  dangerHover: '#9E231E',
   warning: '#855600',
   warningSoft: 'rgba(133, 86, 0, 0.12)',
-  info: blueSteps.text,
-  infoSoft: 'rgba(0, 98, 179, 0.10)',
+  // Teal, not blue — this used to be `blueSteps.text`, the same bytes as
+  // `primaryText`. 5.08:1 inside its own chip on the cream page.
+  info: tealSteps.text,
+  infoSoft: 'rgba(37, 98, 98, 0.12)',
+  rose: roseSteps.text,
+  roseSoft: 'rgba(155, 62, 107, 0.12)',
   chart1: '#1D82D2',
   chart2: '#6F8714',
   chart3: '#BC5F8D',
@@ -163,6 +223,7 @@ export const dark: SemanticTokens = {
   primarySoft: 'rgba(0, 122, 204, 0.22)',
   brand: seed.lime,
   onBrand: seed.charcoal,
+  brandHover: '#BCE52B',
   brandSoft: 'rgba(200, 241, 53, 0.16)',
   // Lime IS a valid text accent in dark mode (13.24:1 on the page). In light
   // mode the same token as text measures 1.13:1 — hence the asymmetry.
@@ -186,10 +247,21 @@ export const dark: SemanticTokens = {
   successSoft: 'rgba(127, 184, 107, 0.12)',
   danger: '#FF7F79',
   dangerSoft: 'rgba(255, 127, 121, 0.12)',
+  // CHARCOAL, not white. White on this fill is 2.45:1 and is what shipped;
+  // charcoal is 5.80:1. Dark mode's danger is a light red because it also has to
+  // work as text on a dark surface — see the docblock on `onDanger`.
+  onDanger: seed.charcoal,
+  // Lighter, not darker: dark-mode hovers move up (like `primaryHover`), and
+  // lifting this raises charcoal's contrast on it from 5.80:1 to 6.98:1.
+  dangerHover: '#FF9A95',
   warning: '#E0C060',
   warningSoft: 'rgba(224, 192, 96, 0.12)',
-  info: blueSteps.textDark,
-  infoSoft: 'rgba(74, 172, 255, 0.12)',
+  // Teal, not blue — see the light block. 4.94:1 inside its own chip on the dark
+  // panel, which is where every dark soft chip bottoms out.
+  info: tealSteps.textDark,
+  infoSoft: 'rgba(111, 186, 185, 0.12)',
+  rose: roseSteps.textDark,
+  roseSoft: 'rgba(218, 143, 178, 0.12)',
   // Lifted relative to light so each series clears 4.5:1 against the darker
   // page instead of resting on the 3:1 floor.
   chart1: '#2387D7',

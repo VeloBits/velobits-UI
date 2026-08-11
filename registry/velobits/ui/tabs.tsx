@@ -73,7 +73,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-bg2',
+        default: 'bg-bg2 control-recessed',
         line: 'gap-1 bg-transparent',
       },
     },
@@ -138,7 +138,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
         [
           'data-[state=active]:text-fg',
           'group-data-[variant=default]/tabs-list:data-[state=active]:bg-panel',
-          'group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm',
+          'group-data-[variant=default]/tabs-list:data-[state=active]:control-raised',
         ],
         // `line`: no pill at all — the underline below is the entire indicator.
         [

@@ -14,7 +14,13 @@ import { extendTailwindMerge } from 'tailwind-merge';
  * `text-link`) already work, because tailwind-merge treats the colour position
  * in `bg-*` / `text-*` as free-form.
  */
-const twMerge = extendTailwindMerge({
+/*
+ * The generic parameter is not optional decoration: `extend.classGroups` is typed
+ * as `Partial<Record<DefaultClassGroupIds, …>>`, so a brand-new group id is a type
+ * error until it is declared here. Registering a NEW group (as opposed to extending
+ * one of Tailwind's own, like `rounded`) is what this argument is for.
+ */
+const twMerge = extendTailwindMerge<'control-material'>({
   extend: {
     classGroups: {
       // --radius-pill, which is not one of Tailwind's built-in radius steps.
@@ -37,6 +43,26 @@ const twMerge = extendTailwindMerge({
       ],
       // Named durations, likewise @utility rules.
       duration: [{ duration: ['micro', 'enter', 'overlay', 'page'] }],
+      /*
+       * The control material (`controls.css`). Both classes set `box-shadow`, so
+       * they conflict with each other AND with Tailwind's own `shadow-*` — and
+       * tailwind-merge cannot know that, because they are component classes rather
+       * than utilities with a recognisable prefix.
+       *
+       * Without this group, `cn('control-recessed', 'control-raised')` keeps BOTH
+       * and the winner is whichever `controls.css` happens to declare last — i.e.
+       * always `control-recessed`, regardless of what the caller asked for. Same
+       * failure that made `rounded-pill` come out a rectangle half the time.
+       */
+      'control-material': ['control-raised', 'control-recessed'],
+    },
+    conflictingClassGroups: {
+      // Declared in BOTH directions so plain last-one-wins holds: a `shadow-*`
+      // utility at a call site clears the material, and applying the material
+      // clears an inherited `shadow-*`. One direction alone silently keeps two
+      // box-shadow declarations alive.
+      'control-material': ['shadow'],
+      shadow: ['control-material'],
     },
   },
 });

@@ -57,6 +57,7 @@
     "diff-viewer",
     "empty-state",
     "form",
+    "motion",
     "pagination",
     "segmented-control",
     "status-chip",

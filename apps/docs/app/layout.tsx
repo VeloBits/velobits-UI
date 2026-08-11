@@ -33,7 +33,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: themeInitScript(THEME_STORAGE_KEYS.dashboard) }}
         />
       </head>
-      <body className="min-h-dvh bg-bg text-fg antialiased">
+      {/*
+       * `page-texture` is opt-in, and this is the reference consumer opting in.
+       *
+       * It is also what makes the blur tier mean anything on this site: the
+       * SiteHeader is tier-O glass with a real `backdrop-filter`, and until there
+       * was something behind it to smear, that blur was a backdrop snapshot per
+       * frame producing an identical picture. Scroll the components page and the
+       * grid visibly softens under the header.
+       *
+       * On `body` rather than a wrapper div so the bloom's `background-attachment:
+       * fixed` resolves against the viewport, and so the grid spans the full
+       * scrollable height rather than the content box.
+       */}
+      <body className="page-texture min-h-dvh bg-bg text-fg antialiased">
         <Providers>
           <SiteHeader />
           <main className="mx-auto w-full max-w-page px-6 pb-24">{children}</main>
