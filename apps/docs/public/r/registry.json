@@ -192,7 +192,8 @@
       "files": [
         {
           "path": "registry/velobits/lib/cn.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/utils.ts"
         }
       ]
     },
@@ -204,7 +205,8 @@
       "files": [
         {
           "path": "registry/velobits/lib/theme.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@ui/velobits/theme.ts"
         }
       ]
     },
@@ -219,7 +221,8 @@
       "files": [
         {
           "path": "registry/velobits/hooks/use-theme.tsx",
-          "type": "registry:hook"
+          "type": "registry:hook",
+          "target": "@ui/velobits/use-theme.tsx"
         }
       ]
     },
@@ -231,7 +234,8 @@
       "files": [
         {
           "path": "registry/velobits/hooks/use-media-query.ts",
-          "type": "registry:hook"
+          "type": "registry:hook",
+          "target": "@ui/velobits/use-media-query.ts"
         }
       ]
     },
@@ -243,7 +247,8 @@
       "files": [
         {
           "path": "registry/velobits/hooks/use-row-selection.ts",
-          "type": "registry:hook"
+          "type": "registry:hook",
+          "target": "@ui/velobits/use-row-selection.ts"
         }
       ]
     },
@@ -262,7 +267,8 @@
       "files": [
         {
           "path": "registry/velobits/providers/velobits-provider.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/velobits-provider.tsx"
         }
       ]
     },
@@ -281,7 +287,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/alert.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/alert.tsx"
         }
       ]
     },
@@ -298,7 +305,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/avatar.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/avatar.tsx"
         }
       ]
     },
@@ -317,7 +325,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/badge.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/badge.tsx"
         }
       ]
     },
@@ -336,7 +345,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/button.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/button.tsx"
         }
       ]
     },
@@ -352,7 +362,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/card.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/card.tsx"
         }
       ]
     },
@@ -371,7 +382,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/checkbox.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/checkbox.tsx"
         }
       ]
     },
@@ -387,7 +399,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/field.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/field.tsx"
         }
       ]
     },
@@ -403,7 +416,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/glass-surface.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/glass-surface.tsx"
         }
       ]
     },
@@ -418,7 +432,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/input.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/input.tsx"
         }
       ]
     },
@@ -432,7 +447,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/kbd.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/kbd.tsx"
         }
       ]
     },
@@ -450,7 +466,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/label.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/label.tsx"
         }
       ]
     },
@@ -465,7 +482,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/native-select.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/native-select.tsx"
         }
       ]
     },
@@ -483,7 +501,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/separator.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/separator.tsx"
         }
       ]
     },
@@ -498,7 +517,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/skeleton.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/skeleton.tsx"
         }
       ]
     },
@@ -512,7 +532,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/spinner.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/spinner.tsx"
         }
       ]
     },
@@ -530,7 +551,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/switch.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/switch.tsx"
         }
       ]
     },
@@ -544,7 +566,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/textarea.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/textarea.tsx"
         }
       ]
     },
@@ -562,7 +585,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/tooltip.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/tooltip.tsx"
         }
       ]
     },
@@ -583,7 +607,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/command-palette.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/command-palette.tsx"
         }
       ]
     },
@@ -604,7 +629,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/dialog.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/dialog.tsx"
         }
       ]
     },
@@ -624,7 +650,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/dropdown-menu.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/dropdown-menu.tsx"
         }
       ]
     },
@@ -643,7 +670,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/popover.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/popover.tsx"
         }
       ]
     },
@@ -664,7 +692,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/side-panel.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/side-panel.tsx"
         }
       ]
     },
@@ -685,7 +714,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/toast.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/toast.tsx"
         }
       ]
     },
@@ -704,7 +734,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/accordion.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/accordion.tsx"
         }
       ]
     },
@@ -728,7 +759,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/app-shell.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/app-shell.tsx"
         }
       ]
     },
@@ -747,7 +779,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/breadcrumb.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/breadcrumb.tsx"
         }
       ]
     },
@@ -768,7 +801,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/code-block.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/code-block.tsx"
         }
       ]
     },
@@ -788,7 +822,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/data-table.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/data-table.tsx"
         }
       ]
     },
@@ -803,7 +838,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/diff-viewer.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/diff-viewer.tsx"
         }
       ]
     },
@@ -821,7 +857,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/empty-state.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/empty-state.tsx"
         }
       ]
     },
@@ -840,7 +877,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/form.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/form.tsx"
         }
       ]
     },
@@ -858,7 +896,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/motion.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/motion.tsx"
         }
       ]
     },
@@ -878,7 +917,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/pagination.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/pagination.tsx"
         }
       ]
     },
@@ -896,7 +936,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/segmented-control.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/segmented-control.tsx"
         }
       ]
     },
@@ -917,7 +958,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/status-chip.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/status-chip.tsx"
         }
       ]
     },
@@ -932,7 +974,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/table.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/table.tsx"
         }
       ]
     },
@@ -950,7 +993,8 @@
       "files": [
         {
           "path": "registry/velobits/ui/tabs.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/tabs.tsx"
         }
       ]
     }

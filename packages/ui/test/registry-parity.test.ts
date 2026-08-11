@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -230,6 +230,56 @@ describe('registry hygiene', () => {
       bare,
       'These would send the CLI to shadcn/ui looking for our items, and 404 on ' +
         `the consumer's machine. Run \`npm run registry:build\`: ${bare.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  /**
+   * ## Every published import must resolve where the CLI puts the file
+   *
+   * The sources live in `registry/velobits/{ui,lib,hooks,providers}/` and import
+   * each other relatively against that shape. The CLI writes them all into ONE
+   * flat folder and only rewrites alias-form specifiers, so a surviving `../`
+   * cannot resolve on a consumer's machine.
+   *
+   * This is not hypothetical. Before `scripts/registry-layout.ts` existed, all 38
+   * components published `from '../lib/cn'` and would not compile once installed
+   * — the files copied without complaint, so nothing here noticed for as long as
+   * nothing here compiled the installed output.
+   *
+   * Reads the COMPILED output rather than the sources, because the sources are
+   * supposed to have relative imports; it is the published copy that must not.
+   */
+  it('publishes no import that would dangle where the CLI installs it', () => {
+    const compiledDir = join(uiDir, '../../apps/docs/public/r');
+    const dangling: string[] = [];
+    let checked = 0;
+
+    for (const fileName of readdirSync(compiledDir).filter((f) => f.endsWith('.json'))) {
+      const item = JSON.parse(readFileSync(join(compiledDir, fileName), 'utf8')) as {
+        name: string;
+        files?: { path: string; content?: string; target?: string }[];
+      };
+
+      for (const file of item.files ?? []) {
+        if (!file.content) continue;
+        checked += 1;
+
+        // Every file needs a target, or the CLI falls back to its per-type
+        // default and scatters the flat folder back across three directories.
+        if (!file.target) dangling.push(`${item.name} → ${file.path} has no target`);
+
+        for (const match of file.content.matchAll(/from\s+(['"])(\.\.\/[^'"]*)\1/g)) {
+          dangling.push(`${item.name} → ${file.path} imports ${match[2]}`);
+        }
+      }
+    }
+
+    // Guards against the glob silently matching nothing and the assertion passing.
+    expect(checked).toBeGreaterThan(30);
+    expect(
+      dangling,
+      'These do not resolve where the CLI writes the files, so the install ' +
+        `compiles on nobody's machine. Run \`npm run registry:build\`: ${dangling.join(', ')}`,
     ).toEqual([]);
   });
 

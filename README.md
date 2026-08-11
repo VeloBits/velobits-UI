@@ -79,8 +79,31 @@ it to point a build at a local server and verify an install end to end:
 ```bash
 REGISTRY_BASE_URL=http://localhost:4100 npm run build
 npm run docs:serve
-npx shadcn@latest add http://localhost:4100/r/button.json   # in a scratch app
+# in a scratch app whose components.json maps @velobits at localhost:
+npx shadcn@latest add @velobits/velobits --overwrite && npx tsc --noEmit
 ```
+
+That last `tsc` is the check worth keeping. The CLI half is copy-and-paste, so it
+can install cleanly and still not compile — which is exactly what it did until the
+imports were rewritten. See `scripts/registry-layout.ts`.
+
+## Where the CLI puts things
+
+Everything lands in **one flat folder** inside the consumer's `ui` alias, with `cn`
+at their `utils` module:
+
+```
+components/ui/velobits/button.tsx      import { cn } from '@/lib/utils'
+components/ui/velobits/data-table.tsx  import { Table } from './table'
+components/ui/velobits/use-theme.tsx
+lib/utils.ts                           ← our cn, a superset of shadcn's
+```
+
+The prefixes are placeholders (`@ui/`, `@lib/`) resolved against the consumer's
+`components.json`; only `velobits/` is fixed. Targets and the import rewrites both
+come from `scripts/registry-layout.ts`, which `build-registry.ts` stamps and
+`build-docs-data.ts` reads for the docs — so the path in the documentation cannot
+disagree with the path the CLI uses.
 
 ## Layout
 
@@ -120,7 +143,7 @@ any item that file does not place.
 | the editor app                | **npm**                         | Module Federation needs `@velobits-dev/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                    |
 | the dashboard app dashboard   | **npm**                         | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
 | Keycloak login theme          | **`@velobits-dev/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
-| Greenfield / one-off surfaces | **shadcn CLI**                  | `npx shadcn@latest add https://ui.velobits.dev/r/button.json`. You own the source; no dependency to bump.                                                                                                             |
+| Greenfield / one-off surfaces | **shadcn CLI**                  | `npx shadcn@latest add @velobits/button`. You own the source; no dependency to bump.                                                                                                                                  |
 
 Adding a component means touching four lists, and
 `packages/ui/test/registry-parity.test.ts` fails if you miss one:

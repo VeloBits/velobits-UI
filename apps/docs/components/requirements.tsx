@@ -1,6 +1,17 @@
 import Link from 'next/link';
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from '@velobits-dev/ui';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CodeBlock,
+} from '@velobits-dev/ui';
+import { AlertTriangleIcon } from '@velobits-dev/icons';
 
 import type { DocRegistryItem } from '@/lib/generated/registry-data';
 import { componentHref } from '@/lib/docs-nav';
@@ -121,6 +132,39 @@ export function Requirements({ item }: { item: DocRegistryItem }) {
           </CardContent>
         </Card>
       </div>
+
+      {/*
+       * Shown on every component page, not tucked into a guide, because the
+       * failure it prevents is silent. The CLI prompts on the collision and
+       * DEFAULTS TO NO — so the reader who hits it and presses Enter keeps the
+       * stock `twMerge(clsx())` and loses our extended class groups, with nothing
+       * anywhere to say so.
+       */}
+      {item.registryDependencies.includes('cn') && (
+        <Alert variant="warning">
+          <AlertTriangleIcon />
+          <AlertTitle>Already using shadcn/ui? Overwrite `utils`</AlertTitle>
+          <AlertDescription>
+            <p>
+              This installs our <code>cn</code> to your <code>utils</code> module — the same place
+              shadcn puts its own, so you end up with one <code>cn</code> rather than two. If a file
+              is already there the CLI asks, and <strong>defaults to no</strong>. Answer yes, or
+              pass the flag:
+            </p>
+            <CodeBlock variant="terminal" wrap copyable label="overwrite utils" className="mt-3">
+              {`npx shadcn@latest add @velobits/${item.name} --overwrite`}
+            </CodeBlock>
+            <p className="mt-3">
+              Ours is a strict <strong>superset</strong> of shadcn&apos;s: same signature, same
+              behaviour on every standard utility, plus the groups this system needs —{' '}
+              <code>rounded-pill</code>, the <code>z-*</code> ladder, the named durations, and a
+              bidirectional <code>control-material</code> ⇄ <code>shadow</code> conflict. So
+              overwriting is safe for your existing shadcn components; keeping theirs is what
+              quietly breaks ours.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
     </section>
   );
 }

@@ -24,10 +24,10 @@ registries.
 npx shadcn@latest add @velobits/button
 ```
 
-Writes the component into your tree at the path your `aliases` describe, installs
-its npm dependencies, and recursively adds anything in its
-`registryDependencies`. Adding `@velobits/data-table` therefore also brings
-`table`, `cn` and `use-row-selection` without you naming them.
+Writes the component into `<aliases.ui>/velobits/`, installs its npm dependencies,
+and recursively adds anything in its `registryDependencies`. Adding
+`@velobits/data-table` therefore also brings `table`, `cn` and `use-row-selection`
+without you naming them.
 
 Useful flags:
 
@@ -35,7 +35,7 @@ Useful flags:
 | -------------- | --------------------------------------------------------------- |
 | `--overwrite`  | Replace files that already exist. Off by default, deliberately. |
 | `--path <dir>` | Write somewhere other than the configured alias.                |
-| `--yes`        | Skip confirmation prompts. What CI wants.                       |
+| `--yes`        | Skip confirmation prompts — but not the one below.              |
 | `--cwd <dir>`  | Run against another directory — useful in a monorepo.           |
 
 Install the whole system in one command:
@@ -43,6 +43,29 @@ Install the whole system in one command:
 ```bash
 npx shadcn@latest add @velobits/velobits
 ```
+
+### The one prompt `--yes` does not cover
+
+Our `cn` installs to your `utils` module — deliberately, so you end up with one
+`cn` rather than two. If a file is already there, the CLI **prompts** and defaults
+to no:
+
+```
+? The file cn.ts already exists. Would you like to overwrite? » (y/N)
+```
+
+`--yes` does _not_ suppress that particular prompt, so an unattended run will sit
+on it. `--overwrite` answers it and is non-interactive.
+
+Answering no leaves you on shadcn's stock `twMerge(clsx())`, which does not know
+about `rounded-pill`, the `z-*` ladder, the named durations, or the
+`control-material` ⇄ `shadow` conflict group — so conflict resolution quietly
+stops working across every VeloBits component. Ours is a superset, so overwriting
+is safe for your existing shadcn components. See
+[Installation](/docs/installation).
+
+Reach for `--overwrite` when that prompt appears, not by default: you own the
+copied components, so on a later run it discards your edits to them as well.
 
 ## view
 

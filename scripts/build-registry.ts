@@ -12,11 +12,12 @@
  */
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { registry } from '../registry/registry.ts';
+import { IMPORT_REWRITES, INSTALL_DIR, UTILS_TARGET, targetFor } from './registry-layout.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = join(root, 'registry.json');
@@ -107,6 +108,14 @@ const json = {
     ...(item.registryDependencies
       ? { registryDependencies: item.registryDependencies.map(resolveDependency) }
       : {}),
+    ...(item.files
+      ? {
+          files: item.files.map((file) => ({
+            ...file,
+            target: file.target ?? targetFor(file.path),
+          })),
+        }
+      : {}),
   })),
 };
 writeFileSync(registryPath, JSON.stringify(json, null, 2) + '\n', 'utf8');
@@ -150,6 +159,66 @@ try {
   );
   process.exit(1);
 }
+
+/* ── 5. Rewrite the imports to match where the files actually land ─────────── */
+
+/**
+ * Rewriting here rather than in the sources keeps the npm half untouched — tsup
+ * needs the directory layout, and `packages/ui`'s per-entry `exports` map is built
+ * from it. One source, two shapes, and the difference is applied on the way out.
+ * `scripts/registry-layout.ts` carries the reasoning and the rules.
+ *
+ * The step runs AFTER `shadcn build` because that is what inlines `content`;
+ * before it, there is nothing to rewrite.
+ */
+const registryFiles = readdirSync(outputDir).filter((f) => f.endsWith('.json'));
+let rewritten = 0;
+const stillRelative: string[] = [];
+
+for (const fileName of registryFiles) {
+  const itemPath = join(outputDir, fileName);
+  const item = JSON.parse(readFileSync(itemPath, 'utf8')) as {
+    name: string;
+    files?: { path: string; content?: string }[];
+  };
+  if (!item.files?.length) continue;
+
+  let touched = false;
+  for (const file of item.files) {
+    if (!file.content) continue;
+    const before = file.content;
+    for (const [pattern, replacement] of IMPORT_REWRITES) {
+      file.content = file.content.replace(pattern, replacement);
+    }
+    if (file.content !== before) touched = true;
+
+    /*
+     * The invariant that would have caught the original bug. Every surviving `../`
+     * specifier points outside the one flat folder the CLI writes, so it cannot
+     * resolve on a consumer's machine — and the only place that shows up is their
+     * build, not ours.
+     */
+    for (const match of file.content.matchAll(/from\s+(['"])(\.\.\/[^'"]*)\1/g)) {
+      stillRelative.push(`${item.name} → ${file.path} imports ${match[2]}`);
+    }
+  }
+
+  if (touched) {
+    writeFileSync(itemPath, JSON.stringify(item, null, 2) + '\n', 'utf8');
+    rewritten += 1;
+  }
+}
+
+if (stillRelative.length) {
+  console.error(
+    '\nimports that will not resolve where the CLI installs these files:\n  ' +
+      stillRelative.join('\n  ') +
+      '\n(Add a rule to `rewrites` in scripts/build-registry.ts.)',
+  );
+  process.exit(1);
+}
+
+console.log(`rewrote imports in ${rewritten} items → flat ${INSTALL_DIR}/, cn → ${UTILS_TARGET}`);
 
 console.log(`\ncompiled → apps/docs/public/r/`);
 console.log('Consumers install with:');

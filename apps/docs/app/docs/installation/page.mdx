@@ -44,8 +44,64 @@ one-off with no config, the full URL works everywhere:
 npx shadcn@latest add https://ui.velobits.dev/r/button.json
 ```
 
-[Registry](/docs/registry) covers the rest — private registries, `view`, `search`,
-and what the JSON actually contains.
+### Where the files land
+
+Everything goes into **one flat folder** inside your `ui` alias, plus `cn` at your
+`utils` module:
+
+```
+components/ui/velobits/
+  button.tsx          import { cn } from '@/lib/utils'
+  card.tsx
+  data-table.tsx      import { Table } from './table'
+  table.tsx
+  use-theme.tsx
+  theme.ts
+  velobits-provider.tsx
+lib/utils.ts          ← our cn
+```
+
+```tsx
+import { Button } from '@/components/ui/velobits/button';
+```
+
+`components/ui/` and `lib/` come from **your** `components.json` — a project whose
+`aliases.ui` is `@/parts/widgets` gets `parts/widgets/velobits/`. Only the
+`velobits/` segment is ours.
+
+Flat is deliberate. The components import each other as siblings (`./table`,
+`./tooltip`), so one folder makes those true by construction. The alternative —
+letting the CLI scatter them across `components/ui`, `lib` and `hooks` by file
+type — is what broke the imports before this layout existed.
+
+### If you already have shadcn's `utils`
+
+`cn` installs to your `utils` module, which is where shadcn puts its own. That is
+the point: one `cn`, not two. If a file is already there the CLI asks —
+
+```
+? The file cn.ts already exists. Would you like to overwrite? » (y/N)
+```
+
+— and **defaults to no**. Answer **yes**, or pass `--overwrite`, which is also the
+only form that works unattended: `--yes` does not cover this prompt.
+
+Ours is a strict **superset** — same signature, same behaviour on every standard
+utility, plus the class groups this system needs: `rounded-pill`, the `z-*`
+ladder (`z-sticky`, `z-dropdown`, `z-modal`, …), the named durations
+(`duration-micro`, `duration-enter`, …), and a bidirectional
+`control-material` ⇄ `shadow` conflict group. That last one matters most: without
+it, two `box-shadow` declarations survive on the same element.
+
+So overwriting is safe for your existing shadcn components, and _not_ overwriting
+is what quietly degrades ours.
+
+**Do not make `--overwrite` a habit.** You own the copied components, so on a
+later run it discards edits you have made to them too. Reach for it when the
+prompt appears, not by default.
+
+[Registry](/docs/registry) covers the rest — `view`, `search`, and what the JSON
+actually contains.
 
 ## npm
 

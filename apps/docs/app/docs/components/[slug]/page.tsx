@@ -137,9 +137,13 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
               Usage
             </h2>
             <p className="text-sm text-muted-foreground">
-              Spelled for the npm package. If you installed through the CLI, the import path is
-              wherever the file landed in your own tree — <code>@/components/ui/{slug}</code> with
-              the default aliases.
+              Spelled for the npm package. If you installed through the CLI the component is in your
+              own tree instead, so the import is <code>@/components/ui/velobits/{slug}</code> with
+              the default aliases — see{' '}
+              <Link href="/docs/installation" className="text-link underline underline-offset-4">
+                Installation
+              </Link>{' '}
+              for why it is one flat folder.
             </p>
             <CodePanel
               html={content.usage.html}

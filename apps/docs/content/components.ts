@@ -731,10 +731,14 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   /* ── Hooks and utilities ───────────────────────────────────────────────── */
 
   cn: {
-    usage: `import { cn } from '@velobits-dev/ui';
+    usage: `// npm
+import { cn } from '@velobits-dev/ui';
+// shadcn CLI — installed to your utils module
+import { cn } from '@/lib/utils';
 
 cn('rounded-md px-3', isActive && 'bg-primary-soft', className)`,
     notes: [
+      'Installed to your `utils` alias rather than into the velobits folder, so a project already on shadcn keeps one `cn`. Ours is a strict SUPERSET of shadcn’s: identical signature and identical results on standard utilities, plus the class groups this system needs — `rounded-pill`, the `z-*` ladder, the named durations, and a bidirectional `control-material` ⇄ `shadow` conflict group. Pass `--overwrite` so ours wins; the reverse silently leaves two box-shadows alive on one element.',
       'The signature must stay twMerge(clsx(...)). Consumers point their components.json `utils` alias at it, so a change of shape breaks every component the CLI has already written into their tree.',
     ],
   },

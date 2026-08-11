@@ -46,6 +46,7 @@ import ts from 'typescript';
 import { registry } from '../registry/registry.ts';
 import { COMPONENT_CONTENT } from '../apps/docs/content/components.ts';
 import { COMPONENT_GROUPS, GROUPED_COMPONENT_NAMES, GUIDE_NAV } from '../apps/docs/lib/docs-nav.ts';
+import { displayTarget, targetFor } from './registry-layout.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const docsDir = join(root, 'apps/docs');
@@ -184,13 +185,14 @@ interface EmittedItem {
   files: EmittedFile[];
 }
 
-/** `registry/velobits/ui/button.tsx` → `components/ui/button.tsx`, as the CLI writes it. */
+/**
+ * Where the CLI writes each file, spelled with the default aliases so it reads as
+ * an instruction. Derived from `scripts/registry-layout.ts` — the same module
+ * `build-registry.ts` stamps the real targets from, so the path in the docs cannot
+ * disagree with the path the CLI uses.
+ */
 function installTarget(path: string): string {
-  return path
-    .replace(/^registry\/velobits\/ui\//, 'components/ui/')
-    .replace(/^registry\/velobits\/providers\//, 'components/')
-    .replace(/^registry\/velobits\/hooks\//, 'hooks/')
-    .replace(/^registry\/velobits\/lib\//, 'lib/');
+  return displayTarget(targetFor(path));
 }
 
 const groupOf = new Map<string, string>();

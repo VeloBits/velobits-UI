@@ -46,15 +46,30 @@ item name, so `@velobits/button` fetches
 Needs **shadcn CLI v3 or newer**. Without it, install by full URL instead — same
 files, no config. See [Registry](/docs/registry).
 
+## aliases.ui
+
+Where the `velobits/` folder goes. Every component, hook and provider from this
+registry lands in `<aliases.ui>/velobits/`, flat. With the default
+`"@/components/ui"` that is `components/ui/velobits/`, imported as
+`@/components/ui/velobits/button`.
+
 ## aliases.utils
 
-Point this at wherever `cn` landed. The CLI rewrites every copied component's
-import of `cn` to this alias, so getting it wrong means 38 files importing
-something that is not there.
+Where our `cn` goes, and what every component's `cn` import is rewritten to. These
+two have to agree, which they do in the default config — `utils: "@/lib/utils"`
+alongside `lib: "@/lib"` puts the file at `lib/utils.ts` and the import at
+`@/lib/utils`.
 
-`cn`'s signature must stay `twMerge(clsx(...))`. Components rely on later classes
-winning over earlier ones — that is how `className` on a call site overrides a
-variant — and a plain `clsx` does not do that.
+If you point `utils` somewhere that is not `<lib>/utils`, shadcn writes the file to
+the `lib` alias while rewriting imports to the `utils` alias, and they no longer
+match. That inconsistency is the CLI's, not ours — shadcn's own `utils` item has
+it too. Keep the two conventional and it does not arise.
+
+**Our `cn` is a superset of shadcn's**, not a replacement with different
+behaviour: identical signature and identical results on standard utilities, plus
+`rounded-pill`, the `z-*` ladder, the named durations, and a bidirectional
+`control-material` ⇄ `shadow` conflict group. Pass `--overwrite` so ours wins — see
+[Installation](/docs/installation).
 
 ## tailwind.css
 
