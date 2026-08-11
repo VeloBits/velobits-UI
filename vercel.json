@@ -1,0 +1,69 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+
+  "//": [
+    "Deploys the whole thing: the docs site AND the registry the shadcn CLI",
+    "fetches, as one static artefact at one origin.",
+    "",
+    "`framework: null` is deliberate. `apps/docs` IS a Next app, but it builds with",
+    "`output: 'export'`, and Vercel's Next.js builder is for server output — it",
+    "would also look for a next.config at the repo root, where there is none",
+    "(`next` is not even a root dependency). Treating the build as 'produce a",
+    "directory of files' is both what actually happens and what Vercel can serve",
+    "without a runtime.",
+    "",
+    "`buildCommand` runs at the REPO ROOT rather than in apps/docs, because turbo's",
+    "`dependsOn: [\"^build\"]` is what guarantees the three packages are built before",
+    "the registry compile — which imports @velobits-dev/tokens. Pointing Vercel's",
+    "Root Directory at apps/docs would skip that and fail on a missing dist/.",
+    "",
+    "Node comes from `engines.node` in the root package.json (>=22)."
+  ],
+
+  "framework": null,
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "apps/docs/out",
+
+  "//trailingSlash": [
+    "Matches `trailingSlash: true` in apps/docs/next.config.mjs, which emits",
+    "`docs/components/button/index.html` rather than `button.html`. Without this,",
+    "Vercel and Next disagree about the canonical URL and every deep link eats a",
+    "redirect."
+  ],
+  "trailingSlash": true,
+
+  "//headers": [
+    "The rules that live in apps/docs/public/_headers for Cloudflare Pages and",
+    "Netlify. Vercel does not read that file — it is copied into out/ and simply",
+    "sits there — so they are restated here.",
+    "",
+    "CORS on /r/* is for BROWSER consumers (v0 and anything fetching a registry",
+    "item from a page). The shadcn CLI is a Node process and never needed it.",
+    "",
+    "`must-revalidate` rather than a long max-age: a component's source changes",
+    "under a stable URL, so a cached copy is a consumer silently installing last",
+    "month's file. The payloads are small and the revalidation is a 304."
+  ],
+  "headers": [
+    {
+      "source": "/r/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/search-index.json",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "//": "Next writes content-hashed filenames here, so these are immutable by construction.",
+      "source": "/_next/static/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}

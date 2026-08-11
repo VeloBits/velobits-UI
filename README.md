@@ -41,12 +41,40 @@ Steps 2 and 3 run from the docs app's own `build` script, and turbo's
 `dependsOn: ["^build"]` guarantees the packages are built first — which step 2
 needs, since it imports `@velobits-dev/tokens`.
 
-### Deploying
+### Deploying to Vercel
 
-Any static host. `apps/docs/public/_headers` is copied into `out/` and is read
-directly by **Cloudflare Pages** and **Netlify**. For other hosts, the two rules
-that matter are CORS on `/r/*` (for browser-based consumers — the CLI is a Node
-process and never needed it) and no long-lived cache on it, since a component's
+`vercel.json` at the repo root already carries the whole configuration, so the
+project needs no settings in the dashboard:
+
+| Setting          | Value                                                        |
+| ---------------- | ------------------------------------------------------------ |
+| Root Directory   | **the repo root** — leave it empty, do _not_ set `apps/docs` |
+| Framework Preset | Other (`"framework": null`)                                  |
+| Build Command    | `npm run build`                                              |
+| Output Directory | `apps/docs/out`                                              |
+| Node             | from `engines.node` (>= 22)                                  |
+
+Then add `ui.velobits.dev` under **Settings → Domains**.
+
+Two of those are load-bearing:
+
+**Root Directory must stay at the repo root.** Pointing it at `apps/docs` makes
+Vercel install and build only that workspace, so the three packages never build
+and `scripts/build-registry.ts` dies importing `@velobits-dev/tokens`. Turbo's
+`dependsOn: ["^build"]` is what orders them, and it only runs from the root.
+
+**Framework Preset is Other, not Next.js.** `apps/docs` is a Next app, but it
+builds with `output: 'export'` — Vercel's Next builder is for server output and
+would also look for a `next.config` at the repo root, where there is none. What
+this repo produces is a directory of files, which is what Vercel serves best.
+
+### Other hosts
+
+`apps/docs/public/_headers` is copied into `out/` and read directly by
+**Cloudflare Pages** and **Netlify** — nothing else to do. (Vercel ignores it,
+which is why the rules are restated in `vercel.json`.) For anything else, the two
+that matter are CORS on `/r/*` — for browser-based consumers; the CLI is a Node
+process and never needed it — and no long-lived cache on it, since a component's
 source changes under a stable URL:
 
 ```nginx
@@ -56,21 +84,6 @@ location /r/ {
   add_header Cache-Control "public, max-age=0, must-revalidate";
 }
 location / { try_files $uri $uri/ /404.html; }
-```
-
-```json
-// vercel.json
-{
-  "headers": [
-    {
-      "source": "/r/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
-      ]
-    }
-  ]
-}
 ```
 
 `REGISTRY_BASE_URL` overrides the origin baked into `registryDependencies` — set

@@ -19,7 +19,42 @@ preference.
 
 ## shadcn CLI
 
-Add the registry to your `components.json` once:
+This is a standard shadcn registry, so the setup is shadcn's own — VeloBits adds
+one line to it. Three steps from nothing.
+
+### 1. Set up shadcn
+
+Already running shadcn? Skip to step 2.
+
+**Starting a new project** — `init` scaffolds one, wired up:
+
+```bash
+npx shadcn@latest init --template next
+# also: vite · react-router · astro · laravel · start
+```
+
+**Adding to an existing React app:**
+
+```bash
+npx shadcn@latest init
+```
+
+It detects your framework, installs Tailwind and the base dependencies, writes
+your CSS entry, and creates `components.json` — the file everything below reads.
+[components.json](/docs/components-json) explains each field, and the two that
+matter most here are `aliases.ui` (where the `velobits/` folder goes) and
+`aliases.utils` (where `cn` goes).
+
+**Tailwind v4 is required.** The token layer is CSS custom properties plus
+`@theme`; there is no v3 JS-config bridge, and `tailwind.config` is an empty
+string on v4 by design.
+
+You can also skip `init` entirely and hand-write `components.json` — the CLI only
+needs that file plus a `tsconfig.json` whose `paths` resolve your aliases.
+
+### 2. Add the VeloBits registry
+
+One entry in the `registries` block, once:
 
 ```json
 {
@@ -30,15 +65,22 @@ Add the registry to your `components.json` once:
 }
 ```
 
-Then install anything by name:
+`{name}` is substituted per item, so `@velobits/button` fetches
+`https://ui.velobits.dev/r/button.json`.
+
+### 3. Install components
 
 ```bash
 npx shadcn@latest add @velobits/velobits   # the whole system
 npx shadcn@latest add @velobits/button     # one component
 ```
 
+Each item pulls its own npm dependencies and any other registry items it imports,
+so `add @velobits/data-table` also brings `table`, `cn` and `use-row-selection`
+without you naming them.
+
 Namespaced registries need **shadcn CLI v3 or newer**. On anything older, or for a
-one-off with no config, the full URL works everywhere:
+one-off with no config at all, the full URL works everywhere:
 
 ```bash
 npx shadcn@latest add https://ui.velobits.dev/r/button.json
