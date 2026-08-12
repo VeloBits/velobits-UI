@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@velobits-dev/ui';
+import { Button } from '@velobits/ui';
 
 export default function ButtonDemo() {
   return (

@@ -14,7 +14,7 @@
     "",
     "`buildCommand` runs at the REPO ROOT rather than in apps/docs, because turbo's",
     "`dependsOn: [\"^build\"]` is what guarantees the three packages are built before",
-    "the registry compile — which imports @velobits-dev/tokens. Pointing Vercel's",
+    "the registry compile — which imports @velobits/tokens. Pointing Vercel's",
     "Root Directory at apps/docs would skip that and fail on a missing dist/.",
     "",
     "Node comes from `engines.node` in the root package.json (>=22)."

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { Badge, Card, CardDescription, CardHeader, CardTitle } from '@velobits-dev/ui';
+import { Badge, Card, CardDescription, CardHeader, CardTitle } from '@velobits/ui';
 
 import { COMPONENT_GROUPS, componentHref } from '@/lib/docs-nav';
 import { registryItemsByName } from '@/lib/generated/registry-data';

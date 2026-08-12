@@ -1,4 +1,4 @@
-# @velobits-dev/ui
+# @velobits/ui
 
 The VeloBits React component library — 38 components sharing one token layer and
 one glass material.
@@ -9,7 +9,7 @@ served from the same source. A parity test stops the two drifting.
 ## Install
 
 ```bash
-npm install @velobits-dev/ui @velobits-dev/tokens @velobits-dev/icons framer-motion
+npm install @velobits/ui @velobits/tokens @velobits/icons framer-motion
 ```
 
 **`framer-motion` is a required peer**, not an optional one — the barrel imports
@@ -22,8 +22,8 @@ below.
 ## Set up
 
 ```css
-@import '@velobits-dev/tokens/theme.css';
-@source "../node_modules/@velobits-dev/ui/dist";
+@import '@velobits/tokens/theme.css';
+@source "../node_modules/@velobits/ui/dist";
 ```
 
 The `@source` line is not optional. Tailwind v4 does not scan `node_modules`, so
@@ -32,7 +32,7 @@ without it every class this package ships is stripped from your build.
 Then wrap your app once:
 
 ```tsx
-import { VelobitsProvider } from '@velobits-dev/ui';
+import { VelobitsProvider } from '@velobits/ui';
 
 <VelobitsProvider>{children}</VelobitsProvider>;
 ```
@@ -53,13 +53,13 @@ That supplies the theme, the tooltip provider and the reduced-motion config.
 `StatusChip` `Table` `Tabs`
 
 Plus `cn`, `useTheme`, `useMediaQuery` and `useRowSelection`. Every component is
-also available on its own subpath — `@velobits-dev/ui/button` — if you would
+also available on its own subpath — `@velobits/ui/button` — if you would
 rather not rely on the barrel tree-shaking.
 
 ## `Form` is subpath-only
 
 ```tsx
-import { Form, FormField } from '@velobits-dev/ui/form';
+import { Form, FormField } from '@velobits/ui/form';
 ```
 
 It is deliberately absent from the barrel. `react-hook-form` is an optional

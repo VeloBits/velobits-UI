@@ -1,6 +1,6 @@
 'use client';
 
-import { THEME_STORAGE_KEYS, VelobitsProvider } from '@velobits-dev/ui';
+import { THEME_STORAGE_KEYS, VelobitsProvider } from '@velobits/ui';
 
 /**
  * The docs site reuses the dashboard app's storage key rather than inventing a third,

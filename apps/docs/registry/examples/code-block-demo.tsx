@@ -1,6 +1,6 @@
 'use client';
 
-import { CodeBlock } from '@velobits-dev/ui';
+import { CodeBlock } from '@velobits/ui';
 
 export default function CodeBlockDemo() {
   return (

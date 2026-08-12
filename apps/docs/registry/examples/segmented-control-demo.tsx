@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { SegmentedControl } from '@velobits-dev/ui';
+import { SegmentedControl } from '@velobits/ui';
 
 export default function SegmentedControlDemo() {
   const [env, setEnv] = useState('dev');

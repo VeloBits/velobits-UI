@@ -7,7 +7,7 @@
 /*
  * The typefaces the token layer NAMES but deliberately does not ship.
  *
- * `@velobits-dev/tokens` declares `--font-sans: 'Geist Variable', …` and stays
+ * `@velobits/tokens` declares `--font-sans: 'Geist Variable', …` and stays
  * dependency-free, so each consumer installs the faces itself — which is what
  * the Keycloak theme already does, with these same two packages. Skipping this
  * step fails silently: everything falls back to `system-ui`, the layout barely
@@ -17,11 +17,11 @@
 @import '@fontsource-variable/geist';
 @import '@fontsource-variable/jetbrains-mono';
 
-@import '@velobits-dev/tokens/theme.css';
+@import '@velobits/tokens/theme.css';
 
 /*
  * NOT OPTIONAL. Tailwind v4 does not scan node_modules, so every utility used
- * *inside* @velobits-dev/ui would go ungenerated and the components would render
+ * *inside* @velobits/ui would go ungenerated and the components would render
  * completely unstyled — with no warning anywhere. `cva` class strings survive
  * into dist as string literals, which is what makes this work.
  */

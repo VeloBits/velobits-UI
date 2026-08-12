@@ -8,8 +8,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@velobits-dev/ui';
-import { HomeIcon } from '@velobits-dev/icons';
+} from '@velobits/ui';
+import { HomeIcon } from '@velobits/icons';
 
 export default function BreadcrumbDemo() {
   return (

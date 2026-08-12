@@ -2,7 +2,7 @@
 
 import { Accordion as AccordionPrimitive } from 'radix-ui';
 
-import { ChevronDownIcon } from '@velobits-dev/icons';
+import { ChevronDownIcon } from '@velobits/icons';
 
 import { cn } from '../lib/cn';
 
@@ -172,7 +172,7 @@ function AccordionTrigger({
  * ## The one sanctioned height animation in the system
  *
  * `animate-accordion-down` / `animate-accordion-up` (from `tw-animate-css`, which
- * `@velobits-dev/tokens/theme.css` already imports) interpolate `height` from `0` to
+ * `@velobits/tokens/theme.css` already imports) interpolate `height` from `0` to
  * `var(--radix-accordion-content-height)`.
  *
  * Animating height is normally banned here because it invalidates layout on every

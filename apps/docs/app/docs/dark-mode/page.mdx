@@ -18,7 +18,7 @@ the system preference.
 the page renders light and then flips — the flash of wrong theme.
 
 ```tsx
-import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits-dev/ui/theme';
+import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits/ui/theme';
 
 export default function RootLayout({ children }) {
   return (
@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
 `suppressHydrationWarning` is required precisely because that script mutates the
 element React is about to hydrate.
 
-`@velobits-dev/ui/theme` is a **subpath**, and it is React-free by design — which
+`@velobits/ui/theme` is a **subpath**, and it is React-free by design — which
 is what lets a Server Component call `themeInitScript()` during render.
 
 ## The storage key is required, never defaulted

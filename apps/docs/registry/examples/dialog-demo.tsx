@@ -24,8 +24,8 @@ import {
   PopoverTitle,
   PopoverTrigger,
   Textarea,
-} from '@velobits-dev/ui';
-import { ChevronDownIcon, PlusIcon } from '@velobits-dev/icons';
+} from '@velobits/ui';
+import { ChevronDownIcon, PlusIcon } from '@velobits/icons';
 
 /**
  * The Popover inside is load-bearing rather than decorative.

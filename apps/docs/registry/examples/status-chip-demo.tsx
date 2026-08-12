@@ -1,6 +1,6 @@
 'use client';
 
-import { StatusChip, type Status } from '@velobits-dev/ui';
+import { StatusChip, type Status } from '@velobits/ui';
 
 const ALL_STATUSES: readonly Status[] = ['on', 'off', 'partial', 'pending', 'archived'];
 

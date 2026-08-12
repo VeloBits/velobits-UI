@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
-import * as iconModule from '@velobits-dev/icons';
-import { type Icon as IconComponent } from '@velobits-dev/icons';
-import { Badge, EmptyState, Input } from '@velobits-dev/ui';
-import { CheckIcon, SearchIcon } from '@velobits-dev/icons';
+import * as iconModule from '@velobits/icons';
+import { type Icon as IconComponent } from '@velobits/icons';
+import { Badge, EmptyState, Input } from '@velobits/ui';
+import { CheckIcon, SearchIcon } from '@velobits/icons';
 
 /**
  * The searchable grid.
@@ -37,7 +37,7 @@ function Swatch({ name, Icon }: { name: string; Icon: IconComponent }) {
 
   const copy = async () => {
     if (!navigator.clipboard) return;
-    await navigator.clipboard.writeText(`import { ${name} } from '@velobits-dev/icons';`);
+    await navigator.clipboard.writeText(`import { ${name} } from '@velobits/icons';`);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };

@@ -1,4 +1,4 @@
-# @velobits-dev/icons
+# @velobits/icons
 
 The VeloBits icon set — 88 hand-drawn stroke icons on a 24×24 grid, tuned to
 read at 13–18px, which is where they actually get used.
@@ -9,7 +9,7 @@ apps. Every name that existed in either set is preserved.
 ## Install
 
 ```bash
-npm install @velobits-dev/icons
+npm install @velobits/icons
 ```
 
 React 19 or later is a peer dependency.
@@ -17,7 +17,7 @@ React 19 or later is a peer dependency.
 ## Use
 
 ```tsx
-import { FlagIcon } from '@velobits-dev/icons';
+import { FlagIcon } from '@velobits/icons';
 
 <FlagIcon size={16} />;
 ```
@@ -27,7 +27,7 @@ Every icon takes `size` plus the usual SVG props, and inherits `currentColor`.
 Build your own on the same geometry with `createIcon`:
 
 ```tsx
-import { createIcon } from '@velobits-dev/icons';
+import { createIcon } from '@velobits/icons';
 
 export const MyIcon = createIcon('MyIcon', <path d="M4 12h16" />);
 ```

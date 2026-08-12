@@ -1,7 +1,8 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "velobits",
+  "name": "@velobits",
   "homepage": "https://ui.velobits.dev",
+  "description": "An open source collection of accessible, contrast-gated React components on a warm neutral palette and a two-tier glass material — the VeloBits design system, authored once and shipped both as an npm package and as this registry.",
   "items": [
     {
       "name": "velobits",
@@ -16,8 +17,8 @@
         "cmdk",
         "framer-motion",
         "react-hook-form",
-        "@velobits-dev/icons",
-        "@velobits-dev/tokens"
+        "@velobits/icons",
+        "@velobits/tokens"
       ],
       "devDependencies": [
         "tw-animate-css"
@@ -75,7 +76,7 @@
       "name": "velobits-theme",
       "type": "registry:theme",
       "title": "VeloBits theme",
-      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits-dev/tokens test suite.",
+      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits/tokens test suite.",
       "cssVars": {
         "theme": {
           "radius-sm": "4px",
@@ -230,7 +231,7 @@
       "name": "use-media-query",
       "type": "registry:hook",
       "title": "useMediaQuery",
-      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits-dev/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.",
+      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.",
       "files": [
         {
           "path": "registry/velobits/hooks/use-media-query.ts",
@@ -374,7 +375,7 @@
       "description": "Includes the indeterminate state bulk-selection headers need.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json"
@@ -598,7 +599,7 @@
       "dependencies": [
         "cmdk",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -620,7 +621,7 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -641,7 +642,7 @@
       "description": "Highlight is data-[highlighted], never :hover — Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -683,7 +684,7 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -705,7 +706,7 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -726,7 +727,7 @@
       "description": "The one sanctioned height animation: Radix measures --radix-accordion-content-height, so it does not thrash layout the way an unbounded height:auto transition would.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json"
@@ -746,8 +747,8 @@
       "description": "The authenticated chrome. `sidebar` is a prop rather than a child because it is rendered TWICE — as a rail at md and up, and inside a drawer below it — so a nav item cannot exist in one and not the other. Ships the skip link, which is the most-skipped WCAG requirement in an admin UI.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons",
-        "@velobits-dev/tokens"
+        "@velobits/icons",
+        "@velobits/tokens"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -771,7 +772,7 @@
       "description": "A named nav landmark around an ordered list. The leaf is a plain span with aria-current=\"page\" — NOT shadcn’s role=\"link\" aria-disabled, which announces static text as a broken link.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json"
@@ -791,7 +792,7 @@
       "description": "Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on.",
       "dependencies": [
         "class-variance-authority",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -812,7 +813,7 @@
       "title": "DataTable",
       "description": "Sorting, selection and row activation over a column registry — deliberately not TanStack, whose grouping and pivoting nothing here uses. aria-sort goes on the th, not the sort button, and an activatable row needs tabIndex + Enter/Space + a target check or it is mouse-only.",
       "dependencies": [
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -886,7 +887,7 @@
       "name": "motion",
       "type": "registry:ui",
       "title": "Motion",
-      "description": "Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobits-dev/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer — do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.",
+      "description": "Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobits/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer — do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.",
       "dependencies": [
         "framer-motion"
       ],
@@ -908,7 +909,7 @@
       "description": "Numbers are links, previous/next are buttons: an <a> cannot express \"unavailable\" without ceasing to be focusable. Unavailability is aria-disabled plus a guard, so focus is not lost at the ends of the range. `paginationRange` returns a CONSTANT number of slots so the control never reflows as you page.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
@@ -949,7 +950,7 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",

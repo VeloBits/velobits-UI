@@ -19,8 +19,8 @@ import {
   type RowSelection,
   type SortState,
   type Status,
-} from '@velobits-dev/ui';
-import { ArchiveIcon, EllipsisIcon, PlusIcon, SearchIcon, SlidersIcon } from '@velobits-dev/icons';
+} from '@velobits/ui';
+import { ArchiveIcon, EllipsisIcon, PlusIcon, SearchIcon, SlidersIcon } from '@velobits/icons';
 
 interface FlagRow {
   id: string;

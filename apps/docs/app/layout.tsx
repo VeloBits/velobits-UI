@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits-dev/ui/theme';
+import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits/ui/theme';
 
 import { SiteHeader } from '@/components/site-header';
 import { SITE } from '@/lib/site';

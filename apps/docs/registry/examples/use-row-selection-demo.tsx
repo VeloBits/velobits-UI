@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Badge, Button, Checkbox, Input, Label, useRowSelection } from '@velobits-dev/ui';
+import { Badge, Button, Checkbox, Input, Label, useRowSelection } from '@velobits/ui';
 
 const FLAGS = [
   { id: '1', key: 'new-checkout' },

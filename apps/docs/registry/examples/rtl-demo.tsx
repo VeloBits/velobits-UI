@@ -24,8 +24,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@velobits-dev/ui';
-import { PlusIcon } from '@velobits-dev/icons';
+} from '@velobits/ui';
+import { PlusIcon } from '@velobits/icons';
 
 /*
  * Logical properties throughout (`ms-`/`me-`/`text-start`/`ps-`/`pe-`), so RTL

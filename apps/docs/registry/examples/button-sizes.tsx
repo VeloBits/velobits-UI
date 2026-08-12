@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@velobits-dev/ui';
-import { TrashIcon } from '@velobits-dev/icons';
+import { Button } from '@velobits/ui';
+import { TrashIcon } from '@velobits/icons';
 
 export default function ButtonSizes() {
   return (

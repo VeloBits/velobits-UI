@@ -21,7 +21,7 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
 
-      # No token here: every @velobits-dev/* dep in this repo is a workspace
+      # No token here: every @velobits/* dep in this repo is a workspace
       # link, resolved locally and never fetched. Only `release.yml` publishes,
       # and that is the one job needing the NPM_TOKEN secret.
       - run: npm ci

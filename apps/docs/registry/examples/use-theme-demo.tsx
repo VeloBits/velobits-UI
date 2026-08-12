@@ -1,7 +1,7 @@
 'use client';
 
-import { Badge, Button, useTheme } from '@velobits-dev/ui';
-import { MoonIcon, SunIcon } from '@velobits-dev/icons';
+import { Badge, Button, useTheme } from '@velobits/ui';
+import { MoonIcon, SunIcon } from '@velobits/icons';
 
 export default function UseThemeDemo() {
   const { mode, theme, mounted, setMode, toggle } = useTheme();

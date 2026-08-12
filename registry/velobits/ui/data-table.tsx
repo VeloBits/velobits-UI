@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from 'react';
 
-import { ArrowDownIcon, ArrowUpDownIcon } from '@velobits-dev/icons';
+import { ArrowDownIcon, ArrowUpDownIcon } from '@velobits/icons';
 
 import { cn } from '../lib/cn';
 import {

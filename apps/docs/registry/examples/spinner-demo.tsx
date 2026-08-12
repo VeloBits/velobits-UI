@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Spinner } from '@velobits-dev/ui';
+import { Button, Spinner } from '@velobits/ui';
 
 export default function SpinnerDemo() {
   return (

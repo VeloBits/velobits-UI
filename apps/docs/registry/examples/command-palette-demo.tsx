@@ -13,8 +13,8 @@ import {
   CommandSeparator,
   CommandShortcut,
   Kbd,
-} from '@velobits-dev/ui';
-import { FlagIcon, PlusIcon } from '@velobits-dev/icons';
+} from '@velobits/ui';
+import { FlagIcon, PlusIcon } from '@velobits/icons';
 
 export default function CommandPaletteDemo() {
   const [open, setOpen] = useState(false);

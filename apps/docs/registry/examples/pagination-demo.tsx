@@ -11,7 +11,7 @@ import {
   PaginationNext,
   PaginationPrevious,
   paginationRange,
-} from '@velobits-dev/ui';
+} from '@velobits/ui';
 
 export default function PaginationDemo() {
   const [page, setPage] = useState(6);

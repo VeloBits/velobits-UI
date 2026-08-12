@@ -10,7 +10,7 @@ import {
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
-} from '@velobits-dev/ui';
+} from '@velobits/ui';
 
 export default function PopoverDemo() {
   return (

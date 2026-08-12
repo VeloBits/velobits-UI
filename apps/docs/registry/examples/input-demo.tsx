@@ -1,6 +1,6 @@
 'use client';
 
-import { Input } from '@velobits-dev/ui';
+import { Input } from '@velobits/ui';
 
 export default function InputDemo() {
   return (

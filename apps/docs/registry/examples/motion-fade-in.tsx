@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 
-import { Alert, AlertDescription, AlertTitle, Button, Spinner } from '@velobits-dev/ui';
-import { FadeIn } from '@velobits-dev/ui/motion';
-import { CircleCheckIcon } from '@velobits-dev/icons';
+import { Alert, AlertDescription, AlertTitle, Button, Spinner } from '@velobits/ui';
+import { FadeIn } from '@velobits/ui/motion';
+import { CircleCheckIcon } from '@velobits/icons';
 
 /**
  * The case that is neither a route nor a list: a result that arrives after a

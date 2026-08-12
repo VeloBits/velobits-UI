@@ -1,6 +1,6 @@
 'use client';
 
-import { Label, Switch } from '@velobits-dev/ui';
+import { Label, Switch } from '@velobits/ui';
 
 export default function SwitchDemo() {
   return (

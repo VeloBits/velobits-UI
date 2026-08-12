@@ -48,9 +48,9 @@ export default tseslint.config(
   },
 
   /*
-   * @velobits-dev/tokens is declared with ZERO dependencies and ZERO React, and
+   * @velobits/tokens is declared with ZERO dependencies and ZERO React, and
    * that is load-bearing rather than tidy: the Keycloak login theme consumes
-   * this package and CANNOT consume @velobits-dev/ui (its component sources are
+   * this package and CANNOT consume @velobits/ui (its component sources are
    * git-ignored and re-vended by a keycloakify postinstall hook). The moment a
    * token file imports React the theme's only clean seam closes.
    *
@@ -67,7 +67,7 @@ export default tseslint.config(
             {
               group: ['react', 'react-dom', 'react/*', 'node:*'],
               message:
-                '@velobits-dev/tokens must stay dependency-free and React-free — the Keycloak login theme consumes it precisely because it is. Put anything needing React in @velobits-dev/ui.',
+                '@velobits/tokens must stay dependency-free and React-free — the Keycloak login theme consumes it precisely because it is. Put anything needing React in @velobits/ui.',
             },
           ],
         },
@@ -92,7 +92,7 @@ export default tseslint.config(
             {
               name: 'lucide-react',
               message:
-                'velobits-ui IS the icon source — add the glyph to @velobits-dev/icons instead. The 24×24/strokeWidth-2 set is tuned for the 13-18px these products render at.',
+                'velobits-ui IS the icon source — add the glyph to @velobits/icons instead. The 24×24/strokeWidth-2 set is tuned for the 13-18px these products render at.',
             },
           ],
         },
