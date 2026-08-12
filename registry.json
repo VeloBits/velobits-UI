@@ -1,7 +1,8 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "velobits",
+  "name": "@velobits",
   "homepage": "https://ui.velobits.dev",
+  "description": "An open source collection of accessible, contrast-gated React components on a warm neutral palette and a two-tier glass material — the VeloBits design system, authored once and shipped both as an npm package and as this registry.",
   "items": [
     {
       "name": "velobits",
@@ -16,58 +17,58 @@
         "cmdk",
         "framer-motion",
         "react-hook-form",
-        "@velobits-dev/icons",
-        "@velobits-dev/tokens"
+        "@velobits/icons",
+        "@velobits/tokens"
       ],
       "devDependencies": [
         "tw-animate-css"
       ],
       "registryDependencies": [
-        "velobits-theme",
-        "cn",
-        "theme",
-        "use-theme",
-        "use-media-query",
-        "use-row-selection",
-        "velobits-provider",
-        "alert",
-        "avatar",
-        "badge",
-        "button",
-        "card",
-        "checkbox",
-        "field",
-        "glass-surface",
-        "input",
-        "kbd",
-        "label",
-        "native-select",
-        "separator",
-        "skeleton",
-        "spinner",
-        "switch",
-        "textarea",
-        "tooltip",
-        "command-palette",
-        "dialog",
-        "dropdown-menu",
-        "popover",
-        "side-panel",
-        "toast",
-        "accordion",
-        "app-shell",
-        "breadcrumb",
-        "code-block",
-        "data-table",
-        "diff-viewer",
-        "empty-state",
-        "form",
-        "motion",
-        "pagination",
-        "segmented-control",
-        "status-chip",
-        "table",
-        "tabs"
+        "https://ui.velobits.dev/r/velobits-theme.json",
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/theme.json",
+        "https://ui.velobits.dev/r/use-theme.json",
+        "https://ui.velobits.dev/r/use-media-query.json",
+        "https://ui.velobits.dev/r/use-row-selection.json",
+        "https://ui.velobits.dev/r/velobits-provider.json",
+        "https://ui.velobits.dev/r/alert.json",
+        "https://ui.velobits.dev/r/avatar.json",
+        "https://ui.velobits.dev/r/badge.json",
+        "https://ui.velobits.dev/r/button.json",
+        "https://ui.velobits.dev/r/card.json",
+        "https://ui.velobits.dev/r/checkbox.json",
+        "https://ui.velobits.dev/r/field.json",
+        "https://ui.velobits.dev/r/glass-surface.json",
+        "https://ui.velobits.dev/r/input.json",
+        "https://ui.velobits.dev/r/kbd.json",
+        "https://ui.velobits.dev/r/label.json",
+        "https://ui.velobits.dev/r/native-select.json",
+        "https://ui.velobits.dev/r/separator.json",
+        "https://ui.velobits.dev/r/skeleton.json",
+        "https://ui.velobits.dev/r/spinner.json",
+        "https://ui.velobits.dev/r/switch.json",
+        "https://ui.velobits.dev/r/textarea.json",
+        "https://ui.velobits.dev/r/tooltip.json",
+        "https://ui.velobits.dev/r/command-palette.json",
+        "https://ui.velobits.dev/r/dialog.json",
+        "https://ui.velobits.dev/r/dropdown-menu.json",
+        "https://ui.velobits.dev/r/popover.json",
+        "https://ui.velobits.dev/r/side-panel.json",
+        "https://ui.velobits.dev/r/toast.json",
+        "https://ui.velobits.dev/r/accordion.json",
+        "https://ui.velobits.dev/r/app-shell.json",
+        "https://ui.velobits.dev/r/breadcrumb.json",
+        "https://ui.velobits.dev/r/code-block.json",
+        "https://ui.velobits.dev/r/data-table.json",
+        "https://ui.velobits.dev/r/diff-viewer.json",
+        "https://ui.velobits.dev/r/empty-state.json",
+        "https://ui.velobits.dev/r/form.json",
+        "https://ui.velobits.dev/r/motion.json",
+        "https://ui.velobits.dev/r/pagination.json",
+        "https://ui.velobits.dev/r/segmented-control.json",
+        "https://ui.velobits.dev/r/status-chip.json",
+        "https://ui.velobits.dev/r/table.json",
+        "https://ui.velobits.dev/r/tabs.json"
       ],
       "files": []
     },
@@ -75,7 +76,7 @@
       "name": "velobits-theme",
       "type": "registry:theme",
       "title": "VeloBits theme",
-      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits-dev/tokens test suite.",
+      "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits/tokens test suite.",
       "cssVars": {
         "theme": {
           "radius-sm": "4px",
@@ -192,7 +193,8 @@
       "files": [
         {
           "path": "registry/velobits/lib/cn.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@lib/utils.ts"
         }
       ]
     },
@@ -204,7 +206,8 @@
       "files": [
         {
           "path": "registry/velobits/lib/theme.ts",
-          "type": "registry:lib"
+          "type": "registry:lib",
+          "target": "@ui/velobits/theme.ts"
         }
       ]
     },
@@ -214,12 +217,13 @@
       "title": "useTheme",
       "description": "ThemeProvider + useTheme. Honours the existing fmx_theme_mode and tf.theme keys.",
       "registryDependencies": [
-        "theme"
+        "https://ui.velobits.dev/r/theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/hooks/use-theme.tsx",
-          "type": "registry:hook"
+          "type": "registry:hook",
+          "target": "@ui/velobits/use-theme.tsx"
         }
       ]
     },
@@ -227,11 +231,12 @@
       "name": "use-media-query",
       "type": "registry:hook",
       "title": "useMediaQuery",
-      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits-dev/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.",
+      "description": "Media query subscription plus usePrefersReducedMotion. Import breakpoints from @velobits/tokens rather than re-typing the pixel value, so the JS and CSS breakpoints cannot drift apart.",
       "files": [
         {
           "path": "registry/velobits/hooks/use-media-query.ts",
-          "type": "registry:hook"
+          "type": "registry:hook",
+          "target": "@ui/velobits/use-media-query.ts"
         }
       ]
     },
@@ -243,7 +248,8 @@
       "files": [
         {
           "path": "registry/velobits/hooks/use-row-selection.ts",
-          "type": "registry:hook"
+          "type": "registry:hook",
+          "target": "@ui/velobits/use-row-selection.ts"
         }
       ]
     },
@@ -256,13 +262,14 @@
         "framer-motion"
       ],
       "registryDependencies": [
-        "use-theme",
-        "tooltip"
+        "https://ui.velobits.dev/r/use-theme.json",
+        "https://ui.velobits.dev/r/tooltip.json"
       ],
       "files": [
         {
           "path": "registry/velobits/providers/velobits-provider.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/velobits-provider.tsx"
         }
       ]
     },
@@ -275,13 +282,14 @@
         "class-variance-authority"
       ],
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/alert.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/alert.tsx"
         }
       ]
     },
@@ -293,12 +301,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/avatar.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/avatar.tsx"
         }
       ]
     },
@@ -312,12 +321,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/badge.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/badge.tsx"
         }
       ]
     },
@@ -331,12 +341,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/button.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/button.tsx"
         }
       ]
     },
@@ -346,13 +357,14 @@
       "title": "Card",
       "description": "Tier-S glass by default; surface=\"panel\" for the opaque original, which writes border-border explicitly so it survives an app that skipped the base layer.",
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/card.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/card.tsx"
         }
       ]
     },
@@ -363,15 +375,16 @@
       "description": "Includes the indeterminate state bulk-selection headers need.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/checkbox.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/checkbox.tsx"
         }
       ]
     },
@@ -381,13 +394,14 @@
       "title": "Field",
       "description": "Label/description/error wiring. Keeps BOTH ids in aria-describedby when a field has an error and a hint.",
       "registryDependencies": [
-        "cn",
-        "label"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/label.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/field.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/field.tsx"
         }
       ]
     },
@@ -397,13 +411,14 @@
       "title": "GlassSurface",
       "description": "All three glass tiers behind one prop: surface (Tier S, no blur by default) · overlay · elevated. Never for page backgrounds, table rows, or nested glass.",
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/glass-surface.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/glass-surface.tsx"
         }
       ]
     },
@@ -413,12 +428,13 @@
       "title": "Input",
       "description": "border-input maps to --field-border, the half WCAG 1.4.11 gates.",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/input.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/input.tsx"
         }
       ]
     },
@@ -427,12 +443,13 @@
       "type": "registry:ui",
       "title": "Kbd",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/kbd.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/kbd.tsx"
         }
       ]
     },
@@ -445,12 +462,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/label.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/label.tsx"
         }
       ]
     },
@@ -460,12 +478,13 @@
       "title": "NativeSelect",
       "description": "A cva-styled native <select>. Deliberately NOT Radix Select, which is undriveable under happy-dom.",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/native-select.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/native-select.tsx"
         }
       ]
     },
@@ -478,12 +497,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/separator.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/separator.tsx"
         }
       ]
     },
@@ -493,12 +513,13 @@
       "title": "Skeleton",
       "description": "aria-hidden; pair with ONE sr-only live region rather than announcing each block.",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/skeleton.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/skeleton.tsx"
         }
       ]
     },
@@ -507,12 +528,13 @@
       "type": "registry:ui",
       "title": "Spinner",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/spinner.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/spinner.tsx"
         }
       ]
     },
@@ -525,12 +547,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/switch.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/switch.tsx"
         }
       ]
     },
@@ -539,12 +562,13 @@
       "type": "registry:ui",
       "title": "Textarea",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/textarea.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/textarea.tsx"
         }
       ]
     },
@@ -557,12 +581,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/tooltip.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/tooltip.tsx"
         }
       ]
     },
@@ -574,16 +599,17 @@
       "dependencies": [
         "cmdk",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/command-palette.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/command-palette.tsx"
         }
       ]
     },
@@ -595,16 +621,17 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/dialog.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/dialog.tsx"
         }
       ]
     },
@@ -615,16 +642,17 @@
       "description": "Highlight is data-[highlighted], never :hover — Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/dropdown-menu.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/dropdown-menu.tsx"
         }
       ]
     },
@@ -637,13 +665,14 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/popover.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/popover.tsx"
         }
       ]
     },
@@ -655,16 +684,17 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/side-panel.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/side-panel.tsx"
         }
       ]
     },
@@ -676,16 +706,17 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/toast.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/toast.tsx"
         }
       ]
     },
@@ -696,15 +727,16 @@
       "description": "The one sanctioned height animation: Radix measures --radix-accordion-content-height, so it does not thrash layout the way an unbounded height:auto transition would.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/accordion.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/accordion.tsx"
         }
       ]
     },
@@ -715,20 +747,21 @@
       "description": "The authenticated chrome. `sidebar` is a prop rather than a child because it is rendered TWICE — as a rail at md and up, and inside a drawer below it — so a nav item cannot exist in one and not the other. Ships the skip link, which is the most-skipped WCAG requirement in an admin UI.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons",
-        "@velobits-dev/tokens"
+        "@velobits/icons",
+        "@velobits/tokens"
       ],
       "registryDependencies": [
-        "cn",
-        "use-media-query",
-        "button",
-        "side-panel",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/use-media-query.json",
+        "https://ui.velobits.dev/r/button.json",
+        "https://ui.velobits.dev/r/side-panel.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/app-shell.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/app-shell.tsx"
         }
       ]
     },
@@ -739,15 +772,16 @@
       "description": "A named nav landmark around an ordered list. The leaf is a plain span with aria-current=\"page\" — NOT shadcn’s role=\"link\" aria-disabled, which announces static text as a broken link.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/breadcrumb.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/breadcrumb.tsx"
         }
       ]
     },
@@ -758,17 +792,18 @@
       "description": "Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on.",
       "dependencies": [
         "class-variance-authority",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "button",
-        "velobits-theme"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/button.json",
+        "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/code-block.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/code-block.tsx"
         }
       ]
     },
@@ -778,17 +813,18 @@
       "title": "DataTable",
       "description": "Sorting, selection and row activation over a column registry — deliberately not TanStack, whose grouping and pivoting nothing here uses. aria-sort goes on the th, not the sort button, and an activatable row needs tabIndex + Enter/Space + a target check or it is mouse-only.",
       "dependencies": [
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "table",
-        "use-row-selection"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/table.json",
+        "https://ui.velobits.dev/r/use-row-selection.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/data-table.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/data-table.tsx"
         }
       ]
     },
@@ -798,12 +834,13 @@
       "title": "DiffViewer",
       "description": "A unified line diff. The +/− gutter is the primary channel and the green/red wash the secondary — colour alone fails 1.4.1, and the gutter is also the only channel that survives greyscale. Ships `diffLines`, with a guard: LCS is O(n·m) in MEMORY.",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/diff-viewer.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/diff-viewer.tsx"
         }
       ]
     },
@@ -816,12 +853,13 @@
         "class-variance-authority"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/empty-state.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/empty-state.tsx"
         }
       ]
     },
@@ -834,13 +872,14 @@
         "react-hook-form"
       ],
       "registryDependencies": [
-        "cn",
-        "field"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/field.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/form.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/form.tsx"
         }
       ]
     },
@@ -848,17 +887,18 @@
       "name": "motion",
       "type": "registry:ui",
       "title": "Motion",
-      "description": "Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobits-dev/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer — do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.",
+      "description": "Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobits/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer — do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.",
       "dependencies": [
         "framer-motion"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/motion.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/motion.tsx"
         }
       ]
     },
@@ -869,16 +909,17 @@
       "description": "Numbers are links, previous/next are buttons: an <a> cannot express \"unavailable\" without ceasing to be focusable. Unavailability is aria-disabled plus a guard, so focus is not lost at the ends of the range. `paginationRange` returns a CONSTANT number of slots so the control never reflows as you page.",
       "dependencies": [
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "button"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/button.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/pagination.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/pagination.tsx"
         }
       ]
     },
@@ -891,12 +932,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/segmented-control.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/segmented-control.tsx"
         }
       ]
     },
@@ -908,16 +950,17 @@
       "dependencies": [
         "class-variance-authority",
         "radix-ui",
-        "@velobits-dev/icons"
+        "@velobits/icons"
       ],
       "registryDependencies": [
-        "cn",
-        "badge"
+        "https://ui.velobits.dev/r/cn.json",
+        "https://ui.velobits.dev/r/badge.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/status-chip.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/status-chip.tsx"
         }
       ]
     },
@@ -927,12 +970,13 @@
       "title": "Table",
       "description": "Rows are never glass — one backdrop-filter per row repaints its own backdrop region on every scroll. Surface treatment belongs on the container.",
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/table.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/table.tsx"
         }
       ]
     },
@@ -945,12 +989,13 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "cn"
+        "https://ui.velobits.dev/r/cn.json"
       ],
       "files": [
         {
           "path": "registry/velobits/ui/tabs.tsx",
-          "type": "registry:ui"
+          "type": "registry:ui",
+          "target": "@ui/velobits/tabs.tsx"
         }
       ]
     }

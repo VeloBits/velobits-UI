@@ -3,7 +3,7 @@ import { defineConfig, type Options } from 'tsup';
 const R = '../../registry/velobits';
 
 /**
- * Per-component entry points, so `import { Button } from '@velobits-dev/ui/button'`
+ * Per-component entry points, so `import { Button } from '@velobits/ui/button'`
  * pulls in Button and nothing else. `size-limit` asserts that rather than
  * assuming it — a barrel-only build would quietly ship all 37 components to a
  * consumer that imported one.
@@ -132,8 +132,8 @@ const shared: Options = {
     'react-dom',
     'framer-motion',
     'react-hook-form',
-    '@velobits-dev/icons',
-    '@velobits-dev/tokens',
+    '@velobits/icons',
+    '@velobits/tokens',
   ],
   /*
    * Both configs run CONCURRENTLY, so neither may clean: whichever starts second

@@ -1,9 +1,9 @@
 /*
- * @velobits-dev/tokens/keycloakify.css — the Keycloak login theme's seam.
+ * @velobits/tokens/keycloakify.css — the Keycloak login theme's seam.
  *
  * ## Why this file exists at all
  *
- * The login theme CANNOT consume @velobits-dev/ui. Its component sources are
+ * The login theme CANNOT consume @velobits/ui. Its component sources are
  * git-ignored and vended by `@oussemasahbeni/keycloakify-login-shadcn` through a
  * `keycloakify sync-extensions` postinstall hook. Files must be claimed one at a
  * time with `npx keycloakify own --path …`, and editing an unclaimed file is
@@ -15,8 +15,8 @@
  *
  *   1. npx keycloakify own --path "login/index.css"
  *   2. In that now-owned file:
- *        @import '@velobits-dev/tokens/theme.css';
- *        @import '@velobits-dev/tokens/keycloakify.css';
+ *        @import '@velobits/tokens/theme.css';
+ *        @import '@velobits/tokens/keycloakify.css';
  *   3. Update the owned `velobits` base + accent presets in
  *      src/login/components/Template/theme/Themes.ts to reference these vars.
  *

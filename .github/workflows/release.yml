@@ -52,7 +52,7 @@ jobs:
           # npm hard-fails on an unresolvable ${VAR} in it.
           registry-url: https://registry.npmjs.org
 
-      # No auth needed to install: every @velobits-dev/* dep here is a workspace
+      # No auth needed to install: every @velobits/* dep here is a workspace
       # link, resolved locally and never fetched.
       - run: npm ci
 

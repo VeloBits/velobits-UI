@@ -3,8 +3,8 @@
   "compilerOptions": {
     "types": [],
     "paths": {
-      "@velobits-dev/tokens": ["../tokens/src/index.ts"],
-      "@velobits-dev/icons": ["../icons/src/index.ts"]
+      "@velobits/tokens": ["../tokens/src/index.ts"],
+      "@velobits/icons": ["../icons/src/index.ts"]
     }
   },
   "include": ["../../registry/velobits", "test", "tsup.config.ts", "vitest.config.ts"]

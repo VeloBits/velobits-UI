@@ -1,0 +1,98 @@
+export const metadata = {
+  title: 'Dark mode',
+  description: 'Class-based theming, the blocking init script, and the hydration trap.',
+};
+
+# Dark mode
+
+Class-based: `.dark` on `<html>` swaps every semantic token. Both themes are
+first-class — dark is not a filter over light, and several tokens are not the
+same colour scaled.
+
+## The two pieces
+
+**`VelobitsProvider`** owns the state, reads and writes storage, and subscribes to
+the system preference.
+
+**`themeInitScript`** applies the stored theme _before first paint_. Without it,
+the page renders light and then flips — the flash of wrong theme.
+
+```tsx
+import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits/ui/theme';
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: themeInitScript(THEME_STORAGE_KEYS.dashboard) }}
+        />
+      </head>
+      <body>
+        <VelobitsProvider storageKey={THEME_STORAGE_KEYS.dashboard}>{children}</VelobitsProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+`suppressHydrationWarning` is required precisely because that script mutates the
+element React is about to hydrate.
+
+`@velobits/ui/theme` is a **subpath**, and it is React-free by design — which
+is what lets a Server Component call `themeInitScript()` during render.
+
+## The storage key is required, never defaulted
+
+Two surfaces silently sharing a default key is a bug you find in production.
+`THEME_STORAGE_KEYS` carries the existing keys (`fmx_theme_mode`, `tf.theme`) so
+an app being migrated keeps its users' preference rather than resetting it.
+
+## Reading the theme
+
+```tsx
+const { mode, theme, setMode, toggle, mounted } = useTheme();
+```
+
+`mode` is what the user chose, including `system`. `theme` is what that currently
+resolves to, and is never `system`.
+
+## The trap: do not branch on the theme in JS
+
+This looks right and is a hydration bug:
+
+```tsx
+{
+  theme === 'dark' ? <SunIcon /> : <MoonIcon />;
+}
+```
+
+The server has no `localStorage`, so it renders the light branch, while the
+client's first render already knows the stored preference. When they disagree
+React throws #418 and **discards the server HTML**.
+
+Render both and let CSS choose:
+
+```tsx
+<SunIcon className="hidden dark:block" />
+<MoonIcon className="dark:hidden" />
+```
+
+The markup is then identical on both sides, and the right icon shows before React
+has even booted. The `aria-label` stays static for the same reason — "Switch to
+dark theme" would be wrong on the server in exactly the cases the icon was.
+
+`mounted` is the escape hatch for the cases CSS genuinely cannot express, such as
+printing the current mode as text. It is `false` during SSR and on the first
+client render.
+
+## Reduced motion
+
+Handled in two places, and adding a third is how they get out of step.
+`VelobitsProvider` mounts `<MotionConfig reducedMotion="user">`, which drops
+transform and opacity animations for users who asked for less motion — across
+every component, without any of them knowing. The token layer's
+`@media (prefers-reduced-motion: reduce)` block clamps CSS durations globally.
+
+`usePrefersReducedMotion()` is for imperative decisions neither of those can see,
+like whether to autoplay something. Not for animations.

@@ -1,16 +1,23 @@
 import type { Metadata } from 'next';
 
-import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits-dev/ui/theme';
+import { THEME_STORAGE_KEYS, themeInitScript } from '@velobits/ui/theme';
+
+import { SiteHeader } from '@/components/site-header';
+import { SITE } from '@/lib/site';
 
 import { Providers } from './providers';
-import { SiteHeader } from './site-header';
 
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'VeloBits UI',
-  description:
-    'The VeloBits design system: tokens, icons and components shared across every VeloBits surface.',
+  /*
+   * A template rather than a literal, now that there are ~60 pages: every one of
+   * them sets a bare title and the suffix is appended here, so a component page
+   * reads "Button — VeloBits UI" in a tab strip and a bookmark list.
+   */
+  title: { default: SITE.name, template: `%s — ${SITE.name}` },
+  description: SITE.description,
+  metadataBase: new URL(SITE.url),
   /*
    * Declared explicitly against `public/icon.svg` rather than relying on the
    * `app/icon.svg` file convention, which built as a route but was not served by
@@ -39,8 +46,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
        * It is also what makes the blur tier mean anything on this site: the
        * SiteHeader is tier-O glass with a real `backdrop-filter`, and until there
        * was something behind it to smear, that blur was a backdrop snapshot per
-       * frame producing an identical picture. Scroll the components page and the
-       * grid visibly softens under the header.
+       * frame producing an identical picture. Scroll any component page and the
+       * content visibly softens under the header.
        *
        * On `body` rather than a wrapper div so the bloom's `background-attachment:
        * fixed` resolves against the viewport, and so the grid spans the full
@@ -48,8 +55,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
        */}
       <body className="page-texture min-h-dvh bg-bg text-fg antialiased">
         <Providers>
+          {/*
+           * The skip link, which is the most-skipped WCAG requirement in a docs
+           * site: the sidebar is ~60 links, and without this a keyboard user tabs
+           * through every one of them on every page before reaching the prose.
+           * Visible only on focus, and first in the tab order.
+           */}
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:absolute focus:inset-s-4 focus:top-4 focus:z-modal focus:rounded-md focus:bg-panel focus:px-4 focus:py-2 focus:text-fg focus:outline-2 focus:outline-offset-2 focus:outline-primary"
+          >
+            Skip to content
+          </a>
           <SiteHeader />
-          <main className="mx-auto w-full max-w-page px-6 pb-24">{children}</main>
+          {children}
         </Providers>
       </body>
     </html>
