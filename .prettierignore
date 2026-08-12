@@ -18,3 +18,11 @@ apps/docs/public/r/
 # Written by `npm run registry:build` from registry/registry.ts. Formatting it
 # by hand would be overwritten on the next build.
 registry.json
+
+# The static export — the whole deployable, and it is minified output.
+apps/docs/out/
+
+# Written by `scripts/build-docs-data.ts` on every dev and build run, and it
+# embeds component sources as escaped string literals.
+apps/docs/lib/generated/
+apps/docs/public/search-index.json

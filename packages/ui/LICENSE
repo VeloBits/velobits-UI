@@ -6,7 +6,7 @@ This software, together with its source code, design tokens, icon artwork and
 accompanying documentation (the "Software"), is proprietary and confidential to
 VeloBits.
 
-The `@velobits-dev/*` packages are published to the public npm registry solely
+The `@velobits/*` packages are published to the public npm registry solely
 as a distribution convenience for VeloBits' own applications, services and build
 pipelines, so that those builds need no registry credentials. Publication to a
 public registry is not an offer of licence, does not place the Software in the

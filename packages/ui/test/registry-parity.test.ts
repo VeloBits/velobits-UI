@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -115,8 +115,8 @@ describe('registry ↔ tsup ↔ exports parity', () => {
     expect(
       missing,
       `Built and exported as a subpath, but missing from the barrel — so ` +
-        `\`import { X } from '@velobits-dev/ui'\` fails while ` +
-        `\`from '@velobits-dev/ui/x'\` works: ${missing.join(', ')}`,
+        `\`import { X } from '@velobits/ui'\` fails while ` +
+        `\`from '@velobits/ui/x'\` works: ${missing.join(', ')}`,
     ).toEqual([]);
   });
 
@@ -198,6 +198,91 @@ describe('registry hygiene', () => {
     expect(dangling, `dangling registryDependencies: ${dangling.join(', ')}`).toEqual([]);
   });
 
+  /**
+   * ## A bare name in the PUBLISHED json is a shadcn/ui item, not one of ours
+   *
+   * The source above writes bare names, which is right — they are readable and
+   * the parity checks work against them. `scripts/build-registry.ts` rewrites
+   * them into absolute URLs on the way out, and this asserts that it did.
+   *
+   * Without that rewrite the CLI resolves `cn` against
+   * `https://ui.shadcn.com/r/styles/new-york-v4/cn.json`, which does not exist —
+   * so `add button` dies on the CONSUMER'S machine, naming a URL they have never
+   * heard of. It affects nearly every item here, and both install paths.
+   *
+   * This reads the committed `registry.json` rather than the TS source on
+   * purpose: the source is not what anyone installs, and the whole class of bug
+   * is "the published artefact disagrees with the thing we validated".
+   */
+  it('publishes self-references as absolute URLs, never as bare names', () => {
+    const published = JSON.parse(readFileSync(join(uiDir, '../../registry.json'), 'utf8')) as {
+      items: { name: string; registryDependencies?: string[] }[];
+    };
+
+    const ours = new Set(registry.items.map((i) => i.name));
+    const bare = published.items.flatMap((item) =>
+      (item.registryDependencies ?? [])
+        .filter((dep) => ours.has(dep))
+        .map((dep) => `${item.name} → ${dep}`),
+    );
+
+    expect(
+      bare,
+      'These would send the CLI to shadcn/ui looking for our items, and 404 on ' +
+        `the consumer's machine. Run \`npm run registry:build\`: ${bare.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  /**
+   * ## Every published import must resolve where the CLI puts the file
+   *
+   * The sources live in `registry/velobits/{ui,lib,hooks,providers}/` and import
+   * each other relatively against that shape. The CLI writes them all into ONE
+   * flat folder and only rewrites alias-form specifiers, so a surviving `../`
+   * cannot resolve on a consumer's machine.
+   *
+   * This is not hypothetical. Before `scripts/registry-layout.ts` existed, all 38
+   * components published `from '../lib/cn'` and would not compile once installed
+   * — the files copied without complaint, so nothing here noticed for as long as
+   * nothing here compiled the installed output.
+   *
+   * Reads the COMPILED output rather than the sources, because the sources are
+   * supposed to have relative imports; it is the published copy that must not.
+   */
+  it('publishes no import that would dangle where the CLI installs it', () => {
+    const compiledDir = join(uiDir, '../../apps/docs/public/r');
+    const dangling: string[] = [];
+    let checked = 0;
+
+    for (const fileName of readdirSync(compiledDir).filter((f) => f.endsWith('.json'))) {
+      const item = JSON.parse(readFileSync(join(compiledDir, fileName), 'utf8')) as {
+        name: string;
+        files?: { path: string; content?: string; target?: string }[];
+      };
+
+      for (const file of item.files ?? []) {
+        if (!file.content) continue;
+        checked += 1;
+
+        // Every file needs a target, or the CLI falls back to its per-type
+        // default and scatters the flat folder back across three directories.
+        if (!file.target) dangling.push(`${item.name} → ${file.path} has no target`);
+
+        for (const match of file.content.matchAll(/from\s+(['"])(\.\.\/[^'"]*)\1/g)) {
+          dangling.push(`${item.name} → ${file.path} imports ${match[2]}`);
+        }
+      }
+    }
+
+    // Guards against the glob silently matching nothing and the assertion passing.
+    expect(checked).toBeGreaterThan(30);
+    expect(
+      dangling,
+      'These do not resolve where the CLI writes the files, so the install ' +
+        `compiles on nobody's machine. Run \`npm run registry:build\`: ${dangling.join(', ')}`,
+    ).toEqual([]);
+  });
+
   it('gives the `velobits` style every component, so one command installs the set', () => {
     const style = registry.items.find((i) => i.name === 'velobits')!;
     const uiNames = registry.items.filter((i) => i.type === 'registry:ui').map((i) => i.name);
@@ -209,20 +294,20 @@ describe('registry hygiene', () => {
     const theme = registry.items.find((i) => i.name === 'velobits-theme')!;
     expect(Object.keys(theme.cssVars?.light ?? {}).length).toBeGreaterThan(20);
     expect(Object.keys(theme.cssVars?.dark ?? {}).length).toBeGreaterThan(20);
-    // Derived from @velobits-dev/tokens, so the two sets necessarily match in shape.
+    // Derived from @velobits/tokens, so the two sets necessarily match in shape.
     expect(Object.keys(theme.cssVars!.light!).sort()).toEqual(
       Object.keys(theme.cssVars!.dark!).sort(),
     );
   });
 
-  it('declares @velobits-dev/icons wherever a component imports an icon', () => {
+  it('declares @velobits/icons wherever a component imports an icon', () => {
     /**
      * A CLI consumer copies the file and installs the listed dependencies. Miss
      * this and their build fails on an unresolved import — on their machine, not
      * in our CI.
      */
     const checkbox = registry.items.find((i) => i.name === 'checkbox')!;
-    expect(checkbox.dependencies).toContain('@velobits-dev/icons');
+    expect(checkbox.dependencies).toContain('@velobits/icons');
   });
 });
 
@@ -230,14 +315,14 @@ describe('packaging invariants that break consumers quietly', () => {
   it('keeps React and the sibling packages as peers, never dependencies', () => {
     /**
      * A bundled React means two copies at runtime and hooks that throw. Bundling
-     * @velobits-dev/ui's siblings would also defeat the Module Federation singleton
+     * @velobits/ui's siblings would also defeat the Module Federation singleton
      * arrangement the editor app needs.
      */
     for (const p of [
       'react',
       'react-dom',
-      '@velobits-dev/tokens',
-      '@velobits-dev/icons',
+      '@velobits/tokens',
+      '@velobits/icons',
       'framer-motion',
     ]) {
       expect(pkg.peerDependencies).toHaveProperty(p);

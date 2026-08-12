@@ -1,5 +1,5 @@
 /**
- * The barrel `@velobits-dev/ui` publishes.
+ * The barrel `@velobits/ui` publishes.
  *
  * This file exists for the npm half of the dual distribution only. Consumers
  * using the shadcn CLI never see it — they get individual component files copied
@@ -7,13 +7,13 @@
  * relative path rather than from this barrel.
  *
  * Per-component entry points are generated from `registry.json` at build time,
- * so `import { Button } from '@velobits-dev/ui/button'` also works and is what
+ * so `import { Button } from '@velobits/ui/button'` also works and is what
  * `size-limit` measures.
  *
  * ## The one deliberate omission
  *
  * **`Form` is not re-exported here.** It is reachable only as
- * `@velobits-dev/ui/form`.
+ * `@velobits/ui/form`.
  *
  * `react-hook-form` is an optional peer dependency, and this barrel is a single
  * bundled module — so re-exporting `Form` would put a top-level
