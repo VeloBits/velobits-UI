@@ -39,3 +39,5 @@ apps/docs/public/search-index.json
 #   apps/docs/public/r/*.json the compiled registry the CLI actually fetches.
 #                             Committed for the same reason — and because the
 #                             docs deploy serves these as static files.
+
+.vercel
