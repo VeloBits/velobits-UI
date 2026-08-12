@@ -40,7 +40,7 @@ export interface TableProps extends React.ComponentProps<'table'> {
  * fixed` descendants (so a fixed-position child of a cell is trapped in the row).
  *
  * The wrapper is also a **scroll container** (`overflow-x-auto`), and glass is
- * forbidden inside a scroll container by `@velobits-dev/tokens/glass.css` for the
+ * forbidden inside a scroll container by `@velobits/tokens/glass.css` for the
  * same repaint reason — so if this table sits *inside* a glass Dialog, the glass
  * stops at the Dialog panel.
  *

@@ -7,7 +7,7 @@ export default defineConfig((options) => ({
   sourcemap: true,
   treeshake: true,
   // Function-form config with `clean: !options.watch` is mandatory for any
-  // package whose dist/ types a sibling consumes: @velobits-dev/ui resolves its
+  // package whose dist/ types a sibling consumes: @velobits/ui resolves its
   // token types from dist/index.d.ts, and a startup wipe races its DTS build.
   clean: !options.watch,
 }));

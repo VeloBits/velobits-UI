@@ -5,7 +5,7 @@ import { createIcon } from './create-icon';
  *
  * Merged from the two hand-drawn sets that had diverged across the workspace:
  * the dashboard app's own `src/ui/icons.tsx` (52) and the editor app's
- * `@velobits-dev/design-system` (55), which shared 19 names. EVERY existing
+ * `@velobits/design-system` (55), which shared 19 names. EVERY existing
  * name is preserved, so no consumer has to rename anything at migration time.
  *
  * Both sets already shared an identical `createIcon` factory and `IconProps`,

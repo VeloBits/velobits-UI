@@ -1,0 +1,107 @@
+export const metadata = {
+  title: 'CLI',
+  description: 'The shadcn commands that matter for this registry.',
+};
+
+# CLI
+
+VeloBits ships no CLI of its own. It is a standard shadcn registry, so the
+standard `shadcn` commands are the whole interface.
+
+## init
+
+```bash
+npx shadcn@latest init
+```
+
+Creates [`components.json`](/docs/components-json) and wires up your aliases. Add
+the `registries` block afterwards — `init` does not prompt for third-party
+registries.
+
+## add
+
+```bash
+npx shadcn@latest add @velobits/button
+```
+
+Writes the component into `<aliases.ui>/velobits/`, installs its npm dependencies,
+and recursively adds anything in its `registryDependencies`. Adding
+`@velobits/data-table` therefore also brings `table`, `cn` and `use-row-selection`
+without you naming them.
+
+Useful flags:
+
+| Flag           | Does                                                            |
+| -------------- | --------------------------------------------------------------- |
+| `--overwrite`  | Replace files that already exist. Off by default, deliberately. |
+| `--path <dir>` | Write somewhere other than the configured alias.                |
+| `--yes`        | Skip confirmation prompts — but not the one below.              |
+| `--cwd <dir>`  | Run against another directory — useful in a monorepo.           |
+
+Install the whole system in one command:
+
+```bash
+npx shadcn@latest add @velobits/velobits
+```
+
+### The one prompt `--yes` does not cover
+
+Our `cn` installs to your `utils` module — deliberately, so you end up with one
+`cn` rather than two. If a file is already there, the CLI **prompts** and defaults
+to no:
+
+```
+? The file cn.ts already exists. Would you like to overwrite? » (y/N)
+```
+
+`--yes` does _not_ suppress that particular prompt, so an unattended run will sit
+on it. `--overwrite` answers it and is non-interactive.
+
+Answering no leaves you on shadcn's stock `twMerge(clsx())`, which does not know
+about `rounded-pill`, the `z-*` ladder, the named durations, or the
+`control-material` ⇄ `shadow` conflict group — so conflict resolution quietly
+stops working across every VeloBits component. Ours is a superset, so overwriting
+is safe for your existing shadcn components. See
+[Installation](/docs/installation).
+
+Reach for `--overwrite` when that prompt appears, not by default: you own the
+copied components, so on a later run it discards your edits to them as well.
+
+## view
+
+```bash
+npx shadcn@latest view @velobits/dialog
+```
+
+Prints what would be installed — dependencies, registry dependencies and file
+targets — and writes nothing. Worth running before an `--overwrite`.
+
+## search
+
+```bash
+npx shadcn@latest search @velobits
+npx shadcn@latest search @velobits --query "table"
+```
+
+Lists the registry's items, read from its index at `/r/registry.json`.
+
+## build
+
+The command on the _publishing_ side, not the consuming one. It compiles a
+`registry.json` into the per-item files the CLI fetches:
+
+```bash
+npx shadcn@latest build registry.json --output apps/docs/public/r
+```
+
+In this repository that runs as part of `npm run build` rather than by hand, so
+the published JSON cannot drift from the sources — see [Registry](/docs/registry).
+
+## Older CLIs
+
+Namespaced names (`@velobits/button`) need **v3 or newer**. Everything works on
+any version by full URL:
+
+```bash
+npx shadcn@latest add https://ui.velobits.dev/r/button.json
+```

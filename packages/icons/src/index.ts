@@ -1,12 +1,12 @@
 /**
- * @velobits-dev/icons — the unified VeloBits icon set.
+ * @velobits/icons — the unified VeloBits icon set.
  *
  * 88 hand-drawn stroke icons, merged from the two sets that had independently
  * diverged in the dashboard app and the editor app. Every existing name is
  * preserved.
  *
  * ```tsx
- * import { FlagIcon } from '@velobits-dev/icons';
+ * import { FlagIcon } from '@velobits/icons';
  * <FlagIcon size={16} />
  * ```
  *

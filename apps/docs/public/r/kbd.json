@@ -3,13 +3,14 @@
   "name": "kbd",
   "title": "Kbd",
   "registryDependencies": [
-    "cn"
+    "https://ui.velobits.dev/r/cn.json"
   ],
   "files": [
     {
       "path": "registry/velobits/ui/kbd.tsx",
-      "content": "'use client';\n\nimport { cn } from '../lib/cn';\n\n/**\n * A keyboard key hint, for command palettes and shortcut lists.\n *\n * `⌘` on Apple platforms and `Ctrl` elsewhere is a real difference users notice,\n * but detecting it here would make the component render differently between\n * server and client and produce a hydration mismatch. So this stays presentational\n * and the caller decides — `useIsMac()` in an effect, or the platform string\n * the app already has.\n */\nfunction Kbd({ className, ...props }: React.ComponentProps<'kbd'>) {\n  return (\n    <kbd\n      data-slot=\"kbd\"\n      className={cn(\n        'pointer-events-none inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-sm',\n        'border border-border bg-bg2 control-recessed px-1.5 font-mono text-[0.6875rem] font-medium text-muted-foreground',\n        'select-none',\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport { Kbd };\n",
-      "type": "registry:ui"
+      "content": "'use client';\n\nimport { cn } from '@/lib/utils';\n\n/**\n * A keyboard key hint, for command palettes and shortcut lists.\n *\n * `⌘` on Apple platforms and `Ctrl` elsewhere is a real difference users notice,\n * but detecting it here would make the component render differently between\n * server and client and produce a hydration mismatch. So this stays presentational\n * and the caller decides — `useIsMac()` in an effect, or the platform string\n * the app already has.\n */\nfunction Kbd({ className, ...props }: React.ComponentProps<'kbd'>) {\n  return (\n    <kbd\n      data-slot=\"kbd\"\n      className={cn(\n        'pointer-events-none inline-flex h-5 min-w-5 items-center justify-center gap-1 rounded-sm',\n        'border border-border bg-bg2 control-recessed px-1.5 font-mono text-[0.6875rem] font-medium text-muted-foreground',\n        'select-none',\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport { Kbd };\n",
+      "type": "registry:ui",
+      "target": "@ui/velobits/kbd.tsx"
     }
   ],
   "type": "registry:ui"

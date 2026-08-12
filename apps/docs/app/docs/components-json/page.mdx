@@ -1,0 +1,93 @@
+export const metadata = {
+  title: 'components.json',
+  description:
+    'The config the shadcn CLI reads to know where to write files and which registries to trust.',
+};
+
+# components.json
+
+The file the shadcn CLI reads to decide where to write things, and which
+registries it is allowed to fetch from. It lives at the root of your project.
+Create it with `npx shadcn@latest init`, or write it yourself.
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/components",
+    "ui": "@/components/ui",
+    "utils": "@/lib/cn",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "registries": {
+    "@velobits": "https://ui.velobits.dev/r/{name}.json"
+  }
+}
+```
+
+## registries
+
+The field that makes `@velobits/button` resolve. `{name}` is replaced with the
+item name, so `@velobits/button` fetches
+`https://ui.velobits.dev/r/button.json`.
+
+Needs **shadcn CLI v3 or newer**. Without it, install by full URL instead — same
+files, no config. See [Registry](/docs/registry).
+
+## aliases.ui
+
+Where the `velobits/` folder goes. Every component, hook and provider from this
+registry lands in `<aliases.ui>/velobits/`, flat. With the default
+`"@/components/ui"` that is `components/ui/velobits/`, imported as
+`@/components/ui/velobits/button`.
+
+## aliases.utils
+
+Where our `cn` goes, and what every component's `cn` import is rewritten to. These
+two have to agree, which they do in the default config — `utils: "@/lib/utils"`
+alongside `lib: "@/lib"` puts the file at `lib/utils.ts` and the import at
+`@/lib/utils`.
+
+If you point `utils` somewhere that is not `<lib>/utils`, shadcn writes the file to
+the `lib` alias while rewriting imports to the `utils` alias, and they no longer
+match. That inconsistency is the CLI's, not ours — shadcn's own `utils` item has
+it too. Keep the two conventional and it does not arise.
+
+**Our `cn` is a superset of shadcn's**, not a replacement with different
+behaviour: identical signature and identical results on standard utilities, plus
+`rounded-pill`, the `z-*` ladder, the named durations, and a bidirectional
+`control-material` ⇄ `shadow` conflict group. Pass `--overwrite` so ours wins — see
+[Installation](/docs/installation).
+
+## tailwind.css
+
+The stylesheet the CLI writes theme variables into. Installing
+`@velobits/velobits-theme` — which every component depends on, so it arrives
+whether or not you ask for it — appends the full token layer here as `:root` and
+`.dark` blocks.
+
+`cssVariables` must be `true`. The token layer is variables; with `false` the CLI
+would try to write literal colour utilities and the theme would not switch.
+
+## tailwind.config
+
+Empty string on Tailwind v4. There is no JS config file any more — `@theme` in
+your CSS replaces it. Leave the key present and blank; the CLI still reads it.
+
+## iconLibrary
+
+Set to whatever you use for your own components. It does not affect anything from
+this registry: VeloBits components import from `@velobits/icons` explicitly,
+which the CLI installs as a dependency rather than rewriting.

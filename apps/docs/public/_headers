@@ -1,0 +1,30 @@
+# Host header rules for the static export. `public/` is copied verbatim into
+# `out/`, so this file ships with the site.
+#
+# It lives here rather than in `next.config.mjs` because `headers()` is one of the
+# features Next lists as unsupported under `output: 'export'` — there is no server
+# left to apply it. Cloudflare Pages and Netlify both read this format from the
+# root of the deployed directory. For other hosts, see the "Deploying" section of
+# the repo README, which carries the equivalent nginx and vercel.json snippets.
+
+# The registry the shadcn CLI serves.
+#
+# The CLI itself is a Node process and CORS never applied to it. This is for
+# BROWSER consumers — v0 and anything else fetching a registry item from a page.
+#
+# `must-revalidate` rather than a long max-age: a component's source changes under
+# a stable URL, so a cached copy is a consumer silently installing last month's
+# file. The files are small and the revalidation is a 304.
+/r/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The ⌘K index, regenerated on every build for the same reason.
+/search-index.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Next writes content-hashed filenames under /_next/static, so these are
+# immutable by construction.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable

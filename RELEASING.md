@@ -29,7 +29,7 @@ a human in front of that.
 5. **Watch the Release run.** Open its Summary. It says either which packages
    published, or `Nothing published`. If you expected a release and see the latter,
    stop and read the failure modes below.
-6. **Confirm.** `npm view @velobits-dev/ui version`, and check the tag and GitHub
+6. **Confirm.** `npm view @velobits/ui version`, and check the tag and GitHub
    Release exist.
 
 ## Releasing 0.2.0 specifically
@@ -46,7 +46,7 @@ The delta being shipped is written up in [RELEASE-0.2.0.md](RELEASE-0.2.0.md).
 
 - **Every user-facing PR needs a changeset**, and the bump type is a permanent
   decision. `npm run changeset` on the feature branch.
-- **Don't add one for docs-only work.** `@velobits-dev/docs` is `private` and in
+- **Don't add one for docs-only work.** `@velobits/docs` is `private` and in
   the `.changeset` `ignore` list.
 - **CI does not run on pushes to `develop`** — only on PRs and on `main`. Feature
   PRs into `develop` are covered, but anything pushed straight to `develop` is
@@ -66,7 +66,7 @@ The delta being shipped is written up in [RELEASE-0.2.0.md](RELEASE-0.2.0.md).
 | Prepare release job skipped entirely                  | Dispatched on a ref other than `develop`.                                                                                        | Re-dispatch with `develop` selected.                                                                                                                 |
 | Release job skipped entirely                          | Dispatched on a ref other than `main`. The picker defaults to `develop`.                                                         | Re-dispatch with `main` selected.                                                                                                                    |
 | One package published, another failed                 | npm rejected one publish (token scope, registry outage, name collision). Tags and Releases for what succeeded are still created. | Dispatch **Release** on `main` again. `changeset publish` skips what already shipped and retries the rest.                                           |
-| Publish rejected: auth                                | `NPM_TOKEN` expired or lost scope on `@velobits-dev`.                                                                            | Reissue an automation token with write on the scope; update the secret.                                                                              |
+| Publish rejected: auth                                | `NPM_TOKEN` expired or lost scope on `@velobits`.                                                                                | Reissue an automation token with write on the scope; update the secret.                                                                              |
 | Version published but no tag or GitHub Release        | Publish succeeded, then tagging or the Release step failed.                                                                      | Dispatch **Release** on `main`. It tags any version the registry has but the remote lacks, then cuts any Release that is missing. No manual tagging. |
 
 Re-running **Release** is always safe. It publishes only what the registry lacks,

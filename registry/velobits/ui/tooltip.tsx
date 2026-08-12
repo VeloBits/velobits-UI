@@ -13,10 +13,10 @@ import { cn } from '../lib/cn';
  *
  * ### Under Module Federation this becomes a singleton requirement
  *
- * If the shell and each remote load their own copy of `@velobits-dev/ui`, the
+ * If the shell and each remote load their own copy of `@velobits/ui`, the
  * shell's provider context never reaches a remote's tooltip, and the throw
  * appears only when someone hovers a control inside a remote. So
- * `@velobits-dev/ui`, `@velobits-dev/icons` and `framer-motion` must all be in the
+ * `@velobits/ui`, `@velobits/icons` and `framer-motion` must all be in the
  * `shared` map of all three of the editor app's vite configs with
  * `singleton: true` and a pinned `requiredVersion`.
  *
