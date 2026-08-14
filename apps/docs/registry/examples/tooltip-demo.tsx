@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@velobits/ui';
-import { SearchIcon } from '@velobits/icons';
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@velobitsio/ui';
+import { SearchIcon } from '@velobitsio/icons';
 
 export default function TooltipDemo() {
   return (

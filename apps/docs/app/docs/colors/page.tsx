@@ -22,17 +22,17 @@ import {
   SOFT_CHIP_PAIRS,
   TARGET,
   type SemanticTokens,
-} from '@velobits/tokens';
+} from '@velobitsio/tokens';
 import type { Metadata } from 'next';
 
-import { Badge } from '@velobits/ui';
+import { Badge } from '@velobitsio/ui';
 
 import { DocsToc, type TocEntry } from '@/components/docs-toc';
 
 export const metadata: Metadata = {
   title: 'Colors',
   description:
-    'Every semantic token, its contrast gate, and the glass composites — computed from @velobits/tokens at build time.',
+    'Every semantic token, its contrast gate, and the glass composites — computed from @velobitsio/tokens at build time.',
 };
 
 /**
@@ -54,7 +54,7 @@ const TOC: TocEntry[] = [
 ];
 
 /**
- * Every value on this page is read from `@velobits/tokens` at build time.
+ * Every value on this page is read from `@velobitsio/tokens` at build time.
  * Nothing is transcribed, and — this is the part that was wrong before — nothing
  * is *enumerated by hand* either.
  *
@@ -189,7 +189,7 @@ export default function ColorsPage() {
         <section>
           <h1 className="mb-2 text-3xl font-semibold tracking-tight">Colors</h1>
           <p className="max-w-3xl text-muted-foreground">
-            Every value below is read from <code>@velobits/tokens</code> at build time and mapped
+            Every value below is read from <code>@velobitsio/tokens</code> at build time and mapped
             from the exported registries, so a token added to the package appears here without
             anyone editing this page.
           </p>

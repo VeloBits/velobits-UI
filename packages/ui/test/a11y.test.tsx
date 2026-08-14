@@ -197,7 +197,7 @@ describe('the audit itself is wired correctly', () => {
   it('leaves contrast rules explicitly disabled rather than passing them', () => {
     /**
      * A reader should not conclude from a green run that contrast was checked
-     * here. It was not — @velobits/tokens measures the token values directly,
+     * here. It was not — @velobitsio/tokens measures the token values directly,
      * which is stronger than sampling rendered pixels in a DOM without a cascade.
      */
     expect(RULES_UNRUNNABLE_WITHOUT_LAYOUT).toContain('color-contrast');

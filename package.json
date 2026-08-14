@@ -32,8 +32,8 @@
     "release": "turbo run build && changeset publish",
     "registry:build": "tsx scripts/build-registry.ts",
     "docs:data": "tsx scripts/build-docs-data.ts",
-    "docs": "npm run dev -w @velobits/docs",
-    "docs:serve": "npm run start -w @velobits/docs"
+    "docs": "npm run dev -w @velobitsio/docs",
+    "docs:serve": "npm run start -w @velobitsio/docs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.1",

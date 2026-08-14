@@ -17,6 +17,10 @@ export default tseslint.config(
       // The static export — the whole deployable, and it is minified JS. Same
       // reasoning as `.next` above: thousands of errors nobody can act on.
       'apps/docs/out/**',
+      // Vercel's build output, same minified deployable by another path. CI never
+      // has this directory, so its absence here only ever broke `npm run lint`
+      // for whoever had run a Vercel build locally — 3900 errors, none actionable.
+      '**/.vercel/**',
       'packages/tokens/src/generated/**',
       // Compiled registry output, written by `npm run registry:build`.
       'apps/docs/public/r/**',
@@ -48,9 +52,9 @@ export default tseslint.config(
   },
 
   /*
-   * @velobits/tokens is declared with ZERO dependencies and ZERO React, and
+   * @velobitsio/tokens is declared with ZERO dependencies and ZERO React, and
    * that is load-bearing rather than tidy: the Keycloak login theme consumes
-   * this package and CANNOT consume @velobits/ui (its component sources are
+   * this package and CANNOT consume @velobitsio/ui (its component sources are
    * git-ignored and re-vended by a keycloakify postinstall hook). The moment a
    * token file imports React the theme's only clean seam closes.
    *
@@ -67,7 +71,7 @@ export default tseslint.config(
             {
               group: ['react', 'react-dom', 'react/*', 'node:*'],
               message:
-                '@velobits/tokens must stay dependency-free and React-free — the Keycloak login theme consumes it precisely because it is. Put anything needing React in @velobits/ui.',
+                '@velobitsio/tokens must stay dependency-free and React-free — the Keycloak login theme consumes it precisely because it is. Put anything needing React in @velobitsio/ui.',
             },
           ],
         },
@@ -92,7 +96,7 @@ export default tseslint.config(
             {
               name: 'lucide-react',
               message:
-                'velobits-ui IS the icon source — add the glyph to @velobits/icons instead. The 24×24/strokeWidth-2 set is tuned for the 13-18px these products render at.',
+                'velobits-ui IS the icon source — add the glyph to @velobitsio/icons instead. The 24×24/strokeWidth-2 set is tuned for the 13-18px these products render at.',
             },
           ],
         },

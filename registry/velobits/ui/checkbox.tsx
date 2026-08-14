@@ -2,7 +2,7 @@
 
 import { Checkbox as CheckboxPrimitive } from 'radix-ui';
 
-import { CheckIcon, MinusIcon } from '@velobits/icons';
+import { CheckIcon, MinusIcon } from '@velobitsio/icons';
 
 import { cn } from '../lib/cn';
 

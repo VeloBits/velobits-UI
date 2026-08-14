@@ -40,8 +40,8 @@ import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '.
  * ─────────────────────────────────────────────────────────────────────────────
  * ## THIS IS THE ONE COMPONENT NOT EXPORTED FROM THE PACKAGE BARREL
  *
- * `import { Form } from '@velobits/ui'` does **not** work, and that is
- * deliberate. Use `import { Form } from '@velobits/ui/form'`.
+ * `import { Form } from '@velobitsio/ui'` does **not** work, and that is
+ * deliberate. Use `import { Form } from '@velobitsio/ui/form'`.
  *
  * `react-hook-form` is an **optional** peer dependency. The barrel is a single
  * bundled module, so a re-export here would put a top-level

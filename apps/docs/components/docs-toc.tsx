@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { cn } from '@velobits/ui';
+import { cn } from '@velobitsio/ui';
 
 export interface TocEntry {
   id: string;
