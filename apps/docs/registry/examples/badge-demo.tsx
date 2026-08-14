@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@velobits/ui';
+import { Badge } from '@velobitsio/ui';
 
 export default function BadgeDemo() {
   return (

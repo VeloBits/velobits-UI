@@ -8,12 +8,12 @@ bump every package a second time.
 
 ## What ships
 
-| Package            | 0.1.0 | 0.2.0     | Bump  | Publishes?                                         |
-| ------------------ | ----- | --------- | ----- | -------------------------------------------------- |
-| `@velobits/tokens` | 0.1.0 | **0.2.0** | minor | yes                                                |
-| `@velobits/ui`     | 0.1.0 | **0.2.0** | minor | yes                                                |
-| `@velobits/icons`  | 0.1.0 | 0.1.0     | none  | no — zero diff since its tag                       |
-| `@velobits/docs`   | —     | —         | —     | no — `private: true`, and in `.changeset` `ignore` |
+| Package              | 0.1.0 | 0.2.0     | Bump  | Publishes?                                         |
+| -------------------- | ----- | --------- | ----- | -------------------------------------------------- |
+| `@velobitsio/tokens` | 0.1.0 | **0.2.0** | minor | yes                                                |
+| `@velobitsio/ui`     | 0.1.0 | **0.2.0** | minor | yes                                                |
+| `@velobitsio/icons`  | 0.1.0 | 0.1.0     | none  | no — zero diff since its tag                       |
+| `@velobitsio/docs`   | —     | —         | —     | no — `private: true`, and in `.changeset` `ignore` |
 
 `ui` lands on **0.2.0, not 1.0.0**. Changesets bumps a peer dependent to major
 unconditionally by default, and `^0.1.0` pinned the minor on a 0.x version, so a `tokens`
@@ -21,8 +21,8 @@ minor put it out of range as well. Widening the sibling peers to `>=0.1.0` plus
 `onlyUpdatePeerDependentsWhenOutOfRange` in `.changeset/config.json` is what avoids the
 spurious major.
 
-On publish this produces two tags — `@velobits/tokens@0.2.0` and
-`@velobits/ui@0.2.0` — two GitHub Releases whose bodies are the `## 0.2.0` section of
+On publish this produces two tags — `@velobitsio/tokens@0.2.0` and
+`@velobitsio/ui@0.2.0` — two GitHub Releases whose bodies are the `## 0.2.0` section of
 each package's `CHANGELOG.md`, and two npm publishes at `access: public`. `icons` gets
 none of the three.
 
@@ -138,13 +138,13 @@ came out blue.
 
 ## New entry points
 
-`@velobits/ui/motion` — `PageTransition`, `Stagger`, `StaggerItem`, `FadeIn`.
+`@velobitsio/ui/motion` — `PageTransition`, `Stagger`, `StaggerItem`, `FadeIn`.
 Subpath-only, like `form`: the barrel's own-code budget has ~4 kB left, and nobody importing
 a Button should pay for Framer's runtime. `framer-motion` was already a required peer and
 until now bought exactly one `MotionConfig`. `Stagger` caps its cascade at 12 items so a
 200-row list doesn't take eight seconds to arrive.
 
-`@velobits/tokens` adds two CSS exports: `./texture.css` and `./controls.css`. Both are
+`@velobitsio/tokens` adds two CSS exports: `./texture.css` and `./controls.css`. Both are
 added to the `attw --exclude-entrypoints` list alongside the existing CSS entries.
 
 ## Breaking
@@ -159,8 +159,8 @@ equivalent value; it carries 0.1.0's alpha and near-identical colour in both the
 
 ## Peer range change
 
-`@velobits/ui` widened its sibling peers from `^0.1.0` to `>=0.1.0` on
-`@velobits/tokens` and `@velobits/icons`. `>=` also matches how every other peer in
+`@velobitsio/ui` widened its sibling peers from `^0.1.0` to `>=0.1.0` on
+`@velobitsio/tokens` and `@velobitsio/icons`. `>=` also matches how every other peer in
 that file is already spelled. No consumer action needed — the range only got wider.
 
 ## Verification
@@ -180,5 +180,5 @@ the component changes show up under `registry/` rather than `packages/ui/src/`. 
 JSON under `apps/docs/public/r/` is regenerated output; `registry-parity.test.ts` asserts the
 npm package and the shadcn registry never drift.
 
-`@velobits/icons` has an empty diff against its 0.1.0 tag — confirmed with
-`git diff --stat @velobits/icons@0.1.0..origin/main -- packages/icons/`.
+`@velobitsio/icons` has an empty diff against its 0.1.0 tag — confirmed with
+`git diff --stat @velobitsio/icons@0.1.0..origin/main -- packages/icons/`.

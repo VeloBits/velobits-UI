@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-import { Button } from '@velobits/ui';
-import { ArrowRightIcon } from '@velobits/icons';
+import { Button } from '@velobitsio/ui';
+import { ArrowRightIcon } from '@velobitsio/icons';
 
 import { componentPager } from '@/lib/docs-nav';
 import { registryItemsByName } from '@/lib/generated/registry-data';

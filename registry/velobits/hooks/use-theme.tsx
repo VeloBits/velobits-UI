@@ -151,7 +151,7 @@ export function ThemeProvider({
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
-    throw new Error('useTheme must be used within a <ThemeProvider>. See @velobits/ui docs.');
+    throw new Error('useTheme must be used within a <ThemeProvider>. See @velobitsio/ui docs.');
   }
   return ctx;
 }

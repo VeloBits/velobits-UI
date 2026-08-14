@@ -1,6 +1,6 @@
 'use client';
 
-import { Textarea } from '@velobits/ui';
+import { Textarea } from '@velobitsio/ui';
 
 export default function TextareaDemo() {
   return (

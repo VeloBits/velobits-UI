@@ -10,8 +10,8 @@ import {
   CardHeader,
   CardTitle,
   CodeBlock,
-} from '@velobits/ui';
-import { AlertTriangleIcon } from '@velobits/icons';
+} from '@velobitsio/ui';
+import { AlertTriangleIcon } from '@velobitsio/icons';
 
 import type { DocRegistryItem } from '@/lib/generated/registry-data';
 import { componentHref } from '@/lib/docs-nav';
@@ -33,8 +33,8 @@ const PEER_NOTES: Record<string, string> = {
     'A REQUIRED peer, not an optional one — VelobitsProvider imports MotionConfig, so a barrel import fails to resolve without it.',
   'react-hook-form':
     'The one OPTIONAL peer. Needed only by Form, which is why Form ships on its own subpath and never in the barrel.',
-  '@velobits/icons': 'The icon set this component renders glyphs from.',
-  '@velobits/tokens': 'The token layer. Every colour and radius below resolves through it.',
+  '@velobitsio/icons': 'The icon set this component renders glyphs from.',
+  '@velobitsio/tokens': 'The token layer. Every colour and radius below resolves through it.',
 };
 
 export function Requirements({ item }: { item: DocRegistryItem }) {
@@ -59,7 +59,7 @@ export function Requirements({ item }: { item: DocRegistryItem }) {
               line:
             </p>
             <pre className="overflow-x-auto rounded-md border border-border bg-bg2 p-3 font-mono text-xs">
-              {`@import '@velobits/tokens/theme.css';\n@source "../node_modules/@velobits/ui/dist";`}
+              {`@import '@velobitsio/tokens/theme.css';\n@source "../node_modules/@velobitsio/ui/dist";`}
             </pre>
             <p>
               The <code>@source</code> line is <strong>not optional</strong>. Tailwind v4 does not

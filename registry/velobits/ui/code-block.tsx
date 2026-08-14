@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-import { CheckIcon, CopyIcon } from '@velobits/icons';
+import { CheckIcon, CopyIcon } from '@velobitsio/icons';
 
 import { cn } from '../lib/cn';
 import { buttonVariants } from './button';

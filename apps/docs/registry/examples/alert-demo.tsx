@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, AlertDescription, AlertTitle } from '@velobits/ui';
-import { AlertTriangleIcon, FlagIcon } from '@velobits/icons';
+import { Alert, AlertDescription, AlertTitle } from '@velobitsio/ui';
+import { AlertTriangleIcon, FlagIcon } from '@velobitsio/icons';
 
 export default function AlertDemo() {
   return (

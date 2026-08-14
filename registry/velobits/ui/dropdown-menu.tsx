@@ -2,7 +2,7 @@
 
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 
-import { CheckIcon, ChevronRightIcon, DotIcon } from '@velobits/icons';
+import { CheckIcon, ChevronRightIcon, DotIcon } from '@velobitsio/icons';
 
 import { cn } from '../lib/cn';
 
@@ -70,7 +70,7 @@ import { cn } from '../lib/cn';
  *
  * The content sits at `z-dropdown` (1000), which is above `z-sticky` (100). A
  * sticky topbar raised to 1100 "to be safe" swallows its own menu — see the
- * z-ladder note in `@velobits/tokens/theme.css`.
+ * z-ladder note in `@velobitsio/tokens/theme.css`.
  *
  * Submenus use `glass glass-elevated`, the plum-tinted tier, because a plain
  * glass panel over another plain glass panel composites to a single indistinct

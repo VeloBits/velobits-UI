@@ -1,4 +1,4 @@
-# @velobits-dev/icons
+# @velobitsio/icons
 
 ## 0.1.0
 

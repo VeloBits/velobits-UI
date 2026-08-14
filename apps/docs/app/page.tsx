@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
   CodeBlock,
-} from '@velobits/ui';
-import { ArrowRightIcon, DropletIcon, LayersIcon, SparklesIcon } from '@velobits/icons';
+} from '@velobitsio/ui';
+import { ArrowRightIcon, DropletIcon, LayersIcon, SparklesIcon } from '@velobitsio/icons';
 
 import { COMPONENT_GROUPS, componentHref } from '@/lib/docs-nav';
 import { registryItemsByName } from '@/lib/generated/registry-data';
