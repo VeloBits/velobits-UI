@@ -1,4 +1,4 @@
-# @velobits-dev/tokens
+# @velobitsio/tokens
 
 ## 0.2.0
 

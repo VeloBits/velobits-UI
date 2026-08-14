@@ -5,8 +5,8 @@ export default defineConfig({
     // Test against source, not dist, so a failure points at a line you can edit.
     // The PUBLISHED types are verified separately by publint + attw in CI.
     alias: {
-      '@velobitsdevs/tokens': new URL('../tokens/src/index.ts', import.meta.url).pathname,
-      '@velobitsdevs/icons': new URL('../icons/src/index.ts', import.meta.url).pathname,
+      '@velobitsio/tokens': new URL('../tokens/src/index.ts', import.meta.url).pathname,
+      '@velobitsio/icons': new URL('../icons/src/index.ts', import.meta.url).pathname,
     },
   },
   test: {

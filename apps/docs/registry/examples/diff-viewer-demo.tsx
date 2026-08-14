@@ -1,6 +1,6 @@
 'use client';
 
-import { DiffViewer, diffLines } from '@velobitsdevs/ui';
+import { DiffViewer, diffLines } from '@velobitsio/ui';
 
 const BEFORE = `{
   "key": "new-checkout",

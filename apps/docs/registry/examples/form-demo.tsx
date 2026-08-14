@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
-import { Button, Input, NativeSelect, Textarea } from '@velobitsdevs/ui';
+import { Button, Input, NativeSelect, Textarea } from '@velobitsio/ui';
 // Deliberately NOT from the barrel. `react-hook-form` is an OPTIONAL peer and the
 // barrel is one bundled module, so re-exporting Form there would put a top-level
 // `import 'react-hook-form'` in dist/index.js and break every consumer that has
 // no forms. `registry-parity.test.ts` asserts this exception by name, in both
 // directions. This import is itself part of the check.
-import { Form, FormError, FormField } from '@velobitsdevs/ui/form';
+import { Form, FormError, FormField } from '@velobitsio/ui/form';
 
 interface FlagFormValues {
   key: string;

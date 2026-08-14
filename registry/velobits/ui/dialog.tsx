@@ -3,7 +3,7 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 
-import { XIcon } from '@velobitsdevs/icons';
+import { XIcon } from '@velobitsio/icons';
 
 import { cn } from '../lib/cn';
 

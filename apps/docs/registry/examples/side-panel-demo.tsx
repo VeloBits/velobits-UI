@@ -11,7 +11,7 @@ import {
   SidePanelTitle,
   SidePanelTrigger,
   StatusChip,
-} from '@velobitsdevs/ui';
+} from '@velobitsio/ui';
 
 export default function SidePanelDemo() {
   return (

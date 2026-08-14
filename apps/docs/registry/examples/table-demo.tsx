@@ -13,7 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@velobitsdevs/ui';
+} from '@velobitsio/ui';
 
 export default function TableDemo() {
   return (

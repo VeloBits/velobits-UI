@@ -10,12 +10,12 @@ Two distributions, one source. Every component is authored once in
 not interchangeable, and the choice is forced by your architecture rather than by
 preference.
 
-| Your surface                  | Use                             | Because                                                                                                                                                                    |
-| ----------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Module-federated app          | **npm**                         | Federation needs `@velobitsdevs/ui` to be a real singleton so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary. |
-| Existing Tailwind v4 + shadcn | **npm**                         | One `@theme inline` bridge; the palette swap is one file.                                                                                                                  |
-| Keycloak login theme          | **`@velobitsdevs/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted.               |
-| Greenfield / one-off          | **shadcn CLI**                  | You own the source. No dependency to bump, and no singleton either — which is exactly why federated apps should not use this path.                                         |
+| Your surface                  | Use                           | Because                                                                                                                                                                  |
+| ----------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Module-federated app          | **npm**                       | Federation needs `@velobitsio/ui` to be a real singleton so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary. |
+| Existing Tailwind v4 + shadcn | **npm**                       | One `@theme inline` bridge; the palette swap is one file.                                                                                                                |
+| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted.             |
+| Greenfield / one-off          | **shadcn CLI**                | You own the source. No dependency to bump, and no singleton either — which is exactly why federated apps should not use this path.                                       |
 
 ## shadcn CLI
 
@@ -148,7 +148,7 @@ actually contains.
 ## npm
 
 ```bash
-npm i @velobitsdevs/tokens @velobitsdevs/icons @velobitsdevs/ui framer-motion
+npm i @velobitsio/tokens @velobitsio/icons @velobitsio/ui framer-motion
 ```
 
 `framer-motion` is a **required** peer, not an optional one — the barrel imports
@@ -159,12 +159,12 @@ resolve. `react-hook-form` is the only optional peer; it is needed solely by
 Then, in your app's CSS:
 
 ```css
-@import '@velobitsdevs/tokens/theme.css';
-@source "../node_modules/@velobitsdevs/ui/dist";
+@import '@velobitsio/tokens/theme.css';
+@source "../node_modules/@velobitsio/ui/dist";
 ```
 
 That `@source` line is **not optional**. Tailwind v4 does not scan
-`node_modules`, so utilities used inside `@velobitsdevs/ui` are never generated
+`node_modules`, so utilities used inside `@velobitsio/ui` are never generated
 and the components arrive completely unstyled — with no warning anywhere. `cva`
 class strings survive into `dist` as string literals, which is what makes this
 work.
@@ -172,7 +172,7 @@ work.
 Finally, mount the provider once at your shell root:
 
 ```tsx
-import { VelobitsProvider, THEME_STORAGE_KEYS } from '@velobitsdevs/ui';
+import { VelobitsProvider, THEME_STORAGE_KEYS } from '@velobitsio/ui';
 
 export function App({ children }) {
   return <VelobitsProvider storageKey={THEME_STORAGE_KEYS.dashboard}>{children}</VelobitsProvider>;
@@ -189,8 +189,8 @@ blocking init script that goes with it.
 `Form` and `Motion` are reachable **only** as subpaths, never from the barrel:
 
 ```tsx
-import { Form, FormField } from '@velobitsdevs/ui/form';
-import { PageTransition, Stagger } from '@velobitsdevs/ui/motion';
+import { Form, FormField } from '@velobitsio/ui/form';
+import { PageTransition, Stagger } from '@velobitsio/ui/motion';
 ```
 
 Two different reasons, both deliberate. `Form` needs `react-hook-form`, an

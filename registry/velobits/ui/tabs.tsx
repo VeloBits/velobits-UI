@@ -106,7 +106,7 @@ function TabsList({
  * roughly 3:1, under AA for 14px text, and the dashboard app patched around it
  * with a `dark:text-muted-foreground` override that made the two themes disagree
  * about what an inactive tab is. `--muted-fg` is measured against both themes'
- * surfaces by `@velobitsdevs/tokens`' contrast suite, so one class covers both.
+ * surfaces by `@velobitsio/tokens`' contrast suite, so one class covers both.
  *
  * The underline for `line` is positioned with **logical** inset on the vertical
  * axis (`end-[-4px]`, i.e. `inset-inline-end`) rather than `-right-1`, so it

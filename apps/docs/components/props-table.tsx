@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@velobitsdevs/ui';
+} from '@velobitsio/ui';
 
 import type { DocPropGroup } from '@/lib/generated/props';
 

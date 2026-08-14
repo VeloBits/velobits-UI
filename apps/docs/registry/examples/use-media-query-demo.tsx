@@ -1,10 +1,10 @@
 'use client';
 
-import { Badge, useMediaQuery, usePrefersReducedMotion } from '@velobitsdevs/ui';
-import { breakpoint } from '@velobitsdevs/tokens';
+import { Badge, useMediaQuery, usePrefersReducedMotion } from '@velobitsio/ui';
+import { breakpoint } from '@velobitsio/tokens';
 
 /**
- * The breakpoint comes from `@velobitsdevs/tokens`, not from a re-typed pixel
+ * The breakpoint comes from `@velobitsio/tokens`, not from a re-typed pixel
  * value — that is what keeps the JS and CSS breakpoint from drifting apart.
  */
 export default function UseMediaQueryDemo() {

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { Button, Card, CardContent, CardHeader, CardTitle, StatusChip } from '@velobitsdevs/ui';
-import { STAGGER_LIMIT, Stagger, StaggerItem } from '@velobitsdevs/ui/motion';
+import { Button, Card, CardContent, CardHeader, CardTitle, StatusChip } from '@velobitsio/ui';
+import { STAGGER_LIMIT, Stagger, StaggerItem } from '@velobitsio/ui/motion';
 
 const FLAGS = [
   { key: 'new-checkout', status: 'partial' },

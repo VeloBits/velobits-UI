@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@velobitsdevs/ui';
+import { Avatar, AvatarFallback, AvatarImage } from '@velobitsio/ui';
 
 export default function AvatarDemo() {
   return (

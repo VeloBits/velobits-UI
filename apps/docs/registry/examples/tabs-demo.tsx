@@ -1,6 +1,6 @@
 'use client';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@velobitsdevs/ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@velobitsio/ui';
 
 export default function TabsDemo() {
   return (

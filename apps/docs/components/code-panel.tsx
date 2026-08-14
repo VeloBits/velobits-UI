@@ -1,5 +1,5 @@
 /*
- * `@velobitsdevs/ui/cn`, not the barrel.
+ * `@velobitsio/ui/cn`, not the barrel.
  *
  * This is a Server Component, and the barrel is bundled with a `'use client'`
  * banner — so importing `cn` from it and CALLING it fails the build with
@@ -11,7 +11,7 @@
  * this: they are React-free and callable during server render. The subpath is the
  * whole point of that split.
  */
-import { cn } from '@velobitsdevs/ui/cn';
+import { cn } from '@velobitsio/ui/cn';
 
 import { CopyButton } from './copy-button';
 

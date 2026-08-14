@@ -15,7 +15,7 @@ import { createElement } from 'react';
  *
  * happy-dom has no layout engine and no CSS cascade, so **colour-contrast rules
  * cannot run here** and are disabled below rather than silently passing. Contrast
- * is covered properly and exhaustively by `@velobitsdevs/tokens`' own suite, which
+ * is covered properly and exhaustively by `@velobitsio/tokens`' own suite, which
  * measures the actual token values instead of sampling rendered pixels. What
  * these audits catch is the structural half: roles, names, label association,
  * ARIA validity, and nesting.
@@ -30,7 +30,7 @@ import { createElement } from 'react';
  * them in here would silently exempt every other suite from a real rule.
  */
 export const RULES_UNRUNNABLE_WITHOUT_LAYOUT = [
-  // Needs computed colours and a real cascade. See @velobitsdevs/tokens/test/contrast.test.ts.
+  // Needs computed colours and a real cascade. See @velobitsio/tokens/test/contrast.test.ts.
   'color-contrast',
   // Needs a full page, which a component fixture is not.
   'region',

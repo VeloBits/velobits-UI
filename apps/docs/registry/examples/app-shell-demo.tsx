@@ -17,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@velobitsdevs/ui';
+} from '@velobitsio/ui';
 import {
   BarChart3Icon,
   ClockIcon,
@@ -27,7 +27,7 @@ import {
   PlusIcon,
   SearchIcon,
   UsersIcon,
-} from '@velobitsdevs/icons';
+} from '@velobitsio/icons';
 
 const NAV = [
   { label: 'Flags', icon: FlagIcon, active: true },

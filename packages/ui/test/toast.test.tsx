@@ -5,7 +5,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { CircleCheckIcon } from '@velobitsdevs/icons';
+import { CircleCheckIcon } from '@velobitsio/icons';
 
 import {
   Toast,

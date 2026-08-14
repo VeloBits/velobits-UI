@@ -43,7 +43,7 @@ export const COMPONENT_CONTENT: Record<string, ComponentContent> = {
   /* ── Getting started ───────────────────────────────────────────────────── */
 
   velobits: {
-    usage: `import { VelobitsProvider, Button } from '@velobitsdevs/ui';
+    usage: `import { VelobitsProvider, Button } from '@velobitsio/ui';
 
 export function App() {
   return (
@@ -59,11 +59,11 @@ export function App() {
 
   'velobits-theme': {
     usage: `/* your app's CSS — one import */
-@import '@velobitsdevs/tokens/theme.css';
+@import '@velobitsio/tokens/theme.css';
 
 /* NOT OPTIONAL: Tailwind v4 does not scan node_modules, so utilities used
-   INSIDE @velobitsdevs/ui are never generated and components arrive unstyled. */
-@source "../node_modules/@velobitsdevs/ui/dist";`,
+   INSIDE @velobitsio/ui are never generated and components arrive unstyled. */
+@source "../node_modules/@velobitsio/ui/dist";`,
     notes: [
       'Installing this item writes every semantic token into your CSS as light and dark custom properties. It is a dependency of every component that paints a glass surface, so the CLI pulls it in whether or not you ask for it by name.',
       'Colors renders the whole gate — every measured pair, every soft-chip composite and every perceptibility floor — computed at build time by the same functions CI uses.',
@@ -71,7 +71,7 @@ export function App() {
   },
 
   'velobits-provider': {
-    usage: `import { VelobitsProvider, THEME_STORAGE_KEYS } from '@velobitsdevs/ui';
+    usage: `import { VelobitsProvider, THEME_STORAGE_KEYS } from '@velobitsio/ui';
 
 <VelobitsProvider storageKey={THEME_STORAGE_KEYS.dashboard}>
   {children}
@@ -92,7 +92,7 @@ export function App() {
   /* ── Primitives ────────────────────────────────────────────────────────── */
 
   'glass-surface': {
-    usage: `import { GlassSurface } from '@velobitsdevs/ui';
+    usage: `import { GlassSurface } from '@velobitsio/ui';
 
 <GlassSurface tier="surface" className="rounded-lg p-4">
   Tier S — the component-surface material.
@@ -111,7 +111,7 @@ export function App() {
   },
 
   card: {
-    usage: `import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@velobitsdevs/ui';
+    usage: `import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@velobitsio/ui';
 
 <Card>
   <CardHeader>
@@ -131,7 +131,7 @@ export function App() {
   },
 
   alert: {
-    usage: `import { Alert, AlertTitle, AlertDescription } from '@velobitsdevs/ui';
+    usage: `import { Alert, AlertTitle, AlertDescription } from '@velobitsio/ui';
 
 <Alert variant="warning">
   <AlertTriangleIcon />
@@ -152,7 +152,7 @@ export function App() {
   },
 
   button: {
-    usage: `import { Button } from '@velobitsdevs/ui';
+    usage: `import { Button } from '@velobitsio/ui';
 
 <Button variant="primary">Create flag</Button>`,
     examples: [
@@ -171,7 +171,7 @@ export function App() {
   },
 
   badge: {
-    usage: `import { Badge } from '@velobitsdevs/ui';
+    usage: `import { Badge } from '@velobitsio/ui';
 
 <Badge variant="success">Live</Badge>`,
     examples: [
@@ -185,7 +185,7 @@ export function App() {
   },
 
   input: {
-    usage: `import { Input } from '@velobitsdevs/ui';
+    usage: `import { Input } from '@velobitsio/ui';
 
 <Input type="search" placeholder="Search flags…" aria-label="Search flags" />`,
     examples: [{ name: 'input-demo', title: 'States' }],
@@ -195,7 +195,7 @@ export function App() {
   },
 
   textarea: {
-    usage: `import { Textarea } from '@velobitsdevs/ui';
+    usage: `import { Textarea } from '@velobitsio/ui';
 
 <Textarea placeholder="What does this flag control?" />`,
     examples: [
@@ -208,7 +208,7 @@ export function App() {
   },
 
   'native-select': {
-    usage: `import { NativeSelect } from '@velobitsdevs/ui';
+    usage: `import { NativeSelect } from '@velobitsio/ui';
 
 <NativeSelect aria-label="Environment" defaultValue="prod">
   <option value="dev">Development</option>
@@ -221,7 +221,7 @@ export function App() {
   },
 
   checkbox: {
-    usage: `import { Checkbox, Label } from '@velobitsdevs/ui';
+    usage: `import { Checkbox, Label } from '@velobitsio/ui';
 
 <Checkbox id="archived" defaultChecked />
 <Label htmlFor="archived">Show archived</Label>`,
@@ -236,7 +236,7 @@ export function App() {
   },
 
   switch: {
-    usage: `import { Switch, Label } from '@velobitsdevs/ui';
+    usage: `import { Switch, Label } from '@velobitsio/ui';
 
 <Switch id="auto" defaultChecked />
 <Label htmlFor="auto">Enabled in Production</Label>`,
@@ -247,7 +247,7 @@ export function App() {
   },
 
   label: {
-    usage: `import { Label, Input } from '@velobitsdevs/ui';
+    usage: `import { Label, Input } from '@velobitsio/ui';
 
 <Label htmlFor="env">Environment name</Label>
 <Input id="env" />`,
@@ -258,7 +258,7 @@ export function App() {
   },
 
   field: {
-    usage: `import { Field, FieldLabel, FieldControl, FieldDescription, FieldError } from '@velobitsdevs/ui';
+    usage: `import { Field, FieldLabel, FieldControl, FieldDescription, FieldError } from '@velobitsio/ui';
 
 <Field error="That key is already taken">
   <FieldLabel>Flag key</FieldLabel>
@@ -277,7 +277,7 @@ export function App() {
   },
 
   avatar: {
-    usage: `import { Avatar, AvatarImage, AvatarFallback } from '@velobitsdevs/ui';
+    usage: `import { Avatar, AvatarImage, AvatarFallback } from '@velobitsio/ui';
 
 <Avatar>
   <AvatarImage src={user.avatarUrl} alt="" />
@@ -290,14 +290,14 @@ export function App() {
   },
 
   kbd: {
-    usage: `import { Kbd } from '@velobitsdevs/ui';
+    usage: `import { Kbd } from '@velobitsio/ui';
 
 Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
     examples: [{ name: 'kbd-demo', title: 'Basic' }],
   },
 
   separator: {
-    usage: `import { Separator } from '@velobitsdevs/ui';
+    usage: `import { Separator } from '@velobitsio/ui';
 
 <Separator />
 <Separator orientation="vertical" />`,
@@ -308,7 +308,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   skeleton: {
-    usage: `import { Skeleton } from '@velobitsdevs/ui';
+    usage: `import { Skeleton } from '@velobitsio/ui';
 
 <Skeleton className="h-9 w-full" />`,
     examples: [{ name: 'skeleton-demo', title: 'A loading block' }],
@@ -318,14 +318,14 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   spinner: {
-    usage: `import { Spinner } from '@velobitsdevs/ui';
+    usage: `import { Spinner } from '@velobitsio/ui';
 
 <Spinner size={16} />`,
     examples: [{ name: 'spinner-demo', title: 'Sizes, and inside a button' }],
   },
 
   tooltip: {
-    usage: `import { Tooltip, TooltipTrigger, TooltipContent } from '@velobitsdevs/ui';
+    usage: `import { Tooltip, TooltipTrigger, TooltipContent } from '@velobitsio/ui';
 
 <Tooltip>
   <TooltipTrigger asChild>
@@ -343,7 +343,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   /* ── Overlays ──────────────────────────────────────────────────────────── */
 
   dialog: {
-    usage: `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@velobitsdevs/ui';
+    usage: `import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@velobitsio/ui';
 
 <Dialog>
   <DialogTrigger asChild><Button>Create flag</Button></DialogTrigger>
@@ -366,7 +366,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'side-panel': {
-    usage: `import { SidePanel, SidePanelTrigger, SidePanelContent, SidePanelHeader, SidePanelTitle } from '@velobitsdevs/ui';
+    usage: `import { SidePanel, SidePanelTrigger, SidePanelContent, SidePanelHeader, SidePanelTitle } from '@velobitsio/ui';
 
 <SidePanel>
   <SidePanelTrigger asChild><Button>Open detail</Button></SidePanelTrigger>
@@ -382,7 +382,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   popover: {
-    usage: `import { Popover, PopoverTrigger, PopoverContent, PopoverTitle } from '@velobitsdevs/ui';
+    usage: `import { Popover, PopoverTrigger, PopoverContent, PopoverTitle } from '@velobitsio/ui';
 
 <Popover>
   <PopoverTrigger asChild><Button>Rollout</Button></PopoverTrigger>
@@ -398,7 +398,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'dropdown-menu': {
-    usage: `import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@velobitsdevs/ui';
+    usage: `import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@velobitsio/ui';
 
 <DropdownMenu>
   <DropdownMenuTrigger asChild><Button>Actions</Button></DropdownMenuTrigger>
@@ -420,7 +420,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   toast: {
-    usage: `import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } from '@velobitsdevs/ui';
+    usage: `import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } from '@velobitsio/ui';
 
 <ToastProvider>
   <Toast variant="success">
@@ -436,7 +436,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'command-palette': {
-    usage: `import { CommandDialog, CommandInput, CommandList, CommandItem } from '@velobitsdevs/ui';
+    usage: `import { CommandDialog, CommandInput, CommandList, CommandItem } from '@velobitsio/ui';
 
 <CommandDialog open={open} onOpenChange={setOpen} shortcut="k">
   <CommandInput placeholder="Search…" />
@@ -453,7 +453,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   /* ── Composites ────────────────────────────────────────────────────────── */
 
   'app-shell': {
-    usage: `import { AppShell, AppShellHeader, AppShellSidebarTrigger } from '@velobitsdevs/ui';
+    usage: `import { AppShell, AppShellHeader, AppShellSidebarTrigger } from '@velobitsio/ui';
 
 <AppShell
   sidebarLabel="Control plane"
@@ -476,7 +476,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'data-table': {
-    usage: `import { DataTable, useRowSelection } from '@velobitsdevs/ui';
+    usage: `import { DataTable, useRowSelection } from '@velobitsio/ui';
 
 <DataTable
   label="Flags"
@@ -500,7 +500,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   table: {
-    usage: `import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@velobitsdevs/ui';
+    usage: `import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@velobitsio/ui';
 
 <Table>
   <TableHeader><TableRow><TableHead>Environment</TableHead></TableRow></TableHeader>
@@ -520,7 +520,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   form: {
-    usage: `import { Form, FormField, FormError } from '@velobitsdevs/ui/form';
+    usage: `import { Form, FormField, FormError } from '@velobitsio/ui/form';
 
 <Form {...form}>
   <form onSubmit={form.handleSubmit(create)}>
@@ -548,7 +548,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   accordion: {
-    usage: `import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@velobitsdevs/ui';
+    usage: `import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@velobitsio/ui';
 
 <Accordion type="single" collapsible>
   <AccordionItem value="what">
@@ -563,7 +563,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   tabs: {
-    usage: `import { Tabs, TabsList, TabsTrigger, TabsContent } from '@velobitsdevs/ui';
+    usage: `import { Tabs, TabsList, TabsTrigger, TabsContent } from '@velobitsio/ui';
 
 <Tabs defaultValue="targeting">
   <TabsList>
@@ -578,7 +578,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'segmented-control': {
-    usage: `import { SegmentedControl } from '@velobitsdevs/ui';
+    usage: `import { SegmentedControl } from '@velobitsio/ui';
 
 <SegmentedControl
   aria-label="Environment"
@@ -600,7 +600,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'status-chip': {
-    usage: `import { StatusChip } from '@velobitsdevs/ui';
+    usage: `import { StatusChip } from '@velobitsio/ui';
 
 <StatusChip status="partial">40%</StatusChip>`,
     examples: [
@@ -614,7 +614,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'empty-state': {
-    usage: `import { EmptyState } from '@velobitsdevs/ui';
+    usage: `import { EmptyState } from '@velobitsio/ui';
 
 <EmptyState
   icon={<FlagIcon />}
@@ -635,7 +635,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   pagination: {
-    usage: `import { Pagination, PaginationContent, PaginationItem, PaginationLink, paginationRange } from '@velobitsdevs/ui';
+    usage: `import { Pagination, PaginationContent, PaginationItem, PaginationLink, paginationRange } from '@velobitsio/ui';
 
 {paginationRange({ page, pageCount }).map((slot) => …)}`,
     examples: [
@@ -652,7 +652,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   breadcrumb: {
-    usage: `import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage } from '@velobitsdevs/ui';
+    usage: `import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage } from '@velobitsio/ui';
 
 <Breadcrumb>
   <BreadcrumbList>
@@ -668,7 +668,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'code-block': {
-    usage: `import { CodeBlock } from '@velobitsdevs/ui';
+    usage: `import { CodeBlock } from '@velobitsio/ui';
 
 <CodeBlock language="json" copyable label="Flag payload">
   {JSON.stringify(flag, null, 2)}
@@ -687,7 +687,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'diff-viewer': {
-    usage: `import { DiffViewer, diffLines } from '@velobitsdevs/ui';
+    usage: `import { DiffViewer, diffLines } from '@velobitsio/ui';
 
 <DiffViewer lines={diffLines(before, after)} label="Config v3 → v4" />`,
     examples: [{ name: 'diff-viewer-demo', title: 'A unified line diff' }],
@@ -698,7 +698,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   motion: {
-    usage: `import { PageTransition, Stagger, StaggerItem, FadeIn } from '@velobitsdevs/ui/motion';
+    usage: `import { PageTransition, Stagger, StaggerItem, FadeIn } from '@velobitsio/ui/motion';
 
 <PageTransition transitionKey={pathname}>{children}</PageTransition>`,
     examples: [
@@ -722,7 +722,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
       },
     ],
     notes: [
-      'Subpath-only: @velobitsdevs/ui/motion, never the barrel — nobody should pay for Framer’s runtime to import a Button.',
+      'Subpath-only: @velobitsio/ui/motion, never the barrel — nobody should pay for Framer’s runtime to import a Button.',
       'These components assume VelobitsProvider is mounted. Without it they still animate — and silently stop honouring the reader’s reduced-motion preference, which is the one failure mode here worth knowing about.',
       'Everything animates transform and opacity and nothing else. Both are composited on the GPU: no layout, no paint, no main-thread work per frame.',
     ],
@@ -732,7 +732,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
 
   cn: {
     usage: `// npm
-import { cn } from '@velobitsdevs/ui';
+import { cn } from '@velobitsio/ui';
 // shadcn CLI — installed to your utils module
 import { cn } from '@/lib/utils';
 
@@ -744,7 +744,7 @@ cn('rounded-md px-3', isActive && 'bg-primary-soft', className)`,
   },
 
   theme: {
-    usage: `import { themeInitScript, THEME_STORAGE_KEYS } from '@velobitsdevs/ui/theme';
+    usage: `import { themeInitScript, THEME_STORAGE_KEYS } from '@velobitsio/ui/theme';
 
 <script dangerouslySetInnerHTML={{ __html: themeInitScript(THEME_STORAGE_KEYS.dashboard) }} />`,
     notes: [
@@ -754,7 +754,7 @@ cn('rounded-md px-3', isActive && 'bg-primary-soft', className)`,
   },
 
   'use-theme': {
-    usage: `import { useTheme } from '@velobitsdevs/ui';
+    usage: `import { useTheme } from '@velobitsio/ui';
 
 const { mode, theme, setMode, toggle, mounted } = useTheme();`,
     examples: [
@@ -771,8 +771,8 @@ const { mode, theme, setMode, toggle, mounted } = useTheme();`,
   },
 
   'use-media-query': {
-    usage: `import { useMediaQuery } from '@velobitsdevs/ui';
-import { breakpoint } from '@velobitsdevs/tokens';
+    usage: `import { useMediaQuery } from '@velobitsio/ui';
+import { breakpoint } from '@velobitsio/tokens';
 
 const isDesktop = useMediaQuery(\`(min-width: \${breakpoint.md})\`);`,
     examples: [
@@ -788,7 +788,7 @@ const isDesktop = useMediaQuery(\`(min-width: \${breakpoint.md})\`);`,
   },
 
   'use-row-selection': {
-    usage: `import { useRowSelection } from '@velobitsdevs/ui';
+    usage: `import { useRowSelection } from '@velobitsio/ui';
 
 const selection = useRowSelection(rows, (row) => row.id);`,
     examples: [

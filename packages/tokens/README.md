@@ -1,4 +1,4 @@
-# @velobitsdevs/tokens
+# @velobitsio/tokens
 
 The VeloBits design tokens — colour, type, spacing, motion and the glass
 material — as CSS custom properties and as TypeScript.
@@ -10,7 +10,7 @@ its own.
 ## Install
 
 ```bash
-npm install @velobitsdevs/tokens
+npm install @velobitsio/tokens
 ```
 
 ## Use
@@ -18,25 +18,25 @@ npm install @velobitsdevs/tokens
 Import the theme once, at the root of your app:
 
 ```css
-@import '@velobitsdevs/tokens/theme.css';
+@import '@velobitsio/tokens/theme.css';
 ```
 
 That single import brings in `tailwindcss`, `tw-animate-css`, the raw tokens and
 the glass material, and registers the `dark` variant. Four entry points are
 exported if you need them individually:
 
-| Entry point                            | What it holds                                       |
-| -------------------------------------- | --------------------------------------------------- |
-| `@velobitsdevs/tokens/theme.css`       | The one you want. Everything below, wired together. |
-| `@velobitsdevs/tokens/tokens.css`      | The raw custom properties, light and dark.          |
-| `@velobitsdevs/tokens/glass.css`       | The two-tier glass material only.                   |
-| `@velobitsdevs/tokens/keycloakify.css` | The bridge for the Keycloak login theme.            |
+| Entry point                          | What it holds                                       |
+| ------------------------------------ | --------------------------------------------------- |
+| `@velobitsio/tokens/theme.css`       | The one you want. Everything below, wired together. |
+| `@velobitsio/tokens/tokens.css`      | The raw custom properties, light and dark.          |
+| `@velobitsio/tokens/glass.css`       | The two-tier glass material only.                   |
+| `@velobitsio/tokens/keycloakify.css` | The bridge for the Keycloak login theme.            |
 
 The same values are available to TypeScript, for anything that has to compute
 rather than declare:
 
 ```ts
-import { contrastRatio, themes } from '@velobitsdevs/tokens';
+import { contrastRatio, themes } from '@velobitsio/tokens';
 ```
 
 `themes` holds the `light` and `dark` semantic sets (both are exported

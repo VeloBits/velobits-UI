@@ -45,7 +45,7 @@ export function itemUrl(name: string): string {
 
 /** The three published packages, for the npm half of the distribution. */
 export const NPM_PACKAGES = {
-  tokens: '@velobitsdevs/tokens',
-  icons: '@velobitsdevs/icons',
-  ui: '@velobitsdevs/ui',
+  tokens: '@velobitsio/tokens',
+  icons: '@velobitsio/icons',
+  ui: '@velobitsio/ui',
 } as const;

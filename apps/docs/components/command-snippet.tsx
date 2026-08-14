@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { CodeBlock, Tabs, TabsContent, TabsList, TabsTrigger } from '@velobitsdevs/ui';
+import { CodeBlock, Tabs, TabsContent, TabsList, TabsTrigger } from '@velobitsio/ui';
 
 /**
  * A shell command in the four package managers, the way shadcn's own docs show

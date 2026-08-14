@@ -7,7 +7,7 @@ import {
   FieldError,
   FieldLabel,
   Input,
-} from '@velobitsdevs/ui';
+} from '@velobitsio/ui';
 
 export default function FieldDemo() {
   return (

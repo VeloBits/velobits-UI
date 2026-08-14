@@ -7,7 +7,7 @@ export default defineConfig((options) => ({
   sourcemap: true,
   treeshake: true,
   external: ['react'],
-  // See the note in packages/tokens/tsup.config.ts — @velobitsdevs/ui resolves icon
+  // See the note in packages/tokens/tsup.config.ts — @velobitsio/ui resolves icon
   // types from this dist/, so a watch-mode wipe races its DTS build.
   clean: !options.watch,
 }));

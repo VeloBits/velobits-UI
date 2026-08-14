@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { Badge } from '@velobitsdevs/ui';
-import { ChevronRightIcon } from '@velobitsdevs/icons';
+import { Badge } from '@velobitsio/ui';
+import { ChevronRightIcon } from '@velobitsio/icons';
 
 import { CodePanel } from '@/components/code-panel';
 import { ComponentPreview } from '@/components/component-preview';

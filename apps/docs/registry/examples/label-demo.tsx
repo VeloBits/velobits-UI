@@ -1,6 +1,6 @@
 'use client';
 
-import { Input, Label } from '@velobitsdevs/ui';
+import { Input, Label } from '@velobitsio/ui';
 
 export default function LabelDemo() {
   return (

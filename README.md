@@ -39,7 +39,7 @@ npm run build
 
 Steps 2 and 3 run from the docs app's own `build` script, and turbo's
 `dependsOn: ["^build"]` guarantees the packages are built first — which step 2
-needs, since it imports `@velobitsdevs/tokens`.
+needs, since it imports `@velobitsio/tokens`.
 
 ### Deploying to Vercel
 
@@ -60,7 +60,7 @@ Two of those are load-bearing:
 
 **Root Directory must stay at the repo root.** Pointing it at `apps/docs` makes
 Vercel install and build only that workspace, so the three packages never build
-and `scripts/build-registry.ts` dies importing `@velobitsdevs/tokens`. Turbo's
+and `scripts/build-registry.ts` dies importing `@velobitsio/tokens`. Turbo's
 `dependsOn: ["^build"]` is what orders them, and it only runs from the root.
 
 **Framework Preset is Other, not Next.js.** `apps/docs` is a Next app, but it
@@ -129,9 +129,9 @@ velobits-UI/
 │   └── providers/            VelobitsProvider
 ├── registry/registry.ts      → registry.json → apps/docs/public/r/*.json
 ├── packages/
-│   ├── tokens/  @velobitsdevs/tokens   CSS + TS. ZERO deps, ZERO React.
-│   ├── icons/   @velobitsdevs/icons    88 hand-drawn stroke icons
-│   └── ui/      @velobitsdevs/ui       builds from registry/velobits
+│   ├── tokens/  @velobitsio/tokens   CSS + TS. ZERO deps, ZERO React.
+│   ├── icons/   @velobitsio/icons    88 hand-drawn stroke icons
+│   └── ui/      @velobitsio/ui       builds from registry/velobits
 ├── scripts/
 │   ├── build-registry.ts     validates + compiles the shadcn registry
 │   └── build-docs-data.ts    docs codegen: examples, prop tables, search index
@@ -151,12 +151,12 @@ any item that file does not place.
 
 ## Two distributions, and which one to use is not taste
 
-| Consumer                      | Path                            | Why                                                                                                                                                                                                                   |
-| ----------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| the editor app                | **npm**                         | Module Federation needs `@velobitsdevs/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                    |
-| the dashboard app dashboard   | **npm**                         | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
-| Keycloak login theme          | **`@velobitsdevs/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
-| Greenfield / one-off surfaces | **shadcn CLI**                  | `npx shadcn@latest add @velobits/button`. You own the source; no dependency to bump.                                                                                                                                  |
+| Consumer                      | Path                          | Why                                                                                                                                                                                                                   |
+| ----------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| the editor app                | **npm**                       | Module Federation needs `@velobitsio/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                      |
+| the dashboard app dashboard   | **npm**                       | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
+| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
+| Greenfield / one-off surfaces | **shadcn CLI**                | `npx shadcn@latest add @velobits/button`. You own the source; no dependency to bump.                                                                                                                                  |
 
 Adding a component means touching four lists, and
 `packages/ui/test/registry-parity.test.ts` fails if you miss one:
@@ -167,16 +167,16 @@ Adding a component means touching four lists, and
 
 ```css
 /* your app's CSS — one import */
-@import '@velobitsdevs/tokens/theme.css';
+@import '@velobitsio/tokens/theme.css';
 
 /* NOT OPTIONAL: Tailwind v4 does not scan node_modules, so utilities used
-   INSIDE @velobitsdevs/ui are never generated and the components arrive completely
+   INSIDE @velobitsio/ui are never generated and the components arrive completely
    unstyled with no warning anywhere. */
-@source "../node_modules/@velobitsdevs/ui/dist";
+@source "../node_modules/@velobitsio/ui/dist";
 ```
 
 ```tsx
-import { THEME_STORAGE_KEYS, VelobitsProvider } from '@velobitsdevs/ui';
+import { THEME_STORAGE_KEYS, VelobitsProvider } from '@velobitsio/ui';
 
 // Once, at the shell root. Radix's Tooltip THROWS without a provider ancestor.
 <VelobitsProvider storageKey={THEME_STORAGE_KEYS.dashboard}>{children}</VelobitsProvider>;
@@ -237,14 +237,14 @@ inside a scroll container, or nested.
 ## Publishing
 
 GitHub Packages, private, `@velobits/*`. Every published change needs a
-changeset (`npm run changeset`). `@velobitsdevs/tokens` versions independently so a
+changeset (`npm run changeset`). `@velobitsio/tokens` versions independently so a
 palette tweak does not force a component release.
 
 Reads require auth even for consumers. In Docker use a **BuildKit secret**
 (`RUN --mount=type=secret,id=npmrc`), never an `ARG` — an `ARG` is recorded in
 the image history.
 
-When `@velobitsdevs/ui` gets a new version, the editor app's Federation
+When `@velobitsio/ui` gets a new version, the editor app's Federation
 `requiredVersion` pins in `apps/shell`, `apps/editor-remote` and
 `apps/analytics-remote` must move in lockstep. Overshooting the pin gives
 `does not satisfy` warnings and then a fatal

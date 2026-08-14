@@ -17,8 +17,8 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@velobitsdevs/ui';
-import { EllipsisIcon, SlidersIcon } from '@velobitsdevs/icons';
+} from '@velobitsio/ui';
+import { EllipsisIcon, SlidersIcon } from '@velobitsio/icons';
 
 export default function DropdownMenuDemo() {
   const [withArchived, setWithArchived] = useState(true);

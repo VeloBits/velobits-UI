@@ -12,8 +12,8 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@velobitsdevs/ui';
-import { LayersIcon } from '@velobitsdevs/icons';
+} from '@velobitsio/ui';
+import { LayersIcon } from '@velobitsio/icons';
 
 import type { DocRegistryItem } from '@/lib/generated/registry-data';
 import { componentHref } from '@/lib/docs-nav';

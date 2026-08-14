@@ -1,6 +1,6 @@
 'use client';
 
-import { GlassSurface } from '@velobitsdevs/ui';
+import { GlassSurface } from '@velobitsio/ui';
 
 export default function GlassSurfaceDemo() {
   return (

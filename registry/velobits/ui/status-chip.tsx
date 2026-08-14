@@ -7,7 +7,7 @@ import {
   CircleSlashIcon,
   ClockIcon,
   type Icon,
-} from '@velobitsdevs/icons';
+} from '@velobitsio/icons';
 
 import { cn } from '../lib/cn';
 import { Badge, type BadgeProps } from './badge';
@@ -38,7 +38,7 @@ import { Badge, type BadgeProps } from './badge';
  * this maps status → variant and stops. The gate includes the composite: at
  * 12px the 4.5:1 target applies, and each text-over-wash pairing is measured
  * flattened over the page, the panel and the tier-S glass surface in both
- * themes — the soft-chip suite in `@velobitsdevs/tokens`. The token re-tune
+ * themes — the soft-chip suite in `@velobitsio/tokens`. The token re-tune
  * that made those composites pass landed for `Badge` and this component at the
  * same time, precisely because there is only one set of values.
  *

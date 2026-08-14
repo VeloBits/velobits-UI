@@ -9,8 +9,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@velobitsdevs/ui';
-import { FlagIcon, PlusIcon, SearchIcon } from '@velobitsdevs/icons';
+} from '@velobitsio/ui';
+import { FlagIcon, PlusIcon, SearchIcon } from '@velobitsio/icons';
 
 export default function EmptyStateDemo() {
   return (

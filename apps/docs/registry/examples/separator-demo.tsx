@@ -1,6 +1,6 @@
 'use client';
 
-import { Separator } from '@velobitsdevs/ui';
+import { Separator } from '@velobitsio/ui';
 
 export default function SeparatorDemo() {
   return (

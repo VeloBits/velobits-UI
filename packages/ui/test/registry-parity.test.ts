@@ -115,8 +115,8 @@ describe('registry ↔ tsup ↔ exports parity', () => {
     expect(
       missing,
       `Built and exported as a subpath, but missing from the barrel — so ` +
-        `\`import { X } from '@velobitsdevs/ui'\` fails while ` +
-        `\`from '@velobitsdevs/ui/x'\` works: ${missing.join(', ')}`,
+        `\`import { X } from '@velobitsio/ui'\` fails while ` +
+        `\`from '@velobitsio/ui/x'\` works: ${missing.join(', ')}`,
     ).toEqual([]);
   });
 
@@ -294,20 +294,20 @@ describe('registry hygiene', () => {
     const theme = registry.items.find((i) => i.name === 'velobits-theme')!;
     expect(Object.keys(theme.cssVars?.light ?? {}).length).toBeGreaterThan(20);
     expect(Object.keys(theme.cssVars?.dark ?? {}).length).toBeGreaterThan(20);
-    // Derived from @velobitsdevs/tokens, so the two sets necessarily match in shape.
+    // Derived from @velobitsio/tokens, so the two sets necessarily match in shape.
     expect(Object.keys(theme.cssVars!.light!).sort()).toEqual(
       Object.keys(theme.cssVars!.dark!).sort(),
     );
   });
 
-  it('declares @velobitsdevs/icons wherever a component imports an icon', () => {
+  it('declares @velobitsio/icons wherever a component imports an icon', () => {
     /**
      * A CLI consumer copies the file and installs the listed dependencies. Miss
      * this and their build fails on an unresolved import — on their machine, not
      * in our CI.
      */
     const checkbox = registry.items.find((i) => i.name === 'checkbox')!;
-    expect(checkbox.dependencies).toContain('@velobitsdevs/icons');
+    expect(checkbox.dependencies).toContain('@velobitsio/icons');
   });
 });
 
@@ -315,14 +315,14 @@ describe('packaging invariants that break consumers quietly', () => {
   it('keeps React and the sibling packages as peers, never dependencies', () => {
     /**
      * A bundled React means two copies at runtime and hooks that throw. Bundling
-     * @velobitsdevs/ui's siblings would also defeat the Module Federation singleton
+     * @velobitsio/ui's siblings would also defeat the Module Federation singleton
      * arrangement the editor app needs.
      */
     for (const p of [
       'react',
       'react-dom',
-      '@velobitsdevs/tokens',
-      '@velobitsdevs/icons',
+      '@velobitsio/tokens',
+      '@velobitsio/icons',
       'framer-motion',
     ]) {
       expect(pkg.peerDependencies).toHaveProperty(p);
