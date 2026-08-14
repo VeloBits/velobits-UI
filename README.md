@@ -151,12 +151,12 @@ any item that file does not place.
 
 ## Two distributions, and which one to use is not taste
 
-| Consumer                      | Path                        | Why                                                                                                                                                                                                                   |
-| ----------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| the editor app                | **npm**                     | Module Federation needs `@velobitsdevs/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                        |
-| the dashboard app dashboard   | **npm**                     | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
+| Consumer                      | Path                            | Why                                                                                                                                                                                                                   |
+| ----------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| the editor app                | **npm**                         | Module Federation needs `@velobitsdevs/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                    |
+| the dashboard app dashboard   | **npm**                         | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
 | Keycloak login theme          | **`@velobitsdevs/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
-| Greenfield / one-off surfaces | **shadcn CLI**              | `npx shadcn@latest add @velobits/button`. You own the source; no dependency to bump.                                                                                                                                  |
+| Greenfield / one-off surfaces | **shadcn CLI**                  | `npx shadcn@latest add @velobits/button`. You own the source; no dependency to bump.                                                                                                                                  |
 
 Adding a component means touching four lists, and
 `packages/ui/test/registry-parity.test.ts` fails if you miss one:

@@ -25,8 +25,8 @@ That single import brings in `tailwindcss`, `tw-animate-css`, the raw tokens and
 the glass material, and registers the `dark` variant. Four entry points are
 exported if you need them individually:
 
-| Entry point                        | What it holds                                       |
-| ---------------------------------- | --------------------------------------------------- |
+| Entry point                            | What it holds                                       |
+| -------------------------------------- | --------------------------------------------------- |
 | `@velobitsdevs/tokens/theme.css`       | The one you want. Everything below, wired together. |
 | `@velobitsdevs/tokens/tokens.css`      | The raw custom properties, light and dark.          |
 | `@velobitsdevs/tokens/glass.css`       | The two-tier glass material only.                   |

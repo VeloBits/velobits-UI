@@ -189,9 +189,9 @@ export default function ColorsPage() {
         <section>
           <h1 className="mb-2 text-3xl font-semibold tracking-tight">Colors</h1>
           <p className="max-w-3xl text-muted-foreground">
-            Every value below is read from <code>@velobitsdevs/tokens</code> at build time and mapped
-            from the exported registries, so a token added to the package appears here without
-            anyone editing this page.
+            Every value below is read from <code>@velobitsdevs/tokens</code> at build time and
+            mapped from the exported registries, so a token added to the package appears here
+            without anyone editing this page.
           </p>
         </section>
 

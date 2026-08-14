@@ -10,12 +10,12 @@ Two distributions, one source. Every component is authored once in
 not interchangeable, and the choice is forced by your architecture rather than by
 preference.
 
-| Your surface                  | Use                         | Because                                                                                                                                                                |
-| ----------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Module-federated app          | **npm**                     | Federation needs `@velobitsdevs/ui` to be a real singleton so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary. |
-| Existing Tailwind v4 + shadcn | **npm**                     | One `@theme inline` bridge; the palette swap is one file.                                                                                                              |
-| Keycloak login theme          | **`@velobitsdevs/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted.           |
-| Greenfield / one-off          | **shadcn CLI**              | You own the source. No dependency to bump, and no singleton either — which is exactly why federated apps should not use this path.                                     |
+| Your surface                  | Use                             | Because                                                                                                                                                                    |
+| ----------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Module-federated app          | **npm**                         | Federation needs `@velobitsdevs/ui` to be a real singleton so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary. |
+| Existing Tailwind v4 + shadcn | **npm**                         | One `@theme inline` bridge; the palette swap is one file.                                                                                                                  |
+| Keycloak login theme          | **`@velobitsdevs/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted.               |
+| Greenfield / one-off          | **shadcn CLI**                  | You own the source. No dependency to bump, and no singleton either — which is exactly why federated apps should not use this path.                                         |
 
 ## shadcn CLI
 

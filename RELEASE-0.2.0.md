@@ -8,8 +8,8 @@ bump every package a second time.
 
 ## What ships
 
-| Package            | 0.1.0 | 0.2.0     | Bump  | Publishes?                                         |
-| ------------------ | ----- | --------- | ----- | -------------------------------------------------- |
+| Package                | 0.1.0 | 0.2.0     | Bump  | Publishes?                                         |
+| ---------------------- | ----- | --------- | ----- | -------------------------------------------------- |
 | `@velobitsdevs/tokens` | 0.1.0 | **0.2.0** | minor | yes                                                |
 | `@velobitsdevs/ui`     | 0.1.0 | **0.2.0** | minor | yes                                                |
 | `@velobitsdevs/icons`  | 0.1.0 | 0.1.0     | none  | no — zero diff since its tag                       |

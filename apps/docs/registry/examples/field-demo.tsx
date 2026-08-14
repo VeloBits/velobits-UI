@@ -1,6 +1,13 @@
 'use client';
 
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel, Input } from '@velobitsdevs/ui';
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  Input,
+} from '@velobitsdevs/ui';
 
 export default function FieldDemo() {
   return (
