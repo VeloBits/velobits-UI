@@ -29,7 +29,7 @@ a human in front of that.
 5. **Watch the Release run.** Open its Summary. It says either which packages
    published, or `Nothing published`. If you expected a release and see the latter,
    stop and read the failure modes below.
-6. **Confirm.** `npm view @velobits/ui version`, and check the tag and GitHub
+6. **Confirm.** `npm view @velobitsio/ui version`, and check the tag and GitHub
    Release exist.
 
 ## Releasing 0.2.0 specifically
@@ -46,7 +46,7 @@ The delta being shipped is written up in [RELEASE-0.2.0.md](RELEASE-0.2.0.md).
 
 - **Every user-facing PR needs a changeset**, and the bump type is a permanent
   decision. `npm run changeset` on the feature branch.
-- **Don't add one for docs-only work.** `@velobits/docs` is `private` and in
+- **Don't add one for docs-only work.** `@velobitsio/docs` is `private` and in
   the `.changeset` `ignore` list.
 - **CI does not run on pushes to `develop`** — only on PRs and on `main`. Feature
   PRs into `develop` are covered, but anything pushed straight to `develop` is

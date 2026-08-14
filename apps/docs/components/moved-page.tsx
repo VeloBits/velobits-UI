@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { Button } from '@velobits/ui';
-import { ArrowRightIcon } from '@velobits/icons';
+import { Button } from '@velobitsio/ui';
+import { ArrowRightIcon } from '@velobitsio/icons';
 
 /**
  * A page that used to live somewhere else.

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { cn } from '@velobits/ui';
+import { cn } from '@velobitsio/ui';
 
 import { COMPONENT_GROUPS, GUIDE_NAV, componentHref } from '@/lib/docs-nav';
 import { registryItemsByName } from '@/lib/generated/registry-data';

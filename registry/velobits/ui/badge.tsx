@@ -12,7 +12,7 @@ import { cn } from '../lib/cn';
  * the colour the text actually sits on is the wash FLATTENED over the surface
  * beneath the chip — so each pairing is gated as a composite over the page, the
  * panel and the tier-S glass surface, in both themes: the soft-chip suite in
- * `@velobits/tokens` (`test/contrast.test.ts`, driven by `SOFT_CHIP_PAIRS`).
+ * `@velobitsio/tokens` (`test/contrast.test.ts`, driven by `SOFT_CHIP_PAIRS`).
  * The token values were tuned to hold that gate.
  *
  * `brand` is the exception that proves the palette's asymmetry: lime is a fill

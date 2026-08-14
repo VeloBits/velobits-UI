@@ -1,6 +1,6 @@
 'use client';
 
-import { Skeleton } from '@velobits/ui';
+import { Skeleton } from '@velobitsio/ui';
 
 export default function SkeletonDemo() {
   return (

@@ -16,14 +16,14 @@ import { cn } from '../lib/cn';
  * paid the install and got no primitives. This is the capacity we were already
  * buying, spent.
  *
- * It is a **subpath-only export** — `@velobits/ui/motion`, not the barrel —
+ * It is a **subpath-only export** — `@velobitsio/ui/motion`, not the barrel —
  * for the same reason `form` is: the barrel's own-code budget sits at 28.13 kB of
  * 32, and anything added there is paid for by every consumer whether they import
  * it or not. Pulling motion in through the barrel would also drag Framer's runtime
  * into apps that only wanted a `Button`.
  *
  * ```ts
- * import { PageTransition, Stagger, StaggerItem } from '@velobits/ui/motion';
+ * import { PageTransition, Stagger, StaggerItem } from '@velobitsio/ui/motion';
  * ```
  *
  * ## Reduced motion is already handled — do not re-handle it here

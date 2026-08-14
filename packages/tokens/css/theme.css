@@ -1,9 +1,9 @@
 /*
- * @velobits/tokens/theme.css — THE single Tailwind entry every VeloBits app
+ * @velobitsio/tokens/theme.css — THE single Tailwind entry every VeloBits app
  * imports. One line in your app CSS:
  *
- *   @import '@velobits/tokens/theme.css';
- *   @source "../node_modules/@velobits/ui/dist";   ← see note at the bottom
+ *   @import '@velobitsio/tokens/theme.css';
+ *   @source "../node_modules/@velobitsio/ui/dist";   ← see note at the bottom
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * FOUR TRAPS, ALREADY PAID FOR IN DEBUGGING TIME. Do not rediscover these.
@@ -333,9 +333,9 @@
  * ── CONSUMERS: THE @source LINE IS NOT OPTIONAL ──────────────────────────────
  *
  * Tailwind v4 does not scan node_modules, so utilities used INSIDE
- * @velobits/ui are never generated. Each consuming app must add:
+ * @velobitsio/ui are never generated. Each consuming app must add:
  *
- *   @source "../node_modules/@velobits/ui/dist";
+ *   @source "../node_modules/@velobitsio/ui/dist";
  *
  * (adjust the depth for your workspace layout). `cva` class strings survive
  * into `dist` as string literals, which is what makes this work. Without it the

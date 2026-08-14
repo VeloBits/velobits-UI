@@ -1,4 +1,4 @@
-# @velobits-dev/ui
+# @velobitsio/ui
 
 ## 0.2.0
 
