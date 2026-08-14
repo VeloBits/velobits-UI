@@ -12,8 +12,8 @@ import {
   CommandItem,
   CommandList,
   Kbd,
-} from '@velobits/ui';
-import { SearchIcon } from '@velobits/icons';
+} from '@velobitsdevs/ui';
+import { SearchIcon } from '@velobitsdevs/icons';
 
 interface SearchEntry {
   title: string;

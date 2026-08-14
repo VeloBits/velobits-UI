@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
   VelobitsProvider,
   useTheme,
-} from '@velobits/ui';
+} from '@velobitsdevs/ui';
 
 function Inside() {
   const { theme, mounted } = useTheme();

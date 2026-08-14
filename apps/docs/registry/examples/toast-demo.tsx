@@ -11,8 +11,8 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from '@velobits/ui';
-import { AlertTriangleIcon, CircleCheckIcon } from '@velobits/icons';
+} from '@velobitsdevs/ui';
+import { AlertTriangleIcon, CircleCheckIcon } from '@velobitsdevs/icons';
 
 interface ToastEntry {
   id: number;

@@ -11,8 +11,8 @@
     "cmdk",
     "framer-motion",
     "react-hook-form",
-    "@velobits/icons",
-    "@velobits/tokens"
+    "@velobitsdevs/icons",
+    "@velobitsdevs/tokens"
   ],
   "devDependencies": [
     "tw-animate-css"

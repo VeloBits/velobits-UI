@@ -2,8 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { breakpoint } from '@velobits/tokens';
-import { MenuIcon } from '@velobits/icons';
+import { breakpoint } from '@velobitsdevs/tokens';
+import { MenuIcon } from '@velobitsdevs/icons';
 
 import { cn } from '../lib/cn';
 import { useMediaQuery } from '../hooks/use-media-query';
@@ -132,7 +132,7 @@ function AppShell({
   const closeSidebar = useCallback(() => setSidebarOpen(false), [setSidebarOpen]);
 
   /*
-   * The breakpoint comes from @velobits/tokens rather than being typed here,
+   * The breakpoint comes from @velobitsdevs/tokens rather than being typed here,
    * because it has to agree with the `md:` variants below. When those two
    * disagree the failure is a narrow band of viewport widths in which the rail
    * and the drawer are both showing — which nobody finds, because nobody resizes

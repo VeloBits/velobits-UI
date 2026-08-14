@@ -29,12 +29,12 @@ build time rather than transcribed.
 One import, and one `@source` line:
 
 ```css
-@import '@velobits/tokens/theme.css';
-@source "../node_modules/@velobits/ui/dist";
+@import '@velobitsdevs/tokens/theme.css';
+@source "../node_modules/@velobitsdevs/ui/dist";
 ```
 
 The `@source` line is **not optional** on the npm path. Tailwind v4 does not scan
-`node_modules`, so every utility used inside `@velobits/ui` goes ungenerated
+`node_modules`, so every utility used inside `@velobitsdevs/ui` goes ungenerated
 and the components arrive completely unstyled, with no warning anywhere. `cva`
 class strings survive into `dist` as string literals, which is what makes
 scanning it work at all.
@@ -47,7 +47,7 @@ already scans.
 Redefine it after the import. Both themes, or the one you mean:
 
 ```css
-@import '@velobits/tokens/theme.css';
+@import '@velobitsdevs/tokens/theme.css';
 
 :root {
   --primary: #0a6ebd;
@@ -104,7 +104,7 @@ rendering as tofu. The `⌘` in `Kbd` is what gave it away here.
 ## Keycloak
 
 The login theme takes tokens only, through
-`@velobits/tokens/keycloakify.css`. It cannot consume `@velobits/ui`:
+`@velobitsdevs/tokens/keycloakify.css`. It cannot consume `@velobitsdevs/ui`:
 its component sources are git-ignored and re-vended by a
 `keycloakify sync-extensions` postinstall hook, so an edit to an unclaimed file
 is silently reverted on the next `npm install`.

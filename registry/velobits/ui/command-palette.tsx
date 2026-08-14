@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Dialog as DialogPrimitive, VisuallyHidden } from 'radix-ui';
 
-import { SearchIcon } from '@velobits/icons';
+import { SearchIcon } from '@velobitsdevs/icons';
 
 import { cn } from '../lib/cn';
 

@@ -85,7 +85,7 @@ export interface GlassSurfaceProps extends React.ComponentProps<'div'> {
  *  - it forms a stacking context, so `z-index` within is scoped locally.
  *
  * Legibility, the `@supports` fallback and the `prefers-reduced-transparency`
- * override all live in `@velobits/tokens/glass.css` alongside the classes, so
+ * override all live in `@velobitsdevs/tokens/glass.css` alongside the classes, so
  * they apply identically to any consumer that reaches for a class directly.
  */
 function GlassSurface({ className, tier = 'overlay', blur = false, ...props }: GlassSurfaceProps) {

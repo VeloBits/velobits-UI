@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@velobits/ui';
+} from '@velobitsdevs/ui';
 
 export default function CardDemo() {
   return (

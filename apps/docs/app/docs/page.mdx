@@ -29,12 +29,12 @@ taste, and [Installation](/docs/installation) says which is which.
 
 | Package            | What it is                                  | Depends on                                                                                |
 | ------------------ | ------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `@velobits/tokens` | CSS + TS tokens. **Zero deps, zero React.** | nothing                                                                                   |
-| `@velobits/icons`  | 88 hand-drawn stroke icons                  | `react` (peer)                                                                            |
-| `@velobits/ui`     | 38 components                               | tokens, icons, react, react-dom, **framer-motion** (peers) · `react-hook-form` (optional) |
+| `@velobitsdevs/tokens` | CSS + TS tokens. **Zero deps, zero React.** | nothing                                                                                   |
+| `@velobitsdevs/icons`  | 88 hand-drawn stroke icons                  | `react` (peer)                                                                            |
+| `@velobitsdevs/ui`     | 38 components                               | tokens, icons, react, react-dom, **framer-motion** (peers) · `react-hook-form` (optional) |
 
 `tokens` is split out because the **Keycloak login theme cannot consume
-`@velobits/ui`**: its component sources are git-ignored and re-vended by a
+`@velobitsdevs/ui`**: its component sources are git-ignored and re-vended by a
 `keycloakify sync-extensions` postinstall hook, so an edit to an unclaimed file
 is silently reverted on the next `npm install`. Shared _tokens_ is a clean seam
 there; shared _components_ would mean fighting the upstream extension forever.

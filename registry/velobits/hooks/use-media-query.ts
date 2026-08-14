@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
  * `useMediaQuery('(max-width: 768px)')` and the matching `editor.css` media
  * query must agree, or the two-surface mobile IA desynchronises mid-resize —
  * JavaScript switches surfaces at one width while CSS switches layout at
- * another. Import the breakpoint from `@velobits/tokens` (`breakpoint.md`)
+ * another. Import the breakpoint from `@velobitsdevs/tokens` (`breakpoint.md`)
  * rather than typing the number twice.
  *
  * Returns `false` during SSR and on the first client render, then corrects

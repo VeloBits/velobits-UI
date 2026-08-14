@@ -1,6 +1,6 @@
 'use client';
 
-import { NativeSelect } from '@velobits/ui';
+import { NativeSelect } from '@velobitsdevs/ui';
 
 export default function NativeSelectDemo() {
   return (

@@ -13,8 +13,8 @@ import {
   SidePanelTrigger,
   cn,
   useTheme,
-} from '@velobits/ui';
-import { MenuIcon, MoonIcon, SunIcon } from '@velobits/icons';
+} from '@velobitsdevs/ui';
+import { MenuIcon, MoonIcon, SunIcon } from '@velobitsdevs/icons';
 
 import { SITE } from '@/lib/site';
 

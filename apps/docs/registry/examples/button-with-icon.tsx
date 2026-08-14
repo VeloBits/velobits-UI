@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Spinner } from '@velobits/ui';
-import { FlagIcon } from '@velobits/icons';
+import { Button, Spinner } from '@velobitsdevs/ui';
+import { FlagIcon } from '@velobitsdevs/icons';
 
 export default function ButtonWithIcon() {
   return (

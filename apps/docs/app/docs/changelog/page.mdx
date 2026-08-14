@@ -58,7 +58,7 @@ parity test asserting the two never drift.
 
 ### Decisions worth knowing about
 
-- **`Form` is subpath-only** — `@velobits/ui/form`, never the barrel.
+- **`Form` is subpath-only** — `@velobitsdevs/ui/form`, never the barrel.
   `react-hook-form` is an optional peer and the barrel is a single bundled
   module, so re-exporting it would put a top-level `import 'react-hook-form'`
   into `dist/index.js` and break every consumer without forms. Bundling our own

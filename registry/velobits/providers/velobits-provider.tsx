@@ -26,7 +26,7 @@ export interface VelobitsProviderProps extends ThemeProviderProps {
  *
  * Under the editor app's federated setup this provider lives in the shell, and
  * its context has to cross into `editor-remote` and `analytics-remote`. That only
- * works if `@velobits/ui`, `@velobits/icons` and `framer-motion` are declared
+ * works if `@velobitsdevs/ui`, `@velobitsdevs/icons` and `framer-motion` are declared
  * `singleton: true` with a pinned `requiredVersion` in ALL THREE vite configs.
  * Otherwise each remote instantiates its own copy of this module, the shell's
  * context is invisible to it, and tooltips inside remotes throw.

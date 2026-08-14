@@ -1,6 +1,6 @@
 'use client';
 
-import { Checkbox, Label } from '@velobits/ui';
+import { Checkbox, Label } from '@velobitsdevs/ui';
 
 export default function CheckboxDemo() {
   return (

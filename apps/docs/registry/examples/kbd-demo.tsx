@@ -1,6 +1,6 @@
 'use client';
 
-import { Kbd, Separator } from '@velobits/ui';
+import { Kbd, Separator } from '@velobitsdevs/ui';
 
 export default function KbdDemo() {
   return (

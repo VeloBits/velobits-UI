@@ -2,7 +2,7 @@
 
 import { Slot } from 'radix-ui';
 
-import { ChevronRightIcon, MoreHorizontalIcon } from '@velobits/icons';
+import { ChevronRightIcon, MoreHorizontalIcon } from '@velobitsdevs/icons';
 
 import { cn } from '../lib/cn';
 

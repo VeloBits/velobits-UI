@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "velobits-theme",
   "title": "VeloBits theme",
-  "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobits/tokens test suite.",
+  "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobitsdevs/tokens test suite.",
   "cssVars": {
     "theme": {
       "radius-sm": "4px",

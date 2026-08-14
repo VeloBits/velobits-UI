@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { Button, cn } from '@velobits/ui';
-import { CheckIcon, CopyIcon } from '@velobits/icons';
+import { Button, cn } from '@velobitsdevs/ui';
+import { CheckIcon, CopyIcon } from '@velobitsdevs/icons';
 
 /**
  * Copy-to-clipboard with a confirmation that decays.

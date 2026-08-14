@@ -1,4 +1,4 @@
-import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@velobits/ui';
+import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@velobitsdevs/ui';
 
 import type { DocPropGroup } from '@/lib/generated/props';
 

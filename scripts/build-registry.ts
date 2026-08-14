@@ -6,7 +6,7 @@
  *
  * Two things this exists to prevent:
  *  1. Hand-maintaining `registry.json`, where the theme item's ~70 CSS variables
- *     would silently drift from `@velobits/tokens`.
+ *     would silently drift from `@velobitsdevs/tokens`.
  *  2. Publishing a registry whose file paths do not exist — the CLI fails at the
  *     consumer's machine, not ours, so the check happens here.
  */

@@ -1,8 +1,8 @@
 /**
- * @velobits/tokens — the VeloBits design system's token layer.
+ * @velobitsdevs/tokens — the VeloBits design system's token layer.
  *
  * ZERO dependencies and ZERO React, deliberately: the Keycloak login theme
- * consumes this package and **cannot** consume `@velobits/ui`. Its component
+ * consumes this package and **cannot** consume `@velobitsdevs/ui`. Its component
  * sources are git-ignored and re-vended by a `keycloakify sync-extensions`
  * postinstall hook, so shared *components* there means fighting the upstream
  * extension forever, while shared *tokens* is a clean seam the theme's own
@@ -14,12 +14,12 @@
  * layer and the page texture:
  *
  * ```css
- * @import '@velobits/tokens/theme.css';
- * @source "../node_modules/@velobits/ui/dist";
+ * @import '@velobitsdevs/tokens/theme.css';
+ * @source "../node_modules/@velobitsdevs/ui/dist";
  * ```
  *
  * That `@source` line is not optional. Tailwind v4 does not scan node_modules,
- * so utilities used *inside* `@velobits/ui` are never generated without it, and
+ * so utilities used *inside* `@velobitsdevs/ui` are never generated without it, and
  * the components arrive unstyled with no error anywhere.
  *
  * The page texture is the one piece that is **opt-in**: `theme.css` ships the

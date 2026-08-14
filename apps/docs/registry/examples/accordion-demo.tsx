@@ -1,6 +1,6 @@
 'use client';
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@velobits/ui';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@velobitsdevs/ui';
 
 export default function AccordionDemo() {
   return (

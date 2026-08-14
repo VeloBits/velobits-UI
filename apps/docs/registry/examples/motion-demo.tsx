@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 
-import { Button, Card, CardContent, CardHeader, CardTitle, SegmentedControl } from '@velobits/ui';
-import { PageTransition } from '@velobits/ui/motion';
+import { Button, Card, CardContent, CardHeader, CardTitle, SegmentedControl } from '@velobitsdevs/ui';
+import { PageTransition } from '@velobitsdevs/ui/motion';
 
 const ROUTES = {
   targeting: {
