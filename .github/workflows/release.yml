@@ -91,19 +91,47 @@ jobs:
           ')
 
           for s in $scope; do
-            # Empty on a scope this token cannot see, which is indistinguishable
-            # from one that does not exist — hence warn-only below.
-            members=$(curl -fsSL "https://registry.npmjs.org/-/org/$s/user" || echo '{}')
-            echo "Members of @$s: $members"
+            # Status and body separately, because they mean different things and an
+            # earlier version of this step conflated them: `curl -f … || echo '{}'`
+            # turned a 404 into the same empty map a real org returns, so "the scope
+            # does not exist" — hard, actionable, knowable — arrived as the warning
+            # for "members are private". Read them apart.
+            #
+            #   404          the name is unregistered. Nothing can publish into it.
+            #   200 {"u":…}  a USER scope. Membership is public, so check it.
+            #   200 {}       an ORG. Members are private to unauthenticated reads,
+            #                so ask npm as ourselves, below.
+            body=$(curl -sSL -o "$RUNNER_TEMP/members.json" -w '%{http_code}' \
+              "https://registry.npmjs.org/-/org/$s/user") || body=000
+            members=$(cat "$RUNNER_TEMP/members.json" 2>/dev/null || echo '{}')
+            echo "GET /-/org/$s/user -> HTTP $body  $members"
 
-            if node -e 'const m = JSON.parse(process.argv[1]); process.exit(Object.keys(m).length === 0 ? 1 : 0)' "$members"; then
-              if ! node -e 'process.exit(Object.keys(JSON.parse(process.argv[1])).includes(process.argv[2]) ? 0 : 1)' "$members" "$who"; then
-                echo "::error::npm user '$who' is not a member of '@$s'. The publish would fail with a masked E404 on PUT. Publish from an account that owns '@$s', or add '$who' to it with write access."
+            if [ "$body" = "404" ]; then
+              echo "::error::The '@$s' scope does not exist on npm — the name '$s' is not a registered org or user. Create the org first; a scope with no account behind it can never be published to."
+              exit 1
+            fi
+
+            if ! node -e 'const m=JSON.parse(process.argv[1]); process.exit(Object.keys(m).length===0?1:0)' "$members" 2>/dev/null; then
+              # An org. Ask the registry with our own credentials — this is the only
+              # check that distinguishes "not a member" from "member, cannot list",
+              # and not-a-member is precisely what produces the masked 404.
+              if roles=$(npm org ls "$s" --json 2>/dev/null); then
+                if node -e 'process.exit(Object.keys(JSON.parse(process.argv[1])).includes(process.argv[2])?0:1)' "$roles" "$who" 2>/dev/null; then
+                  echo "'$who' is a member of the '$s' org: $(node -p "JSON.parse(process.argv[1])[process.argv[2]]" "$roles" "$who")"
+                else
+                  echo "::error::npm user '$who' is NOT a member of the '$s' org, so the publish will fail with a masked E404 on PUT. Add '$who' to the org with write access, or issue NPM_TOKEN from an account that already has it. Members seen: $roles"
+                  exit 1
+                fi
+              else
+                echo "::warning::'@$s' is a registered org but its members could not be enumerated with this token. That is expected for a restricted role, and also what a token scoped to a DIFFERENT org looks like — if the publish below fails with E404 on PUT, re-issue NPM_TOKEN against '@$s' specifically."
+              fi
+            else
+              # A user scope: the owner is public, so this is decidable here.
+              if ! node -e 'process.exit(Object.keys(JSON.parse(process.argv[1])).includes(process.argv[2])?0:1)' "$members" "$who"; then
+                echo "::error::'@$s' is the personal scope of another npm account, not '$who'. Publish from the account that owns it, or move these packages to a scope you control."
                 exit 1
               fi
-              echo "'$who' can write to @$s."
-            else
-              echo "::warning::Could not read the member list for '@$s' — this token may not be able to see it. If the publish below fails with E404 on PUT, that is a permission error, not a missing package."
+              echo "'$who' owns the '@$s' scope."
             fi
 
             # The trap per-package granular tokens fall into, said out loud because
