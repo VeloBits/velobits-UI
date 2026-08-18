@@ -31,6 +31,7 @@ apps/docs/public/search-index.json
 .playwright-mcp/
 
 .claude*
+*swarm*
 
 # NOT ignored, deliberately:
 #   registry.json             the shadcn CLI manifest. Generated from
