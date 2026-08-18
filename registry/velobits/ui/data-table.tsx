@@ -43,14 +43,14 @@ import {
  * ## WHY THIS IS NOT TANSTACK TABLE
  *
  * A deliberate choice, not an omission. TanStack is excellent and it is the
- * right answer for pivoting, grouping, faceted filters and column resizing —
+ * right answer for pivoting, grouping, faceted filters and column resizing ,
  * none of which any VeloBits surface does. What our tables actually need is a
  * list of columns, a sort key, a selection set and a row click.
  *
  * Against that, a headless table engine costs a ~14 kB dependency, a second
  * mental model for "what is a column", and a rewrite of the column definitions
  * that already exist and already work. The registry shape below is lifted from
- * the dashboard app's flags table, which arrived at it independently — so
+ * the dashboard app's flags table, which arrived at it independently , so
  * adopting it is a move, not a migration.
  *
  * If a surface ever genuinely needs grouping or virtualisation, that surface
@@ -62,7 +62,7 @@ import {
  *
  *  1. **`aria-sort` on the `<th>`, not on the sort button.** The attribute
  *     describes the column, and assistive tech reads it from the header cell. On
- *     the button it is silently ignored — the visual arrow works, the
+ *     the button it is silently ignored , the visual arrow works, the
  *     announcement does not, and nothing anywhere reports a problem.
  *  2. **A clickable `<tr>` is mouse-only.** See `onRowActivate` below.
  *  3. **Interactive cells must swallow the click**, or flipping a switch also
@@ -93,12 +93,12 @@ export interface DataTableColumn<TRow, TContext = undefined> {
   /** Stable identity. Used as the React key and for nothing else. */
   id: string;
   /**
-   * The column's name — and it is a name, not decoration.
+   * The column's name , and it is a name, not decoration.
    *
    * **Never empty.** A `<th>` with no text is an axe `empty-table-header`
    * violation and, more to the point, a screen reader announcing every cell in
    * that column with no idea what it contains. A column with nothing to *show*
-   * in its header — actions, a kebab menu — still has a name: pass it, and set
+   * in its header , actions, a kebab menu , still has a name: pass it, and set
    * `hideHeader`.
    */
   header: React.ReactNode;
@@ -111,12 +111,12 @@ export interface DataTableColumn<TRow, TContext = undefined> {
   /** The cell body. */
   cell: (row: TRow, context: TContext) => React.ReactNode;
   /**
-   * Makes the header a sort control. The value is opaque here — it is passed
+   * Makes the header a sort control. The value is opaque here , it is passed
    * back through `onSortChange` for the caller to interpret.
    */
   sortKey?: string;
   /**
-   * Owns its own header — the select-all checkbox, which has nothing to sort by.
+   * Owns its own header , the select-all checkbox, which has nothing to sort by.
    * Wins over `header` and over the sort button.
    */
   headerCell?: (context: TContext) => React.ReactNode;
@@ -130,7 +130,7 @@ export interface DataTableColumn<TRow, TContext = undefined> {
   className?: string;
   /** Applied to the `<th>` only. */
   headClassName?: string;
-  /** Return false to drop the column — a permission, a narrow viewport, a mode. */
+  /** Return false to drop the column , a permission, a narrow viewport, a mode. */
   visible?: (context: TContext) => boolean;
 }
 
@@ -145,7 +145,7 @@ export interface DataTableProps<TRow, TContext = undefined> extends Omit<
    * Passed to every `cell`, `headerCell` and `visible` call.
    *
    * **Memoise it.** The rows below are `memo`ised and this object is one of the
-   * props they compare, so a fresh object per render makes the memo dead code —
+   * props they compare, so a fresh object per render makes the memo dead code ,
    * and the symptom is not a bug, it is a filter box that stutters at a hundred
    * rows. This component cannot enforce it; what it can do is not be the reason
    * the comparison fails.
@@ -158,7 +158,7 @@ export interface DataTableProps<TRow, TContext = undefined> extends Omit<
   sort?: SortState;
   onSortChange?: (sort: SortState) => void;
   /**
-   * Open the row. See the note on keyboard activation below — this makes the
+   * Open the row. See the note on keyboard activation below , this makes the
    * `<tr>` focusable and Enter/Space-activatable, which is the *convenience*
    * path; the row should still contain a real link or button.
    */
@@ -167,14 +167,14 @@ export interface DataTableProps<TRow, TContext = undefined> extends Omit<
   rowLabel?: (row: TRow) => string;
   /** Draws the row as selected. Pair with `useRowSelection`. */
   isRowSelected?: (row: TRow) => boolean;
-  /** Extra classes per row — dimming an archived record, say. */
+  /** Extra classes per row , dimming an archived record, say. */
   rowClassName?: (row: TRow) => string | undefined;
   /** Shown in a spanning cell when `rows` is empty. */
   empty?: React.ReactNode;
   /** Classes for the scroll wrapper. Surface treatment belongs here. */
   containerClassName?: string;
   /**
-   * Forwarded to the underlying {@link Table} — `'glass'` (default), `'panel'` or
+   * Forwarded to the underlying {@link Table} , `'glass'` (default), `'panel'` or
    * `'none'`.
    *
    * **Pass `'none'` for a DataTable already inside a Card, Dialog or SidePanel.**
@@ -184,7 +184,7 @@ export interface DataTableProps<TRow, TContext = undefined> extends Omit<
    *
    * This existed on `Table` from the start and was missing here, so the one
    * component most likely to be dropped inside a Card was also the one that could
-   * not opt out — `surface` is not part of `React.ComponentProps<'table'>`, so it
+   * not opt out , `surface` is not part of `React.ComponentProps<'table'>`, so it
    * was not reachable through the prop spread either. It is declared explicitly
    * rather than left to `...props` so the compiler can see it.
    */
@@ -224,7 +224,7 @@ function DataTable<TRow, TContext = undefined>({
     >
       {/*
        * The caption IS the accessible name, and it is announced wherever it is
-       * painted — so `sr-only` costs nothing semantically. A table with neither
+       * painted , so `sr-only` costs nothing semantically. A table with neither
        * a caption nor an aria-label announces as "table, 5 columns, 40 rows",
        * which does not say which of the three tables on the page you are in.
        */}
@@ -250,7 +250,7 @@ function DataTable<TRow, TContext = undefined>({
                  * property of the column, and AT reads it from the header cell;
                  * on the button it is ignored and the sort state is announced
                  * nowhere, while the arrow glyph keeps working. Omitted rather
-                 * than set to "none" on inactive columns — "none" on every other
+                 * than set to "none" on inactive columns , "none" on every other
                  * header is noise, and absent means the same thing.
                  */
                 aria-sort={active ? (sort!.dir === 'asc' ? 'ascending' : 'descending') : undefined}
@@ -293,7 +293,7 @@ function DataTable<TRow, TContext = undefined>({
                     )}
                   </button>
                 ) : (
-                  // `sr-only`, never an empty `<th>` — see the note on `header`.
+                  // `sr-only`, never an empty `<th>` , see the note on `header`.
                   <span className={column.hideHeader ? 'sr-only' : undefined}>{column.header}</span>
                 )}
               </TableHead>
@@ -354,7 +354,7 @@ interface DataTableRowProps<TRow, TContext> {
  * two of them have their own trap:
  *
  *  1. **`tabIndex={0}`** so the row can be focused at all. On its own this is
- *     worse than nothing — a focus stop that does nothing when you press Enter.
+ *     worse than nothing , a focus stop that does nothing when you press Enter.
  *  2. **A keydown handler for Enter and Space**, with `preventDefault` on Space.
  *     Without it, Space scrolls the page: the row activates *and* the viewport
  *     jumps, which reads as a broken navigation.
@@ -368,7 +368,7 @@ interface DataTableRowProps<TRow, TContext> {
  * paragraph. Hence `rowLabel` being required alongside `onRowActivate`.
  *
  * **This is still the convenience path, not the primary one.** A row that opens
- * a record should also contain a real `<a>` in its identifying cell — that is
+ * a record should also contain a real `<a>` in its identifying cell , that is
  * what gives middle-click, Cmd-click, "open in new tab", a status-bar URL
  * preview, and a sane experience in a screen reader's link list. The row click
  * is an accelerator layered on top of it.
@@ -397,7 +397,7 @@ function DataTableRowBase<TRow, TContext>({
       /*
        * No `aria-selected` here, deliberately. This is a `table`, not a `grid`:
        * row selection is not a table-level concept, and the accessible truth
-       * about whether a row is selected already exists — it is the checkbox in
+       * about whether a row is selected already exists , it is the checkbox in
        * the select column, which announces checked. Adding `aria-selected`
        * would state the same fact twice, in a role context where screen readers
        * handle it inconsistently, and the two could then disagree.
@@ -437,7 +437,7 @@ function DataTableRowBase<TRow, TContext>({
  * one.
  *
  * A toolbar search re-derives the filtered list on every keystroke. Without this,
- * each character re-renders every visible row — and a row is not cheap: it
+ * each character re-renders every visible row , and a row is not cheap: it
  * formats a timestamp, mounts a switch, a tooltip and a Radix menu.
  *
  * It only bites while `context` keeps its identity between renders, which is the

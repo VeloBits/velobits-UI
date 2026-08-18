@@ -29,13 +29,13 @@ const NAV = [
 ];
 
 /**
- * Exact match for the root, prefix match for everything else — so
+ * Exact match for the root, prefix match for everything else , so
  * `/docs/components/button` lights up "Components" while `/docs/colors` does not
  * also light up "Docs".
  *
  * `trailingSlash: true` is on for the static export, so `usePathname()` returns
  * paths with a trailing slash and the hrefs above are written without one.
- * Comparing them raw makes every link inactive — silently, and only in the
+ * Comparing them raw makes every link inactive , silently, and only in the
  * production build.
  */
 function isCurrent(pathname: string, href: string) {
@@ -65,7 +65,7 @@ export function SiteHeader() {
 
   return (
     /*
-     * A sticky bar over scrolling content — one of the sanctioned Tier-O glass
+     * A sticky bar over scrolling content , one of the sanctioned Tier-O glass
      * surfaces, and the only blurred layer on most routes. `z-sticky` sits BELOW
      * `z-dropdown` deliberately, or the header would paint over its own menus.
      */
@@ -73,7 +73,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center gap-3 px-4 sm:px-6">
         {/*
          * The whole sidebar, in a real SidePanel below the lg breakpoint. Same
-         * component the AppShell drawer uses — so it buys the focus trap and,
+         * component the AppShell drawer uses , so it buys the focus trap and,
          * the part hand-rolled drawers miss, focus restoration to the trigger.
          */}
         <SidePanel open={navOpen} onOpenChange={setNavOpen}>
@@ -82,7 +82,7 @@ export function SiteHeader() {
               <MenuIcon />
             </Button>
           </SidePanelTrigger>
-          {/* `left`, which the component maps to the inline START edge — it uses
+          {/* `left`, which the component maps to the inline START edge , it uses
               logical properties, so this mirrors correctly under RTL. */}
           <SidePanelContent side="left">
             <SidePanelHeader>
@@ -108,7 +108,7 @@ export function SiteHeader() {
 
         {/*
          * The current page is signalled THREE ways, and that is not belt-and-
-         * braces — it is 1.4.1. A colour shift alone leaves the answer invisible
+         * braces , it is 1.4.1. A colour shift alone leaves the answer invisible
          * to anyone who cannot separate `--fg` from `--muted-fg`, and invisible
          * to a screen reader entirely.
          *
@@ -163,7 +163,7 @@ export function SiteHeader() {
            * That JS branch is a hydration bug, and it is the reference example
            * for why `useTheme` exposes `mounted`. The server has no localStorage,
            * so it renders the light branch while the client's first render
-           * already knows the stored preference — when they disagree React throws
+           * already knows the stored preference , when they disagree React throws
            * #418 and discards the server HTML. Letting the `dark` class decide
            * keeps the markup identical on both sides, and shows the right icon
            * before React has booted.

@@ -104,7 +104,7 @@ describe('AppShell, the skip link', () => {
     /**
      * Without it the browser scrolls to the target and leaves focus on the link,
      * so the very next Tab goes straight back into the navigation the user asked
-     * to skip — the link appears to do nothing.
+     * to skip , the link appears to do nothing.
      */
     render(<Fixture />);
     expect(screen.getByRole('main').getAttribute('tabindex')).toBe('-1');
@@ -184,7 +184,7 @@ describe('AppShell, the resize case it CAN handle', () => {
     /**
      * Otherwise the rail and the drawer are both showing, with a scrim over the
      * page and no way to see what you clicked. This is the one of the three
-     * lifecycle cases that is pure layout, so the shell owns it — closing on
+     * lifecycle cases that is pure layout, so the shell owns it , closing on
      * navigation needs a router and stays the caller's job.
      */
     render(<Fixture />);
@@ -296,7 +296,7 @@ describe('AppShell, glass', () => {
   it('applies the Tier-S rail material without stripping it', () => {
     /**
      * The temptation is `shadow-none border-0`, because those edges are
-     * off-screen anyway — and that deletes the inset specular highlight that IS
+     * off-screen anyway , and that deletes the inset specular highlight that IS
      * dark mode's material.
      */
     const { container } = render(<Fixture />);

@@ -24,7 +24,7 @@ export default function CardDemo() {
           </CardAction>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          The archetypal Tier-S surface, with the page as its backdrop — which is the backdrop the
+          The archetypal Tier-S surface, with the page as its backdrop , which is the backdrop the
           perceptibility gate measures it against.
         </CardContent>
         <CardFooter>
@@ -36,7 +36,7 @@ export default function CardDemo() {
       <Card surface="panel">
         <CardHeader>
           <CardTitle>Staging</CardTitle>
-          <CardDescription>surface=&quot;panel&quot; — the opaque original</CardDescription>
+          <CardDescription>surface=&quot;panel&quot; , the opaque original</CardDescription>
           <CardAction>
             <Badge variant="warning">Drifted</Badge>
           </CardAction>

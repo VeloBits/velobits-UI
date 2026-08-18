@@ -13,7 +13,7 @@ export default function UseThemeDemo() {
          * Both icons render and CSS picks one, rather than branching on `theme`
          * in JS. The server has no localStorage, so a JS branch
          * renders the light arm while the client's first render already knows the
-         * stored preference — React throws #418 and discards the server HTML.
+         * stored preference , React throws #418 and discards the server HTML.
          * Letting the `dark` class decide keeps the markup identical on both
          * sides. `mounted` is for the cases CSS cannot express, like the readout
          * below.

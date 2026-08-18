@@ -10,7 +10,7 @@ export interface DiffLine {
 }
 
 /**
- * A unified line diff — what changed between two versions of a config payload.
+ * A unified line diff , what changed between two versions of a config payload.
  *
  * ```tsx
  * <DiffViewer lines={diffLines(prettyJson(before), prettyJson(after))} label="Config v3 → v4" />
@@ -30,13 +30,13 @@ export interface DiffLine {
  * for everyone else they are the fastest possible scan.
  *
  * The gutter is `select-none`, so copying the diff yields the code and not a
- * column of punctuation — the thing that makes hand-marked diffs annoying to
+ * column of punctuation , the thing that makes hand-marked diffs annoying to
  * reuse.
  * ─────────────────────────────────────────────────────────────────────────────
  *
  * ## What a screen reader gets
  *
- * A per-line `sr-only` "Added"/"Removed" would be intolerable — a 200-line diff
+ * A per-line `sr-only` "Added"/"Removed" would be intolerable , a 200-line diff
  * would announce the word "same" 190 times. Instead:
  *
  *  - the region is labelled and carries a **counted summary** ("3 lines added,
@@ -63,7 +63,7 @@ export interface DiffViewerProps extends Omit<React.ComponentProps<'div'>, 'chil
 const LINE_STYLES: Record<DiffKind, string> = {
   /**
    * `bg-*-soft` is an α 0.10–0.16 wash, so it tints whatever surface the diff
-   * sits on rather than replacing it — correct here, and the reason these are
+   * sits on rather than replacing it , correct here, and the reason these are
    * safe on a line where they would flatten a glass component.
    */
   added: 'bg-success-soft',
@@ -130,7 +130,7 @@ function DiffViewer({ lines, label, hideSummary = false, className, ...props }: 
         >
           <span
             data-slot="diff-marker"
-            // NOT aria-hidden — see the docblock. `select-none` so a copied diff
+            // NOT aria-hidden , see the docblock. `select-none` so a copied diff
             // is pasteable code rather than code with a punctuation column.
             className="w-2 shrink-0 select-none opacity-70"
           >
@@ -153,7 +153,7 @@ function DiffViewer({ lines, label, hideSummary = false, className, ...props }: 
  *
  * ## The guard is not optional
  *
- * LCS is O(n·m) in time **and memory** — the table is `n × m` numbers. Two
+ * LCS is O(n·m) in time **and memory** , the table is `n × m` numbers. Two
  * 5,000-line inputs is 25 million array slots, which is not slow so much as it is
  * several hundred megabytes allocated synchronously on the main thread, and the
  * tab dies rather than lags. Config payloads are small and this never fires in

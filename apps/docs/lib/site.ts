@@ -1,6 +1,6 @@
 /**
  * The handful of strings that appear in dozens of places and must never disagree
- * with each other — most of all the registry namespace, which is copied out of
+ * with each other , most of all the registry namespace, which is copied out of
  * this site into consumers' `components.json` files.
  */
 
@@ -19,7 +19,7 @@ export const SITE = {
  *
  * Namespaced registries need shadcn CLI 3 or newer. The full-URL form documented
  * alongside it works on any version and needs no configuration, which is why it
- * is never removed from these pages — only demoted.
+ * is never removed from these pages , only demoted.
  */
 export const REGISTRY_NAMESPACE = '@velobits';
 

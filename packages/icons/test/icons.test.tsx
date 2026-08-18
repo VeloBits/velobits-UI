@@ -231,7 +231,7 @@ describe('the accessibility opt-in', () => {
 
   it('documents the trap: aria-label alone stays hidden', () => {
     /**
-     * Not an endorsement — an assertion that the failure mode is what the
+     * Not an endorsement , an assertion that the failure mode is what the
      * docblock on `createIcon` says it is. `aria-hidden` wins over
      * `aria-label`, so the label is never announced.
      */

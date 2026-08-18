@@ -23,7 +23,7 @@ const ROUTES = {
 type RouteKey = keyof typeof ROUTES;
 
 /**
- * `transitionKey` stands in for the route here — `usePathname()` in Next,
+ * `transitionKey` stands in for the route here , `usePathname()` in Next,
  * `useLocation().pathname` in React Router. With a constant value the component
  * renders once and never animates again, which reads as the transition being
  * broken rather than the key being wrong.

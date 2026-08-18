@@ -5,20 +5,20 @@
  * Shared by `build-registry.ts` (which stamps the targets and rewrites the
  * imports) and `build-docs-data.ts` (which tells the reader where the files land).
  * One module rather than two copies, because the failure mode of a copy here is
- * documentation confidently naming the wrong path — and a wrong path in a "copy
+ * documentation confidently naming the wrong path , and a wrong path in a "copy
  * and paste this into…" instruction is worse than no instruction.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * ## Why the installed layout is FLAT, when the source is not
  *
- * `registry/velobits/` is laid out for the npm build — `ui/`, `lib/`, `hooks/`,
- * `providers/` — because `packages/ui`'s per-entry `exports` map and tsup's entry
+ * `registry/velobits/` is laid out for the npm build , `ui/`, `lib/`, `hooks/`,
+ * `providers/` , because `packages/ui`'s per-entry `exports` map and tsup's entry
  * map are both derived from that shape. The components therefore import each other
  * relatively against it: `from '../lib/cn'`, `from '../ui/tooltip'`.
  *
  * The CLI does not reproduce that shape. It writes each file to the alias its TYPE
- * implies — `registry:ui` → `aliases.ui`, `registry:lib` → `aliases.lib`,
- * `registry:hook` → `aliases.hooks` — which scatters four sibling directories to
+ * implies , `registry:ui` → `aliases.ui`, `registry:lib` → `aliases.lib`,
+ * `registry:hook` → `aliases.hooks` , which scatters four sibling directories to
  * three unrelated places. And it only rewrites ALIAS-form imports (`@/lib/utils`);
  * a relative specifier is copied through untouched.
  *
@@ -39,7 +39,7 @@
  * The one folder everything lands in, inside the consumer's own `ui` alias.
  *
  * `@ui/` is a placeholder the CLI resolves against `components.json`, so a project
- * whose `aliases.ui` is `@/parts/widgets` gets `parts/widgets/velobits/…` — the
+ * whose `aliases.ui` is `@/parts/widgets` gets `parts/widgets/velobits/…` , the
  * namespace is ours, the location stays theirs. Verified against a deliberately
  * non-default alias rather than assumed.
  */
@@ -48,7 +48,7 @@ export const INSTALL_DIR = '@ui/velobits';
 /**
  * `cn` is the one file that does NOT go in that folder. It targets the consumer's
  * `utils` module, so a project already on shadcn ends up with one `cn` instead of
- * two — carrying OUR implementation.
+ * two , carrying OUR implementation.
  *
  * `@lib/utils.ts`, not `@utils`: `@utils` is not a placeholder the CLI knows, and
  * passing it writes a literal file called `@utils`. With the default config
@@ -58,14 +58,14 @@ export const INSTALL_DIR = '@ui/velobits';
  * ## This target can collide, and the direction of the collision matters
  *
  * If the consumer already has shadcn's `utils`, the CLI prompts and defaults to
- * **No** — so without `--overwrite` they keep the stock `twMerge(clsx())` and our
+ * **No** , so without `--overwrite` they keep the stock `twMerge(clsx())` and our
  * extended class groups go missing. That is not cosmetic. `registry/velobits/lib/cn.ts`
  * extends tailwind-merge with `rounded-pill`, the `z-*` ladder, the named
  * durations, and a BIDIRECTIONAL `control-material ⇄ shadow` conflict group; lose
  * that last one and two `box-shadow` declarations survive on the same element.
  *
  * The saving asymmetry: ours is a strict SUPERSET. Same signature, same behaviour
- * on every standard utility, plus the extra groups — so overwriting shadcn's copy
+ * on every standard utility, plus the extra groups , so overwriting shadcn's copy
  * with ours is safe for their components too, while the reverse silently degrades
  * ours. Which is why every install surface in the docs says to overwrite.
  */
@@ -82,7 +82,7 @@ export function targetFor(path: string): string {
 
 /**
  * A target with its placeholder expanded to the DEFAULT alias, for display in the
- * docs — "copy this into `components/ui/velobits/button.tsx`" reads as an
+ * docs , "copy this into `components/ui/velobits/button.tsx`" reads as an
  * instruction, where `@ui/velobits/button.tsx` reads as a riddle.
  *
  * The docs say once, next to it, that the prefix follows the reader's own

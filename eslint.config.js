@@ -14,12 +14,12 @@ export default tseslint.config(
       // .next/types. Linting generated output produces thousands of errors
       // nobody can act on.
       '**/.next/**',
-      // The static export — the whole deployable, and it is minified JS. Same
+      // The static export , the whole deployable, and it is minified JS. Same
       // reasoning as `.next` above: thousands of errors nobody can act on.
       'apps/docs/out/**',
       // Vercel's build output, same minified deployable by another path. CI never
       // has this directory, so its absence here only ever broke `npm run lint`
-      // for whoever had run a Vercel build locally — 3900 errors, none actionable.
+      // for whoever had run a Vercel build locally , 3900 errors, none actionable.
       '**/.vercel/**',
       'packages/tokens/src/generated/**',
       // Compiled registry output, written by `npm run registry:build`.
@@ -58,7 +58,7 @@ export default tseslint.config(
    * git-ignored and re-vended by a keycloakify postinstall hook). The moment a
    * token file imports React the theme's only clean seam closes.
    *
-   * Node built-ins are barred for the same reason — the generator script under
+   * Node built-ins are barred for the same reason , the generator script under
    * scripts/ is where filesystem work belongs, and it is not shipped.
    */
   {
@@ -71,7 +71,7 @@ export default tseslint.config(
             {
               group: ['react', 'react-dom', 'react/*', 'node:*'],
               message:
-                '@velobitsio/tokens must stay dependency-free and React-free — the Keycloak login theme consumes it precisely because it is. Put anything needing React in @velobitsio/ui.',
+                '@velobitsio/tokens must stay dependency-free and React-free , the Keycloak login theme consumes it precisely because it is. Put anything needing React in @velobitsio/ui.',
             },
           ],
         },
@@ -96,7 +96,7 @@ export default tseslint.config(
             {
               name: 'lucide-react',
               message:
-                'velobits-ui IS the icon source — add the glyph to @velobitsio/icons instead. The 24×24/strokeWidth-2 set is tuned for the 13-18px these products render at.',
+                'velobits-ui IS the icon source , add the glyph to @velobitsio/icons instead. The 24×24/strokeWidth-2 set is tuned for the 13-18px these products render at.',
             },
           ],
         },
@@ -120,7 +120,7 @@ export default tseslint.config(
             {
               group: ['@tanstack/react-query', 'react-router-dom', '**/api/*'],
               message:
-                'Shared primitives must not fetch, route, or know an app type — those belong in the consuming app.',
+                'Shared primitives must not fetch, route, or know an app type , those belong in the consuming app.',
             },
           ],
         },

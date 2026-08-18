@@ -39,7 +39,7 @@ import { cn } from '../lib/cn';
  *
  * Radix always points `aria-describedby` at its description id and warns when
  * nothing claims it. For a genuinely description-less dialog pass
- * `aria-describedby={undefined}` — that silences the warning without leaving a
+ * `aria-describedby={undefined}` , that silences the warning without leaving a
  * dangling reference behind.
  */
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -59,7 +59,7 @@ function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.C
 }
 
 /**
- * The scrim. `bg-overlay` is `--overlay` — a dimmed page, NOT a second blur.
+ * The scrim. `bg-overlay` is `--overlay` , a dimmed page, NOT a second blur.
  * Blurring both the scrim and the panel doubles the backdrop cost for an effect
  * nobody can see through the panel anyway.
  *
@@ -88,13 +88,13 @@ function DialogOverlay({
 
 /**
  * `~480px` is the form width the system settled on; `size` widens it for the
- * occasional table or diff. Only `max-width` changes — the panel is
+ * occasional table or diff. Only `max-width` changes , the panel is
  * `calc(100% - 2rem)` below that, so it keeps a gutter on a phone.
  */
 const dialogContentVariants = cva(
   [
     // Tier O. `.glass` carries the background, the border and the shadow, and it
-    // lives in Tailwind's `components` layer — so a `bg-*` utility added here or
+    // lives in Tailwind's `components` layer , so a `bg-*` utility added here or
     // by a caller SILENTLY REPLACES the glass background. Do not add one.
     'glass',
     /*
@@ -113,19 +113,19 @@ const dialogContentVariants = cva(
     /*
      * A safety net, not a layout: a 480px form does not scroll. When one does
      * overflow, the ✕ is positioned against this box and therefore scrolls with
-     * it — Esc and the scrim both still close, so the dialog is never a trap.
+     * it , Esc and the scrim both still close, so the dialog is never a trap.
      * `dvh` rather than `vh` so mobile browser chrome is accounted for.
      */
     'max-h-[calc(100dvh-2rem)] overflow-y-auto',
     'grid gap-4 rounded-xl p-6 text-fg',
     /*
-     * Enter/exit. Opacity and scale only — never the blur radius, which forces a
+     * Enter/exit. Opacity and scale only , never the blur radius, which forces a
      * full backdrop repaint every frame.
      *
      * The duration is set through `animation-duration-(--duration-overlay)` and
      * NOT through the `duration-overlay` token utility: `animate-in` expands to
      * the `animation` SHORTHAND, and under a `data-[state=…]` variant it outranks
-     * a bare `animation-duration` longhand on both order and specificity — so
+     * a bare `animation-duration` longhand on both order and specificity , so
      * `duration-overlay` would be silently discarded. `--tw-animation-duration`
      * is the variable the shorthand itself reads, so it always wins.
      */
@@ -139,7 +139,7 @@ const dialogContentVariants = cva(
     variants: {
       size: {
         sm: 'max-w-[24rem]',
-        /** 480px — the form default. */
+        /** 480px , the form default. */
         md: 'max-w-[30rem]',
         lg: 'max-w-[42rem]',
         xl: 'max-w-[56rem]',
@@ -151,7 +151,7 @@ const dialogContentVariants = cva(
 
 /**
  * Matches an enabled form field, in DOM order. Carried verbatim from the
- * dashboard app's dialog — see `focusFirstField` below for why it exists.
+ * dashboard app's dialog , see `focusFirstField` below for why it exists.
  */
 const FIRST_FORM_FIELD =
   'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
@@ -167,7 +167,7 @@ export interface DialogContentProps
    * ## Why this prop exists at all: `autoFocus` is silently swallowed
    *
    * Radix wraps the content in a `FocusScope` that focuses the first tabbable
-   * element on mount — which in this layout is the header ✕ — and it does so
+   * element on mount , which in this layout is the header ✕ , and it does so
    * AFTER React has honoured `autoFocus`. So `autoFocus` on a field has never
    * worked inside a Radix Dialog, in any version, and it fails with no warning:
    * the dialog opens, the caret is nowhere, and Enter activates the close button
@@ -179,7 +179,7 @@ export interface DialogContentProps
    *
    * ## Default `false`, deliberately
    *
-   * A dialog with no field to focus — a confirmation, a reveal-once API key —
+   * A dialog with no field to focus , a confirmation, a reveal-once API key ,
    * wants Radix's default, and so does anything long enough to read rather than
    * fill in (that is `SidePanel`, which never redirects).
    *
@@ -213,7 +213,7 @@ function DialogContent({
            * `currentTarget` is the content element: Radix dispatches
            * `focusScope.autoFocusOnMount` on the FocusScope container, which
            * `asChild` makes this node. Reading it off the event rather than a
-           * local ref keeps a caller-supplied `ref` intact — composing one here
+           * local ref keeps a caller-supplied `ref` intact , composing one here
            * is a clobber waiting to happen.
            */
           const field = (event.currentTarget as HTMLElement | null)?.querySelector<HTMLElement>(
@@ -227,7 +227,7 @@ function DialogContent({
         {...props}
       >
         {/*
-         * FIRST in the DOM, though it is painted in the corner — so it is the
+         * FIRST in the DOM, though it is painted in the corner , so it is the
          * first tabbable node and therefore what Radix focuses on open. That is
          * deliberate: the ✕ is the harmless default landing spot, and it is
          * exactly the element `focusFirstField` exists to step past. Moving it
@@ -242,7 +242,7 @@ function DialogContent({
              * `absolute`, and it matters: `backdrop-filter` makes `.glass` a
              * containing block for `position: fixed` descendants, so a fixed
              * child here would be positioned against the dialog rather than the
-             * viewport — and would not escape it.
+             * viewport , and would not escape it.
              */
             className={cn(
               'absolute end-3 top-3 grid size-7 place-items-center rounded-md text-muted-foreground',
@@ -300,7 +300,7 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
 
 /**
  * `text-muted-foreground` resolves to `--muted-on-glass` in here, because
- * `.glass` rebinds `--muted-fg` for its descendants — `--muted-fg` measures
+ * `.glass` rebinds `--muted-fg` for its descendants , `--muted-fg` measures
  * 3.09:1 over the worst-case backdrop once glass is composited over it, and the
  * on-glass step holds 4.92:1. Nothing at the call site has to know.
  */

@@ -1,5 +1,5 @@
 /**
- * @velobitsio/tokens — the VeloBits design system's token layer.
+ * @velobitsio/tokens , the VeloBits design system's token layer.
  *
  * ZERO dependencies and ZERO React, deliberately: the Keycloak login theme
  * consumes this package and **cannot** consume `@velobitsio/ui`. Its component
@@ -10,7 +10,7 @@
  *
  * ## Consuming the CSS
  *
- * One import per app — `theme.css` pulls in Tailwind, the raw tokens, the glass
+ * One import per app , `theme.css` pulls in Tailwind, the raw tokens, the glass
  * layer and the page texture:
  *
  * ```css
@@ -25,7 +25,7 @@
  * The page texture is the one piece that is **opt-in**: `theme.css` ships the
  * `.page-texture` class but nothing applies it, because a page treatment is a
  * product decision and four different consumers share this layer. Put it on the
- * element that owns the page background — see `src/texture.ts`.
+ * element that owns the page background , see `src/texture.ts`.
  */
 
 export * from './color';

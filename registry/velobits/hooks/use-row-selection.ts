@@ -12,7 +12,7 @@ export interface RowSelection {
   count: number;
   /** Every row on screen is selected, and there is at least one. */
   allSelected: boolean;
-  /** Some but not all — the header checkbox's indeterminate state. */
+  /** Some but not all , the header checkbox's indeterminate state. */
   someSelected: boolean;
   isSelected: (id: string) => boolean;
   toggle: (id: string) => void;
@@ -22,7 +22,7 @@ export interface RowSelection {
 }
 
 /**
- * Row selection for `DataTable` — the state half of bulk operations.
+ * Row selection for `DataTable` , the state half of bulk operations.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * ## THE SELECTION IS DERIVED, NOT STORED
@@ -32,11 +32,11 @@ export interface RowSelection {
  *
  * That is the whole design, and it exists because a bulk action must never point
  * at something invisible. "Disable 12 flags" has to mean the twelve you can see
- * and count — not twelve minus the four the filter just hid, and certainly not
+ * and count , not twelve minus the four the filter just hid, and certainly not
  * twelve including one the server deleted.
  *
- * The obvious alternative — prune the stored set in an effect whenever the row
- * list changes — leaves a window between the filter narrowing and the effect
+ * The obvious alternative , prune the stored set in an effect whenever the row
+ * list changes , leaves a window between the filter narrowing and the effect
  * running, during which the bar shows a stale count and a click acts on rows
  * that are gone. Deriving closes the window rather than making it small.
  *
@@ -50,7 +50,7 @@ export interface RowSelection {
  *
  * Deriving per render would hand back a fresh object every time. `DataTable`
  * memoises its rows and this object reaches them, so a hook that re-identified
- * on every keystroke would silently turn that memo into dead code — and a
+ * on every keystroke would silently turn that memo into dead code , and a
  * hundred rows, each formatting a date and mounting a switch and a menu, would
  * re-render per character typed into the filter box.
  *
@@ -63,7 +63,7 @@ export interface RowSelection {
  * physically sits above.
  * @param getId Read per render from a ref, so an inline arrow at the call site
  * does not invalidate anything. Changing what it *returns* for a given row
- * mid-session is not supported — that is a different row.
+ * mid-session is not supported , that is a different row.
  */
 export function useRowSelection<TRow>(
   rows: readonly TRow[],
@@ -79,7 +79,7 @@ export function useRowSelection<TRow>(
   /*
    * Held across renders so an intersection that comes out the same is handed
    * back as the same object. Without it, filtering to a narrower list of rows
-   * none of which is selected would still produce a NEW empty Set — and
+   * none of which is selected would still produce a NEW empty Set , and
    * therefore a new context object, and therefore a hundred re-rendered rows
    * for a change that did not happen.
    */
@@ -110,7 +110,7 @@ export function useRowSelection<TRow>(
   const toggleAll = useCallback(() => {
     setRaw((current) => {
       const onScreen = ids.filter((id) => current.has(id)).length;
-      // Everything on screen is already ticked, so this is a clear — and it
+      // Everything on screen is already ticked, so this is a clear , and it
       // clears only what is on screen, leaving an off-screen selection alone.
       if (onScreen === ids.length) {
         const next = new Set(current);

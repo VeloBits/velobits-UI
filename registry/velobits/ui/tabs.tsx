@@ -20,14 +20,14 @@ import { cn } from '../lib/cn';
  * Radix already emits `data-orientation` on the root, so the attribute below is
  * a duplicate of the same value. It stays because every orientation-dependent
  * class in this file is a `group-data-[orientation=…]/tabs:` selector reading
- * that attribute — if a future Radix release stopped emitting it, the vertical
+ * that attribute , if a future Radix release stopped emitting it, the vertical
  * layout would silently flatten with nothing to point at. Cheap insurance for a
  * styling contract that has no other guard.
  *
  * ## Nothing here animates layout
  *
  * The `line` variant's underline is an `::after` pseudo-element whose *opacity*
- * crossfades — not a sliding indicator whose position is animated, and not a
+ * crossfades , not a sliding indicator whose position is animated, and not a
  * border that would change the trigger's box. `transition-colors` rather than the
  * dashboard app's `transition-all` for the same reason: `transition-all` will
  * happily animate whatever layout property a caller adds via `className`.
@@ -51,9 +51,9 @@ function Tabs({
 /**
  * Two variants, and they are not interchangeable:
  *
- *  - `default` — a filled track with the active tab as a raised pill. Reads as a
+ *  - `default` , a filled track with the active tab as a raised pill. Reads as a
  *    control, so it suits a small in-panel switch.
- *  - `line` — a transparent track with an underline under the active tab. Reads
+ *  - `line` , a transparent track with an underline under the active tab. Reads
  *    as page structure, which is why the dashboard app's Flag detail and Audit
  *    detail panels both use it: those tabs switch *sections of a record*, not a
  *    setting.
@@ -140,7 +140,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
           'group-data-[variant=default]/tabs-list:data-[state=active]:bg-panel',
           'group-data-[variant=default]/tabs-list:data-[state=active]:control-raised',
         ],
-        // `line`: no pill at all — the underline below is the entire indicator.
+        // `line`: no pill at all , the underline below is the entire indicator.
         [
           'group-data-[variant=line]/tabs-list:bg-transparent',
           'group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent',

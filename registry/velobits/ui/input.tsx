@@ -7,7 +7,7 @@ import { cn } from '../lib/cn';
  *
  * The two are split because they want different weights: a table separator
  * should recede, a field must announce where you can type. It is also the half
- * WCAG 1.4.11 gates — a control's edge is "required to identify" the control, so
+ * WCAG 1.4.11 gates , a control's edge is "required to identify" the control, so
  * it needs 3:1, while a decorative divider does not. `--field-border` is
  * `neutral-500`, the only ramp step clearing 3:1 in both themes.
  *
@@ -20,19 +20,19 @@ import { cn } from '../lib/cn';
  * A control is not a surface. Three measurements, in order of weight:
  *
  *  1. **Tier S on Tier S self-cancels.** A glass field inside a glass Card
- *     composites 2/255 from the card — under the 8/255 perceptibility floor the
- *     token suite gates the tiers with — so the well would disappear and the
+ *     composites 2/255 from the card , under the 8/255 perceptibility floor the
+ *     token suite gates the tiers with , so the well would disappear and the
  *     border alone would carry the control. Opaque `--panel` inside a glass Card
  *     measures 10/255 in light and 9/255 in dark: moving Card to Tier S is what
  *     gives this field a visible well, and putting the field on the same material
  *     would give it straight back.
  *  2. **1.4.11 stays PROVABLE.** `--field-border` is opaque by token policy, so
- *     over an opaque fill it has one value per surface — 3.86:1 on `--panel` and
- *     3.33:1 on the page in light, 3.58:1 and 4.48:1 in dark — and those are the
+ *     over an opaque fill it has one value per surface , 3.86:1 on `--panel` and
+ *     3.33:1 on the page in light, 3.58:1 and 4.48:1 in dark , and those are the
  *     pairs `@velobitsio/tokens` gates. On Tier S the same border still passes
  *     everywhere (3.66:1 light over the page, 3.75:1 light over a panel, 4.04:1
  *     and 3.89:1 dark, 3.71:1 in the worst nested case), so the gate is not what
- *     stopped this — but the measurement becomes a function of the whole ancestor
+ *     stopped this , but the measurement becomes a function of the whole ancestor
  *     chain instead of one pair a test can pin.
  *  3. **Tier S reads as RAISED**: a bottom-weighted shadow in light, a lit top
  *     edge in dark. That is the wrong affordance for something you type into, and
@@ -42,7 +42,7 @@ import { cn } from '../lib/cn';
  * Two things that are NOT the reason, so nobody re-litigates them: the focus ring
  * is unaffected (`ring-ring/40` composites to 1.73:1 over the Tier-S surface
  * against 1.75:1 over `--panel`, and the base layer's `:focus-visible` outline is
- * opaque `--ring` either way), and neither is performance — Tier S carries no
+ * opaque `--ring` either way), and neither is performance , Tier S carries no
  * `backdrop-filter` at all.
  */
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {

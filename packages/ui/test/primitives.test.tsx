@@ -69,7 +69,7 @@ describe('Button', () => {
 
   it('never paints --primary as text', () => {
     /**
-     * #007ACC is 3.90:1 on the cream page — a fill colour, not a text colour.
+     * #007ACC is 3.90:1 on the cream page , a fill colour, not a text colour.
      * The `link` variant must use `text-link` (--primary-text). A regression here
      * is an accessibility bug that looks like a styling preference.
      */
@@ -92,8 +92,8 @@ describe('Button', () => {
      * The regression guard for a 2.45:1 button that shipped.
      *
      * `destructive` was `bg-danger text-on-primary`, i.e. WHITE on `--danger`. In
-     * dark mode `--danger` is a light red (#FF7F79) — it has to be, because the
-     * same token also serves as text on a dark surface — so white on it measured
+     * dark mode `--danger` is a light red (#FF7F79) , it has to be, because the
+     * same token also serves as text on a dark surface , so white on it measured
      * 2.45:1 against AA's 4.5. `--on-danger` is white in light and charcoal in
      * dark, exactly like `--on-brand` is charcoal on lime.
      *
@@ -110,7 +110,7 @@ describe('Button', () => {
     /**
      * `brand` and `destructive` used `hover:brightness-95`. A filter is outside the
      * palette in a way that matters: nothing measures it, and it composites against
-     * whatever sits behind the button — so the same hover rendered one colour on an
+     * whatever sits behind the button , so the same hover rendered one colour on an
      * opaque panel and a different one on a glass surface.
      */
     for (const variant of ['brand', 'destructive'] as const) {
@@ -126,7 +126,7 @@ describe('Button', () => {
      * The control material is what stops a Card reading as glass while everything
      * inside it reads as paper. It is edge + light + depth, deliberately NOT more
      * translucency: a tier-S surface transmits only 15% of its backdrop at α 0.85,
-     * so transparency cannot deliver a visible material at control scale — the
+     * so transparency cannot deliver a visible material at control scale , the
      * perceptibility gate and see-through-ness pull in opposite directions.
      *
      * `control-raised` REPLACES `shadow-sm` rather than joining it. It owns the
@@ -141,7 +141,7 @@ describe('Button', () => {
     }
   });
 
-  it('leaves ghost and link flat — they are not physical objects', () => {
+  it('leaves ghost and link flat , they are not physical objects', () => {
     /**
      * A ghost button has no fill, so a lit edge and a drop shadow would describe a
      * raised surface that is not there. `link` is text.
@@ -154,7 +154,7 @@ describe('Button', () => {
 
   it('presses with a transform, and not at all under reduced motion', () => {
     /**
-     * `transform` because it composites on the GPU — no layout, no paint — which is
+     * `transform` because it composites on the GPU , no layout, no paint , which is
      * what keeps a twenty-button toolbar cheap.
      *
      * The `motion-reduce:` variant is not redundant with the token layer's global
@@ -190,7 +190,7 @@ describe('Badge', () => {
     /**
      * `rose` exists because every other chromatic variant asserts something.
      * success/danger/warning/info all carry a severity and `brand` means the
-     * product — so an axis whose values are *kinds* (a flag's value type, a
+     * product , so an axis whose values are *kinds* (a flag's value type, a
      * resource class) had to borrow `primary`, and every such axis came out blue.
      *
      * Same soft-wash-with-matching-text shape as the status variants, so it is
@@ -207,13 +207,13 @@ describe('Card', () => {
   it('states its border colour explicitly on the opaque variant', () => {
     /**
      * Tailwind v4's bare `border` emits width and style only, so the colour
-     * falls back to currentColor — which painted a near-white outline on every
+     * falls back to currentColor , which painted a near-white outline on every
      * dark-mode card. The base layer fixes it globally; this makes the component
      * correct even in an app that skipped the base layer.
      *
      * Only the `panel` variant needs the guard. The default glass variant takes
-     * its border from `.glass-surface`, which sets the `border` SHORTHAND —
-     * colour included — from the components layer.
+     * its border from `.glass-surface`, which sets the `border` SHORTHAND ,
+     * colour included , from the components layer.
      */
     const { container } = render(<Card surface="panel">x</Card>);
     expect(container.firstElementChild!.className).toContain('border-border');
@@ -224,8 +224,8 @@ describe('Card', () => {
      * `.glass-surface` sits in Tailwind's `components` layer, so a utility on the
      * same element wins and silently removes part of the material: `bg-*` drops
      * the tint that IS the material, `shadow-*` replaces the whole box-shadow
-     * list — which carries the inset specular highlight that is the entire
-     * dark-mode treatment — and a `border-*` colour swaps the sanctioned
+     * list , which carries the inset specular highlight that is the entire
+     * dark-mode treatment , and a `border-*` colour swaps the sanctioned
      * translucent edge for an opaque one (1.60:1 → 1.53:1 light, 1.50:1 → 1.30:1
      * dark). `surface="panel"` is the escape hatch; an override is not.
      */
@@ -371,7 +371,7 @@ describe('NativeSelect', () => {
     /**
      * Radix Select measures its trigger to position the popper, and happy-dom
      * has no layout, so every option lands at 0×0 and cannot be clicked. This is
-     * the component that decision produced — and this test is what it buys.
+     * the component that decision produced , and this test is what it buys.
      */
     render(
       <NativeSelect aria-label="Environment" defaultValue="prod">
@@ -401,7 +401,7 @@ describe('NativeSelect', () => {
    *
    * `cn()` is clsx + tailwind-merge, and tailwind-merge SPLITS ITS INPUT ON
    * WHITESPACE. A literal space inside an arbitrary value does not stay inside
-   * it — the class is torn into fragments which are then merged against each
+   * it , the class is torn into fragments which are then merged against each
    * other as though they were utilities. With raw spaces in the chevron data URI
    * this shipped for months:
    *
@@ -412,13 +412,13 @@ describe('NativeSelect', () => {
    *   - the leading `bg-[url("data:…` fragment was classified as a background
    *     COLOUR and evicted `bg-panel`, so the control had a transparent fill.
    *     Chromium paints a select's option popup from the select's own
-   *     background and falls back to WHITE when it is transparent — which put
+   *     background and falls back to WHITE when it is transparent , which put
    *     near-white `--fg` option text on a white popup in dark mode.
    *
    * A quote is the second banned character, for an unrelated reason: Tailwind v4
    * scans source files as PLAIN TEXT, so `url(\"…\")` written in a JS string is
    * read with its backslashes intact and emits `url(\"…\")`, which Lightning CSS
-   * rejects as `BadUrl` — taking the whole stylesheet down with a 500.
+   * rejects as `BadUrl` , taking the whole stylesheet down with a 500.
    *
    * Asserting the rendered class attribute rather than the source is the point:
    * the source always looked correct. The encoding is what makes it survive.
@@ -443,7 +443,7 @@ describe('NativeSelect', () => {
       expect(chevron).not.toMatch(/["']/);
 
       // Decode to the SVG the browser will actually parse, and assert it is
-      // whole — the three attributes that were being eaten, and the element
+      // whole , the three attributes that were being eaten, and the element
       // that draws the line at all.
       const svg = decodeURIComponent(chevron.replace(/^.*?,/, '').replace(/\)\]$/, ''));
       expect(svg).toMatch(/^<svg\b/);
@@ -469,7 +469,7 @@ describe('Checkbox', () => {
   it('reports mixed for the indeterminate bulk-selection state', () => {
     /**
      * A header checkbox meaning "some rows selected" must announce `mixed`, not
-     * checked — otherwise a screen-reader user is told everything is selected.
+     * checked , otherwise a screen-reader user is told everything is selected.
      */
     render(<Checkbox aria-label="Select all" checked="indeterminate" />);
     expect(screen.getByRole('checkbox').getAttribute('aria-checked')).toBe('mixed');
@@ -605,7 +605,7 @@ describe('the control material, as a system', () => {
   /**
    * The material is only coherent if RAISED and RECESSED stay distinguishable, and
    * if `cn` can actually resolve between them. Both classes set `box-shadow`, and
-   * they are component classes rather than utilities with a recognisable prefix —
+   * they are component classes rather than utilities with a recognisable prefix ,
    * so tailwind-merge cannot infer the conflict and needs it declared.
    */
   it('cn resolves raised vs recessed last-one-wins, in both directions', () => {
@@ -616,7 +616,7 @@ describe('the control material, as a system', () => {
   it('cn lets a call-site shadow utility win, and the material clear an inherited one', () => {
     /**
      * Without the conflict declared in both directions, tailwind-merge keeps BOTH
-     * classes and the winner is whichever `controls.css` declares last — i.e. always
+     * classes and the winner is whichever `controls.css` declares last , i.e. always
      * `control-recessed`, regardless of what the caller asked for. Exactly the
      * failure that made `rounded-pill` come out a rectangle half the time.
      */

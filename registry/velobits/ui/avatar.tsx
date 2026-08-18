@@ -10,7 +10,7 @@ import { cn } from '../lib/cn';
  * then. A plain `<img onError>` flashes a broken-image glyph first.
  *
  * `AvatarFallback` accepts a `delayMs` to avoid a fallback flash on a fast
- * connection — worth setting when avatars appear in a list.
+ * connection , worth setting when avatars appear in a list.
  */
 function Avatar({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Root>) {
   return (

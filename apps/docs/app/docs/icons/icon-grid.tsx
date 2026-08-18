@@ -14,8 +14,8 @@ import { CheckIcon, SearchIcon } from '@velobitsio/icons';
  *
  * `import * as iconModule` and filter, using the same predicate
  * `packages/icons/test/icons.test.tsx` uses. An 89th icon appears here the moment
- * it is exported; nobody edits this file. The alternative — a literal array of
- * names — is precisely the drift the `/docs/colors` rebuild was undertaken to
+ * it is exported; nobody edits this file. The alternative , a literal array of
+ * names , is precisely the drift the `/docs/colors` rebuild was undertaken to
  * remove, and at 88 entries it would be worse, because a single missing name is
  * invisible in a grid this size.
  *
@@ -48,7 +48,7 @@ function Swatch({ name, Icon }: { name: string; Icon: IconComponent }) {
       onClick={copy}
       /*
        * A real button, so it is focusable and Enter/Space activate it for free.
-       * The accessible name carries the OUTCOME rather than the icon's name —
+       * The accessible name carries the OUTCOME rather than the icon's name ,
        * "TrashIcon" alone does not say that activating this copies anything.
        */
       aria-label={copied ? `Copied import for ${name}` : `Copy import for ${name}`}
@@ -100,7 +100,7 @@ export function IconGrid() {
         <EmptyState
           icon={<SearchIcon />}
           title="No icon matches that"
-          description="Names are the glyph plus an Icon suffix — try 'trash', 'chevron' or 'flag'."
+          description="Names are the glyph plus an Icon suffix , try 'trash', 'chevron' or 'flag'."
         />
       )}
     </div>

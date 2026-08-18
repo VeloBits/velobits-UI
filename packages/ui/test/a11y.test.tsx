@@ -33,7 +33,7 @@ import { RULES_UNRUNNABLE_WITHOUT_LAYOUT, audit, describeViolations } from './ax
  * representative composition and audited.
  *
  * `audit()`, `describeViolations()` and the disabled-rule set live in `./axe`,
- * shared with every other suite that audits — including what the shared helper
+ * shared with every other suite that audits , including what the shared helper
  * can and cannot catch, which is worth reading before adding a case here.
  */
 
@@ -197,7 +197,7 @@ describe('the audit itself is wired correctly', () => {
   it('leaves contrast rules explicitly disabled rather than passing them', () => {
     /**
      * A reader should not conclude from a green run that contrast was checked
-     * here. It was not — @velobitsio/tokens measures the token values directly,
+     * here. It was not , @velobitsio/tokens measures the token values directly,
      * which is stronger than sampling rendered pixels in a DOM without a cascade.
      */
     expect(RULES_UNRUNNABLE_WITHOUT_LAYOUT).toContain('color-contrast');

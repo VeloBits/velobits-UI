@@ -9,7 +9,7 @@ Keycloak login theme.
 
 ```bash
 npm install
-npm run build          # EVERYTHING — see below
+npm run build          # EVERYTHING , see below
 npm run test           # includes the contrast gate
 npm run docs           # docs site on :4100, with codegen
 npm run docs:serve     # serve the built static export on :4100
@@ -19,7 +19,7 @@ npm run registry:build # just the registry, if you want it alone
 ## One build, one artefact
 
 `npm run build` produces **`apps/docs/out/`**, and that folder is the whole
-deployable — the documentation and the registry the shadcn CLI fetches, at one
+deployable , the documentation and the registry the shadcn CLI fetches, at one
 origin. Deploy it to `ui.velobits.dev` and both halves ship together.
 
 ```
@@ -38,7 +38,7 @@ npm run build
 ```
 
 Steps 2 and 3 run from the docs app's own `build` script, and turbo's
-`dependsOn: ["^build"]` guarantees the packages are built first — which step 2
+`dependsOn: ["^build"]` guarantees the packages are built first , which step 2
 needs, since it imports `@velobitsio/tokens`.
 
 ### Deploying to Vercel
@@ -48,7 +48,7 @@ project needs no settings in the dashboard:
 
 | Setting          | Value                                                        |
 | ---------------- | ------------------------------------------------------------ |
-| Root Directory   | **the repo root** — leave it empty, do _not_ set `apps/docs` |
+| Root Directory   | **the repo root** , leave it empty, do _not_ set `apps/docs` |
 | Framework Preset | Other (`"framework": null`)                                  |
 | Build Command    | `npm run build`                                              |
 | Output Directory | `apps/docs/out`                                              |
@@ -64,17 +64,17 @@ and `scripts/build-registry.ts` dies importing `@velobitsio/tokens`. Turbo's
 `dependsOn: ["^build"]` is what orders them, and it only runs from the root.
 
 **Framework Preset is Other, not Next.js.** `apps/docs` is a Next app, but it
-builds with `output: 'export'` — Vercel's Next builder is for server output and
+builds with `output: 'export'` , Vercel's Next builder is for server output and
 would also look for a `next.config` at the repo root, where there is none. What
 this repo produces is a directory of files, which is what Vercel serves best.
 
 ### Other hosts
 
 `apps/docs/public/_headers` is copied into `out/` and read directly by
-**Cloudflare Pages** and **Netlify** — nothing else to do. (Vercel ignores it,
+**Cloudflare Pages** and **Netlify** , nothing else to do. (Vercel ignores it,
 which is why the rules are restated in `vercel.json`.) For anything else, the two
-that matter are CORS on `/r/*` — for browser-based consumers; the CLI is a Node
-process and never needed it — and no long-lived cache on it, since a component's
+that matter are CORS on `/r/*` , for browser-based consumers; the CLI is a Node
+process and never needed it , and no long-lived cache on it, since a component's
 source changes under a stable URL:
 
 ```nginx
@@ -86,7 +86,7 @@ location /r/ {
 location / { try_files $uri $uri/ /404.html; }
 ```
 
-`REGISTRY_BASE_URL` overrides the origin baked into `registryDependencies` — set
+`REGISTRY_BASE_URL` overrides the origin baked into `registryDependencies` , set
 it to point a build at a local server and verify an install end to end:
 
 ```bash
@@ -97,7 +97,7 @@ npx shadcn@latest add @velobits/velobits --overwrite && npx tsc --noEmit
 ```
 
 That last `tsc` is the check worth keeping. The CLI half is copy-and-paste, so it
-can install cleanly and still not compile — which is exactly what it did until the
+can install cleanly and still not compile , which is exactly what it did until the
 imports were rewritten. See `scripts/registry-layout.ts`.
 
 ## Where the CLI puts things
@@ -115,7 +115,7 @@ lib/utils.ts                           ← our cn, a superset of shadcn's
 The prefixes are placeholders (`@ui/`, `@lib/`) resolved against the consumer's
 `components.json`; only `velobits/` is fixed. Targets and the import rewrites both
 come from `scripts/registry-layout.ts`, which `build-registry.ts` stamps and
-`build-docs-data.ts` reads for the docs — so the path in the documentation cannot
+`build-docs-data.ts` reads for the docs , so the path in the documentation cannot
 disagree with the path the CLI uses.
 
 ## Layout
@@ -138,13 +138,13 @@ velobits-UI/
 └── apps/docs/
     ├── app/docs/components/[slug]/   ONE route, every registry item
     ├── content/components.ts         per-component prose (optional, validated)
-    ├── registry/examples/*.tsx       one file per example — preview AND code tab
+    ├── registry/examples/*.tsx       one file per example , preview AND code tab
     └── lib/generated/                codegen output (gitignored)
 ```
 
-Adding a component means touching four lists — `registry/registry.ts`,
+Adding a component means touching four lists , `registry/registry.ts`,
 `packages/ui/tsup.config.ts`, the `exports` map in `packages/ui/package.json`,
-and the barrel — and `packages/ui/test/registry-parity.test.ts` fails if you miss
+and the barrel , and `packages/ui/test/registry-parity.test.ts` fails if you miss
 one. It then gets a documentation page automatically; `apps/docs/lib/docs-nav.ts`
 only decides which sidebar heading it appears under, and the build fails naming
 any item that file does not place.
@@ -155,7 +155,7 @@ any item that file does not place.
 | ----------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | the editor app                | **npm**                       | Module Federation needs `@velobitsio/ui` to be a real singleton, so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary.                                      |
 | the dashboard app dashboard   | **npm**                       | Already Tailwind v4 + shadcn with one `@theme inline` bridge; the palette swap is one file.                                                                                                                           |
-| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
+| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook , an edit to an unclaimed file is silently reverted on the next `npm install`. Tokens are the one clean seam. |
 | Greenfield / one-off surfaces | **shadcn CLI**                | `npx shadcn@latest add @velobits/button`. You own the source; no dependency to bump.                                                                                                                                  |
 
 Adding a component means touching four lists, and
@@ -166,7 +166,7 @@ Adding a component means touching four lists, and
 ## Consuming it
 
 ```css
-/* your app's CSS — one import */
+/* your app's CSS , one import */
 @import '@velobitsio/tokens/theme.css';
 
 /* NOT OPTIONAL: Tailwind v4 does not scan node_modules, so utilities used
@@ -189,11 +189,11 @@ default would silently orphan one app's preferences.
 ## Three things that will bite you
 
 **`--primary` is not a text colour.** `#007ACC` measures **3.90:1** on the cream
-page — fine as a fill behind white text (4.51:1), a WCAG failure as text. Links
+page , fine as a fill behind white text (4.51:1), a WCAG failure as text. Links
 use `text-link`. No `Button` variant paints it as text, and a test enforces that.
 
 **Lime is asymmetric.** `bg-brand` + `text-on-brand` (charcoal) is 10.89:1 and is
-the only sanctioned pairing — white on lime is 1.31:1. Lime _as text_ is 13.24:1
+the only sanctioned pairing , white on lime is 1.31:1. Lime _as text_ is 13.24:1
 in dark mode and 1.13:1 in light, so `--accent-text` is lime in dark and plum in
 light. A lime fill also cannot be a lone graphical indicator in light mode.
 
@@ -205,19 +205,19 @@ inside a scroll container, or nested.
 
 | Gate                | What it protects                                                                                                                                                                                                           |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **contrast test**   | Every semantic pair against its WCAG target in both themes, plus every glass tier over the seven worst-case backdrops. Composited in **gamma-encoded sRGB** — measuring in linear light overstates glass legibility badly. |
+| **contrast test**   | Every semantic pair against its WCAG target in both themes, plus every glass tier over the seven worst-case backdrops. Composited in **gamma-encoded sRGB** , measuring in linear light overstates glass legibility badly. |
 | CSS ↔ TS drift test | `css/tokens.css` and `src/semantic.ts` describe the same values; neither can move alone.                                                                                                                                   |
 | ramp round-trip     | The generated neutral ramp is machine-checked, so "never hand-edit" is enforced rather than requested.                                                                                                                     |
-| axe (`packages/ui`) | Structural a11y on every primitive. Contrast rules are explicitly **disabled** there — happy-dom has no cascade, and the token suite measures values directly instead.                                                     |
+| axe (`packages/ui`) | Structural a11y on every primitive. Contrast rules are explicitly **disabled** there , happy-dom has no cascade, and the token suite measures values directly instead.                                                     |
 | registry parity     | The four lists above agree.                                                                                                                                                                                                |
-| `publint` + `attw`  | The exports map and `.d.ts` resolution — the things that break quietly across the TS 6.0.3 / ~6.0.2 / 5.9.3 consumer skew.                                                                                                 |
+| `publint` + `attw`  | The exports map and `.d.ts` resolution , the things that break quietly across the TS 6.0.3 / ~6.0.2 / 5.9.3 consumer skew.                                                                                                 |
 | `size-limit`        | Per-entry budgets, the only real proof tree-shaking works.                                                                                                                                                                 |
 
 ## Gotchas encoded in this repo
 
 - **The base border reset must say `var(--border)`, never `var(--color-border)`.**
   A `@theme` var is emitted as a real `:root` declaration, so it resolves to the
-  light value and inherits everywhere — `body.dark` never reaches it.
+  light value and inherits everywhere , `body.dark` never reaches it.
 - **`'use client'` needs two tsup builds.** esbuild strips directives from
   bundled modules, and tsup's `treeshake` (a Rollup pass) strips the `banner`
   that re-adds them. `lib/theme.ts` must stay directive-free so a Server
@@ -232,7 +232,7 @@ inside a scroll container, or nested.
   cache lies through HMR.
 - **`z-*` and `duration-*` are `@utility` rules, not theme values.** Tailwind v4
   has no `--z-index-*` or `--duration-*` namespace, so declaring them in `@theme`
-  emits a variable and no utility — `z-tooltip` would silently do nothing.
+  emits a variable and no utility , `z-tooltip` would silently do nothing.
 
 ## Publishing
 
@@ -241,11 +241,11 @@ changeset (`npm run changeset`). `@velobitsio/tokens` versions independently so 
 palette tweak does not force a component release.
 
 Reads require auth even for consumers. In Docker use a **BuildKit secret**
-(`RUN --mount=type=secret,id=npmrc`), never an `ARG` — an `ARG` is recorded in
+(`RUN --mount=type=secret,id=npmrc`), never an `ARG` , an `ARG` is recorded in
 the image history.
 
 When `@velobitsio/ui` gets a new version, the editor app's Federation
 `requiredVersion` pins in `apps/shell`, `apps/editor-remote` and
 `apps/analytics-remote` must move in lockstep. Overshooting the pin gives
 `does not satisfy` warnings and then a fatal
-`does not provide an export named 'default'` — a blank page, not a build error.
+`does not provide an export named 'default'` , a blank page, not a build error.

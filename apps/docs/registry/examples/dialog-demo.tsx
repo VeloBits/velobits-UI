@@ -30,7 +30,7 @@ import { ChevronDownIcon, PlusIcon } from '@velobitsio/icons';
 /**
  * The Popover inside is load-bearing rather than decorative.
  *
- * `.glass-elevated` — Tier O stacked on Tier O — is the one composite in the
+ * `.glass-elevated` , Tier O stacked on Tier O , is the one composite in the
  * system that no gate measures: `GLASS_OVERLAY_PAIRS` excludes it by name, and a
  * `GlassSurface tier="elevated"` sitting on the page forms a different composite
  * from the one that matters. Nesting is the only way to see the real thing, and a

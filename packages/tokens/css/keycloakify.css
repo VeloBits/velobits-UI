@@ -1,5 +1,5 @@
 /*
- * @velobitsio/tokens/keycloakify.css — the Keycloak login theme's seam.
+ * @velobitsio/tokens/keycloakify.css , the Keycloak login theme's seam.
  *
  * ## Why this file exists at all
  *
@@ -23,7 +23,7 @@
  * The extension reads `--keycloakify-shadcn-*` custom properties, which it also
  * lets Keycloak set at RUNTIME from `kcContext.properties` (SHADCN_THEME_PRESET,
  * _BASE, _RADIUS, _FONT, _APP_NAME, _LAYOUT, _LOGO_*) applied inline on
- * `documentElement`. Those runtime knobs need no rebuild — but anything in this
+ * `documentElement`. Those runtime knobs need no rebuild , but anything in this
  * file DOES, and a theme rebuild is not a plain `restart`:
  *
  *     docker compose stop keycloak-dev
@@ -32,7 +32,7 @@
  *
  * Docker file-locks the mounted jar, `start-dev` only picks up providers at
  * startup, and a MISSING jar makes the login page 500 while realm import still
- * succeeds — which is why CI asserts the login page actually rendered the
+ * succeeds , which is why CI asserts the login page actually rendered the
  * `velobits` theme rather than merely that the realm imported.
  *
  * ## Consequence accepted with the user
@@ -65,7 +65,7 @@
 
   /* ── lines and focus ────────────────────────────────────────────────────── */
   --keycloakify-shadcn-border: var(--border);
-  /* Control edge, not separator — the half WCAG 1.4.11 gates. */
+  /* Control edge, not separator , the half WCAG 1.4.11 gates. */
   --keycloakify-shadcn-input: var(--field-border);
   --keycloakify-shadcn-ring: var(--ring);
 
@@ -87,7 +87,7 @@
  * No `.dark` block is needed here.
  *
  * Every value above is a `var()` reference to a token that tokens.css already
- * re-declares under `.dark, body.dark` — and that selector list deliberately
+ * re-declares under `.dark, body.dark` , and that selector list deliberately
  * includes the bare `.dark` so it matches this theme's `html.dark` as well as
  * the apps' `body.dark`. A second block here would be a duplicate palette to
  * keep in sync, which is exactly the failure mode a single shared bridge

@@ -9,13 +9,13 @@ coverage/
 .next/
 next-env.d.ts
 
-# The static export — the whole deployable, docs and /r together.
+# The static export , the whole deployable, docs and /r together.
 apps/docs/out/
 
 # Codegen for the docs site: example sources, prop tables, registry metadata.
 # Written by `scripts/build-docs-data.ts`, which BOTH `dev` and `build` run first,
 # so a clean clone never sees it missing. Not committed because every byte of it
-# is derived from files that are — and because it embeds ~40 component sources
+# is derived from files that are , and because it embeds ~40 component sources
 # verbatim, which would make every component edit a two-file diff.
 apps/docs/lib/generated/
 apps/docs/public/search-index.json
@@ -31,13 +31,15 @@ apps/docs/public/search-index.json
 .playwright-mcp/
 
 .claude*
+*db*
+*swarm*
 
 # NOT ignored, deliberately:
 #   registry.json             the shadcn CLI manifest. Generated from
 #                             registry/registry.ts, but committed so the repo is
 #                             installable from a clone without a build step.
 #   apps/docs/public/r/*.json the compiled registry the CLI actually fetches.
-#                             Committed for the same reason — and because the
+#                             Committed for the same reason , and because the
 #                             docs deploy serves these as static files.
 
 .vercel

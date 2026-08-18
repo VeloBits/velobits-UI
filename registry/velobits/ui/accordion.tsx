@@ -22,7 +22,7 @@ import { cn } from '../lib/cn';
  *    `Accordion.Header` is a hard-coded `<h3>`; the host page decides where the
  *    accordion sits in its outline, and a heading that lies about its depth is
  *    worse than no heading. Kept via `Header asChild`.
- *  - **`min-h-11`** on the trigger — the 44px touch minimum, even if a title
+ *  - **`min-h-11`** on the trigger , the 44px touch minimum, even if a title
  *    renders unusually short.
  *  - **`border-0`, `bg-transparent`, own padding, own radius** on the trigger.
  *    These look redundant and are not: the dashboard app's `styles.css` styles bare
@@ -41,7 +41,7 @@ import { cn } from '../lib/cn';
  *    so only the first row's top and last row's bottom followed the container's
  *    9px *inner* radius. That machinery is gone: `overflow-hidden` on the root
  *    clips at the padding box, whose corner radius is already the outer radius
- *    minus the border width — so the hover band follows the same 9px curve with
+ *    minus the border width , so the hover band follows the same 9px curve with
  *    no arithmetic and no open/closed special case.
  *  - **Collapsed panels no longer stay in the DOM.** The original kept them
  *    mounted (with `aria-hidden` + `inert`) because that landing page is the
@@ -49,7 +49,7 @@ import { cn } from '../lib/cn';
  *    served HTML. Radix unmounts closed content. `forceMount` does not
  *    substitute: with it, Radix's Collapsible never applies `hidden` and always
  *    renders children, so the panel does not collapse at all and
- *    `--radix-accordion-content-height` is never set — the caller would have to
+ *    `--radix-accordion-content-height` is never set , the caller would have to
  *    re-author both the collapse and the `aria-hidden`/`inert` pair. A crawlable
  *    FAQ is therefore a page-level requirement this shared component
  *    deliberately does not carry.
@@ -58,7 +58,7 @@ type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root> & {
   /**
    * The container's material. `glass` (the default since 2026-08-06) is Tier S,
    * the same `.glass-surface` a `Card` uses. `panel` is the opaque fallback,
-   * and `none` is for an accordion nested inside a Card or a Dialog — glass
+   * and `none` is for an accordion nested inside a Card or a Dialog , glass
    * inside glass composites ~2/255 apart and both layers disappear.
    *
    * Note the border comes from `.glass-surface` itself in the `glass` case, so
@@ -71,7 +71,7 @@ type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root> & {
 function Accordion({ className, surface = 'glass', ...props }: AccordionProps) {
   // `collapsible` exists only on the single-value variant, hence the narrow. The
   // spread comes second so an explicit `collapsible={false}` still wins.
-  // Cast to Root's own props, not AccordionProps — `surface` is ours and is
+  // Cast to Root's own props, not AccordionProps , `surface` is ours and is
   // already destructured out above; it must not reach the Radix element.
   const rootProps = (
     props.type === 'single' ? { collapsible: true, ...props } : props
@@ -111,12 +111,12 @@ export interface AccordionTriggerProps extends React.ComponentProps<
 /**
  * The heading needs `m-0`: the dashboard app's `styles.css` gives h1–h3 a 0.5rem
  * bottom margin, which would push every row off its divider. `flex` on the heading is
- * what lets the trigger fill the row — a heading is `display: block` and its
+ * what lets the trigger fill the row , a heading is `display: block` and its
  * button child would otherwise shrink to its text.
  *
  * The chevron rotates via a `group-data-[state=open]/accordion-trigger:` selector
  * rather than a descendant selector on the trigger, so it is the chevron and only
- * the chevron that turns — a `[&>svg]` rule would also spin any icon a caller
+ * the chevron that turns , a `[&>svg]` rule would also spin any icon a caller
  * puts inside the title.
  */
 function AccordionTrigger({
@@ -177,7 +177,7 @@ function AccordionTrigger({
  *
  * Animating height is normally banned here because it invalidates layout on every
  * frame. This case is the exception because Radix **measures** the content once,
- * in a layout effect, and publishes the result as that CSS variable — so the
+ * in a layout effect, and publishes the result as that CSS variable , so the
  * keyframes run between two known pixel values. The pathological version is
  * `height: auto` in a transition, which either does not animate at all or forces
  * the engine to re-resolve intrinsic size each frame; and `max-height: 9999px`,
@@ -190,13 +190,13 @@ function AccordionTrigger({
  *
  * Deliberate, and it matches shadcn's Accordion. The animated element's own
  * classes are load-bearing (`overflow-hidden` plus the two keyframe utilities),
- * and padding there would be height the `0` keyframe cannot remove — leaving a
+ * and padding there would be height the `0` keyframe cannot remove , leaving a
  * collapsed panel roughly 32px tall. Putting the caller's classes on the body
  * makes the common case (`className="px-6 pb-6"`) correct instead of a bug.
  *
  * `max-w-[70ch]` caps the measure: a 90-character line of 13.5px muted text is
  * unreadable, and the FAQ container is as wide as the page's content grid.
- * Override it with `className="max-w-none"` — `cn` is twMerge-based, so it wins.
+ * Override it with `className="max-w-none"` , `cn` is twMerge-based, so it wins.
  */
 function AccordionContent({
   className,

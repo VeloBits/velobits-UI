@@ -19,7 +19,7 @@ apps/docs/public/r/
 # by hand would be overwritten on the next build.
 registry.json
 
-# The static export — the whole deployable, and it is minified output.
+# The static export , the whole deployable, and it is minified output.
 apps/docs/out/
 
 # Written by `scripts/build-docs-data.ts` on every dev and build run, and it

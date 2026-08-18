@@ -57,7 +57,7 @@ describe('Accordion, expand and collapse', () => {
     expect(panel.textContent).toContain('A switch you can flip without a deploy.');
   });
 
-  it('closes the previous row when another opens — single-expand', async () => {
+  it('closes the previous row when another opens , single-expand', async () => {
     render(<Fixture />);
     await userEvent.click(screen.getByRole('button', { name: 'What is a feature flag?' }));
     await userEvent.click(screen.getByRole('button', { name: 'How do environments work?' }));
@@ -198,7 +198,7 @@ describe('Accordion, headings', () => {
     const headings = screen.getAllByRole('heading');
     expect(headings).toHaveLength(3);
     expect(headings[0]!.tagName).toBe('H3');
-    // The button lives INSIDE the heading — a heading whose only child is the
+    // The button lives INSIDE the heading , a heading whose only child is the
     // control is what lets a screen reader list the rows from the heading menu.
     expect(headings[0]!.querySelector('button')).toBeTruthy();
   });
@@ -225,7 +225,7 @@ describe('Accordion, styling contract', () => {
     /**
      * the dashboard app's styles.css styles bare `button` (border, background, radius,
      * padding) in Tailwind's components layer. Utilities win that cascade only for
-     * properties one is actually written for — drop `rounded-none` and the row
+     * properties one is actually written for , drop `rounded-none` and the row
      * grows a 6px-rounded panel-coloured box inside the container.
      */
     render(<Fixture />);
@@ -245,7 +245,7 @@ describe('Accordion, styling contract', () => {
     /**
      * Replaces the original `triggerRadius()` helper: `overflow-hidden` clips at
      * the padding box, whose corner radius is already the outer radius minus the
-     * border width — so the first and last rows follow the same 9px inner curve
+     * border width , so the first and last rows follow the same 9px inner curve
      * with no arithmetic and no open/closed special case.
      */
     const { container } = render(<Fixture />);
@@ -268,7 +268,7 @@ describe('Accordion, styling contract', () => {
     expect(trigger.className).toContain('group/accordion-trigger');
     const chevron = trigger.querySelector('[data-slot="accordion-chevron"]')!;
     expect(chevron.className).toContain('group-data-[state=open]/accordion-trigger:rotate-180');
-    // Transform and colour only — never a blur radius.
+    // Transform and colour only , never a blur radius.
     expect(chevron.className).toContain('transition-[transform,color]');
     // --primary is 3.90:1 on the cream page; --primary-text has headroom.
     expect(chevron.className).toContain('group-data-[state=open]/accordion-trigger:text-link');
@@ -335,14 +335,14 @@ describe('Accordion, the one sanctioned height animation', () => {
     expect(body.className).toContain('max-w-[70ch]');
   });
 
-  it('unmounts a closed panel — the one original behaviour NOT carried over', () => {
+  it('unmounts a closed panel , the one original behaviour NOT carried over', () => {
     /**
      * The hand-rolled version kept collapsed panels in the DOM (with `aria-hidden`
      * + `inert`) because the dashboard app's landing page is the product's only crawlable
      * surface. Radix unmounts them, and `forceMount` is not a substitute: with it
      * Radix never applies `hidden` and always renders children, so the panel does
      * not collapse and the height var is never set. A crawlable FAQ is a
-     * page-level requirement, not this component's job — asserted here so the
+     * page-level requirement, not this component's job , asserted here so the
      * trade-off is visible rather than discovered in a search console.
      */
     render(<Fixture />);
@@ -382,7 +382,7 @@ describe('Accordion, the container surface', () => {
   it('does NOT add a border-* utility alongside the glass', () => {
     /**
      * `.glass-surface` lives in the components layer, so a `border-border`
-     * utility would beat it and silently replace the material's own edge —
+     * utility would beat it and silently replace the material's own edge ,
      * the exact failure the Card docblock warns about.
      */
     render(<Fixture />);

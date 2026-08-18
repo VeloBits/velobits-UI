@@ -1,7 +1,7 @@
 import type { ReactNode, SVGProps } from 'react';
 
 export interface IconProps extends SVGProps<SVGSVGElement> {
-  /** Width and height in px — icons are square. */
+  /** Width and height in px , icons are square. */
   size?: number | string;
 }
 
@@ -15,8 +15,8 @@ export interface IconProps extends SVGProps<SVGSVGElement> {
  *
  * Icons are **decorative by default** (`aria-hidden="true"`), because the
  * overwhelming majority sit beside a text label that already names the action.
- * For the minority that carry meaning alone — an icon-only button, a status
- * glyph — opt in explicitly:
+ * For the minority that carry meaning alone , an icon-only button, a status
+ * glyph , opt in explicitly:
  *
  * ```tsx
  * <TrashIcon aria-hidden={undefined} role="img" aria-label="Delete flag" />

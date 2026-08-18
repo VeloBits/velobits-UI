@@ -23,7 +23,7 @@ import { auditElement, describeViolations } from './axe';
  * Unlike `DropdownMenu`, these rows ARE clickable in tests: cmdk is not a Radix
  * menu, so there is no `disableOutsidePointerEvents` layer setting
  * `pointer-events: none` on `document.body`. Selection still moves with the
- * arrow keys while focus stays in the input — that is the whole point of a
+ * arrow keys while focus stays in the input , that is the whole point of a
  * palette, and it is why the highlight rides `data-selected` rather than focus.
  */
 function Inline({ onSelect = () => {} }: { onSelect?: (value: string) => void }) {
@@ -93,7 +93,7 @@ describe('CommandPalette, inline', () => {
   it('hides the separator from the accessibility tree', () => {
     /**
      * cmdk hard-codes `role="separator"` after its prop spread, and a separator
-     * is not a permitted child of a `listbox` — axe reports it as
+     * is not a permitted child of a `listbox` , axe reports it as
      * `aria-required-children`. The rule between two named groups is purely
      * visual, so `aria-hidden` is the fix rather than a suppression.
      */
@@ -103,7 +103,7 @@ describe('CommandPalette, inline', () => {
     expect(separator.getAttribute('aria-hidden')).toBe('true');
   });
 
-  it('stays opaque inline — the glass tier is only for surfaces that float', () => {
+  it('stays opaque inline , the glass tier is only for surfaces that float', () => {
     /**
      * `.glass` is Tier O. An embedded palette sits on a real panel with page
      * content around it rather than over it, which is exactly the case
@@ -173,7 +173,7 @@ describe('CommandPalette, keyboard navigation', () => {
 
   it('highlights through data-[selected=true] and never through :hover', () => {
     /**
-     * cmdk is not Radix Menu, so `data-highlighted` does not exist here — but the
+     * cmdk is not Radix Menu, so `data-highlighted` does not exist here , but the
      * rule that produced that refusal does: a hover-only highlight leaves the
      * keyboard user with no visible cursor while the arrows work perfectly.
      */
@@ -247,7 +247,7 @@ describe('CommandDialog', () => {
     const dialog = await waitFor(() => screen.getByRole('dialog'));
     expect(dialog.className).toContain('top-[15vh]');
     // Horizontal centring is symmetric, so the physical pair is correct in both
-    // directions — `start-1/2` would break RTL, because translate does not flip.
+    // directions , `start-1/2` would break RTL, because translate does not flip.
     expect(dialog.className).toContain('left-1/2');
     expect(dialog.className).toContain('-translate-x-1/2');
     expect(dialog.className).not.toContain('start-1/2');
@@ -401,7 +401,7 @@ describe('CommandPalette accessibility', () => {
      * Radix layer marks the rest of the page `aria-hidden` while leaving it
      * focusable, because it relies on a focus SCOPE that axe cannot see. Filtered
      * node by node on Radix-specific attributes so a genuine violation in our own
-     * markup still fails — and kept file-local rather than hoisted into `./axe`,
+     * markup still fails , and kept file-local rather than hoisted into `./axe`,
      * which would exempt every suite from the rule.
      */
     const isRadixModalMachinery = (html: string) =>

@@ -5,7 +5,7 @@ const R = '../../registry/velobits';
 /**
  * Per-component entry points, so `import { Button } from '@velobitsio/ui/button'`
  * pulls in Button and nothing else. `size-limit` asserts that rather than
- * assuming it — a barrel-only build would quietly ship all 37 components to a
+ * assuming it , a barrel-only build would quietly ship all 37 components to a
  * consumer that imported one.
  *
  * The entries live OUTSIDE this package, in `registry/velobits/`, because that
@@ -26,8 +26,8 @@ const R = '../../registry/velobits';
  * error pointing at a bundled chunk rather than at anything you wrote.
  *
  * Bannering the whole package would be wrong: `lib/theme.ts` is deliberately
- * React-free so a Server Component can call `themeInitScript()` during render —
- * `apps/docs/app/layout.tsx` does that to apply the theme before first paint —
+ * React-free so a Server Component can call `themeInitScript()` during render ,
+ * `apps/docs/app/layout.tsx` does that to apply the theme before first paint ,
  * and a Server Component may not call an arbitrary exported function from a
  * `'use client'` module. Hence two groups.
  *
@@ -36,7 +36,7 @@ const R = '../../registry/velobits';
  * Shared chunks are what lost the directive in the first place: a chunk imported
  * by both a client and a server entry can carry only one answer. It also stops
  * the two builds racing to write same-named chunks into one `dist/`. The cost is
- * `cn` being inlined per component rather than shared — a few hundred bytes,
+ * `cn` being inlined per component rather than shared , a few hundred bytes,
  * held honest by the per-entry `size-limit` budget.
  * ─────────────────────────────────────────────────────────────────────────────
  */
@@ -75,7 +75,7 @@ const CLIENT = {
   textarea: `${R}/ui/textarea.tsx`,
   tooltip: `${R}/ui/tooltip.tsx`,
 
-  /* Tier 2 — overlays. */
+  /* Tier 2 , overlays. */
   'command-palette': `${R}/ui/command-palette.tsx`,
   dialog: `${R}/ui/dialog.tsx`,
   'dropdown-menu': `${R}/ui/dropdown-menu.tsx`,
@@ -83,7 +83,7 @@ const CLIENT = {
   'side-panel': `${R}/ui/side-panel.tsx`,
   toast: `${R}/ui/toast.tsx`,
 
-  /* Tier 3 — composites. */
+  /* Tier 3 , composites. */
   accordion: `${R}/ui/accordion.tsx`,
   'app-shell': `${R}/ui/app-shell.tsx`,
   breadcrumb: `${R}/ui/breadcrumb.tsx`,
@@ -110,14 +110,14 @@ const shared: Options = {
    * `treeshake` is deliberately OFF, and not for the reason it looks like.
    *
    * tsup implements it as a Rollup pass after esbuild, and Rollup DROPS the
-   * `banner` below — so enabling it silently removes every `'use client'`
+   * `banner` below , so enabling it silently removes every `'use client'`
    * directive and reintroduces the RSC failure this config exists to fix. The
    * output is still dead-code-eliminated by esbuild's own bundling, and
    * `size-limit` holds the per-entry budgets that prove it.
    */
   splitting: false,
   /*
-   * Peers stay external so a consumer's copy is the only copy — also what makes
+   * Peers stay external so a consumer's copy is the only copy , also what makes
    * the Module Federation singleton arrangement possible at all.
    *
    * `react-hook-form` is here for a sharper version of the same reason. It is an
@@ -125,7 +125,7 @@ const shared: Options = {
    * own module state, so `useFormContext()` inside `FormField` would read a
    * different context from the consumer's `useForm()` and every field would
    * register against nothing. Externalising it is also what makes the barrel
-   * exclusion work — see the docblock at the top of `registry/velobits/ui/form.tsx`.
+   * exclusion work , see the docblock at the top of `registry/velobits/ui/form.tsx`.
    */
   external: [
     'react',
@@ -139,7 +139,7 @@ const shared: Options = {
    * Both configs run CONCURRENTLY, so neither may clean: whichever starts second
    * would wipe the other's finished output, non-deterministically. `npm run
    * build` does `rm -rf dist` first instead, which also leaves watch mode
-   * correctly untouched — a startup wipe there would race apps/docs resolving
+   * correctly untouched , a startup wipe there would race apps/docs resolving
    * types from dist/.
    */
   clean: false,

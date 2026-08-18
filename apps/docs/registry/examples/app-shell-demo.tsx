@@ -104,7 +104,7 @@ export default function AppShellDemo() {
             ))}
           </div>
           {/*
-           * `surface="none"` — this Table is inside the shell's main region, which
+           * `surface="none"` , this Table is inside the shell's main region, which
            * sits over the Tier-S rail's material. Defaulting it to glass here
            * would be the nested case.
            */}
@@ -130,7 +130,7 @@ export default function AppShellDemo() {
           </Table>
           {Array.from({ length: 8 }, (_, i) => (
             <p key={i} className="text-sm text-muted-foreground">
-              The main region scrolls under the sticky glass header — scroll it and watch content
+              The main region scrolls under the sticky glass header , scroll it and watch content
               pass behind the blur.
             </p>
           ))}

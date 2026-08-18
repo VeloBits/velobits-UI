@@ -7,7 +7,7 @@ import { CheckIcon, ChevronRightIcon, DotIcon } from '@velobitsio/icons';
 import { cn } from '../lib/cn';
 
 /**
- * Radix DropdownMenu on the glass overlay tier — the kebab/actions menu every
+ * Radix DropdownMenu on the glass overlay tier , the kebab/actions menu every
  * table row and topbar in these dashboards reaches for.
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ import { cn } from '../lib/cn';
  * A filter/search field inside the menu loses focus on the first keystroke: the
  * content's focus management pulls focus back to the item list, and typing is
  * additionally swallowed by Radix's typeahead. The only lever that would hold
- * focus is `onOpenAutoFocus` — which is a **private, unsupported escape hatch on
+ * focus is `onOpenAutoFocus` , which is a **private, unsupported escape hatch on
  * this primitive** and is not part of its public contract, so building on it is
  * building on something that can vanish in a patch release.
  *
@@ -46,13 +46,13 @@ import { cn } from '../lib/cn';
  * This is the same conclusion the dashboard app reached when it tried to put an
  * environment filter in a DropdownMenu and shipped a Dialog instead.
  *
- * ## 3. Testing: `keyDown Enter`, not `click` — and Playwright cannot do it
+ * ## 3. Testing: `keyDown Enter`, not `click` , and Playwright cannot do it
  *
  * Modal menu content wraps itself in a `DismissableLayer` with
  * `disableOutsidePointerEvents`, which sets `pointer-events: none` on
  * `document.body`. `userEvent` v14 refuses to click anything that inherits that
  * and THROWS ("unable to perform pointer interaction as the element has
- * `pointer-events: none`") rather than failing an assertion — so the failure does
+ * `pointer-events: none`") rather than failing an assertion , so the failure does
  * not look like a menu problem at all.
  *
  * Drive items with `fireEvent.keyDown(item, { key: 'Enter' })`, which is also
@@ -69,7 +69,7 @@ import { cn } from '../lib/cn';
  * ## Layering
  *
  * The content sits at `z-dropdown` (1000), which is above `z-sticky` (100). A
- * sticky topbar raised to 1100 "to be safe" swallows its own menu — see the
+ * sticky topbar raised to 1100 "to be safe" swallows its own menu , see the
  * z-ladder note in `@velobitsio/tokens/theme.css`.
  *
  * Submenus use `glass glass-elevated`, the plum-tinted tier, because a plain
@@ -137,7 +137,7 @@ function DropdownMenuGroup({ ...props }: React.ComponentProps<typeof DropdownMen
  * Shared by Item, CheckboxItem, RadioItem and SubTrigger so the highlight can
  * only ever be defined in one place.
  *
- * `data-[highlighted]` — see refusal 1 in the file docblock. `bg-highlight` is
+ * `data-[highlighted]` , see refusal 1 in the file docblock. `bg-highlight` is
  * `--highlight`, the system's one hover/active surface, so a menu row and a
  * table row highlight identically.
  */
@@ -153,7 +153,7 @@ const menuItemBase = [
 export interface DropdownMenuItemProps extends React.ComponentProps<
   typeof DropdownMenuPrimitive.Item
 > {
-  /** Destructive actions — delete, revoke, archive. */
+  /** Destructive actions , delete, revoke, archive. */
   variant?: 'default' | 'danger';
   /** Aligns the label with the checkbox/radio items in a mixed menu. */
   inset?: boolean;
@@ -161,7 +161,7 @@ export interface DropdownMenuItemProps extends React.ComponentProps<
 
 /**
  * `variant` rides a `data-variant` attribute rather than a class branch so the
- * danger styling composes with `data-[highlighted]` in one selector — the
+ * danger styling composes with `data-[highlighted]` in one selector , the
  * highlighted state of a destructive row needs its own pairing (`bg-danger-soft`
  * with `text-danger`), not the neutral highlight with red text on top of it.
  */
@@ -282,7 +282,7 @@ function DropdownMenuSeparator({
 }
 
 /**
- * `⌘K` versus `Ctrl+K` is the caller's decision, exactly as in `Kbd` — deciding
+ * `⌘K` versus `Ctrl+K` is the caller's decision, exactly as in `Kbd` , deciding
  * it here would make the component render differently on server and client and
  * produce a hydration mismatch.
  *

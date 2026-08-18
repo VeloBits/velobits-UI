@@ -1,5 +1,5 @@
 /**
- * GENERATED FILE — do not edit.
+ * GENERATED FILE , do not edit.
  * Regenerate with: npm run generate -w @velobitsio/tokens
  * Source of truth: scripts/generate-neutrals.ts
  *

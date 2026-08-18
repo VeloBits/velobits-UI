@@ -16,7 +16,7 @@ page is the summary worth reading.
 The docs site and the registry are now **one build and one origin**. `npm run
 build` produces a single static export containing both the pages you are reading
 and the `/r/*.json` the shadcn CLI fetches, so there is no arrangement in which
-one is stale relative to the other — previously the registry compile was a
+one is stale relative to the other , previously the registry compile was a
 separate command that CI happened to run as its own step.
 
 - **A page per registry item.** Generated from `registry/registry.ts`, so a new
@@ -33,7 +33,7 @@ separate command that CI happened to run as its own step.
 
 ### Components
 
-- **`Motion` added** — `PageTransition`, `Stagger`, `StaggerItem` and `FadeIn`,
+- **`Motion` added** , `PageTransition`, `Stagger`, `StaggerItem` and `FadeIn`,
   on the `framer-motion` peer that was already required and until now bought
   nothing but `MotionConfig`. Subpath-only, like `Form`: nobody should download
   Framer's runtime to render a `Button`. See [Motion](/docs/components/motion).
@@ -44,12 +44,12 @@ Initial release. 37 components on the shared token layer, authored once in the
 registry source and shipped both as npm packages and as a shadcn registry, with a
 parity test asserting the two never drift.
 
-- **Tier 1 — 18 primitives.** `Alert` `Avatar` `Badge` `Button` `Card`
+- **Tier 1 , 18 primitives.** `Alert` `Avatar` `Badge` `Button` `Card`
   `Checkbox` `Field` `GlassSurface` `Input` `Kbd` `Label` `NativeSelect`
   `Separator` `Skeleton` `Spinner` `Switch` `Textarea` `Tooltip`
-- **Tier 2 — 6 overlays.** `CommandPalette` `Dialog` `DropdownMenu` `Popover`
+- **Tier 2 , 6 overlays.** `CommandPalette` `Dialog` `DropdownMenu` `Popover`
   `SidePanel` `Toast`
-- **Tier 3 — 13 composites.** `Accordion` `AppShell` `Breadcrumb` `CodeBlock`
+- **Tier 3 , 13 composites.** `Accordion` `AppShell` `Breadcrumb` `CodeBlock`
   `DataTable` `DiffViewer` `EmptyState` `Form` `Pagination` `SegmentedControl`
   `StatusChip` `Table` `Tabs`
 - Plus `cn`, `VelobitsProvider`, `useTheme`, `useMediaQuery` and
@@ -58,7 +58,7 @@ parity test asserting the two never drift.
 
 ### Decisions worth knowing about
 
-- **`Form` is subpath-only** — `@velobitsio/ui/form`, never the barrel.
+- **`Form` is subpath-only** , `@velobitsio/ui/form`, never the barrel.
   `react-hook-form` is an optional peer and the barrel is a single bundled
   module, so re-exporting it would put a top-level `import 'react-hook-form'`
   into `dist/index.js` and break every consumer without forms. Bundling our own
@@ -69,6 +69,6 @@ parity test asserting the two never drift.
   14 kB for none of it. A surface that ever needs virtualisation should use
   TanStack directly on `Table`.
 - **`EmptyState` defaults to `surface="none"`** even though `Table` and
-  `Accordion` default to glass — its documented homes are a table body and a
+  `Accordion` default to glass , its documented homes are a table body and a
   card body, both already glass, and defaulting it would ship nested glass at its
   commonest call site.

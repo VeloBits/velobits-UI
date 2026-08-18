@@ -7,10 +7,10 @@ import { cn } from '../lib/cn';
 
 /**
  * The `*-soft` variants pair a tinted wash with the matching *text* token, never
- * with the solid fill — `bg-success-soft text-success`, not
+ * with the solid fill , `bg-success-soft text-success`, not
  * `bg-success text-success`. Badge text is 12px, so the full 4.5:1 applies, and
  * the colour the text actually sits on is the wash FLATTENED over the surface
- * beneath the chip — so each pairing is gated as a composite over the page, the
+ * beneath the chip , so each pairing is gated as a composite over the page, the
  * panel and the tier-S glass surface, in both themes: the soft-chip suite in
  * `@velobitsio/tokens` (`test/contrast.test.ts`, driven by `SOFT_CHIP_PAIRS`).
  * The token values were tuned to hold that gate.
@@ -37,7 +37,7 @@ const badgeVariants = cva(
         warning: 'border-transparent bg-warning-soft text-warning',
         info: 'border-transparent bg-info-soft text-info',
         /**
-         * A CATEGORY, not a status — the point of it.
+         * A CATEGORY, not a status , the point of it.
          *
          * `success`/`danger`/`warning`/`info` all assert a severity, so an axis
          * whose values are *kinds* (a flag's value type, a resource class, an

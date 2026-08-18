@@ -1,7 +1,7 @@
 export const metadata = {
   title: 'Introduction',
   description:
-    'One token and component layer for every VeloBits surface — shipped twice, from one source.',
+    'One token and component layer for every VeloBits surface , shipped twice, from one source.',
 };
 
 # Introduction
@@ -12,14 +12,14 @@ editor app, the dashboard app, and the shared Keycloak login theme.
 Before this existed, those four had grown **four token vocabularies on the same
 Tailwind v4 foundation**, and ~19 icons were byte-identical across two repos.
 
-Every component is authored once, in `registry/velobits/`, and shipped **twice** —
+Every component is authored once, in `registry/velobits/`, and shipped **twice** ,
 as an npm package and as a shadcn registry. Which one you want is not a matter of
 taste, and [Installation](/docs/installation) says which is which.
 
 ## What is here
 
-- **38 components** across three tiers — 18 primitives, 6 overlays, 14 composites
-  — on 36 semantic tokens, every one of which is either contrast-gated or carries
+- **38 components** across three tiers , 18 primitives, 6 overlays, 14 composites
+  , on 36 semantic tokens, every one of which is either contrast-gated or carries
   a recorded exemption. See [Components](/docs/components).
 - **88 hand-drawn stroke icons**, tuned to read at 13–18px. See [Icons](/docs/icons).
 - **Three colour registries** and a glass perceptibility gate, all rendered live
@@ -42,39 +42,39 @@ there; shared _components_ would mean fighting the upstream extension forever.
 ## Three things that will bite you
 
 **`--primary` is not a text colour.** `#007ACC` measures 3.90:1 on the cream
-page — a fill behind white text (4.51:1), and a WCAG failure as text. Links use
+page , a fill behind white text (4.51:1), and a WCAG failure as text. Links use
 `text-link`.
 
 **Lime is asymmetric.** `bg-brand` with `text-on-brand` (charcoal) is 10.89:1 and
 is the only sanctioned pairing. Lime _as text_ is 13.9:1 in dark mode and
-1.13:1 in light — so `--accent-text` is lime in dark and plum in light.
+1.13:1 in light , so `--accent-text` is lime in dark and plum in light.
 
 **Glass has two tiers, and they are not the same material.** Tier O (`.glass`)
-is for surfaces floating over arbitrary content — dialogs, popovers, menus,
+is for surfaces floating over arbitrary content , dialogs, popovers, menus,
 toasts, sticky headers. Tier S (`.glass-surface`) is for component surfaces
 whose backdrop is known to be the page: `Card`, `Alert`, and the `Table`,
 `Accordion` and `EmptyState` shells. Tier S carries **no `backdrop-filter`** by
 default, so a 20-card grid does not mount 20 blur layers.
 
-Forbidden on both: page backgrounds, and **nested glass** — two instances of one
+Forbidden on both: page backgrounds, and **nested glass** , two instances of one
 tier composite about 2/255 apart and cancel each other out.
 
 ## The gate that matters
 
 Every semantic colour pair is asserted against its WCAG target in both themes,
 and every **Tier-O** glass tier against the seven worst-case backdrops in the
-palette — composited in **gamma-encoded sRGB**, because that is what browsers
+palette , composited in **gamma-encoded sRGB**, because that is what browsers
 actually do. Measuring in linear light overstates glass legibility by a wide
 margin. Tier S is not in that sweep and does not need to be: its backdrop is
 known to be the page, so it is measured against the page and the panel instead.
 
 Three registries carry it, and [Colors](/docs/colors) renders all of them:
 
-- **Flat pairs** — a token against a token.
+- **Flat pairs** , a token against a token.
 - **Soft-chip pairs**, each composited over the page, the panel _and_ the
   Tier-S glass composite, in both themes. A chip is never seen against the
   colour it is declared with, which a flat pair cannot express.
-- **Perceptibility pairs** — translucency is worthless if the result is the
+- **Perceptibility pairs** , translucency is worthless if the result is the
   colour underneath it, so every tier must clear 8/255 max-channel distance from
   what it sits on. This is the gate that caught a dark overlay compositing to
   byte-identical with the page.

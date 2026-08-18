@@ -20,7 +20,7 @@ import { Badge, type BadgeProps } from './badge';
  *
  * On and off are encoded here as green and red. Around 8% of men have a
  * red/green deficiency, so for one reader in twelve a colour-only chip conveys
- * *nothing* — and on-versus-off is the single most consequential distinction a
+ * *nothing* , and on-versus-off is the single most consequential distinction a
  * control plane makes. WCAG 1.4.1 is the rule; this is the case it was written
  * for.
  *
@@ -38,7 +38,7 @@ import { Badge, type BadgeProps } from './badge';
  * this maps status → variant and stops. The gate includes the composite: at
  * 12px the 4.5:1 target applies, and each text-over-wash pairing is measured
  * flattened over the page, the panel and the tier-S glass surface in both
- * themes — the soft-chip suite in `@velobitsio/tokens`. The token re-tune
+ * themes , the soft-chip suite in `@velobitsio/tokens`. The token re-tune
  * that made those composites pass landed for `Badge` and this component at the
  * same time, precisely because there is only one set of values.
  *
@@ -47,7 +47,7 @@ import { Badge, type BadgeProps } from './badge';
  * `<StatusChip status="on" />` renders the text `On` and paints it `ON`.
  *
  * Literal `"ON"` in the DOM is what the hand-rolled version does, and some
- * screen readers spell a short all-caps token letter by letter — "oh en". A
+ * screen readers spell a short all-caps token letter by letter , "oh en". A
  * `text-transform` changes only the glyphs, so the accessible name stays the
  * word. Free correctness; the visual result is identical.
  */
@@ -61,11 +61,11 @@ const PRESENTATION: Record<
   off: { icon: CircleSlashIcon, variant: 'danger', label: 'Off' },
   /** A rollout, a partial deploy, a half-applied migration. */
   partial: { icon: CircleHalfIcon, variant: 'warning', label: 'Partial' },
-  /** Queued, scheduled, awaiting approval — not yet in effect either way. */
+  /** Queued, scheduled, awaiting approval , not yet in effect either way. */
   pending: { icon: ClockIcon, variant: 'info', label: 'Pending' },
   /**
    * Deliberately `neutral`, not a colour. Archived is not a *state of the
-   * thing*, it is a statement that the thing is no longer live — giving it a
+   * thing*, it is a statement that the thing is no longer live , giving it a
    * status colour would put it on the same axis as on/off and invite the reading
    * "archived, and also somehow off".
    */
@@ -93,7 +93,7 @@ export interface StatusChipProps extends Omit<BadgeProps, 'variant' | 'children'
    * Replaces the default word. The case for it: a partial rollout should read
    * `25%`, which is strictly more information than `Partial` in the same space.
    *
-   * Whatever is passed still has to *say the state* — this is a label override,
+   * Whatever is passed still has to *say the state* , this is a label override,
    * not a slot for extra content.
    */
   children?: React.ReactNode;
@@ -116,7 +116,7 @@ function StatusChip({ status, children, className, ...props }: StatusChipProps) 
       {...props}
     >
       {/*
-       * Left decorative — `createIcon` already sets `aria-hidden`, and that is
+       * Left decorative , `createIcon` already sets `aria-hidden`, and that is
        * correct here rather than something to override: the label beside it
        * carries the meaning. The glyph is the second channel for *sighted*
        * readers with a colour deficiency, not a third announcement.

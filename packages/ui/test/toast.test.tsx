@@ -21,7 +21,7 @@ import { auditElement, describeViolations } from './axe';
 
 /**
  * Radix portals each toast into the viewport, and the viewport refuses to render
- * toasts without a `ToastProvider` above it — so every fixture here mounts the
+ * toasts without a `ToastProvider` above it , so every fixture here mounts the
  * full triple. That is also the shape a consumer must use.
  */
 function Harness({
@@ -59,7 +59,7 @@ describe('Toast, rendering and structure', () => {
 
   it('portals the toast into the viewport list, not where it was declared', () => {
     /**
-     * Which is why the viewport's own position is the thing that matters — see
+     * Which is why the viewport's own position is the thing that matters , see
      * the containing-block warning. A toast declared deep inside a glass Dialog
      * still lands in the viewport's `<ol>`.
      */
@@ -79,7 +79,7 @@ describe('Toast, rendering and structure', () => {
 
   it('places title, description, action and close on the reserved grid', () => {
     /**
-     * Column 1 is the icon gutter, 2 the content, 3 the close affordance — the
+     * Column 1 is the icon gutter, 2 the content, 3 the close affordance , the
      * same shape as Alert, so the two read as one family and neither has to be
      * laid out at the call site.
      */
@@ -162,7 +162,7 @@ describe('Toast, dismissal', () => {
   it('never auto-dismisses when duration is Infinity', async () => {
     /**
      * The escape hatch for a message the user must read. Anything they must ACT
-     * on is a Dialog, not a toast — but a persistent toast is the right shape for
+     * on is a Dialog, not a toast , but a persistent toast is the right shape for
      * "we lost the connection, retrying".
      */
     render(
@@ -239,7 +239,7 @@ describe('Toast, variants', () => {
   it('never puts a *-soft wash on the glass surface', () => {
     /**
      * THE variant trap. The soft tokens are low-alpha washes meant for an OPAQUE
-     * panel — `--success-soft` is `rgba(34,110,37,0.12)`. `.glass` sits in
+     * panel , `--success-soft` is `rgba(34,110,37,0.12)`. `.glass` sits in
      * Tailwind's `components` layer, so a `bg-success-soft` utility WINS and
      * replaces `--glass-bg` (alpha 0.85) with alpha 0.12. The toast becomes a
      * blurred smear of the page behind it, and nothing warns you because both
@@ -260,7 +260,7 @@ describe('Toast, variants', () => {
   it('tints only the icon, leaving body copy on the glass-corrected muted step', () => {
     /**
      * Stacking a status tint on body copy is how a text pair quietly drops below
-     * AA — the same reason `Alert` keeps its description on
+     * AA , the same reason `Alert` keeps its description on
      * `text-muted-foreground`. Inside `.glass` that token resolves to
      * `--muted-on-glass` (4.92:1) rather than `--muted-fg` (3.09:1), and the call
      * site does not have to know.
@@ -326,7 +326,7 @@ describe('Toast, the viewport contract', () => {
      * `backdrop-filter` establishes a containing block for `position: fixed`
      * descendants, so a viewport under a `.glass` element anchors to that element
      * instead of the layout viewport and is trapped inside it. There is no
-     * runtime check that can catch this — the docblock is the control, so the
+     * runtime check that can catch this , the docblock is the control, so the
      * docblock is what is asserted.
      */
     const source = readFileSync(
@@ -377,7 +377,7 @@ describe('Toast, swipe and animation', () => {
     expect(getToast()!.getAttribute('data-swipe-direction')).toBe('right');
   });
 
-  it('animates transform and opacity only — never the blur radius', () => {
+  it('animates transform and opacity only , never the blur radius', () => {
     const cls = toastVariants({});
     expect(cls).toMatch(/data-\[state=open\]:animate-in/);
     expect(cls).toMatch(/data-\[state=closed\]:animate-out/);

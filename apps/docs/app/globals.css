@@ -1,5 +1,5 @@
 /*
- * The docs site consumes the design system exactly as a product app does — one
+ * The docs site consumes the design system exactly as a product app does , one
  * import, plus the @source lines. If this file ever needs more than that, the
  * token layer is missing something.
  */
@@ -8,7 +8,7 @@
  * The typefaces the token layer NAMES but deliberately does not ship.
  *
  * `@velobitsio/tokens` declares `--font-sans: 'Geist Variable', …` and stays
- * dependency-free, so each consumer installs the faces itself — which is what
+ * dependency-free, so each consumer installs the faces itself , which is what
  * the Keycloak theme already does, with these same two packages. Skipping this
  * step fails silently: everything falls back to `system-ui`, the layout barely
  * shifts, and the only visible symptom is a glyph the fallback lacks rendering
@@ -22,7 +22,7 @@
 /*
  * NOT OPTIONAL. Tailwind v4 does not scan node_modules, so every utility used
  * *inside* @velobitsio/ui would go ungenerated and the components would render
- * completely unstyled — with no warning anywhere. `cva` class strings survive
+ * completely unstyled , with no warning anywhere. `cva` class strings survive
  * into dist as string literals, which is what makes this work.
  */
 @source "../../../packages/ui/dist";
@@ -32,7 +32,7 @@
  * The registry JSON is auto-scanned (it is committed, so .gitignore does not
  * exclude it) and every file in it carries a JSON-ESCAPED copy of a component's
  * full source. Tailwind scans plain text, so a `"` that a component legitimately
- * has inside an arbitrary value arrives here as `\"` — and Lightning CSS rejects
+ * has inside an arbitrary value arrives here as `\"` , and Lightning CSS rejects
  * the resulting declaration as `BadUrl`, taking the entire stylesheet down with
  * a 500 rather than dropping one rule.
  *
@@ -67,7 +67,7 @@
  * emits `--shiki-light` and `--shiki-dark` custom properties per token instead of
  * a baked-in colour. These four rules pick between them off the `dark` class,
  * which means the code recolours in the same frame as the rest of the page rather
- * than after it — and one payload serves both themes instead of two hidden copies.
+ * than after it , and one payload serves both themes instead of two hidden copies.
  *
  * No `!important` anywhere: the spans carry the custom properties but never a
  * `color`, and `.dark .shiki span` outranks `.shiki span` on specificity alone.

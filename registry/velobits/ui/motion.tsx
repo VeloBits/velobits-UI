@@ -6,7 +6,7 @@ import { AnimatePresence, motion, type HTMLMotionProps, type Transition } from '
 import { cn } from '../lib/cn';
 
 /**
- * The motion layer — page transitions and list entrances.
+ * The motion layer , page transitions and list entrances.
  *
  * ## Why this exists, and why it is not in the barrel
  *
@@ -16,7 +16,7 @@ import { cn } from '../lib/cn';
  * paid the install and got no primitives. This is the capacity we were already
  * buying, spent.
  *
- * It is a **subpath-only export** — `@velobitsio/ui/motion`, not the barrel —
+ * It is a **subpath-only export** , `@velobitsio/ui/motion`, not the barrel ,
  * for the same reason `form` is: the barrel's own-code budget sits at 28.13 kB of
  * 32, and anything added there is paid for by every consumer whether they import
  * it or not. Pulling motion in through the barrel would also drag Framer's runtime
@@ -26,7 +26,7 @@ import { cn } from '../lib/cn';
  * import { PageTransition, Stagger, StaggerItem } from '@velobitsio/ui/motion';
  * ```
  *
- * ## Reduced motion is already handled — do not re-handle it here
+ * ## Reduced motion is already handled , do not re-handle it here
  *
  * Two mechanisms cover it, and adding a third is how they get out of step:
  *
@@ -40,13 +40,13 @@ import { cn } from '../lib/cn';
  * case only: imperative decisions Framer cannot see, like whether to autoplay.
  *
  * **These components assume `VelobitsProvider` is mounted.** Without it they still
- * animate — and they stop honouring the user's preference, silently. That is the
+ * animate , and they stop honouring the user's preference, silently. That is the
  * one failure mode worth knowing about.
  *
  * ## Everything animates transform and opacity, and nothing else
  *
  * Both are composited on the GPU: no layout, no paint, no main-thread work per
- * frame. `height`, `width`, `top` and `filter` are all deliberately absent —
+ * frame. `height`, `width`, `top` and `filter` are all deliberately absent ,
  * animating them on a list of forty rows is how a 60fps entrance becomes a
  * stutter. `glass.css` makes the same point about blur radius, for the same reason.
  */
@@ -57,23 +57,23 @@ import { cn } from '../lib/cn';
  * Values come from the token layer (`--duration-*`, `--ease-out`) rather than being
  * invented here, so CSS transitions and Framer animations in the same view agree.
  * They are duplicated as numbers because Framer needs seconds and a cubic-bezier
- * array — a `var()` string is not something it can interpolate.
+ * array , a `var()` string is not something it can interpolate.
  *
  * `scales.test.ts` pins the CSS side; `motion.test.tsx` asserts these match it, so
  * the duplication cannot drift.
  */
 export const TRANSITION = {
-  /** 180ms — `--duration-enter`. List items, cards, anything entering in place. */
+  /** 180ms , `--duration-enter`. List items, cards, anything entering in place. */
   enter: { duration: 0.18, ease: [0.32, 0.72, 0, 1] },
-  /** 320ms — `--duration-page`. Route changes. */
+  /** 320ms , `--duration-page`. Route changes. */
   page: { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
 } as const satisfies Record<string, Transition>;
 
 /**
  * How far an entering element travels, in pixels.
  *
- * Small on purpose. A large offset reads as a slide — content arriving from
- * somewhere else — while 8px reads as the thing settling into place, which is what
+ * Small on purpose. A large offset reads as a slide , content arriving from
+ * somewhere else , while 8px reads as the thing settling into place, which is what
  * a page or a list row is actually doing. It also keeps the distance below the
  * threshold where motion-sensitive users notice displacement even at full opacity.
  */
@@ -84,7 +84,7 @@ export interface PageTransitionProps extends Omit<
   'initial' | 'animate' | 'exit' | 'transition' | 'variants' | 'key'
 > {
   /**
-   * Changes to this value trigger the transition. Pass the route key —
+   * Changes to this value trigger the transition. Pass the route key ,
    * `useLocation().pathname` in React Router, `usePathname()` in Next.
    *
    * **Required, and it must actually change per route.** With a constant value the
@@ -105,7 +105,7 @@ export interface PageTransitionProps extends Omit<
  * page's focused element stays focusable while invisible, and any `position: fixed`
  * child of a glass surface in the outgoing tree is still painting.
  *
- * `mode="wait"` serialises them — out, then in. It costs the overlap, which at
+ * `mode="wait"` serialises them , out, then in. It costs the overlap, which at
  * 320ms nobody perceives as slower.
  *
  * Only opacity and a small Y offset move. A scale or a horizontal slide on a whole
@@ -146,7 +146,7 @@ export interface StaggerProps extends Omit<
    * Narrowed back to plain `ReactNode` from Framer's own `children` type, which
    * also admits a `MotionValue`. This component walks its children with
    * `React.Children.map` to assign each item its index, and a MotionValue is not
-   * something that can be walked — so the wider type is not merely unhelpful here,
+   * something that can be walked , so the wider type is not merely unhelpful here,
    * it is unimplementable.
    */
   children?: React.ReactNode;
@@ -157,7 +157,7 @@ export interface StaggerProps extends Omit<
  * item {@link STAGGER_LIMIT}.
  *
  * A stagger scales linearly with list length, so an uncapped one takes
- * `step × n` seconds to finish — at 200 rows and the default step, eight seconds
+ * `step × n` seconds to finish , at 200 rows and the default step, eight seconds
  * of mostly-blank page. This is the exact shape of "the animation that looked
  * great on the design's six items".
  *
@@ -180,7 +180,7 @@ const StaggerContext = React.createContext<{ step: number; delay: number }>({
  * ## Why this does not use Framer's `staggerChildren`
  *
  * It is the obvious tool and it cannot be capped. `staggerChildren` multiplies by
- * each child's index internally, with no way to say "stop counting at twelve" —
+ * each child's index internally, with no way to say "stop counting at twelve" ,
  * so the 200-row case above is unavoidable with it. Splitting the children into a
  * staggered group and a plain group would work, and would also put them under two
  * different parents, which silently breaks any `grid` or `flex` layout on this
@@ -192,7 +192,7 @@ const StaggerContext = React.createContext<{ step: number; delay: number }>({
  */
 function Stagger({ step = 0.04, delay = 0, className, children, ...props }: StaggerProps) {
   // Memoised: this is a context value, and a fresh object every render would
-  // re-render every item in the list — on a component whose entire purpose is
+  // re-render every item in the list , on a component whose entire purpose is
   // lists.
   const timing = React.useMemo(() => ({ step, delay }), [step, delay]);
 
@@ -203,7 +203,7 @@ function Stagger({ step = 0.04, delay = 0, className, children, ...props }: Stag
          * `React.Children.map` supplies the index, so a call site can write items
          * declaratively or from a `.map()` and get the same result. A StaggerItem
          * nested inside a Fragment or a wrapper div will not be found and simply
-         * arrives with the first batch — degraded, not broken.
+         * arrives with the first batch , degraded, not broken.
          */}
         {React.Children.map(children, (child, index) =>
           React.isValidElement<StaggerItemProps>(child) && child.type === StaggerItem
@@ -221,7 +221,7 @@ export interface StaggerItemProps extends Omit<
 > {
   /**
    * Set by {@link Stagger} via `React.Children.map`. Passing it by hand is
-   * supported — useful when items come from several sources and you want one
+   * supported , useful when items come from several sources and you want one
    * continuous cascade across them.
    */
   index?: number;
@@ -257,7 +257,7 @@ export interface FadeInProps extends Omit<
 }
 
 /**
- * A single element's entrance, for the cases that are not a route or a list —
+ * A single element's entrance, for the cases that are not a route or a list ,
  * an expanding detail panel, a result that arrives after a fetch.
  *
  * Deliberately has no exit animation. An element that fades OUT on unmount has to

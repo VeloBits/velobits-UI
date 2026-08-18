@@ -10,7 +10,7 @@ describe('StatusChip, the second channel', () => {
   it('gives every status an icon as well as a colour', () => {
     /**
      * WCAG 1.4.1. Around 8% of men have a red/green deficiency, and on-versus-off
-     * is the single most consequential distinction this system makes — a chip
+     * is the single most consequential distinction this system makes , a chip
      * carrying only a colour conveys nothing to one reader in twelve.
      */
     for (const status of ALL) {
@@ -43,7 +43,7 @@ describe('StatusChip, the second channel', () => {
 describe('StatusChip, labelling', () => {
   it('puts sentence case in the DOM and uppercases with CSS', () => {
     /**
-     * Some screen readers spell a short all-caps token letter by letter — "oh
+     * Some screen readers spell a short all-caps token letter by letter , "oh
      * en". `text-transform` changes the glyphs only, so the accessible name stays
      * the word.
      */
@@ -54,7 +54,7 @@ describe('StatusChip, labelling', () => {
     expect(chip.className).toContain('uppercase');
   });
 
-  it('lets children replace the word — a rollout shows its percentage', () => {
+  it('lets children replace the word , a rollout shows its percentage', () => {
     render(<StatusChip status="partial">25%</StatusChip>);
     expect(screen.getByText('25%')).toBeTruthy();
   });

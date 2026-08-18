@@ -13,7 +13,7 @@ import { registryItemsByName } from '@/lib/generated/registry-data';
  *
  * Deliberately NOT glass. It is a full-height column beside scrolling content, so
  * a `backdrop-filter` here would re-sample a region the size of the viewport on
- * every scroll frame — and the header above it is already Tier O. The blur budget
+ * every scroll frame , and the header above it is already Tier O. The blur budget
  * for a route is about six live layers; spending one on a static column that
  * never floats over anything is the wrong purchase.
  */
@@ -22,7 +22,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   /*
    * `trailingSlash: true` is on for the static export, so `usePathname()` returns
    * `/docs/components/button/` while the hrefs here are written without it.
-   * Comparing them raw makes every link inactive — silently, and only in the
+   * Comparing them raw makes every link inactive , silently, and only in the
    * production build, which is the worst place to find it.
    */
   const normalise = (value: string) => (value.length > 1 ? value.replace(/\/$/, '') : value);

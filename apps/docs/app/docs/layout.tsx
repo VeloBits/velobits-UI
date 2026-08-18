@@ -4,7 +4,7 @@ import { DocsSidebarNav } from '@/components/docs-sidebar';
  * The three-column docs shell: sidebar, content, "On this page".
  *
  * Each page supplies its own table of contents rather than this layout deriving
- * one, because the two page shapes have different sources for it — MDX guides
+ * one, because the two page shapes have different sources for it , MDX guides
  * know their headings at authoring time, and `[slug]` builds them from which
  * sections it decided to render. A layout that scraped the DOM for headings
  * would work for both and only in the browser, which on a statically exported

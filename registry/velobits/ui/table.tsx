@@ -4,16 +4,16 @@ import { cn } from '../lib/cn';
 
 export interface TableProps extends React.ComponentProps<'table'> {
   /**
-   * Classes for the scroll wrapper rather than the `<table>` — the only place a
+   * Classes for the scroll wrapper rather than the `<table>` , the only place a
    * surface treatment belongs. See the glass rule in the docblock.
    */
   containerClassName?: string;
   /**
-   * The wrapper's material. `glass` (the default) is Tier S — the same
+   * The wrapper's material. `glass` (the default) is Tier S , the same
    * `.glass-surface` a `Card` uses, and **never** `.glass-surface-blur`: this
    * wrapper is a scroll container, so a live backdrop layer here re-samples on
    * every scroll frame. `panel` is the opaque fallback, and `none` leaves the
-   * wrapper bare for a table already sitting inside a Card or a Dialog — which
+   * wrapper bare for a table already sitting inside a Card or a Dialog , which
    * is the case that matters, because a surface inside a surface is nested
    * glass and both layers cancel.
    */
@@ -31,7 +31,7 @@ export interface TableProps extends React.ComponentProps<'table'> {
  *
  * `backdrop-filter` is per-element. Fifty rows means fifty blur layers, and each
  * one has to re-sample and re-composite its own slice of the backdrop on every
- * frame the table scrolls — the cost scales with visible rows, so the table gets
+ * frame the table scrolls , the cost scales with visible rows, so the table gets
  * *worse* the more data it has, which is the opposite of how anyone tests it.
  * Two further consequences make it wrong even when it is fast enough:
  * `backdrop-filter` forms a stacking context on every row (so a row-level
@@ -41,17 +41,17 @@ export interface TableProps extends React.ComponentProps<'table'> {
  *
  * The wrapper is also a **scroll container** (`overflow-x-auto`), and glass is
  * forbidden inside a scroll container by `@velobitsio/tokens/glass.css` for the
- * same repaint reason — so if this table sits *inside* a glass Dialog, the glass
+ * same repaint reason , so if this table sits *inside* a glass Dialog, the glass
  * stops at the Dialog panel.
  *
  * What that leaves: the wrapper carries the surface, and rows use the opaque
  * wash tokens (`--highlight` for hover, `--bg2` for selected) that the
- * implementation below already uses. Those are flat colours — no filter, no
+ * implementation below already uses. Those are flat colours , no filter, no
  * compositing layer.
  *
  * Since 2026-08-06 the wrapper does that by DEFAULT (`surface="glass"`) rather
  * than leaving it to `containerClassName` at every call site. It is Tier S
- * without the blur, for the reason above — a scroll container is the one place
+ * without the blur, for the reason above , a scroll container is the one place
  * `.glass-surface-blur` must never appear, and `glass.css` forbids it.
  *
  * **Pass `surface="none"` for a table already inside a Card or a Dialog.** That
@@ -63,7 +63,7 @@ export interface TableProps extends React.ComponentProps<'table'> {
  * ## `caption-bottom`
  *
  * The `<caption>` is the table's accessible name, and it is the first thing a
- * screen reader announces regardless of where it is painted — so rendering it
+ * screen reader announces regardless of where it is painted , so rendering it
  * below the data costs nothing semantically and keeps a visible caption from
  * competing with the page heading above the table.
  */
@@ -121,7 +121,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<'tfoot'>) {
 }
 
 /**
- * Opaque washes only, by design — see the glass rule on `Table`.
+ * Opaque washes only, by design , see the glass rule on `Table`.
  *
  * `--highlight` is the system's hover wash (a 5–6% ink/paper overlay) and
  * `--bg2` the selected surface; both are flat colours, so a row costs one paint
@@ -151,7 +151,7 @@ function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
 /**
  * `scope="col"` by default rather than relying on the implicit scope a `<th>` in
  * a `<thead>` gets. The implicit rule is real HTML but assistive tech applies it
- * unevenly once a table has a footer, a caption, or cells that span — and the
+ * unevenly once a table has a footer, a caption, or cells that span , and the
  * failure mode is a screen reader reading the wrong column name for every cell in
  * a row, which nobody notices visually.
  *

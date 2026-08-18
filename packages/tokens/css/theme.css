@@ -1,5 +1,5 @@
 /*
- * @velobitsio/tokens/theme.css — THE single Tailwind entry every VeloBits app
+ * @velobitsio/tokens/theme.css , THE single Tailwind entry every VeloBits app
  * imports. One line in your app CSS:
  *
  *   @import '@velobitsio/tokens/theme.css';
@@ -10,14 +10,14 @@
  *
  * 1. The base border reset must say `var(--border)`, NEVER `var(--color-border)`.
  *    A `@theme` variable is emitted as a real `:root` declaration, so
- *    `--color-border: var(--border)` resolves against `:root` — the LIGHT value —
+ *    `--color-border: var(--border)` resolves against `:root` , the LIGHT value ,
  *    and that resolved value then inherits everywhere. `body.dark` is a
  *    descendant, so its override never reaches it. Symptom: a bare `border`
  *    paints light grey in dark mode while `border-border` is correct. If a
  *    border looks wrong ONLY on shadcn primitives, suspect the bridged variable,
  *    not the palette.
  * 2. `--border` and `--field-border` stay OPAQUE (see tokens.css).
- * 3. `@theme inline` means there is NO `.dark` block inside `@theme` — dark
+ * 3. `@theme inline` means there is NO `.dark` block inside `@theme` , dark
  *    switching lives only in the raw variables in tokens.css.
  * 4. Renaming a `@theme` token requires a dev-server RESTART. Tailwind's
  *    candidate cache lies through HMR.
@@ -31,13 +31,13 @@
  * layer) override it without `!important`, while it still beats Preflight. */
 @import './glass.css' layer(components);
 
-/* The control material — the same language as the glass tier, applied to controls.
+/* The control material , the same language as the glass tier, applied to controls.
  * Same layer so a `shadow-*` utility at a call site still wins. Before this every
  * control was a flat fill, which is why a Card read as glass and everything inside
  * it read as paper. */
 @import './controls.css' layer(components);
 
-/* The page texture, same layer and for the same reason — plus one that is
+/* The page texture, same layer and for the same reason , plus one that is
  * specific to it: `.page-texture` sets `background-image`, and the page's
  * `background-color` comes from `body { background: var(--bg) }` in the base
  * layer below. Components beat base, so the texture paints over the page colour
@@ -61,7 +61,7 @@
  * THE ONE BRIDGE.
  *
  * shadcn's semantic names are added here as additional SPELLINGS of the same
- * runtime variables, never as a second palette — which is why light and dark
+ * runtime variables, never as a second palette , which is why light and dark
  * both work for free and why there is no `.dark` token block to keep in sync.
  * If `npx shadcn add` ever appends its own `:root`/`.dark` oklch blocks below,
  * DELETE THEM; they would shadow this bridge with a stock grey palette.
@@ -90,7 +90,7 @@
   --color-highlight: var(--highlight);
   --color-overlay: var(--overlay);
   /* Blue as TEXT. `--primary` is 3.90:1 on the cream page and fails AA for
-   * text — `text-link` is the token for a link, never `text-primary`. */
+   * text , `text-link` is the token for a link, never `text-primary`. */
   --color-link: var(--primary-text);
   --color-primary-text: var(--primary-text);
   --color-accent-text: var(--accent-text);
@@ -112,12 +112,12 @@
 
   /* ── categorical, not a status ──────────────────────────────────────────── */
   /* `rose` sits here rather than under status because it deliberately carries no
-   * severity reading — it is for axes whose values are kinds. See src/palette.ts. */
+   * severity reading , it is for axes whose values are kinds. See src/palette.ts. */
   --color-rose: var(--rose);
   --color-rose-soft: var(--rose-soft);
 
   /* Text on a `danger` FILL, and the hover fills that replaced `brightness-95`.
-   * `--on-danger` is white in light and CHARCOAL in dark — dark's danger fill is a
+   * `--on-danger` is white in light and CHARCOAL in dark , dark's danger fill is a
    * light red, because the same token also has to work as text there. */
   --color-on-danger: var(--on-danger);
   --color-danger-hover: var(--danger-hover);
@@ -147,7 +147,7 @@
   --color-input: var(--field-border);
   --color-ring: var(--ring);
 
-  /* Sidebar block — shadcn's `sidebar` primitive reads these by name. */
+  /* Sidebar block , shadcn's `sidebar` primitive reads these by name. */
   --color-sidebar: var(--panel);
   --color-sidebar-foreground: var(--fg);
   --color-sidebar-primary: var(--primary);
@@ -157,7 +157,7 @@
   --color-sidebar-border: var(--border);
   --color-sidebar-ring: var(--ring);
 
-  /* Chart series. Isoluminant by construction — each clears 3:1 against its
+  /* Chart series. Isoluminant by construction , each clears 3:1 against its
    * theme's page, but they are distinguished by HUE, not lightness, so they are
    * indistinguishable in greyscale. Charts must therefore also encode series by
    * shape, pattern or direct label (WCAG 1.4.1 Use of Color). */
@@ -195,7 +195,7 @@
   --container-page: 72rem;
 
   /* One ladder for the whole system. Portalled Radix content lands at
-   * `dropdown` and above, so sticky app chrome must stay below it — a topbar at
+   * `dropdown` and above, so sticky app chrome must stay below it , a topbar at
    * 1100 swallows its own dropdown. */
   --z-index-base: 0;
   --z-index-raised: 10;
@@ -220,14 +220,14 @@
  * ── Custom utilities ────────────────────────────────────────────────────────
  *
  * Tailwind v4 has theme namespaces for colours, radii, fonts, containers,
- * shadows and easings — but NOT for z-index or transition duration. Declaring
+ * shadows and easings , but NOT for z-index or transition duration. Declaring
  * `--z-index-tooltip` in `@theme` therefore emits a CSS variable and NO
  * utility, so `z-tooltip` silently does nothing (an unknown class, not an
  * error). These `@utility` rules are what actually create them.
  *
  * `--ease-out` and `--ease-in` need no such treatment: `--ease-*` IS a
  * namespace, so those overwrite Tailwind's built-in `ease-out`/`ease-in`, which
- * is intended — one easing pair for the whole system.
+ * is intended , one easing pair for the whole system.
  */
 @utility z-base {
   z-index: var(--z-index-base);
@@ -282,7 +282,7 @@
    * that, so `border` / `border-b` emit WIDTH AND STYLE ONLY and the colour
    * falls back to `currentColor`. That is a real bug wherever a shadcn
    * primitive uses a bare `border` and also sets a text colour on the same
-   * element — `Card` is `border` + `text-card-foreground`, which in dark mode
+   * element , `Card` is `border` + `text-card-foreground`, which in dark mode
    * painted a near-white outline around every card.
    *
    * MUST be `var(--border)`, not `var(--color-border)`. See trap 1 at the top.

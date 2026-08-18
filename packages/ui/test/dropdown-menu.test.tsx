@@ -35,7 +35,7 @@ import { auditElement } from './axe';
  *    handler turns Enter/Space into `currentTarget.click()`, so `onSelect` fires
  *    exactly as it does for a real user.
  *
- * See the file docblock in `registry/velobits/ui/dropdown-menu.tsx` — this is
+ * See the file docblock in `registry/velobits/ui/dropdown-menu.tsx` , this is
  * refusal 3, made executable.
  */
 async function openMenu() {
@@ -48,7 +48,7 @@ async function openMenu() {
  * `getByText`, not `getByRole('button')`.
  *
  * While a modal menu is open Radix's `hideOthers` marks everything outside the
- * content `aria-hidden` — INCLUDING the trigger. So the trigger leaves the
+ * content `aria-hidden` , INCLUDING the trigger. So the trigger leaves the
  * accessibility tree and `getByRole('button', { name: 'Open' })` stops finding
  * it mid-test, which reads as "the trigger unmounted". `getByText` queries the
  * DOM rather than the a11y tree and is stable across both states.
@@ -118,7 +118,7 @@ describe('DropdownMenu, opening and closing', () => {
      * Which is why Playwright cannot reliably click these items, and why the
      * viewport/stacking notes matter: the content is not a descendant of
      * whatever the trigger lives in, so an ancestor `overflow: hidden` cannot
-     * clip it — and an ancestor's z-index cannot raise it either.
+     * clip it , and an ancestor's z-index cannot raise it either.
      */
     const { container } = render(<Basic />);
     const menu = await openMenu();
@@ -324,7 +324,7 @@ describe('DropdownMenu, submenus', () => {
   it('stacks the submenu on the elevated glass tier, not plain glass on plain glass', async () => {
     /**
      * Two `.glass` panels at the same alpha composite into one indistinct smear
-     * — which is the whole reason `glass-elevated` exists.
+     * , which is the whole reason `glass-elevated` exists.
      */
     render(<WithSub />);
     const trigger = await waitFor(() => screen.getByRole('menuitem', { name: 'Move to' }));
@@ -407,9 +407,9 @@ describe('DropdownMenu, the styling refusals', () => {
 
   it('contains no text input, and says so', () => {
     /**
-     * REFUSAL 2 (the consumer ADR). A filter field inside a menu cannot keep focus —
+     * REFUSAL 2 (the consumer ADR). A filter field inside a menu cannot keep focus ,
      * Radix's content pulls focus back to the item list and typeahead swallows
-     * the keystrokes — and the only lever that would hold it,
+     * the keystrokes , and the only lever that would hold it,
      * `onOpenAutoFocus`, is a private escape hatch on this primitive. The
      * pattern is a Dialog or a Popover.
      *
@@ -446,7 +446,7 @@ describe('DropdownMenu, the styling refusals', () => {
     expect(cls).not.toMatch(/\bml-auto\b/);
   });
 
-  it('animates transform and opacity only — never the blur radius', () => {
+  it('animates transform and opacity only , never the blur radius', () => {
     /**
      * A blur-radius tween re-rasterises the entire backdrop every frame. This is
      * the assertion that catches someone "smoothing out" the glass entrance.
@@ -490,7 +490,7 @@ describe('DropdownMenu accessibility', () => {
 
     /**
      * The shared gate from `./axe`, rooted at the whole document rather than at
-     * `container` — the menu is portalled to `<body>`.
+     * `container` , the menu is portalled to `<body>`.
      */
     const violations = await auditElement(document.body);
 
@@ -501,14 +501,14 @@ describe('DropdownMenu accessibility', () => {
      *  - the `react-focus-guards` sentinels, which are `aria-hidden="true"` with
      *    `tabindex="0"` by design;
      *  - the rest of the page, which `hideOthers` marks `aria-hidden` while the
-     *    menu is up — and which still contains the focusable trigger, because
+     *    menu is up , and which still contains the focusable trigger, because
      *    Radix relies on a focus SCOPE rather than on stripping tabindex.
      *
      * axe cannot see a focus scope, so it must report this; every shadcn app has
      * the identical finding. Both classes carry a Radix-specific attribute
      * (`data-radix-focus-guard`, `data-aria-hidden`) that nothing in this repo
      * emits, so they are subtracted NODE BY NODE rather than by turning the rule
-     * off — if `aria-hidden-focus` ever fires on markup this file owns, this
+     * off , if `aria-hidden-focus` ever fires on markup this file owns, this
      * still fails.
      *
      * This subtraction stays FILE-LOCAL on purpose. Hoisting it into `./axe`

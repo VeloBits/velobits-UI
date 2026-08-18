@@ -105,7 +105,7 @@ interface FlagTableContext {
 const FLAG_COLUMNS: readonly DataTableColumn<FlagRow, FlagTableContext>[] = [
   {
     id: 'select',
-    // `hideHeader`, never an empty <th> — axe `empty-table-header`, and a screen
+    // `hideHeader`, never an empty <th> , axe `empty-table-header`, and a screen
     // reader would otherwise announce every checkbox with no idea what it does.
     header: 'Select row',
     hideHeader: true,
@@ -219,7 +219,7 @@ export default function DataTableDemo() {
 
       {/*
        * The bulk bar appears only with a selection, which is also the honest demo
-       * of `useRowSelection` — clear it by filtering the rows away.
+       * of `useRowSelection` , clear it by filtering the rows away.
        */}
       {selection.count > 0 && (
         <div
@@ -245,7 +245,7 @@ export default function DataTableDemo() {
       {/*
        * No `containerClassName` border here. `Table` defaults to
        * `surface="glass"`, and a `border-*` utility on that wrapper wins the
-       * cascade over `.glass-surface`'s own translucent edge — silently swapping
+       * cascade over `.glass-surface`'s own translucent edge , silently swapping
        * the material's border for the opaque one.
        */}
       <DataTable

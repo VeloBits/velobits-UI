@@ -12,7 +12,7 @@ describe('the generated neutral ramp', () => {
   /**
    * Widened to string keys on purpose. The generated object's keys are numeric
    * literals, so the narrow key type cannot be recovered from
-   * `Object.entries` — and casting back to it fails `tsc` rather than helping.
+   * `Object.entries` , and casting back to it fails `tsc` rather than helping.
    */
   const ramp: [step: string, hex: string][] = Object.entries(neutral);
   const meta: Record<string, { oklch: string; luminance: number }> = neutralMeta;
@@ -49,7 +49,7 @@ describe('the generated neutral ramp', () => {
     }
   });
 
-  it('stays a WARM ramp — chroma never reaches zero', () => {
+  it('stays a WARM ramp , chroma never reaches zero', () => {
     /**
      * The point of generating this rather than using Tailwind's neutral scale:
      * a pure grey beside the brand cream reads cold. Chroma is small but must
@@ -57,7 +57,7 @@ describe('the generated neutral ramp', () => {
      */
     for (const [step, hex] of ramp) {
       const { c } = hexToOklch(hex);
-      expect(c, `neutral-${step} has zero chroma — that is a cold grey`).toBeGreaterThan(0);
+      expect(c, `neutral-${step} has zero chroma , that is a cold grey`).toBeGreaterThan(0);
       expect(c, `neutral-${step} is too chromatic to read as a neutral`).toBeLessThan(0.02);
     }
   });

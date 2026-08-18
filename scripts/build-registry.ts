@@ -7,7 +7,7 @@
  * Two things this exists to prevent:
  *  1. Hand-maintaining `registry.json`, where the theme item's ~70 CSS variables
  *     would silently drift from `@velobitsio/tokens`.
- *  2. Publishing a registry whose file paths do not exist — the CLI fails at the
+ *  2. Publishing a registry whose file paths do not exist , the CLI fails at the
  *     consumer's machine, not ours, so the check happens here.
  */
 import { execFileSync } from 'node:child_process';
@@ -61,7 +61,7 @@ if (danglingDeps.length) {
 /**
  * ## A bare `registryDependency` is a shadcn/ui item, NOT one of ours
  *
- * This is the whole reason this step exists, and it is not a subtlety — it is the
+ * This is the whole reason this step exists, and it is not a subtlety , it is the
  * difference between a registry that installs and one that does not. Per the
  * shadcn docs: *"Bare names keep their existing behavior. `button` means the
  * built-in shadcn `button` item, not an item from the same repository."*
@@ -70,7 +70,7 @@ if (danglingDeps.length) {
  * CLI goes and asks `https://ui.shadcn.com/r/styles/new-york-v4/cn.json`, which
  * does not exist, and the install dies on the consumer's machine with an error
  * naming a URL they have never heard of. That happens on EVERY item here that
- * depends on another — which is nearly all of them — and it happens on both
+ * depends on another , which is nearly all of them , and it happens on both
  * install paths, the namespaced one and the plain URL.
  *
  * The source in `registry/registry.ts` keeps writing bare names, because that is
@@ -86,7 +86,7 @@ if (danglingDeps.length) {
  * version.
  *
  * `REGISTRY_BASE_URL` exists so a build can be pointed at a local server and
- * genuinely verified end to end — otherwise a localhost install would quietly
+ * genuinely verified end to end , otherwise a localhost install would quietly
  * pull its dependencies from production and prove nothing about the build in
  * front of you.
  */
@@ -163,7 +163,7 @@ try {
 /* ── 5. Rewrite the imports to match where the files actually land ─────────── */
 
 /**
- * Rewriting here rather than in the sources keeps the npm half untouched — tsup
+ * Rewriting here rather than in the sources keeps the npm half untouched , tsup
  * needs the directory layout, and `packages/ui`'s per-entry `exports` map is built
  * from it. One source, two shapes, and the difference is applied on the way out.
  * `scripts/registry-layout.ts` carries the reasoning and the rules.
@@ -195,7 +195,7 @@ for (const fileName of registryFiles) {
     /*
      * The invariant that would have caught the original bug. Every surviving `../`
      * specifier points outside the one flat folder the CLI writes, so it cannot
-     * resolve on a consumer's machine — and the only place that shows up is their
+     * resolve on a consumer's machine , and the only place that shows up is their
      * build, not ours.
      */
     for (const match of file.content.matchAll(/from\s+(['"])(\.\.\/[^'"]*)\1/g)) {
@@ -224,4 +224,4 @@ console.log(`\ncompiled → apps/docs/public/r/`);
 console.log('Consumers install with:');
 console.log('  npx shadcn@latest add @velobits/velobits   # everything');
 console.log('  npx shadcn@latest add @velobits/button     # one component');
-console.log('(after adding the @velobits namespace to components.json — see /docs/registry)');
+console.log('(after adding the @velobits namespace to components.json , see /docs/registry)');

@@ -1,7 +1,7 @@
 import { createIcon } from './create-icon';
 
 /**
- * The unified VeloBits icon set — 88 stroke icons on a 24×24 grid.
+ * The unified VeloBits icon set , 88 stroke icons on a 24×24 grid.
  *
  * Merged from the two hand-drawn sets that had diverged across the workspace:
  * the dashboard app's own `src/ui/icons.tsx` (52) and the editor app's
@@ -15,13 +15,13 @@ import { createIcon } from './create-icon';
  *
  * Lucide's glyphs lose their read at the 13-18px these dashboards render at.
  * Several icons below carry a docblock recording the measured departure from
- * the stock trace — those are deliberate and should not be "corrected" back.
+ * the stock trace , those are deliberate and should not be "corrected" back.
  * An eslint rule bars `lucide-react` from this repo entirely.
  *
  * ## Where the two sets disagreed
  *
  * 19 names existed in both; ten were byte-identical. For the nine that
- * differed, the dashboard app's geometry won — it is the set with recorded
+ * differed, the dashboard app's geometry won , it is the set with recorded
  * small-size tuning. The exception is `AlertTriangleIcon`, where the editor
  * app closes the triangle with `Z` and the dashboard app leaves it open; the
  * closed path is simply more correct.
@@ -32,7 +32,7 @@ import { createIcon } from './create-icon';
  * ## Why every call carries `/*#__PURE__*\/`
  *
  * `export const FlagIcon = createIcon(...)` is a top-level function CALL, and a
- * bundler must assume a call has side effects unless told otherwise — so it
+ * bundler must assume a call has side effects unless told otherwise , so it
  * cannot drop the unused ones. Without the annotation, importing a single icon
  * pulled in 3.4 kB of the set's 3.92 kB: `sideEffects: false` alone was not
  * enough, because that describes the module, not each initialiser. The

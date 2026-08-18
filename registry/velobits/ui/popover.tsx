@@ -6,7 +6,7 @@ import { Popover as PopoverPrimitive } from 'radix-ui';
 import { cn } from '../lib/cn';
 
 /**
- * Anchored, non-modal glass panel — a filter form, a rollout summary, a
+ * Anchored, non-modal glass panel , a filter form, a rollout summary, a
  * "why is this flag on?" explainer. Use `Tooltip` for a label and `Dialog` for
  * anything that must be dismissed deliberately.
  *
@@ -16,12 +16,12 @@ import { cn } from '../lib/cn';
  * inside a Dialog. Plain overlay glass over overlay glass compounds to a milky
  * panel with no readable edge between the two layers, and in dark mode a
  * chromatic tint at the base alpha drifts visibly green over the lime brand
- * fill — hence the plum-tinted, higher-alpha step.
+ * fill , hence the plum-tinted, higher-alpha step.
  *
  * ## Which is also why the Portal is not optional
  *
  * `backdrop-filter` forms a stacking context, so `z-index` inside a glass
- * surface is scoped to it — a popover rendered *within* `DialogContent` could
+ * surface is scoped to it , a popover rendered *within* `DialogContent` could
  * never rise above the dialog, whatever `z-popover` said. It also establishes a
  * containing block for `position: fixed` descendants, so a popover positioned by
  * Radix's popper inside a glass ancestor would be trapped in that panel's box
@@ -43,7 +43,7 @@ function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimiti
 }
 
 /**
- * Anchor the popper to something other than the trigger — a table row while the
+ * Anchor the popper to something other than the trigger , a table row while the
  * kebab button in it stays the trigger.
  */
 function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
@@ -53,7 +53,7 @@ function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitiv
 /**
  * Lets `PopoverTitle` name the panel without the caller wiring ids by hand.
  *
- * Radix gives `PopoverPrimitive.Content` `role="dialog"` — and unlike its Dialog,
+ * Radix gives `PopoverPrimitive.Content` `role="dialog"` , and unlike its Dialog,
  * Radix Popover has no `Title` part, so it never sets `aria-labelledby`. The
  * result is a dialog announced as just "dialog", with the heading only reachable
  * once the user is already inside it. axe catches it as `aria-dialog-name`;
@@ -62,7 +62,7 @@ function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitiv
  * The title REGISTERS the id it actually rendered, rather than the content
  * unconditionally pointing at a generated one. Two reasons: a popover with no
  * `PopoverTitle` is legitimate (a bare form), and `aria-labelledby` pointing at an
- * id that never renders is a *worse* defect than no name at all — the accessible
+ * id that never renders is a *worse* defect than no name at all , the accessible
  * name silently resolves to the empty string. Registering also means a caller's
  * own `id` on the title stays the one referenced.
  */
@@ -86,7 +86,7 @@ function PopoverContent({
     /*
      * The provider sits OUTSIDE the Portal on purpose. React context travels the
      * React tree rather than the DOM tree, so it still reaches the portalled
-     * title — and Radix's `PopoverPortal` renders `PortalPrimitive asChild`, which
+     * title , and Radix's `PopoverPortal` renders `PortalPrimitive asChild`, which
      * is a `Slot` and needs a single DOM element child. A provider in that
      * position breaks it. Keeping `children` in `...props` also leaves `asChild`
      * on the content working.
@@ -112,14 +112,14 @@ function PopoverContent({
             // the panel's geometric centre.
             'origin-(--radix-popover-content-transform-origin)',
             /*
-             * Opacity, scale and a 2px slide — never the blur radius, which
+             * Opacity, scale and a 2px slide , never the blur radius, which
              * repaints the whole backdrop every frame.
              *
              * `duration-enter` (180ms), not the 240ms overlay step: a popover
              * travels a few pixels from a control the user is already looking at,
              * and the longer curve reads as lag. It is applied through
              * `animation-duration-(--duration-enter)` because `animate-in` expands
-             * to the `animation` SHORTHAND — behind a `data-[state=…]` variant it
+             * to the `animation` SHORTHAND , behind a `data-[state=…]` variant it
              * outranks a bare `animation-duration` longhand on both order and
              * specificity, so the `duration-enter` utility would be dropped
              * silently.
@@ -130,7 +130,7 @@ function PopoverContent({
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
             'data-[state=closed]:ease-in',
             /*
-             * Physical, and correctly so — unlike `SidePanel`'s logical
+             * Physical, and correctly so , unlike `SidePanel`'s logical
              * `slide-in-from-end`. `data-side` is the placement Radix's popper
              * RESOLVED, already flipped for collisions and for `dir`, so the slide
              * has to match that physical side rather than the writing direction.
@@ -150,7 +150,7 @@ function PopoverContent({
  * The Header/Title/Description trio is hand-rolled div/h2/p rather than Radix
  * parts, because Radix Popover ships no `Title` or `Description` of its own. Kept
  * at the same names and `data-slot`s the dashboard app already uses so its call
- * sites migrate without edits — the only change in the rendered DOM is the `id`
+ * sites migrate without edits , the only change in the rendered DOM is the `id`
  * the title now carries so it can name the panel.
  */
 function PopoverHeader({ className, ...props }: React.ComponentProps<'div'>) {
@@ -166,7 +166,7 @@ function PopoverHeader({ className, ...props }: React.ComponentProps<'div'>) {
 /**
  * A real `<h2>`, and the panel's accessible name.
  *
- * The dashboard app's copy typed its props as `'h2'` while rendering a `div` —
+ * The dashboard app's copy typed its props as `'h2'` while rendering a `div` ,
  * the sort of drift nothing catches, because it looks identical and leaves the
  * heading out of a screen reader's heading list. Rendering the element the type
  * promised also makes it a legitimate `aria-labelledby` target, which is what
@@ -197,7 +197,7 @@ function PopoverTitle({ className, id, ...props }: React.ComponentProps<'h2'>) {
 }
 
 /**
- * `text-muted-foreground` resolves to `--muted-on-glass` inside a glass surface —
+ * `text-muted-foreground` resolves to `--muted-on-glass` inside a glass surface ,
  * `.glass` rebinds `--muted-fg` for its descendants, because the plain muted grey
  * measures 3.09:1 over the worst-case backdrop while the on-glass step holds
  * 4.92:1. Doubly relevant here: this is the elevated tier, so the text is sitting

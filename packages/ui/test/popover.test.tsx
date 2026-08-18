@@ -25,7 +25,7 @@ import { auditElement } from './axe';
 
 /**
  * This suite audits with `auditElement` rooted at the portalled panel. A popover
- * is not modal, so the document is not `aria-hidden`ed the way a dialog's is — but
+ * is not modal, so the document is not `aria-hidden`ed the way a dialog's is , but
  * scoping keeps the run about the panel and matches the dialog and side-panel
  * suites.
  */
@@ -110,8 +110,8 @@ describe('Popover', () => {
 
   it('renders the hand-rolled Header/Title/Description trio as div/h2/p', async () => {
     /**
-     * Radix Popover has no `Title` or `Description` parts to wire — it is not a
-     * labelled region — so these are ours. the dashboard app's copy typed `PopoverTitle`
+     * Radix Popover has no `Title` or `Description` parts to wire , it is not a
+     * labelled region , so these are ours. the dashboard app's copy typed `PopoverTitle`
      * as `'h2'` props while rendering a `div`, which left the heading invisible to
      * a screen reader's heading list. Kept at the same names and `data-slot`s so
      * its call sites migrate without edits.
@@ -129,7 +129,7 @@ describe('Popover naming', () => {
   it('names the panel from PopoverTitle, because Radix gives it role=dialog', async () => {
     /**
      * Radix Popover's content is a `role="dialog"` with no `Title` part, so unlike
-     * Radix Dialog it never sets `aria-labelledby` — the panel is announced as bare
+     * Radix Dialog it never sets `aria-labelledby` , the panel is announced as bare
      * "dialog" and the heading is only found once the user is already inside it.
      * axe reports it as `aria-dialog-name`; the dashboard app's copy ships it today.
      */
@@ -224,7 +224,7 @@ describe('Popover glass tier', () => {
     expect(cls).not.toMatch(/\bbg-/);
   });
 
-  it('animates opacity, scale and a 2px slide — never the blur radius', async () => {
+  it('animates opacity, scale and a 2px slide , never the blur radius', async () => {
     render(<FilterPopover />);
     const cls = (await open()).className;
     expect(cls).toContain('data-[state=open]:zoom-in-95');
@@ -243,7 +243,7 @@ describe('Popover glass tier', () => {
     /**
      * Not the 240ms overlay step: a popover travels a few pixels from a control the
      * user is already looking at, and the longer curve reads as lag. And not the
-     * `duration-enter` utility — `animate-in` expands to the `animation` SHORTHAND,
+     * `duration-enter` utility , `animate-in` expands to the `animation` SHORTHAND,
      * which behind a `data-[state=…]` variant outranks a bare `animation-duration`
      * longhand on order and specificity. `--tw-animation-duration` is the variable
      * the shorthand itself reads.
@@ -262,7 +262,7 @@ describe('Popover inside a Dialog', () => {
    * The documented elevated-tier case, and the reason `PopoverContent` portals.
    *
    * `backdrop-filter` forms a stacking context, so `z-index` inside a glass
-   * surface is scoped to it — a popover rendered *within* `DialogContent` could
+   * surface is scoped to it , a popover rendered *within* `DialogContent` could
    * never rise above the dialog whatever `z-popover` said. It also establishes a
    * containing block for `position: fixed` descendants, so Radix's popper would be
    * positioned against the dialog and clipped by it.

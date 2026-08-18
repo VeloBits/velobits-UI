@@ -2,7 +2,7 @@
  * `@velobitsio/ui/cn`, not the barrel.
  *
  * This is a Server Component, and the barrel is bundled with a `'use client'`
- * banner — so importing `cn` from it and CALLING it fails the build with
+ * banner , so importing `cn` from it and CALLING it fails the build with
  * "Attempted to call cn() from the server but cn is on the client". Rendering a
  * client component from here is fine; invoking a function out of a client module
  * is not.
@@ -22,7 +22,7 @@ import { CopyButton } from './copy-button';
  * `dangerouslySetInnerHTML` is load-bearing and safe here: the markup is Shiki's
  * output for a file in this repository, produced during the build. Nothing on
  * this page is ever user input, and there is no runtime path that reaches this
- * prop — the alternative, shipping the highlighter to the browser, costs every
+ * prop , the alternative, shipping the highlighter to the browser, costs every
  * reader a megabyte of grammars to render text that never changes.
  *
  * The dual-theme CSS lives in `app/globals.css`: Shiki emits `--shiki-light` and
@@ -59,7 +59,7 @@ export function CodePanel({
       <div
         /*
          * Focusable because it scrolls. A scroll container that keyboard users
-         * cannot reach is 2.1.1 — and this one scrolls by construction, since
+         * cannot reach is 2.1.1 , and this one scrolls by construction, since
          * code does not wrap.
          */
         tabIndex={0}

@@ -27,7 +27,7 @@ import { CommandSnippet, InstallSnippet } from './command-snippet';
  * that is one command, and a Manual tab that is the dependencies plus the file.
  *
  * The dependency lists, the file paths and the file contents all come from
- * `registry/registry.ts` by way of the codegen — the same source the CLI reads.
+ * `registry/registry.ts` by way of the codegen , the same source the CLI reads.
  * So the Manual instructions cannot describe a different install from the one the
  * CLI performs, which is the failure mode of every hand-written "or copy this
  * file" section.
@@ -66,7 +66,7 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
                 {REGISTRY_CONFIG_SNIPPET}
               </CodeBlock>
               <p className="mt-3">
-                Without it — or on a CLI older than v3 — the full URL works anywhere and needs no
+                Without it , or on a CLI older than v3 , the full URL works anywhere and needs no
                 configuration:
               </p>
               <CodeBlock variant="terminal" wrap copyable label="install by URL" className="mt-2">
@@ -94,7 +94,7 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
           {item.registryDependencies.length > 0 && (
             <div className="space-y-2">
               <p className="text-sm font-medium">
-                Add these registry items first — this one imports them:
+                Add these registry items first , this one imports them:
               </p>
               <div className="flex flex-wrap gap-2">
                 {item.registryDependencies.map((dep) => (
@@ -122,7 +122,7 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
             ))
           ) : (
             <p className="text-sm text-muted-foreground">
-              This item ships no files of its own — it is a bundle of the items listed above, so
+              This item ships no files of its own , it is a bundle of the items listed above, so
               installing it by hand means installing each of those.
             </p>
           )}

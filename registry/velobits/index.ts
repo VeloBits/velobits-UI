@@ -2,7 +2,7 @@
  * The barrel `@velobitsio/ui` publishes.
  *
  * This file exists for the npm half of the dual distribution only. Consumers
- * using the shadcn CLI never see it — they get individual component files copied
+ * using the shadcn CLI never see it , they get individual component files copied
  * into their own tree, which is why every component below imports from a
  * relative path rather than from this barrel.
  *
@@ -16,7 +16,7 @@
  * `@velobitsio/ui/form`.
  *
  * `react-hook-form` is an optional peer dependency, and this barrel is a single
- * bundled module — so re-exporting `Form` would put a top-level
+ * bundled module , so re-exporting `Form` would put a top-level
  * `import 'react-hook-form'` at the top of `dist/index.js`, and every app that
  * imports a Button from the barrel would fail to resolve a package it never
  * installed and has no forms in.
@@ -26,7 +26,7 @@
  * subpath export. Every other buildable item must be here.
  */
 
-/* ── Tier 0 — foundation ──────────────────────────────────────────────────── */
+/* ── Tier 0 , foundation ──────────────────────────────────────────────────── */
 export { cn } from './lib/cn';
 export {
   THEME_STORAGE_KEYS,
@@ -50,7 +50,7 @@ export { useMediaQuery, usePrefersReducedMotion } from './hooks/use-media-query'
 export { useRowSelection, type RowSelection } from './hooks/use-row-selection';
 export { VelobitsProvider, type VelobitsProviderProps } from './providers/velobits-provider';
 
-/* ── Tier 1 — primitives ──────────────────────────────────────────────────── */
+/* ── Tier 1 , primitives ──────────────────────────────────────────────────── */
 export { Alert, AlertDescription, AlertTitle, alertVariants, type AlertProps } from './ui/alert';
 export { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 export { Badge, badgeVariants, type BadgeProps } from './ui/badge';
@@ -89,7 +89,7 @@ export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 /* ── The glass tier's shared surface (Tier 2 components land on top of it) ─── */
 export { GlassSurface, type GlassSurfaceProps } from './ui/glass-surface';
 
-/* ── Tier 2 — overlays (the Tier-O glass tier) ────────────────────────────── */
+/* ── Tier 2 , overlays (the Tier-O glass tier) ────────────────────────────── */
 export {
   Dialog,
   DialogClose,
@@ -169,7 +169,7 @@ export {
   type CommandDialogProps,
 } from './ui/command-palette';
 
-/* ── Tier 3 — composites ──────────────────────────────────────────────────── */
+/* ── Tier 3 , composites ──────────────────────────────────────────────────── */
 export {
   Accordion,
   AccordionContent,

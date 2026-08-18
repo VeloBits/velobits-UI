@@ -18,7 +18,7 @@ import { cn } from '../lib/cn';
  *
  * `ToastViewport` is `position: fixed`. `backdrop-filter` **establishes a
  * containing block for fixed descendants**, so a viewport mounted anywhere below
- * a `.glass` element — a glass topbar, a Dialog, a Sheet — is positioned
+ * a `.glass` element , a glass topbar, a Dialog, a Sheet , is positioned
  * relative to that element instead of the layout viewport. It gets trapped: it
  * anchors to the bottom of the overlay, clips against its `overflow`, and
  * disappears with it when the overlay closes.
@@ -35,7 +35,7 @@ import { cn } from '../lib/cn';
  * ## Colour is never the only signal (WCAG 1.4.1)
  *
  * The variant paints an inline-start accent stripe and tints the icon. That is
- * colour, and colour alone tells a colour-blind user nothing — so, exactly as in
+ * colour, and colour alone tells a colour-blind user nothing , so, exactly as in
  * `Alert`, every variant expects an ICON and a TITLE that names the state in
  * words. The grid reserves the icon column so callers do not lay it out.
  *
@@ -43,11 +43,11 @@ import { cn } from '../lib/cn';
  *
  * WCAG 2.2.1: a message that vanishes on a timer is unusable by anyone reading
  * slowly. Radix pauses the timer on hover and while focus is inside, and `Esc`
- * dismisses — but always render `ToastClose` too. Anything the user MUST act on
+ * dismisses , but always render `ToastClose` too. Anything the user MUST act on
  * is a Dialog, not a toast.
  *
  * ```tsx
- * // once, at the shell root — NOT inside glass chrome
+ * // once, at the shell root , NOT inside glass chrome
  * <ToastProvider>
  *   {children}
  *   <ToastViewport />
@@ -68,7 +68,7 @@ function ToastProvider({
        * Radix defaults this to `right`, which is wrong for us in RTL: the
        * viewport sits at the inline END, so under `dir="rtl"` it is the
        * bottom-LEFT corner and a rightward swipe drags the toast away from the
-       * edge it should leave through. `down` is direction-agnostic — the
+       * edge it should leave through. `down` is direction-agnostic , the
        * viewport is bottom-anchored in both directions.
        */
       swipeDirection={swipeDirection}
@@ -105,13 +105,13 @@ function ToastViewport({
 }
 
 /**
- * The variant is an accent stripe plus an icon tint — NOT a `bg-*-soft` wash,
+ * The variant is an accent stripe plus an icon tint , NOT a `bg-*-soft` wash,
  * and that is load-bearing rather than aesthetic.
  *
  * The soft tokens are low-alpha washes designed to sit on an OPAQUE panel
  * (`--success-soft` is `rgba(34,110,37,0.12)`). `.glass` lives in Tailwind's
  * `components` layer, so a `bg-success-soft` utility overrides
- * `background: var(--glass-bg)` — replacing an alpha-0.85 surface with an
+ * `background: var(--glass-bg)` , replacing an alpha-0.85 surface with an
  * alpha-0.12 one. The result is a blurred smear of whatever is behind it: the
  * exact "washed-out panel with page content bleeding through" failure that
  * `glass.css`'s `@supports` fallback exists to prevent. And nothing warns you,
@@ -128,13 +128,13 @@ const toastVariants = cva(
     // as Alert, so the two read as one family.
     'grid grid-cols-[calc(var(--spacing)*4)_1fr_auto] items-start gap-x-3 gap-y-1',
     '[&>svg]:size-4 [&>svg]:translate-y-0.5',
-    // Enter/exit: transform and opacity only. Never tween the blur radius —
+    // Enter/exit: transform and opacity only. Never tween the blur radius ,
     // every frame forces a full backdrop repaint.
     'duration-enter ease-out',
     'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-2',
     'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-2',
     // Swipe-to-dismiss. Both axes carry a `0px` fallback so overriding
-    // `swipeDirection` to a horizontal value still works — Radix only publishes
+    // `swipeDirection` to a horizontal value still works , Radix only publishes
     // the var for the axis in use, and a bare `var()` with no fallback would
     // make the whole `translate` declaration invalid.
     'data-[swipe=move]:transition-none',
@@ -209,7 +209,7 @@ function ToastDescription({
 /**
  * `altText` is REQUIRED by Radix and it is not decoration: a toast is transient,
  * so a screen-reader user may never reach the button. Radix reads `altText` as
- * an instruction for achieving the same thing another way — "press Undo in the
+ * an instruction for achieving the same thing another way , "press Undo in the
  * flag's history", not "click Undo".
  *
  * Styled as a quiet inline control rather than importing `Button`, so a CLI
@@ -235,7 +235,7 @@ function ToastAction({ className, ...props }: React.ComponentProps<typeof ToastP
 }
 
 /**
- * Always rendered, never revealed on hover only — a hover-gated close button
+ * Always rendered, never revealed on hover only , a hover-gated close button
  * does not exist for touch or keyboard users. The 32px hit area is the minimum
  * that survives a thumb.
  */

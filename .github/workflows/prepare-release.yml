@@ -3,8 +3,8 @@ name: Prepare release
 # Turns the changesets pending on develop into a version bump, on develop.
 #
 # This is what replaces changesets' "Version Packages" PR, and the reason it can:
-# `main` carries the `protect-main` ruleset — pull request + 1 approving review +
-# the `verify` check, with `OrganizationAdmin` as the only bypass actor — so no
+# `main` carries the `protect-main` ruleset , pull request + 1 approving review +
+# the `verify` check, with `OrganizationAdmin` as the only bypass actor , so no
 # workflow can push a version commit there, with GITHUB_TOKEN or otherwise.
 # `develop` has no protection and no ruleset, so the bump lands here and rides the
 # develop → main PR that a release already opens. Zero extra PRs, and main keeps
@@ -87,7 +87,7 @@ jobs:
             echo 'PKGEOF'
           } >> "$GITHUB_OUTPUT"
 
-      # The develop → main PR *is* the release PR — the one a release already
+      # The develop → main PR *is* the release PR , the one a release already
       # needed, now carrying the version bump. That is what keeps this at zero
       # extra PRs. If it is already open the bump simply appears in it.
       - name: Open or update the release PR
@@ -102,7 +102,7 @@ jobs:
           fi
 
           # Unquoted delimiter, so $VERSIONS expands. No backticks in the body for
-          # the same reason — the shell would try to run them.
+          # the same reason , the shell would try to run them.
           cat > "$RUNNER_TEMP/pr-body.md" <<BODY
           Versioned by the **Prepare release** workflow. Merging this publishes to
           npm, pushes the tags and cuts the GitHub Releases.

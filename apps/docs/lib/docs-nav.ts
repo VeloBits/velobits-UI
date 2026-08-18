@@ -9,8 +9,8 @@
  * new registry item gets a documentation page whether or not anyone touches this
  * file. What this file decides is only which heading it appears under.
  *
- * The tiers exist only as section comments inside `registry/registry.ts` — one
- * flat `ui` array with `/* ── Tier 2 ── *\/` between the groups — so there is no
+ * The tiers exist only as section comments inside `registry/registry.ts` , one
+ * flat `ui` array with `/* ── Tier 2 ── *\/` between the groups , so there is no
  * exported structure to read them from. Rather than reach into the source with a
  * regex, membership is declared here, and `scripts/build-docs-data.ts` fails the
  * build listing any registry item this file does not place. So the failure mode
@@ -66,13 +66,13 @@ export interface ComponentGroup {
 }
 
 /**
- * Component pages, grouped by tier — the same three tiers the system is designed
+ * Component pages, grouped by tier , the same three tiers the system is designed
  * in, which is also the order to read them in.
  */
 export const COMPONENT_GROUPS: ComponentGroup[] = [
   {
     title: 'Getting started',
-    note: 'The token layer and the provider stack. Install these first — every component below assumes both.',
+    note: 'The token layer and the provider stack. Install these first , every component below assumes both.',
     names: ['velobits', 'velobits-theme', 'velobits-provider'],
   },
   {
@@ -101,7 +101,7 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
   },
   {
     title: 'Overlays',
-    note: 'Tier 2. Each floats above the page on Tier-O glass and manages focus. Every one opens from a real trigger — a still of an overlay proves nothing about focus, Escape or the material.',
+    note: 'Tier 2. Each floats above the page on Tier-O glass and manages focus. Every one opens from a real trigger , a still of an overlay proves nothing about focus, Escape or the material.',
     names: ['dialog', 'side-panel', 'popover', 'dropdown-menu', 'toast', 'command-palette'],
   },
   {
@@ -140,7 +140,7 @@ export function componentHref(name: string): string {
 
 /**
  * Previous/next across the whole component sidebar, for the pager at the foot of
- * each page. Returns `null` at each end rather than wrapping — a "next" link that
+ * each page. Returns `null` at each end rather than wrapping , a "next" link that
  * silently returns you to the top of the list is worse than no link.
  */
 export function componentPager(name: string): {

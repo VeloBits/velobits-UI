@@ -20,7 +20,7 @@ import { buttonVariants } from './button';
  *
  * It paints `--code` / `--on-code`, the one pair in the palette that does not
  * flip between light and dark. This is where the dashboard app's `.reveal-token`
- * rule lands — the surface a one-time API key is shown on.
+ * rule lands , the surface a one-time API key is shown on.
  *
  * A revealed secret is the only string in the product that has to be transcribed
  * *exactly*, and pinning the surface means the characters that are easy to
@@ -39,7 +39,7 @@ import { buttonVariants } from './button';
  * ## What it does NOT do: mask a secret behind a Reveal button
  *
  * Considered and left out. A mask is only meaningful for a value the server can
- * send again — and the case this replaces is a key shown exactly once, where
+ * send again , and the case this replaces is a key shown exactly once, where
  * hiding it behind a click adds a step and protects nothing (it is already in the
  * DOM). A component that offers `secret` would invite it onto values where the
  * mask is theatre.
@@ -47,7 +47,7 @@ import { buttonVariants } from './button';
 const codeBlockVariants = cva(
   [
     'relative overflow-auto rounded-md font-mono text-xs leading-relaxed',
-    // A scrollable region must be reachable by keyboard (WCAG 2.1.1) — hence the
+    // A scrollable region must be reachable by keyboard (WCAG 2.1.1) , hence the
     // `tabIndex={0}` below. Without it a mouse user can read a long snippet and a
     // keyboard user cannot scroll it at all. This is axe's
     // `scrollable-region-focusable`, and it needs real layout to detect, so no
@@ -127,7 +127,7 @@ function CodeBlock({
         data-language={language}
         className={cn(
           codeBlockVariants({ variant, wrap }),
-          // Room for the button, but only on the first line — `pe-12` on the
+          // Room for the button, but only on the first line , `pe-12` on the
           // whole block would indent every line of a long snippet.
           copyable && '[&>code]:inline-block [&>code]:pe-10',
         )}
@@ -143,7 +143,7 @@ function CodeBlock({
  * ## Three things go wrong with a copy button, and two of them are silent
  *
  *  1. **`navigator.clipboard` is undefined on an insecure origin.** It is a
- *     secure-context API, so the whole object — not just the method — is absent
+ *     secure-context API, so the whole object , not just the method , is absent
  *     over plain http, which is exactly how a staging box on a LAN IP gets
  *     reached. Unguarded, the button throws a TypeError on click and appears to
  *     do nothing at all. Here it falls through to a stated instruction to copy
@@ -153,7 +153,7 @@ function CodeBlock({
  *     renames the element the user is standing on; several screen readers
  *     re-announce the whole control, and some announce nothing because the
  *     accessible name changed without a focus event. The name here is constant
- *     and the confirmation goes to a separate live region — which is also the
+ *     and the confirmation goes to a separate live region , which is also the
  *     only way a non-visual user learns the copy succeeded at all.
  *  3. **The reset timer outlives the component.** Copy, navigate away, and
  *     `setState` fires on an unmounted tree. Cleared on unmount below.
@@ -178,7 +178,7 @@ function CopyButton({
       // Presence-checked, not optional-chained: on an insecure origin the whole
       // `clipboard` object is absent, so `?.writeText()` would resolve to
       // `undefined` and the success branch would run on a copy that never
-      // happened — the one failure worse than throwing.
+      // happened , the one failure worse than throwing.
       if (!navigator.clipboard) throw new Error('clipboard unavailable');
       await navigator.clipboard.writeText(value);
       setState('copied');
@@ -193,7 +193,7 @@ function CopyButton({
       <button
         type="button"
         data-slot="code-block-copy"
-        // Constant, deliberately — see point 2 in the docblock.
+        // Constant, deliberately , see point 2 in the docblock.
         aria-label={label ? `Copy ${label}` : 'Copy code'}
         onClick={copy}
         className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-7', className)}
@@ -203,11 +203,11 @@ function CopyButton({
       {/*
        * `aria-live` on a permanently-mounted, initially-empty region. A region
        * that is added to the DOM already containing its message is frequently
-       * not announced — the observer has nothing to observe a change to.
+       * not announced , the observer has nothing to observe a change to.
        */}
       <span aria-live="polite" className="sr-only">
         {state === 'copied' && 'Copied to clipboard'}
-        {state === 'manual' && 'Copying is unavailable here — select the text and press Ctrl+C'}
+        {state === 'manual' && 'Copying is unavailable here , select the text and press Ctrl+C'}
       </span>
     </>
   );

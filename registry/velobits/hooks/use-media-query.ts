@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
  *
  * The editor app learned this constraint the hard way: its
  * `useMediaQuery('(max-width: 768px)')` and the matching `editor.css` media
- * query must agree, or the two-surface mobile IA desynchronises mid-resize —
+ * query must agree, or the two-surface mobile IA desynchronises mid-resize ,
  * JavaScript switches surfaces at one width while CSS switches layout at
  * another. Import the breakpoint from `@velobitsio/tokens` (`breakpoint.md`)
  * rather than typing the number twice.
@@ -37,7 +37,7 @@ export function useMediaQuery(query: string): boolean {
  *
  * Framer is handled by one `<MotionConfig reducedMotion="user">` per app shell
  * and CSS by a `prefers-reduced-motion` block in the token layer; this hook is
- * for the third case — imperative animation, autoplay, and anything that has to
+ * for the third case , imperative animation, autoplay, and anything that has to
  * *decide* rather than merely animate more slowly.
  */
 export function usePrefersReducedMotion(): boolean {

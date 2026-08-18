@@ -1,12 +1,12 @@
 export const metadata = {
   title: 'Installation',
-  description: 'Two distributions, one source — and which one you want is not a matter of taste.',
+  description: 'Two distributions, one source , and which one you want is not a matter of taste.',
 };
 
 # Installation
 
 Two distributions, one source. Every component is authored once in
-`registry/velobits/` and shipped both ways, so they never diverge — but they are
+`registry/velobits/` and shipped both ways, so they never diverge , but they are
 not interchangeable, and the choice is forced by your architecture rather than by
 preference.
 
@@ -14,19 +14,19 @@ preference.
 | ----------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Module-federated app          | **npm**                       | Federation needs `@velobitsio/ui` to be a real singleton so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary. |
 | Existing Tailwind v4 + shadcn | **npm**                       | One `@theme inline` bridge; the palette swap is one file.                                                                                                                |
-| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook — an edit to an unclaimed file is silently reverted.             |
-| Greenfield / one-off          | **shadcn CLI**                | You own the source. No dependency to bump, and no singleton either — which is exactly why federated apps should not use this path.                                       |
+| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook , an edit to an unclaimed file is silently reverted.             |
+| Greenfield / one-off          | **shadcn CLI**                | You own the source. No dependency to bump, and no singleton either , which is exactly why federated apps should not use this path.                                       |
 
 ## shadcn CLI
 
-This is a standard shadcn registry, so the setup is shadcn's own — VeloBits adds
+This is a standard shadcn registry, so the setup is shadcn's own , VeloBits adds
 one line to it. Three steps from nothing.
 
 ### 1. Set up shadcn
 
 Already running shadcn? Skip to step 2.
 
-**Starting a new project** — `init` scaffolds one, wired up:
+**Starting a new project** , `init` scaffolds one, wired up:
 
 ```bash
 npx shadcn@latest init --template next
@@ -40,7 +40,7 @@ npx shadcn@latest init
 ```
 
 It detects your framework, installs Tailwind and the base dependencies, writes
-your CSS entry, and creates `components.json` — the file everything below reads.
+your CSS entry, and creates `components.json` , the file everything below reads.
 [components.json](/docs/components-json) explains each field, and the two that
 matter most here are `aliases.ui` (where the `velobits/` folder goes) and
 `aliases.utils` (where `cn` goes).
@@ -49,7 +49,7 @@ matter most here are `aliases.ui` (where the `velobits/` folder goes) and
 `@theme`; there is no v3 JS-config bridge, and `tailwind.config` is an empty
 string on v4 by design.
 
-You can also skip `init` entirely and hand-write `components.json` — the CLI only
+You can also skip `init` entirely and hand-write `components.json` , the CLI only
 needs that file plus a `tsconfig.json` whose `paths` resolve your aliases.
 
 ### 2. Add the VeloBits registry
@@ -107,28 +107,28 @@ lib/utils.ts          ← our cn
 import { Button } from '@/components/ui/velobits/button';
 ```
 
-`components/ui/` and `lib/` come from **your** `components.json` — a project whose
+`components/ui/` and `lib/` come from **your** `components.json` , a project whose
 `aliases.ui` is `@/parts/widgets` gets `parts/widgets/velobits/`. Only the
 `velobits/` segment is ours.
 
 Flat is deliberate. The components import each other as siblings (`./table`,
-`./tooltip`), so one folder makes those true by construction. The alternative —
+`./tooltip`), so one folder makes those true by construction. The alternative ,
 letting the CLI scatter them across `components/ui`, `lib` and `hooks` by file
-type — is what broke the imports before this layout existed.
+type , is what broke the imports before this layout existed.
 
 ### If you already have shadcn's `utils`
 
 `cn` installs to your `utils` module, which is where shadcn puts its own. That is
-the point: one `cn`, not two. If a file is already there the CLI asks —
+the point: one `cn`, not two. If a file is already there the CLI asks ,
 
 ```
 ? The file cn.ts already exists. Would you like to overwrite? » (y/N)
 ```
 
-— and **defaults to no**. Answer **yes**, or pass `--overwrite`, which is also the
+, and **defaults to no**. Answer **yes**, or pass `--overwrite`, which is also the
 only form that works unattended: `--yes` does not cover this prompt.
 
-Ours is a strict **superset** — same signature, same behaviour on every standard
+Ours is a strict **superset** , same signature, same behaviour on every standard
 utility, plus the class groups this system needs: `rounded-pill`, the `z-*`
 ladder (`z-sticky`, `z-dropdown`, `z-modal`, …), the named durations
 (`duration-micro`, `duration-enter`, …), and a bidirectional
@@ -142,7 +142,7 @@ is what quietly degrades ours.
 later run it discards edits you have made to them too. Reach for it when the
 prompt appears, not by default.
 
-[Registry](/docs/registry) covers the rest — `view`, `search`, and what the JSON
+[Registry](/docs/registry) covers the rest , `view`, `search`, and what the JSON
 actually contains.
 
 ## npm
@@ -151,7 +151,7 @@ actually contains.
 npm i @velobitsio/tokens @velobitsio/icons @velobitsio/ui framer-motion
 ```
 
-`framer-motion` is a **required** peer, not an optional one — the barrel imports
+`framer-motion` is a **required** peer, not an optional one , the barrel imports
 `MotionConfig` through `VelobitsProvider`, so an install without it fails to
 resolve. `react-hook-form` is the only optional peer; it is needed solely by
 `Form`, which is why `Form` ships on its own subpath and never in the barrel.
@@ -165,7 +165,7 @@ Then, in your app's CSS:
 
 That `@source` line is **not optional**. Tailwind v4 does not scan
 `node_modules`, so utilities used inside `@velobitsio/ui` are never generated
-and the components arrive completely unstyled — with no warning anywhere. `cva`
+and the components arrive completely unstyled , with no warning anywhere. `cva`
 class strings survive into `dist` as string literals, which is what makes this
 work.
 
@@ -194,7 +194,7 @@ import { PageTransition, Stagger } from '@velobitsio/ui/motion';
 ```
 
 Two different reasons, both deliberate. `Form` needs `react-hook-form`, an
-optional peer — and the barrel is one bundled module, so a re-export would put a
+optional peer , and the barrel is one bundled module, so a re-export would put a
 top-level `import 'react-hook-form'` in `dist/index.js` and break every app that
 never installed it. `Motion` is a budget decision: anything in the barrel is paid
 for by every consumer whether they import it or not, and nobody should download

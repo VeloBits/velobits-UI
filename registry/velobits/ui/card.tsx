@@ -4,7 +4,7 @@ import { cn } from '../lib/cn';
 
 export interface CardProps extends React.ComponentProps<'div'> {
   /**
-   * The material. `glass` (the default) is Tier S — `.glass-surface` from the
+   * The material. `glass` (the default) is Tier S , `.glass-surface` from the
    * token layer. `panel` is the opaque original: `--panel` + `--border` +
    * `--shadow-sm`.
    */
@@ -21,7 +21,7 @@ export interface CardProps extends React.ComponentProps<'div'> {
  * material is measured against exactly one thing (`--fg` 13.48:1 light /
  * 13.22:1 dark, `--muted-fg` 5.57:1 / 6.19:1). `.glass-surface` carries NO
  * `backdrop-filter`, which is what makes it safe on a component that appears
- * twenty times in a grid — see `GlassSurface` for the layer budget.
+ * twenty times in a grid , see `GlassSurface` for the layer budget.
  *
  * `surface="panel"` returns the opaque card, and is the right answer in three
  * cases: a Card nested inside another Card (glass over the same glass lands
@@ -34,7 +34,7 @@ export interface CardProps extends React.ComponentProps<'div'> {
  * same element wins. Each of these looks harmless and removes part of the
  * material:
  *
- *  - `bg-*` replaces the tint, which IS the material — the card becomes flat.
+ *  - `bg-*` replaces the tint, which IS the material , the card becomes flat.
  *  - `shadow-*` replaces the whole `box-shadow` list, and that list carries the
  *    inset specular highlight. In dark mode the highlight is the entire material
  *    (3.18:1 over the composite), so `shadow-sm` erases it.
@@ -48,7 +48,7 @@ export interface CardProps extends React.ComponentProps<'div'> {
  *
  * `Card` is the component that surfaced ADR-0031's first trap. The panel variant
  * carries both `border` and a text colour, and Tailwind v4's `border` utility
- * emits width and style ONLY — the colour falls back to `currentColor`. In dark
+ * emits width and style ONLY , the colour falls back to `currentColor`. In dark
  * mode that painted a near-white outline around every card. The token layer's
  * `@layer base` rule fixes it globally with `border-color: var(--border)`, and
  * that rule MUST reference `--border` rather than `--color-border`; the latter
@@ -120,7 +120,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 /**
- * Header-anchored actions — a badge, a kebab menu, a small button.
+ * Header-anchored actions , a badge, a kebab menu, a small button.
  *
  * `justify-self-end` rather than `ms-auto`: grid alignment is already
  * direction-aware, so `end` resolves to the right edge in LTR and the left edge

@@ -51,7 +51,7 @@ export function CommandSnippet({
 }
 
 /**
- * The same, for a dependency install rather than a `dlx` one-off — `npm i` and
+ * The same, for a dependency install rather than a `dlx` one-off , `npm i` and
  * `pnpm add` are different verbs, so this cannot be the runner list above with a
  * different string.
  */

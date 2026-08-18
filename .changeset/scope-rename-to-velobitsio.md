@@ -7,7 +7,7 @@
 Renamed the npm scope from `@velobits-dev/*` to `@velobitsio/*`.
 
 **This is a breaking change, and there is no upgrade path from the old packages.**
-The `@velobits-dev/*` packages were removed from npm entirely — they are not
+The `@velobits-dev/*` packages were removed from npm entirely , they are not
 deprecated-but-installable, they are gone, and nothing forwards to the new names.
 Pin to the new scope explicitly.
 
@@ -29,7 +29,7 @@ Pin to the new scope explicitly.
 +@source "../node_modules/@velobitsio/ui/dist";
 ```
 
-The subpath exports are unchanged apart from the scope — `@velobitsio/ui/form`,
+The subpath exports are unchanged apart from the scope , `@velobitsio/ui/form`,
 `@velobitsio/ui/motion`, `@velobitsio/ui/theme` and the per-component entries
 all keep their names.
 
@@ -43,7 +43,7 @@ npx shadcn@latest add @velobits/button    # unchanged
 
 These are two different namespaces that merely look alike. The CLI resolves
 `@velobits` from a registry URL in your `components.json`, never from npm, so the
-npm scope and the registry namespace are independent — changing one does not
+npm scope and the registry namespace are independent , changing one does not
 touch the other.
 
 Minor rather than major because these are pre-1.0; treat it as breaking.

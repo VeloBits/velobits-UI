@@ -13,7 +13,7 @@ import { cn } from '../lib/cn';
  *
  * The trap this replaces is real and was hit in the dashboard app:
  * `SegmentedControl` renders a `<div>` root, so a `<Label htmlFor="…">` pointing
- * at it dangles silently — no error, no association, and a test that asserts
+ * at it dangles silently , no error, no association, and a test that asserts
  * `getByLabelText` passes for the wrong reason. Anything whose root is not a form
  * control needs `aria-labelledby` instead.
  *

@@ -8,7 +8,7 @@ import { cn } from '../lib/cn';
  * `⌘` on Apple platforms and `Ctrl` elsewhere is a real difference users notice,
  * but detecting it here would make the component render differently between
  * server and client and produce a hydration mismatch. So this stays presentational
- * and the caller decides — `useIsMac()` in an effect, or the platform string
+ * and the caller decides , `useIsMac()` in an effect, or the platform string
  * the app already has.
  */
 function Kbd({ className, ...props }: React.ComponentProps<'kbd'>) {

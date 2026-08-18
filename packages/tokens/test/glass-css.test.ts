@@ -17,13 +17,13 @@ import { describe, expect, it } from 'vitest';
  *
  * The CSS pipeline (Lightning CSS, reached through both Tailwind v4 and Next)
  * treats the two spellings as ONE logical property and keeps whichever comes
- * last — so the only declaration that reached the served stylesheet was the
+ * last , so the only declaration that reached the served stylesheet was the
  * `-webkit-` one. Chrome removed that alias around v150:
  * `CSS.supports('-webkit-backdrop-filter', 'blur(1px)')` is now `false`.
  *
  * Net effect: **no glass in the system blurred at all in current Chrome.** Not
  * `.glass-surface-blur`, and not the six tier-O overlays that are supposed to
- * be the whole point of the tier. Nothing caught it — a blur is not a colour,
+ * be the whole point of the tier. Nothing caught it , a blur is not a colour,
  * so no contrast gate has an opinion, and the reduced-transparency and
  * `@supports` fallbacks both fail to fire (that condition asks whether the
  * BROWSER supports blur, which it does, not whether our rule survived the
@@ -32,7 +32,7 @@ import { describe, expect, it } from 'vitest';
  * Tailwind's own generated `.backdrop-filter` utility writes `-webkit-` first
  * and never had the bug. So: **`-webkit-` first, standard last, always.**
  *
- * Assertions are on the SOURCE rather than on built output, deliberately — the
+ * Assertions are on the SOURCE rather than on built output, deliberately , the
  * source order is the thing a future edit gets wrong, and asserting it here
  * means the failure names the actual mistake instead of a missing pixel.
  */
@@ -42,7 +42,7 @@ const raw = readFileSync(join(here, '../css/glass.css'), 'utf8');
 /** Comments strip first: this file documents the rule in prose it must not match. */
 const css = raw.replace(/\/\*[\s\S]*?\*\//g, '');
 
-/** `selector { … }` pairs, flat — glass.css nests only inside `@media`/`@supports`. */
+/** `selector { … }` pairs, flat , glass.css nests only inside `@media`/`@supports`. */
 function rules(): { selector: string; body: string }[] {
   const out: { selector: string; body: string }[] = [];
   const re = /([^{}]+)\{([^{}]*)\}/g;
@@ -84,7 +84,7 @@ describe('backdrop-filter prefix order survives the CSS pipeline', () => {
           webkit,
           `${rule.selector} declares the unprefixed backdrop-filter BEFORE the -webkit- one.\n\n` +
             `The build keeps only the LAST of the two, so this ships -webkit-backdrop-filter ` +
-            `alone — and Chrome dropped that alias at ~v150. The rule would compute to ` +
+            `alone , and Chrome dropped that alias at ~v150. The rule would compute to ` +
             `\`backdrop-filter: none\` with no fallback firing and no other test failing.\n\n` +
             `Swap the two lines.`,
         ).toBeLessThan(standard);
@@ -94,7 +94,7 @@ describe('backdrop-filter prefix order survives the CSS pipeline', () => {
 
   it('covers every class that is supposed to blur', () => {
     /**
-     * Order is only half of it — a new blurring class that never got the
+     * Order is only half of it , a new blurring class that never got the
      * `-webkit-` line at all would pass every assertion above by being absent.
      */
     const blurring = withBackdrop

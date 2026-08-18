@@ -35,21 +35,21 @@ import { cn } from '../lib/cn';
  * what `DropdownMenu` cannot host: a menu manages focus for its items and
  * swallows keystrokes into typeahead, so an input inside one loses focus on the
  * first character. A Dialog CONTAINS focus rather than managing it, so the input
- * behaves like an input. See the refusals in `dropdown-menu.tsx` — this file is
+ * behaves like an input. See the refusals in `dropdown-menu.tsx` , this file is
  * the sanctioned alternative that note points at.
  *
  * ## The highlight attribute here is `data-[selected=true]`, not `data-highlighted`
  *
  * `cmdk` is not Radix Menu. It renders `role="option"` rows and marks the active
  * one with `data-selected` + `aria-selected`. The Radix `data-highlighted`
- * contract does NOT transfer — but the rule behind it does: never style the
+ * contract does NOT transfer , but the rule behind it does: never style the
  * active row with `:hover`, or arrow-key navigation becomes invisible.
  *
  * ## Composed on Radix's Dialog primitive directly, not on our `Dialog`
  *
  * A palette needs an unpadded, top-anchored content box and its own close
  * behaviour, so it would spend its life overriding `dialogContentVariants`.
- * Building on the primitive also keeps this file installable on its own — a CLI
+ * Building on the primitive also keeps this file installable on its own , a CLI
  * consumer needs `cmdk` and `radix-ui`, not the whole Dialog component.
  *
  * ## `CommandPalette` used inline is NOT glass
@@ -71,7 +71,7 @@ function CommandPalette({ className, ...props }: React.ComponentProps<typeof Com
 /**
  * The wrapper carries the icon and the rule; the input itself is transparent and
  * borderless, because the palette's frame already is the field. `outline-none`
- * is safe here for the same reason it is on `NativeSelect`'s inner element —
+ * is safe here for the same reason it is on `NativeSelect`'s inner element ,
  * focus is unambiguous, there is exactly one input in the surface.
  */
 function CommandInput({
@@ -117,7 +117,7 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
  * cmdk renders this only when the filter matches nothing. It is a
  * `role="presentation"` node inside the listbox, so a screen reader learns about
  * the empty result from the combobox's own `aria-activedescendant` going away
- * rather than from an announcement — pass `aria-live="polite"` if the app wants
+ * rather than from an announcement , pass `aria-live="polite"` if the app wants
  * one.
  */
 function CommandEmpty({
@@ -135,7 +135,7 @@ function CommandEmpty({
 
 /**
  * The heading is styled through cmdk's `[cmdk-group-heading]` attribute rather
- * than a slot of ours, because cmdk owns that element — it generates it from the
+ * than a slot of ours, because cmdk owns that element , it generates it from the
  * `heading` prop and wires `aria-labelledby` to it.
  */
 function CommandGroup({
@@ -158,7 +158,7 @@ function CommandGroup({
 }
 
 /**
- * `data-[selected=true]`, never `hover:` — see the note in the file docblock.
+ * `data-[selected=true]`, never `hover:` , see the note in the file docblock.
  * cmdk moves the selection with the arrow keys without moving DOM focus (focus
  * stays in the input, which is what lets you keep typing), so a hover-only
  * highlight leaves keyboard users with no visible cursor at all.
@@ -185,7 +185,7 @@ function CommandItem({ className, ...props }: React.ComponentProps<typeof Comman
  * `aria-hidden`, and it is not optional.
  *
  * cmdk hard-codes `role="separator"` AFTER its prop spread, so the role cannot
- * be overridden from here — and a `separator` is not a permitted child of a
+ * be overridden from here , and a `separator` is not a permitted child of a
  * `listbox`, which axe reports as `aria-required-children`. Hiding it from the
  * accessibility tree is the correct fix rather than a silencer: the groups are
  * already named by their headings, so the rule between them is purely visual.
@@ -233,7 +233,7 @@ function CommandShortcut({ className, ...props }: React.ComponentProps<'span'>) 
  * The callback and the current open state are read through refs, and the effect
  * depends ONLY on `key`. Depending on `onOpenChange` would tear down and
  * re-attach the listener on every render of any parent that passes an inline
- * arrow — which is every parent — and depending on `open` would do the same on
+ * arrow , which is every parent , and depending on `open` would do the same on
  * every toggle.
  */
 function useGlobalShortcut(
@@ -274,7 +274,7 @@ export interface CommandDialogProps extends React.ComponentProps<typeof DialogPr
   description?: string;
   /**
    * The letter to bind with ⌘/Ctrl, e.g. `"k"`. Omitted or `false` means NO
-   * global listener is installed. Requires the controlled form — the shortcut
+   * global listener is installed. Requires the controlled form , the shortcut
    * toggles through `onOpenChange`, so an uncontrolled dialog has nothing to
    * call.
    */
@@ -315,7 +315,7 @@ function CommandDialog({
             // keystroke.
             'top-[15vh] w-[calc(100%-2rem)] max-w-lg',
             // Horizontal centring is symmetric, so the PHYSICAL pair is correct
-            // in both directions. `start-1/2` would break RTL — `translate` does
+            // in both directions. `start-1/2` would break RTL , `translate` does
             // not flip, so the box would be pushed off the wrong edge.
             'left-1/2 -translate-x-1/2',
             'duration-enter ease-out',
@@ -328,7 +328,7 @@ function CommandDialog({
             <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
             <DialogPrimitive.Description>{description}</DialogPrimitive.Description>
           </VisuallyHidden.Root>
-          {/* No rounding or border of its own — the dialog owns the frame. */}
+          {/* No rounding or border of its own , the dialog owns the frame. */}
           <CommandPalette className="rounded-none">{children}</CommandPalette>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

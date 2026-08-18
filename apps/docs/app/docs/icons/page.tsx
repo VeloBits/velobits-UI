@@ -27,7 +27,7 @@ const TOC: TocEntry[] = [
  * The icon gallery.
  *
  * Until this page existed, `@velobitsio/icons` shipped 88 glyphs and the docs
- * app rendered 18 of them — all incidental, sitting inside component demos.
+ * app rendered 18 of them , all incidental, sitting inside component demos.
  * Seventy were published with no way to see them, and `createIcon` was public API
  * documented only in a CHANGELOG.
  *
@@ -50,8 +50,8 @@ export default function IconsPage() {
 
         <Group
           id="the-set"
-          title={`The set — ${ICON_COUNT} icons`}
-          note="Names are shown without their Icon suffix; the import is the name plus Icon — trash is TrashIcon. Every glyph uses stroke=currentColor, so it inherits the colour of whatever it sits in."
+          title={`The set , ${ICON_COUNT} icons`}
+          note="Names are shown without their Icon suffix; the import is the name plus Icon , trash is TrashIcon. Every glyph uses stroke=currentColor, so it inherits the colour of whatever it sits in."
         >
           <IconGrid />
         </Group>
@@ -79,14 +79,14 @@ export default function IconsPage() {
           <Section
             id="decorative"
             title="Decorative by default"
-            note="Icons render aria-hidden=true, because most sit beside a text label that already names the action. An icon carrying meaning alone has to opt out explicitly — and passing aria-label on its own is not enough, since aria-hidden wins and the label is never announced."
+            note="Icons render aria-hidden=true, because most sit beside a text label that already names the action. An icon carrying meaning alone has to opt out explicitly , and passing aria-label on its own is not enough, since aria-hidden wins and the label is never announced."
           >
             <div className="rounded-xl border border-dashed border-border p-6">
               <pre className="overflow-x-auto font-mono text-xs">
-                <code>{`// decorative — the label beside it does the work
+                <code>{`// decorative , the label beside it does the work
 <TrashIcon /> Delete
 
-// meaningful on its own — all three props are required
+// meaningful on its own , all three props are required
 <TrashIcon aria-hidden={undefined} role="img" aria-label="Delete flag" />`}</code>
               </pre>
             </div>
@@ -95,7 +95,7 @@ export default function IconsPage() {
           <Section
             id="create-icon"
             title="createIcon"
-            note="Exported for one-off glyphs that need the same geometry — a 24×24 grid, currentColor, strokeWidth 2, round caps and joins, and a default size of 16. Anything reused across surfaces belongs in the package instead."
+            note="Exported for one-off glyphs that need the same geometry , a 24×24 grid, currentColor, strokeWidth 2, round caps and joins, and a default size of 16. Anything reused across surfaces belongs in the package instead."
           >
             <div className="rounded-xl border border-dashed border-border p-6">
               <pre className="overflow-x-auto font-mono text-xs">

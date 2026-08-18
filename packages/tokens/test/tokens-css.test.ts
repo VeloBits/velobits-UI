@@ -9,7 +9,7 @@ import { themes, type SemanticTokens, type ThemeName } from '../src/semantic';
 
 /**
  * `css/tokens.css` and `src/semantic.ts` describe the same values in two
- * languages, so they can drift — and a drift is invisible, because each half
+ * languages, so they can drift , and a drift is invisible, because each half
  * looks correct on its own. This test makes them one source of truth in effect
  * if not in form: the CSS is parsed and compared value-by-value against the TS.
  *
@@ -32,7 +32,7 @@ function block(selector: string): Record<string, string> {
   const out: Record<string, string> = {};
   /**
    * Strip comments first so a commented-out example is never read as a value,
-   * then split on `;` — NOT on newlines.
+   * then split on `;` , NOT on newlines.
    *
    * A line-based parse silently drops any declaration prettier has wrapped, and
    * it wraps anything past 100 characters, which the three-stop tier-S shadows
@@ -137,7 +137,7 @@ describe('tokens.css agrees with semantic.ts', () => {
       '--shadow-md',
       '--shadow-lg',
       '--shadow-overlay',
-      // The page texture. Gated in `texture-css.test.ts` rather than here — it is
+      // The page texture. Gated in `texture-css.test.ts` rather than here , it is
       // measured against a different thing from everything else in this file (the
       // page it REPLACES, per channel and per direction), because it is the only
       // token group that can invalidate other tokens' numbers without changing
@@ -146,7 +146,7 @@ describe('tokens.css agrees with semantic.ts', () => {
       '--page-texture-dot',
       '--page-texture-field',
       '--page-texture-grid',
-      // The control material. Gated in `controls-css.test.ts` — it is edge, light
+      // The control material. Gated in `controls-css.test.ts` , it is edge, light
       // and depth rather than a fill, so what needs asserting there is the
       // `none`-in-a-shadow-list trap and the light-mode asymmetry, not a ratio
       // against a surface. `src/controls.ts` is the TypeScript counterpart.
@@ -203,7 +203,7 @@ describe('glass CSS agrees with glass.ts', () => {
 
   /**
    * Tier S is five variables per theme rather than tier O's three, and the
-   * loop above only walks `SemanticTokens` — so none of them are auto-discovered
+   * loop above only walks `SemanticTokens` , so none of them are auto-discovered
    * and each has to be named here. The `known` set in the test above is what
    * stops the reverse mistake (a CSS-only variable that never reaches the TS
    * layer and so escapes the contrast and perceptibility gates).
@@ -242,7 +242,7 @@ describe('glass CSS agrees with glass.ts', () => {
   it('glass.css composes BOTH sheen stops into the tier-S gradient', () => {
     /**
      * The two stops are gated individually, which is the point of them being two
-     * variables — but a stop that is declared and never referenced is gated and
+     * variables , but a stop that is declared and never referenced is gated and
      * invisible at the same time, which is worse than an ungated one: the suite
      * goes green while the surface renders as a flat fill of whichever stop the
      * gradient does mention.
@@ -267,7 +267,7 @@ describe('glass CSS agrees with glass.ts', () => {
      *
      * Spelled `background-color` instead, the translucent gradient would survive
      * on top of the opaque colour and the fallback would render as glass over
-     * panel — for users on a browser without `backdrop-filter`, or users who
+     * panel , for users on a browser without `backdrop-filter`, or users who
      * explicitly asked for less transparency. Both are the cases the fallback
      * exists for, and neither would be seen by anyone developing on Chrome with
      * default settings.
@@ -291,7 +291,7 @@ describe('glass CSS agrees with glass.ts', () => {
     /**
      * `.glass-surface` composes `--glass-surface-highlight` and
      * `--glass-surface-shadow` into ONE comma-separated `box-shadow`, and `none`
-     * inside a shadow list is invalid CSS — the browser drops the whole
+     * inside a shadow list is invalid CSS , the browser drops the whole
      * declaration, so dark mode would silently lose its specular top edge, its
      * only material. Dark's "no shadow" is therefore `0 0 0 transparent`.
      */
@@ -308,7 +308,7 @@ describe('glass CSS agrees with glass.ts', () => {
      * The performance half of the two-tier model, asserted rather than trusted:
      * `.glass-surface` goes on repeated components (a list of Cards), so it must
      * be background + border + shadow with no `backdrop-filter`. Only
-     * `.glass-surface-blur` — sticky bars, sidebars — pays for a backdrop
+     * `.glass-surface-blur` , sticky bars, sidebars , pays for a backdrop
      * snapshot.
      */
     const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8');
@@ -326,7 +326,7 @@ describe('glass CSS agrees with glass.ts', () => {
       expect(
         /(^|,)\s*\.glass-surface\s*(,|$)/.test(selector),
         `"${selector}" applies a blur to the plain .glass-surface, which is used on repeated ` +
-          `components — every instance becomes a live backdrop snapshot.`,
+          `components , every instance becomes a live backdrop snapshot.`,
       ).toBe(false);
     }
   });
@@ -336,7 +336,7 @@ describe('glass CSS agrees with glass.ts', () => {
      * A new glass class that nobody added to these two blocks keeps its
      * translucency for users who asked for less of it, and reads as a
      * washed-out panel with page content bleeding through on browsers without
-     * `backdrop-filter`. The tier degrades as ONE material — a sticky bar going
+     * `backdrop-filter`. The tier degrades as ONE material , a sticky bar going
      * opaque while the cards under it stay translucent is worse than either.
      */
     // Comments stripped first: glass.css documents both markers in prose, and
@@ -376,7 +376,7 @@ describe('the dark selector list covers both toggle conventions', () => {
     /**
      * trap 1, and the single most expensive mistake in this file. A
      * `@theme` variable is emitted as a real `:root` declaration, so
-     * `var(--color-border)` resolves against `:root` — the light value — and
+     * `var(--color-border)` resolves against `:root` , the light value , and
      * then inherits everywhere, so `body.dark` never reaches it.
      */
     const themeCss = readFileSync(join(here, '../css/theme.css'), 'utf8');

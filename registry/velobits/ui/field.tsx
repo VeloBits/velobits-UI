@@ -14,7 +14,7 @@ import { Label } from './label';
  * The part that is easy to get wrong: when a field has BOTH a description and an
  * error, `aria-describedby` must list both ids, and the error should come first
  * so it is announced first. Dropping the description when an error appears is
- * the common bug — the user loses the format hint at the exact moment they need
+ * the common bug , the user loses the format hint at the exact moment they need
  * it.
  *
  * ```tsx
@@ -108,7 +108,7 @@ function FieldControl({ children }: FieldControlProps) {
   const { id, descriptionId, errorId, hasError, hasDescription } = useField('FieldControl');
 
   // Error first: a screen reader announces describedby in order, and the
-  // failure matters more than the hint. Both are listed — losing the hint when
+  // failure matters more than the hint. Both are listed , losing the hint when
   // an error appears is the bug this avoids.
   const describedBy =
     [hasError ? errorId : null, hasDescription ? descriptionId : null].filter(Boolean).join(' ') ||
@@ -138,7 +138,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
  * undefined validation message without a conditional.
  *
  * `role="alert"` because this appears in response to a user action and should
- * interrupt — unlike `Alert`, which defaults to polite `status`.
+ * interrupt , unlike `Alert`, which defaults to polite `status`.
  */
 function FieldError({ className, children, ...props }: React.ComponentProps<'p'>) {
   const { errorId } = useField('FieldError');

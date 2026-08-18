@@ -32,13 +32,13 @@ import { DocsToc, type TocEntry } from '@/components/docs-toc';
 export const metadata: Metadata = {
   title: 'Colors',
   description:
-    'Every semantic token, its contrast gate, and the glass composites — computed from @velobitsio/tokens at build time.',
+    'Every semantic token, its contrast gate, and the glass composites , computed from @velobitsio/tokens at build time.',
 };
 
 /**
  * Ids are written here rather than slugified from the headings, because several
  * headings carry a computed count ("Measured pairs (43)") and a slug derived
- * from one would change the moment a pair was added — silently breaking every
+ * from one would change the moment a pair was added , silently breaking every
  * link anyone had saved to it.
  */
 const TOC: TocEntry[] = [
@@ -55,7 +55,7 @@ const TOC: TocEntry[] = [
 
 /**
  * Every value on this page is read from `@velobitsio/tokens` at build time.
- * Nothing is transcribed, and — this is the part that was wrong before — nothing
+ * Nothing is transcribed, and , this is the part that was wrong before , nothing
  * is *enumerated by hand* either.
  *
  * The previous version rendered the seeds and the neutral ramp with
@@ -159,10 +159,10 @@ function Ratio({ value, target }: { value: number; target: number }) {
   return <Badge variant={value >= target ? 'success' : 'danger'}>{value}:1</Badge>;
 }
 
-/** Max per-channel distance in 8-bit sRGB — the unit the perceptibility gate uses. */
+/** Max per-channel distance in 8-bit sRGB , the unit the perceptibility gate uses. */
 function channelDistance(a: string, b: string) {
   // `Rgb` is a fixed 3-tuple, so destructuring keeps this honest under
-  // `noUncheckedIndexedAccess` — indexing it would need a non-null assertion.
+  // `noUncheckedIndexedAccess` , indexing it would need a non-null assertion.
   const [ar, ag, ab] = hexToRgb(a);
   const [br, bg, bb] = hexToRgb(b);
   return Math.max(Math.abs(ar - br), Math.abs(ag - bg), Math.abs(ab - bb));
@@ -232,7 +232,7 @@ export default function ColorsPage() {
           intro={
             <>
               The names components actually consume, resolved per theme. These and{' '}
-              <code>css/tokens.css</code> describe the same values — the suite parses the CSS and
+              <code>css/tokens.css</code> describe the same values , the suite parses the CSS and
               asserts they agree, so the two cannot drift. <strong>Gated</strong> means the token
               appears in at least one contrast pair; <strong>exempt</strong> means it is
               deliberately excluded, with the reason recorded in the package and repeated below.
@@ -351,8 +351,8 @@ export default function ColorsPage() {
           title={`Measured pairs (${CONTRAST_PAIRS.length})`}
           intro={
             <>
-              The full flat-pair registry, not a selection — every ratio is computed here by the
-              same functions the gate uses. A pair scoped to one theme prints <code>—</code> in the
+              The full flat-pair registry, not a selection , every ratio is computed here by the
+              same functions the gate uses. A pair scoped to one theme prints <code>,</code> in the
               other.
             </>
           }
@@ -377,14 +377,14 @@ export default function ColorsPage() {
                     {l ? (
                       <Ratio value={round2(contrastRatio(l.fg, l.bg))} target={l.target} />
                     ) : (
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-muted-foreground">,</span>
                     )}
                   </Td>
                   <Td>
                     {d ? (
                       <Ratio value={round2(contrastRatio(d.fg, d.bg))} target={d.target} />
                     ) : (
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-muted-foreground">,</span>
                     )}
                   </Td>
                 </tr>
@@ -400,7 +400,7 @@ export default function ColorsPage() {
             <>
               A chip is never seen against the colour it is declared with. Each wash is flattened
               over the page, the panel and the Tier-S glass composite, and the text measured on the
-              result — which is the gate a flat pair cannot express.
+              result , which is the gate a flat pair cannot express.
             </>
           }
         >
@@ -445,7 +445,7 @@ export default function ColorsPage() {
             <>
               Translucency is worthless if the result is the colour underneath it. Every tier must
               clear <strong>{PERCEPTIBILITY_FLOOR}/255</strong> max-channel distance from what it
-              sits on — Tier S from both the page and the opaque panel, since it has to read as
+              sits on , Tier S from both the page and the opaque panel, since it has to read as
               raised without becoming the panel. This gate is what caught a dark overlay that
               composited to byte-identical with the page.
             </>
@@ -454,7 +454,7 @@ export default function ColorsPage() {
           <Table head={['Surface', 'Composite', 'vs page', 'vs panel', 'Body text']}>
             {/*
              * One row PER SHEEN STOP, not per tier. Tier S paints a two-stop
-             * gradient, and the far stop is the one that approaches a wall — light's
+             * gradient, and the far stop is the one that approaches a wall , light's
              * bottom sits on the floor exactly. A table showing one composite per
              * tier would be showing the safe half.
              */}
@@ -509,10 +509,10 @@ export default function ColorsPage() {
                     </Badge>
                   </Td>
                   <Td>
-                    <span className="text-muted-foreground">—</span>
+                    <span className="text-muted-foreground">,</span>
                   </Td>
                   <Td>
-                    <span className="text-muted-foreground">—</span>
+                    <span className="text-muted-foreground">,</span>
                   </Td>
                 </tr>
               );
@@ -529,7 +529,7 @@ export default function ColorsPage() {
 }
 
 /**
- * Display names only, and every scale renders whether or not it appears here —
+ * Display names only, and every scale renders whether or not it appears here ,
  * an unlisted one just gets its key capitalised. That asymmetry is the point:
  * this map can get a label wrong, but it can never hide a scale the way the
  * nine hand-written `<ScaleTable>` calls it replaced could.
@@ -542,7 +542,7 @@ const scaleLabel = (name: string) =>
 function ScaleTable({ title, entries }: { title: string; entries: [string, string | number][] }) {
   /**
    * Derived rather than passed: the mono column is for values too long to read
-   * as prose — easings, shadows, font stacks — and length is the actual reason,
+   * as prose , easings, shadows, font stacks , and length is the actual reason,
    * so measuring it keeps a new long-valued scale from arriving unformatted.
    */
   const mono = entries.some(([, value]) => String(value).length > 24);

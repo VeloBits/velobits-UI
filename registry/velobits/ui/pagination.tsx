@@ -40,19 +40,19 @@ import { buttonVariants } from './button';
  * shadcn renders all of them as `<a>`. Two things go wrong with that, and only
  * the second one is visible:
  *
- *  - A page number IS a destination — `?page=3` is a URL somebody can bookmark,
- *    middle-click, or open in a new tab — so `PaginationLink` is an anchor and
+ *  - A page number IS a destination , `?page=3` is a URL somebody can bookmark,
+ *    middle-click, or open in a new tab , so `PaginationLink` is an anchor and
  *    stays one.
  *  - Previous and Next are *relative moves*, and the thing that has to happen at
  *    the ends of the range is that they become unavailable **without leaving the
  *    page**. An `<a>` cannot express that: strip its `href` and it stops being a
  *    link and stops being focusable, so a keyboard user tabbing through the
- *    control finds it has silently vanished — and if focus was ON it when the
+ *    control finds it has silently vanished , and if focus was ON it when the
  *    last page loaded, focus resets to the document body and the next Tab starts
  *    from the top of the page.
  *
  * So they are `<button type="button">`, and unavailability is `aria-disabled`
- * rather than the `disabled` attribute — see the note on `PaginationPrevious`.
+ * rather than the `disabled` attribute , see the note on `PaginationPrevious`.
  * `asChild` is on both, for an app that really does want anchors.
  * ─────────────────────────────────────────────────────────────────────────────
  *
@@ -77,7 +77,7 @@ function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
 }
 
 /**
- * A `<ul>`, so the control announces its length — "list, 7 items" tells a
+ * A `<ul>`, so the control announces its length , "list, 7 items" tells a
  * screen-reader user how far the range extends before they read any of it.
  */
 function PaginationContent({ className, ...props }: React.ComponentProps<'ul'>) {
@@ -104,7 +104,7 @@ export interface PaginationLinkProps extends React.ComponentProps<'a'> {
 /**
  * `aria-current="page"` is the whole accessible story for the active number.
  *
- * The visual treatment — an outlined button instead of a ghost one — is not it:
+ * The visual treatment , an outlined button instead of a ghost one , is not it:
  * a screen reader cannot see a border, and `aria-current` is the only thing that
  * says "you are here" rather than "here is a link to page 3".
  *
@@ -137,7 +137,7 @@ function PaginationLink({
 
 export interface PaginationStepProps extends React.ComponentProps<'button'> {
   /**
-   * There is no page in this direction. See the docblock — this becomes
+   * There is no page in this direction. See the docblock , this becomes
    * `aria-disabled`, NOT the `disabled` attribute.
    */
   disabled?: boolean;
@@ -148,14 +148,14 @@ export interface PaginationStepProps extends React.ComponentProps<'button'> {
  * ## Why `aria-disabled` and not `disabled`
  *
  * A `disabled` button is removed from the tab order. On the last page that means
- * the control the user's focus is sitting in disappears from under them — focus
+ * the control the user's focus is sitting in disappears from under them , focus
  * falls back to `<body>` and the next Tab restarts from the top of the document.
  * On a long list page, that is the difference between "I reached the end" and "I
  * lost my place".
  *
  * `aria-disabled="true"` keeps the button focusable and announced as dimmed,
- * which is what the pattern wants. It does NOT stop activation on its own — the
- * browser has no idea it means anything — so the click and keyboard handlers are
+ * which is what the pattern wants. It does NOT stop activation on its own , the
+ * browser has no idea it means anything , so the click and keyboard handlers are
  * guarded below. Setting `aria-disabled` and forgetting the guard is the classic
  * version of this bug: it looks disabled, announces disabled, and still fires.
  */
@@ -201,7 +201,7 @@ function paginationStep(direction: 'previous' | 'next') {
       >
         {children ?? (
           <>
-            {/* One chevron component, rotated — so the two directions cannot
+            {/* One chevron component, rotated , so the two directions cannot
                 drift apart, and `rtl:` flips both at once. A directional glyph
                 is the one thing a logical property cannot express. */}
             <ChevronRightIcon
@@ -267,12 +267,12 @@ function span(from: number, to: number): number[] {
  * ## The output length is CONSTANT
  *
  * For any page of a list long enough to need cutting, this returns exactly
- * `2 * siblings + 5` slots — `1 … 4 5 6 … 20`, seven at the default.
+ * `2 * siblings + 5` slots , `1 … 4 5 6 … 20`, seven at the default.
  *
  * That is the property worth having and the one hand-rolled versions miss. The
  * naive implementation drops an ellipsis when the current page is near an end,
  * so the control is 6 slots wide on page 1, 7 in the middle and 6 again at the
- * end — meaning every button shifts sideways as you page, and the "next number"
+ * end , meaning every button shifts sideways as you page, and the "next number"
  * you were about to click has moved out from under the pointer. Here the ellipsis
  * is replaced by a *page number*, so the width never changes.
  *
@@ -297,7 +297,7 @@ export function paginationRange({
 
   /*
    * An ellipsis must hide at least TWO pages, never one: standing in for a
-   * single page is strictly worse than showing it — same width, less
+   * single page is strictly worse than showing it , same width, less
    * information, and one more click to reach a page that was on screen a moment
    * ago.
    *

@@ -30,7 +30,7 @@ import { cn } from '../lib/cn';
  *     landmarks cannot tell it from the sidebar. The label is what makes the
  *     landmark list readable, and it is why `Breadcrumb` renders a `nav` rather
  *     than a styled `div`.
- *  2. **`<ol>`.** A breadcrumb is ordered — that is its entire content. The list
+ *  2. **`<ol>`.** A breadcrumb is ordered , that is its entire content. The list
  *     is what gets a screen reader to announce "list, 4 items … item 3 of 4", so
  *     depth is conveyed without reading every crumb. A `div` of spans conveys
  *     none of it.
@@ -43,7 +43,7 @@ import { cn } from '../lib/cn';
  *
  * shadcn's version adds `role="link" aria-disabled="true"` to it. That is
  * deliberately dropped here. `role="link"` asserts that something is a link, and
- * `aria-disabled` then says it does not work — so assistive tech announces "link,
+ * `aria-disabled` then says it does not work , so assistive tech announces "link,
  * dimmed" for a piece of static text that was never interactive and is not
  * focusable. There is no state to communicate: the crumb is the current page, and
  * `aria-current` is the attribute that says exactly that.
@@ -51,7 +51,7 @@ import { cn } from '../lib/cn';
  * ## The one place this system uses an `rtl:` variant
  *
  * The separator chevron. The rule everywhere else is logical properties
- * (`ms-`/`me-`/`text-start`) so `dir="rtl"` needs no variants — but a chevron is
+ * (`ms-`/`me-`/`text-start`) so `dir="rtl"` needs no variants , but a chevron is
  * a *glyph* pointing along the reading direction, and there is no logical
  * property for the shape of a drawing. `rtl:rotate-180` is the only correct fix,
  * and an unflipped chevron in RTL reads as a trail pointing back the way it came.
@@ -86,7 +86,7 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<'li'>) {
 export interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
   /**
    * Render the child element instead of an `<a>`. This is the normal case in a
-   * routed app — `asChild` with a router `Link`, so the crumb navigates client
+   * routed app , `asChild` with a router `Link`, so the crumb navigates client
    * side rather than reloading the document.
    */
   asChild?: boolean;
@@ -136,8 +136,8 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {
  * from the accessibility tree so the count is right; `aria-hidden` stops the
  * glyph inside it being announced. Removing either one leaves a real defect.
  *
- * `children` is supported so a caller can substitute a different glyph — a
- * slash, a dot — without losing the two attributes.
+ * `children` is supported so a caller can substitute a different glyph , a
+ * slash, a dot , without losing the two attributes.
  */
 function BreadcrumbSeparator({ children, className, ...props }: React.ComponentProps<'li'>) {
   return (
@@ -162,12 +162,12 @@ function BreadcrumbSeparator({ children, className, ...props }: React.ComponentP
  * The `sr-only` text is what makes it mean anything: the glyph itself is
  * `aria-hidden` (every icon in this set is, by default), so without the word an
  * ellipsis crumb is announced as an empty list item. Note that this is the
- * inverse of `BreadcrumbSeparator` — there the element must vanish from the tree
+ * inverse of `BreadcrumbSeparator` , there the element must vanish from the tree
  * entirely, here it must stay and say "More", so this one deliberately carries
  * neither `aria-hidden` nor `role="presentation"`.
  *
  * If the hidden crumbs should be *reachable*, wrap this in a `DropdownMenu`
- * trigger — but then it is a button, and the caller owns that.
+ * trigger , but then it is a button, and the caller owns that.
  */
 function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
   return (

@@ -22,13 +22,13 @@ import { auditElement } from './axe';
 
 /**
  * This suite audits with `auditElement` rooted at the portalled panel rather than
- * at `document.body` — a modal Radix dialog marks the rest of the document
+ * at `document.body` , a modal Radix dialog marks the rest of the document
  * `aria-hidden` while its trigger stays tabbable, which trips `aria-hidden-focus`
  * on a mechanism `FocusScope` already handles and no static rule can see.
  */
 
 /**
- * A detail sheet that also happens to contain a field — the shape that makes the
+ * A detail sheet that also happens to contain a field , the shape that makes the
  * the consumer ADR assertions meaningful, because it is where a focus redirect would be
  * *possible* and must not happen.
  */
@@ -65,8 +65,8 @@ async function open() {
 /**
  * A registry component's source with its comments removed.
  *
- * Both docblocks talk about `onOpenAutoFocus` and `focusFirstField` at length —
- * that is the documentation of the split — so a plain substring search over the
+ * Both docblocks talk about `onOpenAutoFocus` and `focusFirstField` at length ,
+ * that is the documentation of the split , so a plain substring search over the
  * raw file can only ever match the prose. Stripping comments is what makes the
  * assertion about the CODE.
  */
@@ -129,14 +129,14 @@ describe('SidePanel', () => {
  * ## The the consumer ADR split, asserted rather than commented
  *
  * `Dialog` is the ~480px centred FORM box and it offers `focusFirstField`.
- * `SidePanel` is the edge-anchored READING sheet and it keeps Radix's default —
+ * `SidePanel` is the edge-anchored READING sheet and it keeps Radix's default ,
  * the first tabbable node, which is the ✕. A reading sheet that yanks focus into
  * the first field scrolls itself, pops the mobile keyboard, and drops a
  * screen-reader user into the middle of the content instead of at its heading.
  *
  * The two were split so that neither behaviour has to be conditional. These tests
  * exist because a future "these are nearly the same component" refactor would
- * merge them, pick one focus policy, and break half the call sites — with nothing
+ * merge them, pick one focus policy, and break half the call sites , with nothing
  * failing.
  */
 describe('SidePanel does not redirect focus (the consumer ADR)', () => {
@@ -170,7 +170,7 @@ describe('SidePanel sides', () => {
   it('anchors to the inline edges with logical properties, never left/right', async () => {
     /**
      * `right` means INLINE-END here, so the sheet attaches to the left edge under
-     * `dir="rtl"` — which is where a reader in an RTL locale expects it. A
+     * `dir="rtl"` , which is where a reader in an RTL locale expects it. A
      * physical `right-0` would not move, and neither would a physical slide.
      */
     render(<DetailPanel />);
@@ -207,7 +207,7 @@ describe('SidePanel sides', () => {
      * the editor app's mobile-IA constraint. `h-[75%]` resolves against a
      * fixed-position containing block that is not always what you expect, and
      * `max-h` with an auto height leaves an inner `flex-1`/`min-h-0` scroll region
-     * nothing to measure — the sheet then either collapses to its content or
+     * nothing to measure , the sheet then either collapses to its content or
      * refuses to scroll. `dvh` also tracks mobile browser chrome, which `vh` does
      * not: with `vh` the bottom of the sheet sits under iOS's URL bar.
      */
@@ -224,7 +224,7 @@ describe('SidePanel glass and animation invariants', () => {
   it('is the overlay glass tier, with no background utility to override it', async () => {
     /**
      * `.glass` sits in Tailwind's `components` layer, so any `bg-*` utility on the
-     * same element replaces the glass background with a flat fill — silently.
+     * same element replaces the glass background with a flat fill , silently.
      */
     render(<DetailPanel />);
     const cls = (await open()).className;
@@ -240,7 +240,7 @@ describe('SidePanel glass and animation invariants', () => {
     expect(cls).not.toMatch(/blur/);
   });
 
-  it('animates transform and opacity only — never width, height or blur', async () => {
+  it('animates transform and opacity only , never width, height or blur', async () => {
     /**
      * Width/height animation relayouts the whole subtree every frame and, on a
      * glass surface, re-samples the backdrop with it. Animating the blur RADIUS
@@ -255,7 +255,7 @@ describe('SidePanel glass and animation invariants', () => {
   });
 
   it('sets the animation duration through the variable the shorthand reads', async () => {
-    /** See dialog.test.tsx — `animate-in` is the `animation` shorthand. */
+    /** See dialog.test.tsx , `animate-in` is the `animation` shorthand. */
     render(<DetailPanel />);
     const cls = (await open()).className;
     expect(cls).toContain('animation-duration-(--duration-overlay)');
@@ -267,7 +267,7 @@ describe('SidePanel glass and animation invariants', () => {
   it('keeps the ✕ absolute, so the glass containing block cannot trap it', async () => {
     /**
      * `backdrop-filter` establishes a containing block for `position: fixed`
-     * descendants — a fixed child of `.glass` is positioned against the panel and
+     * descendants , a fixed child of `.glass` is positioned against the panel and
      * cannot escape it. The same applies to any sticky footer a caller adds, which
      * is why `SidePanelFooter` uses `mt-auto`.
      */
@@ -285,8 +285,8 @@ describe('SidePanel glass and animation invariants', () => {
 
   it('does not scroll itself, so the ✕ stays reachable and mt-auto works', async () => {
     /**
-     * The scroll region belongs on a child. Put it on the panel and the ✕ —
-     * positioned against this box — scrolls out of reach, and the footer's
+     * The scroll region belongs on a child. Put it on the panel and the ✕ ,
+     * positioned against this box , scrolls out of reach, and the footer's
      * `mt-auto` has a column that grows with its content instead of a fixed one.
      */
     render(<DetailPanel />);

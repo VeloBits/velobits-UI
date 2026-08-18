@@ -27,7 +27,7 @@ export interface ThemeContextValue {
    *
    * `theme` is resolved from `localStorage` and `matchMedia`, neither of which
    * exists on the server. So the server always renders the `defaultMode` branch
-   * while the client's very first render already knows the stored value — and if
+   * while the client's very first render already knows the stored value , and if
    * they differ, React throws a hydration error (#418) and discards the server
    * HTML.
    *
@@ -35,10 +35,10 @@ export interface ThemeContextValue {
    * `dark` class and CSS. This flag is for the case where **markup** differs:
    *
    * ```tsx
-   * // WRONG — server says Moon, client says Sun, hydration fails
+   * // WRONG , server says Moon, client says Sun, hydration fails
    * {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
    *
-   * // Better — no JS branch at all, CSS decides
+   * // Better , no JS branch at all, CSS decides
    * <SunIcon className="hidden dark:block" />
    * <MoonIcon className="dark:hidden" />
    *
@@ -54,7 +54,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 export interface ThemeProviderProps {
   children: React.ReactNode;
   /**
-   * Where the choice persists. REQUIRED and intentionally not defaulted — the
+   * Where the choice persists. REQUIRED and intentionally not defaulted , the
    * editor app uses `fmx_theme_mode` and the dashboard app uses `tf.theme`, both
    * with live user data, so a default here would silently orphan one app's
    * preferences. `THEME_STORAGE_KEYS` has the constants.
@@ -97,7 +97,7 @@ export function ThemeProvider({
 
   /**
    * Deliberately set in an effect, so it is `false` for the server render AND
-   * for the first client render — the two that must produce identical markup.
+   * for the first client render , the two that must produce identical markup.
    */
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -111,7 +111,7 @@ export function ThemeProvider({
   }, [mode, disableDomSync]);
 
   useEffect(() => {
-    // Only follow the OS while the user has not made an explicit choice —
+    // Only follow the OS while the user has not made an explicit choice ,
     // otherwise a system change would silently override them.
     if (mode !== 'system') return;
     return watchSystemTheme((next) => {

@@ -1,6 +1,6 @@
 # @velobitsio/ui
 
-The VeloBits React component library — 38 components sharing one token layer and
+The VeloBits React component library , 38 components sharing one token layer and
 one glass material.
 
 Authored once and shipped twice: as this npm package, and as a shadcn registry
@@ -12,7 +12,7 @@ served from the same source. A parity test stops the two drifting.
 npm install @velobitsio/ui @velobitsio/tokens @velobitsio/icons framer-motion
 ```
 
-**`framer-motion` is a required peer**, not an optional one — the barrel imports
+**`framer-motion` is a required peer**, not an optional one , the barrel imports
 `MotionConfig` through `VelobitsProvider`, so an install without it fails to
 resolve. React and React DOM 19 or later are also peers.
 
@@ -41,19 +41,19 @@ That supplies the theme, the tooltip provider and the reduced-motion config.
 
 ## What's in it
 
-**Tier 1 — primitives (18).** `Alert` `Avatar` `Badge` `Button` `Card`
+**Tier 1 , primitives (18).** `Alert` `Avatar` `Badge` `Button` `Card`
 `Checkbox` `Field` `GlassSurface` `Input` `Kbd` `Label` `NativeSelect`
 `Separator` `Skeleton` `Spinner` `Switch` `Textarea` `Tooltip`
 
-**Tier 2 — overlays (6).** `CommandPalette` `Dialog` `DropdownMenu` `Popover`
+**Tier 2 , overlays (6).** `CommandPalette` `Dialog` `DropdownMenu` `Popover`
 `SidePanel` `Toast`
 
-**Tier 3 — composites (13).** `Accordion` `AppShell` `Breadcrumb` `CodeBlock`
+**Tier 3 , composites (13).** `Accordion` `AppShell` `Breadcrumb` `CodeBlock`
 `DataTable` `DiffViewer` `EmptyState` `Form` `Pagination` `SegmentedControl`
 `StatusChip` `Table` `Tabs`
 
 Plus `cn`, `useTheme`, `useMediaQuery` and `useRowSelection`. Every component is
-also available on its own subpath — `@velobitsio/ui/button` — if you would
+also available on its own subpath , `@velobitsio/ui/button` , if you would
 rather not rely on the barrel tree-shaking.
 
 ## `Form` is subpath-only
@@ -66,7 +66,7 @@ It is deliberately absent from the barrel. `react-hook-form` is an optional
 peer, and the barrel is one bundled module, so re-exporting `Form` would put a
 top-level `import 'react-hook-form'` into `dist/index.js` and break every
 consumer that has no forms. Bundling our own copy instead would be worse and
-quieter — it would carry its own module state, so `useFormContext()` would read
+quieter , it would carry its own module state, so `useFormContext()` would read
 a different context from your `useForm()`.
 
 Note that `Form` takes `label` and `description` as **props**, not children, so

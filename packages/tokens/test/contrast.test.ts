@@ -35,7 +35,7 @@ import {
 
 const THEMES: ThemeName[] = ['light', 'dark'];
 
-/** Skip translucent values — a contrast ratio needs an opaque colour. */
+/** Skip translucent values , a contrast ratio needs an opaque colour. */
 const isOpaqueHex = (v: string) => /^#[0-9a-fA-F]{6}$/.test(v);
 
 describe('semantic pairs meet their WCAG target', () => {
@@ -45,7 +45,7 @@ describe('semantic pairs meet their WCAG target', () => {
         const resolved = resolvePair(pair, theme);
         if (!resolved) continue;
 
-        const suffix = pair.note ? ` — ${pair.note}` : '';
+        const suffix = pair.note ? ` , ${pair.note}` : '';
         it(`${pair.label} (≥${TARGET[pair.target]}:1)${suffix}`, () => {
           const ratio = contrastRatio(resolved.fg, resolved.bg);
           expect(
@@ -91,7 +91,7 @@ describe('soft chips clear AA on every surface they sit on', () => {
   /**
    * Badge's `*-soft` variants (and StatusChip, which composes them) put a TEXT
    * token over a translucent wash, and the wash barely moves whatever surface
-   * is underneath — so the colour the 12px text actually sits on is dominated
+   * is underneath , so the colour the 12px text actually sits on is dominated
    * by the backdrop, not the wash. Each pairing is flattened over the page, the
    * panel and the tier-S glass composite, and asserted at the full 4.5:1.
    *
@@ -110,7 +110,7 @@ describe('soft chips clear AA on every surface they sit on', () => {
               ratio,
               `${pair.fg} (${resolved.fg}) over ${pair.wash} flattened onto the ${name} ` +
                 `(${composite}) = ${round2(ratio)}:1, needs ≥${TARGET.text}:1. Chip text is ` +
-                `12px, so the large-text discount does not apply — retune the text token or ` +
+                `12px, so the large-text discount does not apply , retune the text token or ` +
                 `thin the wash; do not lower the target.`,
             ).toBeGreaterThanOrEqual(TARGET.text);
           });
@@ -124,13 +124,13 @@ describe('TWO ROLES ARE NEVER THE SAME COLOUR', () => {
   /**
    * The gate that every other gate in this file is structurally blind to.
    *
-   * Everything else measures a token against a SURFACE — is it readable, is it
+   * Everything else measures a token against a SURFACE , is it readable, is it
    * visible. Nothing else measures a token against ANOTHER TOKEN, and that is how
    * `--info` shipped as the exact bytes of `--primary-text` (`#0062B3` light,
    * `#4AACFF` dark) with a fully green suite: both were individually legible
    * everywhere, so nothing was wrong by any question being asked.
    *
-   * Measured in OKLab ΔE rather than contrast ratio on purpose — see
+   * Measured in OKLab ΔE rather than contrast ratio on purpose , see
    * {@link ROLE_DISTINCTION_FLOOR}. Contrast ratio cannot answer this question at
    * all: two colours of equal lightness and opposite hue have a ratio of ~1.0,
    * which is what "identical" also scores.
@@ -179,7 +179,7 @@ describe('TWO ROLES ARE NEVER THE SAME COLOUR', () => {
   it('every registered role pair refers to tokens that still exist', () => {
     /**
      * The registry names tokens as strings through `keyof SemanticTokens`, so a
-     * rename is caught by the compiler — but a token being DELETED while its pair
+     * rename is caught by the compiler , but a token being DELETED while its pair
      * stays behind would leave an entry silently comparing two undefineds.
      */
     for (const pair of DISTINCT_ROLE_PAIRS) {
@@ -193,12 +193,12 @@ describe('TWO ROLES ARE NEVER THE SAME COLOUR', () => {
 
 describe('the specific claims the palette was designed around', () => {
   /**
-   * These are not redundant with the pair sweep — they are the measurements the
+   * These are not redundant with the pair sweep , they are the measurements the
    * palette's *shape* rests on. If any of them moves, a documented design
    * decision has silently changed meaning.
    */
   it('blue fails as text on cream, which is why --primary-text exists', () => {
-    // 3.90:1 — the whole reason `primary` is a fill-only token.
+    // 3.90:1 , the whole reason `primary` is a fill-only token.
     expect(round2(contrastRatio('#007ACC', '#F4EDEA'))).toBe(3.9);
     expect(contrastRatio('#007ACC', '#F4EDEA')).toBeLessThan(TARGET.text);
   });
@@ -217,12 +217,12 @@ describe('the specific claims the palette was designed around', () => {
 
   it('a lime fill cannot be a lone graphical indicator in light mode', () => {
     /**
-     * 1.13:1 against the cream page — far below the 3:1 that WCAG 1.4.11 asks of
+     * 1.13:1 against the cream page , far below the 3:1 that WCAG 1.4.11 asks of
      * a graphical object conveying information. So in LIGHT mode:
      *
      *   fine    a badge or button, where the charcoal text inside (10.89:1) is
      *           what identifies the element
-     *   NOT fine a status dot, an indicator bar, an unlabelled chart mark — any
+     *   NOT fine a status dot, an indicator bar, an unlabelled chart mark , any
      *           lime shape that is the only carrier of meaning. Those need an
      *           outline or a darker companion colour.
      *
@@ -264,7 +264,7 @@ describe('glass tiers stay legible over every worst-case backdrop', () => {
   /**
    * Composited in GAMMA-encoded sRGB, which is what browsers do. Measuring this
    * in linear light reports a white glass over charcoal as ~38 8-bit steps
-   * lighter and flips failing muted text into passing — see the note on
+   * lighter and flips failing muted text into passing , see the note on
    * `compositeOver`.
    */
   const tiers: [name: keyof typeof glass, theme: ThemeName][] = [
@@ -285,27 +285,27 @@ describe('glass tiers stay legible over every worst-case backdrop', () => {
 
       it(`${tierName}: body text over ${backdrop} (composite ${surface})`, () => {
         const ratio = contrastRatio(themes[theme].fg, surface);
-        expect(ratio, `${round2(ratio)}:1 — needs ≥${TARGET.text}:1`).toBeGreaterThanOrEqual(
+        expect(ratio, `${round2(ratio)}:1 , needs ≥${TARGET.text}:1`).toBeGreaterThanOrEqual(
           TARGET.text,
         );
       });
 
       it(`${tierName}: muted-on-glass over ${backdrop} (composite ${surface})`, () => {
         const ratio = contrastRatio(themes[theme].mutedOnGlass, surface);
-        expect(ratio, `${round2(ratio)}:1 — needs ≥${TARGET.text}:1`).toBeGreaterThanOrEqual(
+        expect(ratio, `${round2(ratio)}:1 , needs ≥${TARGET.text}:1`).toBeGreaterThanOrEqual(
           TARGET.text,
         );
       });
     }
   }
 
-  it('the ordinary muted token is NOT safe on glass — this is why mutedOnGlass exists', () => {
+  it('the ordinary muted token is NOT safe on glass , this is why mutedOnGlass exists', () => {
     /**
      * A guard against someone "simplifying" the two tokens back into one.
      *
      * Note the failure is a WORST-CASE result, not a lime-specific one: over a
      * lime backdrop `mutedFg` actually measures a comfortable 5.40:1, and it is
-     * the DARK backdrops that sink it to 3.09:1 — a white glass at the alpha
+     * the DARK backdrops that sink it to 3.09:1 , a white glass at the alpha
      * floor over near-black is still translucent enough for the page to darken
      * it. Testing only the most colourful backdrop would have reported this pair
      * as safe.
@@ -349,7 +349,7 @@ function maxChannelDelta(a: string, b: string): number {
   return Math.max(...x.map((v, i) => Math.abs(v - y[i]!)));
 }
 
-/** Parse `rgba(r, g, b, a)` — the only translucent spelling these tokens use. */
+/** Parse `rgba(r, g, b, a)` , the only translucent spelling these tokens use. */
 function parseRgba(css: string): { hex: string; alpha: number } {
   const m = /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/.exec(css);
   if (!m) throw new Error(`Not an rgba() colour: ${css}`);
@@ -362,7 +362,7 @@ function parseRgba(css: string): { hex: string; alpha: number } {
   return { hex, alpha: Number(m[4]!) };
 }
 
-describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in disguise', () => {
+describe('THE PERCEPTIBILITY GATE , tier-S glass is not an opaque panel in disguise', () => {
   /**
    * The one gate in this file that is not about accessibility.
    *
@@ -386,14 +386,14 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
      * EVERY assertion below runs once PER SHEEN STOP.
      *
      * Tier S paints a two-stop gradient, and a gate that measured one colour
-     * would leave the other unmeasured — specifically the far stop, which is the
+     * would leave the other unmeasured , specifically the far stop, which is the
      * one that approaches a wall in both themes (light's bottom lands on the
      * floor exactly; dark's bottom is the stop nearest the page). Both stops are
      * real surfaces that real text sits on, so both owe every measurement the
      * flat fill used to owe.
      */
     for (const { name: stopName, composite } of r.stops) {
-      describe(`${pair.label} — ${stopName} stop @α${tier.alpha} → ${composite}`, () => {
+      describe(`${pair.label} , ${stopName} stop @α${tier.alpha} → ${composite}`, () => {
         it(`differs from --panel by ≥${PERCEPTIBILITY_FLOOR}/255 on some channel`, () => {
           const delta = maxChannelDelta(composite, r.panel);
           expect(
@@ -403,7 +403,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
               `THAT MEANS THE GLASS IS VISUALLY IDENTICAL TO AN OPAQUE PANEL: the blur costs a ` +
               `backdrop repaint per surface for no visual change, and blurring a uniform page ` +
               `returns that same uniform page.\n\n` +
-              `Fix it by TINTING that stop further off the panel — not by lowering the ` +
+              `Fix it by TINTING that stop further off the panel , not by lowering the ` +
               `alpha, which makes the composite drift over any backdrop that is not the page ` +
               `(--panel at α 0.50 lands on the same colour and drifts 11/255 in light, 31/255 ` +
               `in dark, against this tier's 3/255).`,
@@ -415,7 +415,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
           expect(
             delta,
             `The ${stopName} stop composites to ${composite}, only ${delta}/255 off the page ` +
-              `(${r.bg}) it is drawn on. A surface that matches the page is not a surface — ` +
+              `(${r.bg}) it is drawn on. A surface that matches the page is not a surface , ` +
               `the card boundary would be carried entirely by its 1px border.\n\n` +
               `Light's BOTTOM stop sits on this floor by design: it is the widest sheen light ` +
               `mode has. If you are here after moving --bg or --panel, the sheen has to narrow, ` +
@@ -426,7 +426,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
         it('reads as RAISED off the page, not recessed into it', () => {
           /**
            * Direction matters as much as magnitude. A tier-S composite DARKER than
-           * the page satisfies both deltas above and still looks wrong — a card is
+           * the page satisfies both deltas above and still looks wrong , a card is
            * elevation, and elevation reads lighter in both themes.
            *
            * This is the assertion the sheen is most likely to break, and the
@@ -452,7 +452,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
            * The load-bearing difference between the tiers. Tier O has to step muted
            * text up to `--muted-on-glass` because its backdrop is unknown and the
            * ordinary token sinks to 3.09:1 against the worst of them. Tier S knows
-           * its backdrop, and the ordinary token clears AA on both stops — so
+           * its backdrop, and the ordinary token clears AA on both stops , so
            * `.glass-surface` deliberately does NOT set the override, and darkening
            * every secondary label in the product is not the price of this retrofit.
            */
@@ -461,7 +461,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
             ratio,
             `--muted-fg (${r.mutedFg}) on ${composite} = ${round2(ratio)}:1. If this drops ` +
               `below ${TARGET.text}:1, .glass-surface has to start overriding --muted-fg the ` +
-              `way .glass does — see css/glass.css.`,
+              `way .glass does , see css/glass.css.`,
           ).toBeGreaterThanOrEqual(TARGET.text);
         });
 
@@ -470,7 +470,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
            * NOT a 1.4.11 gate: `--border` is CONTRAST_EXEMPT because a card
            * outline is decorative, and the tier-S border is the same kind of line.
            * It is asserted anyway because in LIGHT mode it is most of the material
-           * — measured 1.60:1, tuned to match what the opaque `--border` shows on
+           * , measured 1.60:1, tuned to match what the opaque `--border` shows on
            * `--panel` (1.61:1), where the tier-O border at α 0.10 would give only
            * 1.21:1. Dark measures 1.50:1 against the opaque pairing's 1.15:1.
            *
@@ -495,7 +495,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
        *
        * Everything else here asks whether each stop is distinguishable from the
        * page and the panel. Nothing else asks whether the stops are
-       * distinguishable from EACH OTHER — and two identical stops satisfy every
+       * distinguishable from EACH OTHER , and two identical stops satisfy every
        * assertion in this file while rendering exactly the flat fill the sheen
        * replaced. Same failure shape as an invisible glass card: green suite,
        * absent feature.
@@ -503,7 +503,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
        * Deliberately asserted as ≥2/255 rather than the perceptibility floor of 8.
        * A sheen is a RAMP across a whole surface, not an edge between two
        * adjacent patches, and gradient detection runs well below step-edge
-       * detection — 8/255 is simply not available here (the legal maximum is 5 in
+       * detection , 8/255 is simply not available here (the legal maximum is 5 in
        * light and 4 in dark, both walls being spent twice). 2/255 is the floor
        * below which the ramp is arithmetic rather than something a person sees.
        */
@@ -525,7 +525,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
     it(`${pair.label} differs from the page by ≥${PERCEPTIBILITY_FLOOR}/255`, () => {
       /**
        * The tier-O half of this gate, added 2026-08-06 after the dark overlay
-       * was found composting to 0/255 — literally the page colour — because its
+       * was found composting to 0/255 , literally the page colour , because its
        * surface token WAS the page token. See {@link GLASS_OVERLAY_PAIRS} for
        * why this measures against `--bg` only and never `--panel`.
        */
@@ -535,7 +535,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
         `Tier-O glass (${tier.surface} @α${tier.alpha}) composites over the page to ` +
           `${r.composite}, only ${delta}/255 off the page (${r.bg}) it floats above.\n\n` +
           `A Dialog survives this because --overlay scrims its backdrop first, but a Popover, ` +
-          `DropdownMenu, CommandPalette or Toast has no scrim — it would be carried entirely ` +
+          `DropdownMenu, CommandPalette or Toast has no scrim , it would be carried entirely ` +
           `by its 1px border.\n\n` +
           `Fix it by TINTING the tier-O surface off the page, not by lowering the alpha, and ` +
           `re-check the seven-backdrop legibility sweep above: lifting the dark surface as far ` +
@@ -544,7 +544,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
     });
   }
 
-  it('the specular highlight is a DARK-MODE-ONLY material — you cannot lighten white', () => {
+  it('the specular highlight is a DARK-MODE-ONLY material , you cannot lighten white', () => {
     /**
      * The measurement the whole asymmetry rests on, and the reason light mode
      * gets a firmer border and a bottom-weighted shadow instead of a lit edge.
@@ -559,7 +559,7 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
      * Measured against the TOP stop of the sheen, and only that one: the
      * highlight is an `inset 0 1px 0` box-shadow, so the single row of pixels it
      * paints is the top edge of the surface. It is also the lightest stop, which
-     * makes it the hardest place for a white highlight to show — so light mode
+     * makes it the hardest place for a white highlight to show , so light mode
      * failing to be invisible here would mean it is visible everywhere.
      */
     const [light, dark] = GLASS_SURFACE_PAIRS.map(
@@ -580,12 +580,12 @@ describe('THE PERCEPTIBILITY GATE — tier-S glass is not an opaque panel in dis
     expect(parseRgba(glass.surfaceDark.highlight).alpha).toBe(GLASS_SPECULAR_ALPHA);
   });
 
-  it('tier S keeps tier O’s alpha — the tint carries it, not the transparency', () => {
+  it('tier S keeps tier O’s alpha , the tint carries it, not the transparency', () => {
     /**
      * Dropping the alpha is the tempting way to make tier S visible, and it is
      * wrong: `--panel` at α 0.50 lands on an almost identical composite, then
      * drifts 11/255 (light) and 31/255 (dark) the moment the surface sits over
-     * anything but the page — a `bg2` well, a selected row, the plum
+     * anything but the page , a `bg2` well, a selected row, the plum
      * `--elevated`. The tinted surfaces at α 0.85 drift 3/255.
      */
     for (const pair of GLASS_SURFACE_PAIRS) {

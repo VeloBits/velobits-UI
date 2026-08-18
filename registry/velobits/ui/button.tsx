@@ -8,7 +8,7 @@ import { cn } from '../lib/cn';
 /**
  * ## Why there is no `primary`-coloured text variant
  *
- * `--primary` (#007ACC) measures 3.90:1 on the cream page — fine as a fill
+ * `--primary` (#007ACC) measures 3.90:1 on the cream page , fine as a fill
  * behind white text (4.51:1), failing AA as text. The `link` variant therefore
  * uses `text-link` (`--primary-text`, 5.34:1), and no variant paints
  * `--primary` on a page background.
@@ -17,7 +17,7 @@ import { cn } from '../lib/cn';
  *
  * Controls are `--radius-md` (6px) system-wide. The Keycloak login theme's
  * vended `button.tsx` hardcodes `rounded-full`, so adopting this shared radius
- * is what makes login buttons stop being pills — an accepted consequence,
+ * is what makes login buttons stop being pills , an accepted consequence,
  * reversible by overriding `--keycloakify-shadcn-radius`.
  *
  * ## RTL
@@ -31,7 +31,7 @@ const buttonVariants = cva(
     'rounded-md text-sm font-medium',
     // `transition-[colors,transform]`, not `transition-all`: the press below moves
     // a transform, and `all` would also animate width/height when a label changes
-    // — which reads as the button inflating rather than as a press.
+    // , which reads as the button inflating rather than as a press.
     'transition-[color,background-color,border-color,transform] duration-micro ease-out',
     // The visible ring comes from the token layer's global :focus-visible rule.
     // This adds the soft halo; `outline-none` only suppresses the UA default.
@@ -52,14 +52,14 @@ const buttonVariants = cva(
     'active:scale-[0.985] motion-reduce:active:scale-100',
     'disabled:pointer-events-none disabled:opacity-50',
     /*
-     * `aria-disabled` suppresses the PRESS only — never pointer events, and never
+     * `aria-disabled` suppresses the PRESS only , never pointer events, and never
      * the opacity.
      *
      * In this system `aria-disabled` is a message to assistive tech, not a
      * behaviour: `Pagination` marks an unavailable page that way and swallows the
      * click in JS, deliberately keeping the element focusable and hit-testable.
      * `pointer-events-none` here would stop it receiving the very click that guard
-     * exists to catch, and suppresses the focus ring on some platforms — so it is
+     * exists to catch, and suppresses the focus ring on some platforms , so it is
      * `disabled:`-only above, and `pagination.test.tsx` asserts the bare class
      * never reaches an aria-disabled control.
      *
@@ -76,13 +76,13 @@ const buttonVariants = cva(
       variant: {
         primary: 'bg-primary text-on-primary control-raised hover:bg-primary-hover',
         /**
-         * The lime brand fill. `text-on-brand` is charcoal at 10.89:1 — the only
+         * The lime brand fill. `text-on-brand` is charcoal at 10.89:1 , the only
          * sanctioned pairing on lime. White on lime is 1.31:1, which is why no
          * white-on-brand variant exists to reach for by mistake.
          *
          * `hover:bg-brand-hover`, not `hover:brightness-95`. A filter is outside
          * the palette: nothing measures it, and it composites against whatever is
-         * behind the button — so the same hover rendered one colour on an opaque
+         * behind the button , so the same hover rendered one colour on an opaque
          * panel and another on a glass surface. The token is measured (charcoal on
          * it is 9.73:1, so lime's only legal pairing survives the hover).
          */
@@ -92,7 +92,7 @@ const buttonVariants = cva(
         /**
          * `text-on-danger`, NOT `text-on-primary`.
          *
-         * This was `text-on-primary` — white — and in dark mode that measured
+         * This was `text-on-primary` , white , and in dark mode that measured
          * **2.45:1** against AA's 4.5. `--danger` is a LIGHT red in dark mode
          * because the same token also has to work as text on a dark surface, and
          * nothing gated the fill-with-text-on-it combination. `--on-danger` is
@@ -106,7 +106,7 @@ const buttonVariants = cva(
         sm: 'h-8 px-3 text-xs',
         md: 'h-9 px-4',
         lg: 'h-10 px-6',
-        /** Square, for an icon-only button — which needs an `aria-label`. */
+        /** Square, for an icon-only button , which needs an `aria-label`. */
         icon: 'size-9',
       },
     },
@@ -118,7 +118,7 @@ export interface ButtonProps
   extends React.ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   /**
    * Render the single child element instead of a `<button>`, forwarding these
-   * classes onto it — for wrapping a router `<Link>` without nesting an anchor
+   * classes onto it , for wrapping a router `<Link>` without nesting an anchor
    * inside a button.
    */
   asChild?: boolean;

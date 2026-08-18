@@ -18,7 +18,7 @@ function Inside() {
         <TooltipTrigger asChild>
           <Button variant="secondary">Hover me</Button>
         </TooltipTrigger>
-        {/* No TooltipProvider here — the one inside VelobitsProvider is it. */}
+        {/* No TooltipProvider here , the one inside VelobitsProvider is it. */}
         <TooltipContent>The provider supplied this TooltipProvider.</TooltipContent>
       </Tooltip>
       <span className="text-muted-foreground">
