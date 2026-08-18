@@ -35,6 +35,18 @@ import { CodePanel } from './code-panel';
  * Show the material anywhere else and these pages stop corroborating the gate,
  * which is most of what they are for.
  *
+ * ── WHY THE FRAME HUGS ITS CONTENT ────────────────────────────────────────
+ *
+ * The frame used to be `min-h-[22rem]`, so every demo got the same tall box
+ * whatever it held. A pair of Inputs sat marooned in the middle of it while a
+ * DataTable overflowed, which reads as a layout bug rather than a frame, and it
+ * made small components look broken next to large ones.
+ *
+ * The height now comes from the demo. The remaining `min-h-[6rem]` is a floor,
+ * not a size: it stops a lone Badge collapsing the frame into a strip too thin
+ * to read as a boundary. Anything taller than the floor simply sets its own
+ * height, so the frame adapts to what is rendered in it.
+ *
  * `--bg` is the one value in the ramp that NO component paints as its own fill,
  * so it is the only backdrop that can never collide. Hence: no background, a
  * dashed hairline to say "boundary, not surface", and the page shows through.
@@ -82,7 +94,7 @@ export function ComponentPreview({
         <div
           className={[
             'rounded-xl border border-dashed border-border p-6',
-            center ? 'flex min-h-[22rem] items-center justify-center' : '',
+            center ? 'flex min-h-[6rem] items-center justify-center' : '',
           ].join(' ')}
         >
           <div className={center ? 'w-full max-w-full' : undefined}>

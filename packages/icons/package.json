@@ -1,7 +1,7 @@
 {
   "name": "@velobitsio/icons",
   "version": "0.1.0",
-  "description": "VeloBits icon set , 88 hand-drawn stroke icons on a 24×24 grid, tuned for 13-18px rendering.",
+  "description": "VeloBits icon set: 201 hand-drawn stroke icons on a 24×24 grid, tuned for 13-18px rendering.",
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
@@ -74,7 +74,7 @@
       "name": "the whole set",
       "path": "dist/index.js",
       "import": "*",
-      "limit": "6 kB"
+      "limit": "9 kB"
     }
   ]
 }

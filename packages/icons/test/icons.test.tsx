@@ -18,12 +18,12 @@ const entries = Object.entries(iconsModule).filter(
  * relies on (24×24 grid, currentColor, decorative by default).
  */
 describe('the icon set', () => {
-  it('exports exactly 88 icons', () => {
+  it('exports exactly 201 icons', () => {
     /**
      * 52 from the dashboard app + 55 from the editor app, sharing 19 names. If this number
      * changes without a changeset, an icon was added or lost by accident.
      */
-    expect(entries.length).toBe(88);
+    expect(entries.length).toBe(201);
   });
 
   it('has no duplicate or case-colliding names', () => {

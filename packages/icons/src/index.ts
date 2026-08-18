@@ -1,7 +1,7 @@
 /**
  * @velobitsio/icons , the unified VeloBits icon set.
  *
- * 88 hand-drawn stroke icons, merged from the two sets that had independently
+ * 201 hand-drawn stroke icons, merged from the sets that had independently
  * diverged in the dashboard app and the editor app. Every existing name is
  * preserved.
  *

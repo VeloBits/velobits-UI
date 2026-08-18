@@ -130,7 +130,7 @@ velobits-UI/
 ├── registry/registry.ts      → registry.json → apps/docs/public/r/*.json
 ├── packages/
 │   ├── tokens/  @velobitsio/tokens   CSS + TS. ZERO deps, ZERO React.
-│   ├── icons/   @velobitsio/icons    88 hand-drawn stroke icons
+│   ├── icons/   @velobitsio/icons   201 hand-drawn stroke icons
 │   └── ui/      @velobitsio/ui       builds from registry/velobits
 ├── scripts/
 │   ├── build-registry.ts     validates + compiles the shadcn registry
