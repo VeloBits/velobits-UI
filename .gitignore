@@ -32,6 +32,7 @@ apps/docs/public/search-index.json
 
 .claude*
 *swarm*
+*db*
 
 # NOT ignored, deliberately:
 #   registry.json             the shadcn CLI manifest. Generated from
