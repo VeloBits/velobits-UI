@@ -72,9 +72,32 @@ jobs:
             exit 1
           fi
 
-          if ! who=$(npm whoami --registry=https://registry.npmjs.org 2>&1); then
-            echo "$who"
+          if ! raw=$(npm whoami --registry=https://registry.npmjs.org 2>&1); then
+            echo "$raw"
             echo "::error::NPM_TOKEN does not resolve to an npm account — it is revoked, expired, or not an npm token. Issue a new one and update the secret."
+            exit 1
+          fi
+
+          # `2>&1` above is deliberate — on failure the reason is on stderr and is
+          # the only useful output. But it means npm's own chatter lands in the same
+          # capture on SUCCESS, and setup-node writes `always-auth` into the temp
+          # .npmrc it generates, so npm warns about an unknown config on every
+          # single invocation. Taken raw, $who becomes that warning paragraph WITH
+          # the username at the end, and every later comparison is against prose.
+          #
+          # That is not hypothetical: it made this step report the org owner as "NOT
+          # a member" while printing `{"velobits-team":"owner"}` two lines below, an
+          # error that disproved itself. Strip npm's prefixes and take the last real
+          # line, which is the identity.
+          who=$(printf '%s\n' "$raw" \
+            | sed -e 's/\r$//' \
+            | grep -vE '^npm (warn|notice|error|WARN)' \
+            | grep -vE '^[[:space:]]*$' \
+            | tail -n1)
+
+          if [ -z "$who" ]; then
+            echo "$raw"
+            echo "::error::Could not parse an npm username out of \`npm whoami\`. Output above."
             exit 1
           fi
           echo "Publishing as npm user: $who"

@@ -78,12 +78,13 @@ if (danglingDeps.length) {
  * work against. The rewrite happens here, on the way out, so exactly one
  * representation is published and it is the one the CLI can resolve.
  *
- * Absolute URLs rather than the namespaced `@velobits/cn` form on purpose: a
- * namespaced dependency only resolves for a consumer who has already added the
- * namespace to their `components.json`, which would silently break the
- * zero-config `add https://ui.velobits.dev/r/button.json` path we document as the
- * fallback. A URL resolves for everyone, with no configuration and on any CLI
- * version.
+ * Absolute URLs rather than the namespaced `@velobits/cn` form on purpose, even
+ * though `@velobits` is a registered namespace and would now resolve for most
+ * consumers. A namespaced dependency resolves only where the namespace does —
+ * through shadcn's public index, or an explicit `registries` mapping — so it
+ * would quietly fail on an older CLI and inside an air-gapped mirror, both of
+ * which we document as supported. A URL depends on nothing: not the consuming
+ * repo's config, not the index, not the CLI version.
  *
  * `REGISTRY_BASE_URL` exists so a build can be pointed at a local server and
  * genuinely verified end to end — otherwise a localhost install would quietly
@@ -224,4 +225,4 @@ console.log(`\ncompiled → apps/docs/public/r/`);
 console.log('Consumers install with:');
 console.log('  npx shadcn@latest add @velobits/velobits   # everything');
 console.log('  npx shadcn@latest add @velobits/button     # one component');
-console.log('(after adding the @velobits namespace to components.json — see /docs/registry)');
+console.log('(@velobits is a registered shadcn namespace — no consumer config needed)');

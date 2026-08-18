@@ -39,12 +39,14 @@ Create it with `npx shadcn@latest init`, or write it yourself.
 
 ## registries
 
-The field that makes `@velobits/button` resolve. `{name}` is replaced with the
-item name, so `@velobits/button` fetches
-`https://ui.velobits.dev/r/button.json`.
+**Optional for VeloBits.** `@velobits` is a registered shadcn namespace, so a
+current CLI resolves `@velobits/button` through the public index with no entry
+here at all.
 
-Needs **shadcn CLI v3 or newer**. Without it, install by full URL instead — same
-files, no config. See [Registry](/docs/registry).
+Add one anyway to _pin_ the origin — an older CLI, an internal mirror, a staging
+copy. An explicit mapping takes precedence over the index. `{name}` is replaced
+with the item name, so `@velobits/button` fetches
+`https://ui.velobits.dev/r/button.json`. See [Registry](/docs/registry).
 
 ## aliases.ui
 

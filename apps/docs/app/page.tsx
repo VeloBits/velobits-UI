@@ -74,11 +74,11 @@ export default function HomePage() {
             {`npx shadcn@latest add ${namespacedItem('velobits')}`}
           </CodeBlock>
           <p className="mt-2 text-sm text-muted-foreground">
-            Add the{' '}
+            A{' '}
             <Link href="/docs/registry" className="text-link underline underline-offset-4">
-              registry namespace
+              registered shadcn namespace
             </Link>{' '}
-            once, then install anything by name.
+            — nothing to configure. Install anything by name.
           </p>
         </div>
       </section>
