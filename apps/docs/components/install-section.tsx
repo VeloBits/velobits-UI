@@ -17,7 +17,7 @@ import { LayersIcon } from '@velobitsio/icons';
 
 import type { DocRegistryItem } from '@/lib/generated/registry-data';
 import { componentHref } from '@/lib/docs-nav';
-import { itemUrl, namespacedItem, REGISTRY_CONFIG_SNIPPET, REGISTRY_NAMESPACE } from '@/lib/site';
+import { itemUrl, namespacedItem, REGISTRY_NAMESPACE } from '@/lib/site';
 
 import { CodePanel } from './code-panel';
 import { CommandSnippet, InstallSnippet } from './command-snippet';
@@ -50,28 +50,36 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
             command={`shadcn@latest add ${namespacedItem(item.name)}`}
             label={`install ${item.name}`}
           />
-          <Alert variant="info">
+          {/*
+           * No setup step. `@velobits` is registered in shadcn's public index, so
+           * the command above works in any project that has run `shadcn init`.
+           * This block used to open with "One-time setup" and a components.json
+           * snippet; keeping that would now be telling every reader to do
+           * something they do not need to do.
+           */}
+          <Alert>
             <LayersIcon />
-            <AlertTitle>One-time setup</AlertTitle>
+            <AlertTitle>Nothing to configure</AlertTitle>
             <AlertDescription>
               <p>
-                <code>{REGISTRY_NAMESPACE}</code> resolves once you add it to your{' '}
-                <code>components.json</code>. Full instructions on the{' '}
-                <Link href="/docs/registry" className="text-link underline underline-offset-4">
-                  Registry
-                </Link>{' '}
-                page.
+                <code>{REGISTRY_NAMESPACE}</code> is a registered shadcn namespace, so it resolves
+                out of the box — no <code>components.json</code> entry needed.
               </p>
-              <CodeBlock language="json" copyable label="components.json" className="mt-3">
-                {REGISTRY_CONFIG_SNIPPET}
-              </CodeBlock>
               <p className="mt-3">
-                Without it — or on a CLI older than v3 — the full URL works anywhere and needs no
-                configuration:
+                Two cases still want an explicit form: a CLI too old to know the index, or pinning
+                the origin (a staging mirror, an air-gapped copy). Either way the full URL is
+                addressable directly:
               </p>
               <CodeBlock variant="terminal" wrap copyable label="install by URL" className="mt-2">
                 {`npx shadcn@latest add ${itemUrl(item.name)}`}
               </CodeBlock>
+              <p className="mt-3">
+                The{' '}
+                <Link href="/docs/registry" className="text-link underline underline-offset-4">
+                  Registry
+                </Link>{' '}
+                page covers pinning, <code>view</code> and <code>search</code>.
+              </p>
             </AlertDescription>
           </Alert>
         </TabsContent>

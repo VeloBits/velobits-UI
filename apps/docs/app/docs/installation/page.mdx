@@ -19,8 +19,9 @@ preference.
 
 ## shadcn CLI
 
-This is a standard shadcn registry, so the setup is shadcn's own — VeloBits adds
-one line to it. Three steps from nothing.
+`@velobits` is a **registered shadcn namespace**, so there is nothing to add to
+your `components.json` — a current CLI resolves it out of the box. Two steps from
+nothing, and the second one is the install.
 
 ### 1. Set up shadcn
 
@@ -52,9 +53,29 @@ string on v4 by design.
 You can also skip `init` entirely and hand-write `components.json` — the CLI only
 needs that file plus a `tsconfig.json` whose `paths` resolve your aliases.
 
-### 2. Add the VeloBits registry
+### 2. Install components
 
-One entry in the `registries` block, once:
+```bash
+npx shadcn@latest add @velobits/velobits   # the whole system
+npx shadcn@latest add @velobits/button     # one component
+```
+
+Each item pulls its own npm dependencies and any other registry items it imports,
+so `add @velobits/data-table` also brings `table`, `cn` and `use-row-selection`
+without you naming them.
+
+Each item is also addressable by its full URL, which needs no index lookup and
+works on any CLI version:
+
+```bash
+npx shadcn@latest add https://ui.velobits.dev/r/button.json
+```
+
+### Pinning the origin
+
+Namespace resolution goes through shadcn's public index. If you would rather your
+build not depend on that — an older CLI, an air-gapped mirror, or pointing at a
+staging copy — map `@velobits` explicitly and it takes precedence:
 
 ```json
 {
@@ -66,25 +87,8 @@ One entry in the `registries` block, once:
 ```
 
 `{name}` is substituted per item, so `@velobits/button` fetches
-`https://ui.velobits.dev/r/button.json`.
-
-### 3. Install components
-
-```bash
-npx shadcn@latest add @velobits/velobits   # the whole system
-npx shadcn@latest add @velobits/button     # one component
-```
-
-Each item pulls its own npm dependencies and any other registry items it imports,
-so `add @velobits/data-table` also brings `table`, `cn` and `use-row-selection`
-without you naming them.
-
-Namespaced registries need **shadcn CLI v3 or newer**. On anything older, or for a
-one-off with no config at all, the full URL works everywhere:
-
-```bash
-npx shadcn@latest add https://ui.velobits.dev/r/button.json
-```
+`https://ui.velobits.dev/r/button.json`. Everything else below is identical
+either way.
 
 ### Where the files land
 
