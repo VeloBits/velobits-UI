@@ -46,7 +46,7 @@ import ts from 'typescript';
 import { registry } from '../registry/registry.ts';
 import { COMPONENT_CONTENT } from '../apps/docs/content/components.ts';
 import { COMPONENT_GROUPS, GROUPED_COMPONENT_NAMES, GUIDE_NAV } from '../apps/docs/lib/docs-nav.ts';
-import { displayTarget, targetFor } from './registry-layout.ts';
+import { displayTarget, importSpecifierFor, targetFor } from './registry-layout.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const docsDir = join(root, 'apps/docs');
@@ -110,6 +110,102 @@ if (ungrouped.length || phantom.length) {
   process.exit(1);
 }
 
+/* ── The CLI variant of an example ─────────────────────────────────────────── */
+
+/**
+ * Which installed file each exported name comes from.
+ *
+ * The npm package has a barrel, so an example imports `{ Card, CardHeader }` from
+ * `@velobitsio/ui` in one line. The CLI installs one file per component and no
+ * barrel at all, so the same example is several import lines, and which line a
+ * name belongs on is decided by the registry item that exports it.
+ *
+ * Parsed from the sources rather than listed, for the same reason the icon grid
+ * enumerates its module: a hand-kept table of 215 exports is a table that goes
+ * stale, and the failure is silent because a wrong import still renders here.
+ */
+const ownerOf = new Map<string, string>();
+for (const item of registry.items) {
+  for (const file of item.files ?? []) {
+    const src = readFileSync(join(root, file.path), 'utf8');
+    const names = new Set<string>();
+    const declared = /^export\s+(?:const|function|class|interface|type|enum)\s+([A-Za-z0-9_]+)/gm;
+    for (const m of src.matchAll(declared)) names.add(m[1]);
+    for (const m of src.matchAll(/^export\s*\{([^}]+)\}/gm)) {
+      for (const part of m[1].split(',')) {
+        const name = part
+          .trim()
+          .split(/\s+as\s+/)
+          .pop()
+          ?.trim()
+          .replace(/^type\s+/, '');
+        if (name) names.add(name);
+      }
+    }
+    for (const name of names) if (!ownerOf.has(name)) ownerOf.set(name, file.path);
+  }
+}
+
+/** One import line, wrapped the way Prettier would wrap it at 100 columns. */
+function importLine(specifier: string, names: string[], typeOnly: boolean): string {
+  const kind = typeOnly ? 'import type' : 'import';
+  const oneLine = `${kind} { ${names.join(', ')} } from '${specifier}';`;
+  if (oneLine.length <= 100) return oneLine;
+  const body = names.map((n) => `  ${n},`).join('\n');
+  return `${kind} {\n${body}\n} from '${specifier}';`;
+}
+
+/**
+ * Rewrites an example's `@velobitsio/ui` imports into the per-file imports a CLI
+ * consumer writes, and leaves every other import alone.
+ *
+ * `@velobitsio/icons` and `@velobitsio/tokens` deliberately survive untouched: the
+ * registry items declare those two as npm DEPENDENCIES, so a CLI consumer installs
+ * them from npm and imports them exactly as an npm consumer does. Rewriting them
+ * would describe an install that never happens.
+ *
+ * Returns null when a name cannot be attributed to a file, which the caller turns
+ * into a build failure. The alternative is an example shown with a stale import,
+ * and since nothing in this repo compiles the installed output, nothing else would
+ * catch it.
+ */
+function toCliSource(source: string): string | null {
+  let unresolved: string | null = null;
+
+  const barrel = /^import\s+(type\s+)?\{([^}]+)\}\s+from\s+'@velobitsio\/ui(?:\/[a-z-]+)?';$/gm;
+
+  const out = source.replace(barrel, (line, typeOnly: string | undefined, inner: string) => {
+    const groups = new Map<string, string[]>();
+    for (const raw of inner.split(',')) {
+      const spec = raw.trim();
+      if (!spec) continue;
+      const isType = /^type\s+/.test(spec);
+      const bare = spec.replace(/^type\s+/, '');
+      const name = bare.split(/\s+as\s+/)[0].trim();
+      const path = ownerOf.get(name);
+      if (!path) {
+        unresolved = name;
+        return line;
+      }
+      const specifier = importSpecifierFor(path);
+      if (!groups.has(specifier)) groups.set(specifier, []);
+      groups.get(specifier)!.push(typeOnly || !isType ? bare : `type ${bare}`);
+    }
+    return [...groups.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([specifier, names]) => importLine(specifier, names.sort(), Boolean(typeOnly)))
+      .join('\n');
+  });
+
+  if (unresolved) {
+    console.error(
+      `${unresolved} is imported from '@velobitsio/ui' by an example, but no registry item exports it, so the CLI tab cannot say which file it comes from`,
+    );
+    return null;
+  }
+  return out;
+}
+
 /* ── 1. Examples ───────────────────────────────────────────────────────────── */
 
 const exampleFiles = existsSync(examplesDir)
@@ -134,12 +230,23 @@ for (const [index, file] of exampleFiles.entries()) {
   // A path alias rather than a relative one: this file lives in `lib/generated`,
   // and `../../registry/examples/x` is only correct while it stays there.
   exampleImports.push(`import ${ident} from '@/registry/examples/${name}';`);
+
+  // The same example as a CLI consumer would write it. A null here is a real
+  // failure rather than a missing nicety: it means an example imports something
+  // no registry item exports, so one of the two distributions cannot run it.
+  const cliSource = toCliSource(source);
+  if (cliSource === null) {
+    console.error(`could not build the CLI import variant of ${file}`);
+    process.exit(1);
+  }
   exampleEntries.push(
     `  ${JSON.stringify(name)}: {\n` +
       `    name: ${JSON.stringify(name)},\n` +
       `    Component: ${ident},\n` +
       `    source: ${JSON.stringify(source)},\n` +
       `    html: ${JSON.stringify(await highlight(source, 'tsx'))},\n` +
+      `    sourceCli: ${JSON.stringify(cliSource)},\n` +
+      `    htmlCli: ${JSON.stringify(await highlight(cliSource, 'tsx'))},\n` +
       `  },`,
   );
 }
@@ -156,6 +263,10 @@ writeFileSync(
     `  source: string;\n` +
     `  /** The same source, highlighted at build time. */\n` +
     `  html: string;\n` +
+    `  /** The same example, importing the per-file paths the shadcn CLI installs. */\n` +
+    `  sourceCli: string;\n` +
+    `  /** The CLI variant, highlighted at build time. */\n` +
+    `  htmlCli: string;\n` +
     `}\n\n` +
     `export const examples: Record<string, DocExample> = {\n` +
     exampleEntries.join('\n') +

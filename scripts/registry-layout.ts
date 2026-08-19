@@ -104,3 +104,26 @@ export const IMPORT_REWRITES: [RegExp, string][] = [
   // `./use-theme`, `./theme`.
   [/(['"])\.\.\/[a-z-]+\/([a-z-]+)\1/g, "'./$2'"],
 ];
+
+/**
+ * The specifier a CONSUMER writes to import from an installed file.
+ *
+ * `registry/velobits/ui/button.tsx` → `@/components/ui/velobits/button`, and
+ * `registry/velobits/lib/cn.ts` → `@/lib/utils`.
+ *
+ * This exists so the docs can show example code the way someone who installed via
+ * the CLI would actually write it. The npm half imports the barrel
+ * (`@velobitsio/ui`); the CLI half has one file per component and no barrel at
+ * all, so the same example is a different set of import lines depending on which
+ * distribution the reader took. Deriving both from here means neither can drift
+ * from the paths `targetFor` stamps.
+ *
+ * Spelled with the DEFAULT aliases, for the same reason `displayTarget` is: a
+ * reader with a custom `aliases.ui` substitutes their own prefix, and the docs say
+ * so once rather than per line.
+ */
+export function importSpecifierFor(path: string): string {
+  const target = targetFor(path);
+  if (target === UTILS_TARGET) return UTILS_IMPORT;
+  return `@/${displayTarget(target).replace(/\.(tsx?|ts)$/, '')}`;
+}

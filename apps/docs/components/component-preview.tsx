@@ -81,7 +81,7 @@ export function ComponentPreview({
     );
   }
 
-  const { Component, source, html } = example;
+  const { Component, source, html, sourceCli, htmlCli } = example;
 
   return (
     <Tabs defaultValue="preview" className="my-6">
@@ -104,7 +104,42 @@ export function ComponentPreview({
       </TabsContent>
 
       <TabsContent value="code" className="pt-3">
-        <CodePanel html={html} source={source} label={name} maxHeight="34rem" />
+        {/*
+         * Two variants, because this library ships twice and the import lines are
+         * the one part of an example that differs between them. The npm half has a
+         * barrel; the CLI half installs one file per component and has no barrel at
+         * all, so a single listing is necessarily wrong for one set of readers.
+         *
+         * Both are generated from the same file by `build-docs-data.ts`, off the
+         * same targets the CLI is stamped with, so neither can drift from the
+         * paths a real install produces.
+         *
+         * CLI first, to match the Installation tabs above it.
+         */}
+        <Tabs defaultValue="cli">
+          <TabsList variant="line">
+            <TabsTrigger value="cli">shadcn CLI</TabsTrigger>
+            <TabsTrigger value="npm">npm</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="cli" className="pt-3">
+            <CodePanel
+              html={htmlCli}
+              source={sourceCli}
+              label={`${name} with CLI imports`}
+              maxHeight="34rem"
+            />
+          </TabsContent>
+
+          <TabsContent value="npm" className="pt-3">
+            <CodePanel
+              html={html}
+              source={source}
+              label={`${name} with npm imports`}
+              maxHeight="34rem"
+            />
+          </TabsContent>
+        </Tabs>
       </TabsContent>
     </Tabs>
   );
