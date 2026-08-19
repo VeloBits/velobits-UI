@@ -139,15 +139,22 @@ Installing one item brings what it needs: `add @velobits/data-table` also instal
 ## The agent skill is itself an installable item
 
 ```bash
-npx shadcn@latest add https://ui.velobits.dev/r/skill.json          # .claude/skills/
-npx shadcn@latest add https://ui.velobits.dev/r/skill-cursor.json   # .cursor/rules/
+npx shadcn@latest add @velobits/skill          # .claude/skills/velobits-ui/
+npx shadcn@latest add @velobits/skill-cursor   # .cursor/rules/
 ```
 
 Either one writes this guidance into the project, so an agent working in that repo
 has it without being handed it. They are `registry:file` items, not components, so
-they appear in neither the sidebar nor `shadcn search`, and installing one pulls in
-no dependencies and touches no source file. Both need a `components.json` in the
-project like any other `add`; without one, fetch the files directly:
+installing one pulls in no dependencies and touches no source file.
+
+**They resolve by namespace but do not appear in `search`,** and those two facts are
+not in tension. `search` reads `/r/registry.json`, the component index, which these
+are deliberately absent from. `add` never consults it: the public index maps
+`@velobits` to the template `https://ui.velobits.dev/r/{name}.json` and substitutes
+the name, so any file this registry serves resolves, indexed or not.
+
+Both need a `components.json` in the project like any other `add`; without one, fetch
+the files directly:
 
 ```bash
 curl -sSfL https://ui.velobits.dev/skills/velobits-ui/SKILL.md -o SKILL.md

@@ -49,8 +49,16 @@ interface ScriptSpec {
 interface Recipe {
   /** One line, in prose: where this combination puts things. */
   lands: string;
-  /** The shadcn one-liner, where one exists. */
-  cli?: string;
+  /**
+   * The shadcn one-liner, where one exists.
+   *
+   * `item` is the namespaced form, which is what to type: `@velobits` is a
+   * registered namespace, and shadcn's public index maps it to a URL TEMPLATE
+   * (`https://ui.velobits.dev/r/{name}.json`), not to a list of items, so a name
+   * absent from our own index still resolves. `url` is the same item spelled out,
+   * for a CLI too old to know about the index or a machine that cannot reach it.
+   */
+  cli?: { item: string; url: string };
   /** Fetches the files with no CLI and no config. */
   script?: ScriptSpec;
   /** For a target that is a text box rather than a path. */
@@ -63,7 +71,7 @@ const POINTER = `Before writing or reviewing UI, read the VeloBits skill`;
 const RECIPES: Record<string, Recipe> = {
   'claude:project': {
     lands: `.claude/skills/${SKILL_NAME}/`,
-    cli: `npx shadcn@latest add ${ORIGIN}/r/skill.json`,
+    cli: { item: '@velobits/skill', url: `${ORIGIN}/r/skill.json` },
     script: {
       dir: `.claude/skills/${SKILL_NAME}`,
       entry: { from: 'SKILL.md', to: 'SKILL.md' },
@@ -89,7 +97,7 @@ const RECIPES: Record<string, Recipe> = {
   },
   'cursor:project': {
     lands: `.cursor/rules/${SKILL_NAME}.mdc`,
-    cli: `npx shadcn@latest add ${ORIGIN}/r/skill-cursor.json`,
+    cli: { item: '@velobits/skill-cursor', url: `${ORIGIN}/r/skill-cursor.json` },
     script: {
       dir: '.cursor/rules',
       entry: { from: `${SKILL_NAME}.mdc`, to: `${SKILL_NAME}.mdc` },
@@ -265,8 +273,14 @@ export function SkillInstall() {
             <code className="font-mono text-[0.9em]">components.json</code>
           </p>
           <CodeBlock variant="terminal" wrap copyable label="install command">
-            {recipe.cli}
+            {`npx shadcn@latest add ${recipe.cli.item}`}
           </CodeBlock>
+          <p className="text-xs text-muted-foreground">
+            Nothing to configure: <code className="font-mono text-[0.9em]">@velobits</code> is a
+            registered namespace. On a CLI older than v3, or anywhere that cannot reach
+            shadcn&rsquo;s index, name the file instead:{' '}
+            <code className="font-mono text-[0.9em]">{recipe.cli.url}</code>
+          </p>
         </div>
       )}
 

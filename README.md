@@ -29,13 +29,15 @@ npm run build
                                          → apps/docs/public/r/*.json  (shadcn build)
   3  scripts/build-docs-data.ts          example sources, prop tables extracted
                                          from the TS types, search index,
-                                         skills/ → public/skills + r/skill.json
+                                         skills/ → public/skills, r/skill.json
+                                         and r/skill-cursor.json
   4  next build (output: 'export')       → apps/docs/out/
                                               index.html
                                               docs/components/button/index.html
                                               r/button.json
                                               r/registry.json
                                               r/skill.json
+                                              r/skill-cursor.json
                                               skills/velobits-ui/SKILL.md
                                               _headers
 ```
@@ -136,7 +138,8 @@ velobits-UI/
 │   ├── icons/   @velobitsio/icons   201 hand-drawn stroke icons
 │   └── ui/      @velobitsio/ui       builds from registry/velobits
 ├── skills/velobits-ui/       the agent-facing docs. SKILL.md + references/,
-│                             served at /skills and installable as r/skill.json
+│                             served at /skills, installable as r/skill.json
+│                             (Claude Code) or r/skill-cursor.json (Cursor)
 ├── scripts/
 │   ├── build-registry.ts     validates + compiles the shadcn registry
 │   └── build-docs-data.ts    docs codegen: examples, prop tables, search index

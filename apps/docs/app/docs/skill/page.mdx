@@ -19,7 +19,7 @@ reference files, in the format Claude Code, Cursor and anything reading `AGENTS.
 load from a project. One command puts it in your repo:
 
 ```bash
-npx shadcn@latest add https://ui.velobits.dev/r/skill.json
+npx shadcn@latest add @velobits/skill
 ```
 
 That writes five markdown files and nothing else. No dependencies, no source files,
@@ -56,10 +56,11 @@ list to read past.
 
 Two things that apply whatever you picked. **Add `--overwrite`** when the CLI is
 updating a copy that is already there; it prompts otherwise and defaults to no.
-And **the namespace form** works too if you have pinned the `@velobits` mapping in
-your `components.json` (`npx shadcn@latest add @velobits/skill`), but not by bare
-namespace: the skill is not a component and is deliberately absent from the
-registry index, which is why the URL form is the one printed above.
+And **`shadcn search @velobits` will not list these two.** Search reads our
+`/r/registry.json`, which is the component index, and the skill is not a component.
+Resolution does not go through that index though, so `add` finds it anyway: the
+public registry index maps `@velobits` to the URL template
+`https://ui.velobits.dev/r/{name}.json`, and the name is substituted into it.
 
 ## Other agents
 
