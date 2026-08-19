@@ -209,3 +209,13 @@ Framer's runtime to render a `Button`.
 If components render but look unstyled, you skipped the `@source` line. If they
 throw on first hover, `VelobitsProvider` is not mounted. If the theme flashes on
 load, the [init script](/docs/dark-mode) is missing.
+
+## If an agent is doing the wiring
+
+Those three failures are exactly the ones a coding agent reproduces, because none
+of them appears in the code it is writing. [Agent skill](/docs/skill) is this page
+and the rest of these, in the format an agent loads from your repository:
+
+```bash
+npx shadcn@latest add https://ui.velobits.dev/r/skill.json
+```

@@ -268,6 +268,15 @@ describe('registry hygiene', () => {
         // default and scatters the flat folder back across three directories.
         if (!file.target) dangling.push(`${item.name} → ${file.path} has no target`);
 
+        /*
+         * Only code the CLI flattens into one folder. `r/skill.json` ships
+         * markdown to a nested target of its own, and a `../` inside a fenced
+         * example there is prose about a consumer's tree, not a specifier this
+         * registry has to resolve , without this line the agent skill fails a
+         * test about component imports, which names nothing that would help.
+         */
+        if (!/\.(?:tsx?|jsx?)$/.test(file.path)) continue;
+
         for (const match of file.content.matchAll(/from\s+(['"])(\.\.\/[^'"]*)\1/g)) {
           dangling.push(`${item.name} → ${file.path} imports ${match[2]}`);
         }

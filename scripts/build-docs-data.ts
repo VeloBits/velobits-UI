@@ -745,7 +745,100 @@ writeFileSync(
   'utf8',
 );
 
-/* ── 6. Report ─────────────────────────────────────────────────────────────── */
+/* ── 6. The agent skill ────────────────────────────────────────────────────── */
+
+/**
+ * `skills/velobits-ui/` is the source, and it leaves here two ways:
+ *
+ *   public/skills/velobits-ui/…   the files themselves, so the docs origin serves
+ *                                 them for the `curl` install and for any agent
+ *                                 that can fetch a URL
+ *   public/r/skill.json           a `registry:file` item whose targets are
+ *                                 `.claude/skills/…`, so
+ *                                 `npx shadcn add <origin>/r/skill.json` installs
+ *                                 it into a consumer's repo
+ *
+ * Deliberately NOT an entry in `registry/registry.ts`: it has no source under
+ * `registry/velobits/`, and every item in that list gets a component page plus a
+ * sidebar slot (section 0 above enforces exactly that). `/docs/skill` is its page.
+ * `shadcn build` has already run by the time this does, and it only writes the
+ * items it compiled, so one more file in that folder survives.
+ *
+ * ⚠️ `target` must keep the `~/` prefix. That is the CLI's spelling for "the
+ * project root"; without it the path goes through alias resolution instead, and
+ * `.claude/…` is not an alias.
+ */
+const SKILL_NAME = 'velobits-ui';
+const skillDir = join(root, 'skills', SKILL_NAME);
+
+const skillReferences = readdirSync(join(skillDir, 'references'))
+  .filter((f) => f.endsWith('.md'))
+  .sort()
+  .map((f) => `references/${f}`);
+
+const skillEntry = readFileSync(join(skillDir, 'SKILL.md'), 'utf8');
+const linkedReferences = new Set(
+  [...skillEntry.matchAll(/references\/[a-z0-9-]+\.md/g)].map((m) => m[0]),
+);
+
+/*
+ * Same idea as section 0, for the same reason. A `SKILL.md` pointing at a
+ * reference file that is not there sends a model off to invent the answer, which
+ * is worse than shipping no skill , and a reference file nothing points at is
+ * never read. Neither is visible by looking at the rendered docs, so it fails the
+ * build by name instead.
+ */
+const skillProblems = [
+  ...[...linkedReferences]
+    .filter((f) => !skillReferences.includes(f))
+    .map((f) => `SKILL.md links ${f}, which does not exist`),
+  ...skillReferences
+    .filter((f) => !linkedReferences.has(f))
+    .map((f) => `${f} exists, but SKILL.md never points at it`),
+];
+
+if (skillProblems.length) {
+  console.error(`\nskills/${SKILL_NAME} is inconsistent:\n  ` + skillProblems.join('\n  '));
+  process.exit(1);
+}
+
+const skillFiles = ['SKILL.md', ...skillReferences];
+const publicSkillDir = join(docsDir, 'public/skills', SKILL_NAME);
+
+const skillItemFiles = skillFiles.map((relative) => {
+  const source = readFileSync(join(skillDir, relative), 'utf8');
+  const installed = `.claude/skills/${SKILL_NAME}/${relative}`;
+
+  const copy = join(publicSkillDir, relative);
+  mkdirSync(dirname(copy), { recursive: true });
+  writeFileSync(copy, source, 'utf8');
+
+  return { path: installed, content: source, type: 'registry:file', target: `~/${installed}` };
+});
+
+/** The frontmatter `description`, so the registry item cannot describe it differently. */
+const skillDescription =
+  /^---\r?\n[\s\S]*?^description:\s*(.+)$/m.exec(skillEntry)?.[1]?.trim() ?? '';
+
+writeFileSync(
+  join(docsDir, 'public/r/skill.json'),
+  JSON.stringify(
+    {
+      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+      name: 'skill',
+      type: 'registry:file',
+      title: 'VeloBits agent skill',
+      description: skillDescription,
+      files: skillItemFiles,
+      docs: `Installed to .claude/skills/${SKILL_NAME}/. Point your agent at it, or ask it to read SKILL.md before touching UI.`,
+    },
+    null,
+    2,
+  ) + '\n',
+  'utf8',
+);
+
+/* ── 7. Report ─────────────────────────────────────────────────────────────── */
 
 console.log(`docs data → apps/docs/lib/generated/`);
 console.log(`  examples.ts       ${exampleFiles.length} examples`);
@@ -753,6 +846,7 @@ console.log(`  registry-data.ts  ${emittedItems.length} items`);
 console.log(`  content.ts        ${Object.keys(emittedContent).length} items with content`);
 console.log(`  props.ts          ${Object.keys(componentProps).length} items with prop tables`);
 console.log(`  search-index.json ${searchIndex.length} entries`);
+console.log(`  skills/${SKILL_NAME}  ${skillFiles.length} files, plus r/skill.json`);
 
 if (noProps.length) {
   /*

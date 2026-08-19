@@ -20,6 +20,10 @@ apps/docs/out/
 apps/docs/lib/generated/
 apps/docs/public/search-index.json
 
+# The served copy of the agent skill. `skills/` is the source and is committed;
+# this is `cp -r` output, written by the same script.
+apps/docs/public/skills/
+
 # env - keep .env.example tracked
 .env
 .env.*
@@ -40,6 +44,8 @@ apps/docs/public/search-index.json
 #                             installable from a clone without a build step.
 #   apps/docs/public/r/*.json the compiled registry the CLI actually fetches.
 #                             Committed for the same reason , and because the
-#                             docs deploy serves these as static files.
+#                             docs deploy serves these as static files. That
+#                             includes r/skill.json, which is compiled from
+#                             `skills/` rather than from registry/registry.ts.
 
 .vercel

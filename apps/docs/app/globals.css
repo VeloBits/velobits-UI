@@ -53,6 +53,14 @@
 @source not "./lib/generated";
 
 /*
+ * The agent skill, copied out of `skills/` by `build-docs-data.ts` so the origin
+ * serves it. It is prose about utilities rather than markup using them, so every
+ * class name in it is a mention, not a use , scanning it would generate CSS for
+ * every utility the documentation happens to name.
+ */
+@source not "../public/skills";
+
+/*
  * The docs' own chrome and the examples the component pages render. Neither is
  * under `app/`, so neither is picked up by the default scan of this file's
  * directory.

@@ -24,6 +24,13 @@
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=0, must-revalidate
 
+# The agent skill. Same two rules and the same reasoning as /r/*: it is fetched
+# cross-origin by agents running in a browser, and a `curl` install that lands a
+# cached copy is guidance about a version that has moved on.
+/skills/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=0, must-revalidate
+
 # Next writes content-hashed filenames under /_next/static, so these are
 # immutable by construction.
 /_next/static/*

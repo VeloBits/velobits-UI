@@ -26,3 +26,6 @@ apps/docs/out/
 # embeds component sources as escaped string literals.
 apps/docs/lib/generated/
 apps/docs/public/search-index.json
+
+# Copies of `skills/`, written by the same script. Format the source, not these.
+apps/docs/public/skills/

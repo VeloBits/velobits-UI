@@ -40,6 +40,11 @@ export const GUIDE_NAV: NavGroup[] = [
       { title: 'components.json', href: '/docs/components-json' },
       { title: 'Registry', href: '/docs/registry' },
       { title: 'CLI', href: '/docs/cli' },
+      {
+        title: 'Agent skill',
+        href: '/docs/skill',
+        description: 'The same guidance, in the format a coding agent loads.',
+      },
     ],
   },
   {
