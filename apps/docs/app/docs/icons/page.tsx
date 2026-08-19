@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 
-import { ScrollArea } from '@velobitsio/ui';
-
 import { FlagIcon } from '@velobitsio/icons';
 
 import { DocsToc, type TocEntry } from '@/components/docs-toc';
@@ -114,10 +112,8 @@ export const PentagonIcon = createIcon(
         </Group>
       </main>
 
-      <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:py-8">
-        <ScrollArea className="h-full">
-          <DocsToc entries={TOC} />
-        </ScrollArea>
+      <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:overflow-y-auto xl:py-8">
+        <DocsToc entries={TOC} />
       </aside>
     </div>
   );

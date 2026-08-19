@@ -1,5 +1,3 @@
-import { ScrollArea } from '@velobitsio/ui';
-
 import { DocsSidebarNav } from '@/components/docs-sidebar';
 
 /**
@@ -21,15 +19,24 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6">
       <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-10">
         {/*
-         * ScrollArea rather than overflow-y-auto, so the nav scrolls under the
-         * scrollbar this design system ships instead of whatever the OS draws.
-         * The bounded box still comes from the aside: the Root needs a height
-         * from somewhere, and the sticky track already gives it one.
+         * Native overflow, deliberately, and NOT the ScrollArea this library
+         * ships. Radix enables the viewport scroll on mount, unconditionally:
+         * `overflowY: scrollbarYEnabled ? "scroll" : "hidden"`, where
+         * `scrollbarYEnabled` is set by an effect in ScrollAreaScrollbar the
+         * moment it renders, regardless of `type` and regardless of whether the
+         * content overflows.
+         *
+         * So a nav short enough to fit becomes a scroll container with nothing to
+         * scroll: the wheel is captured, the page does not move, and it lurches
+         * once the chain finally reaches the document. `overflow-y-auto` only
+         * becomes a scroller when it needs to be, which is the right behaviour for
+         * content whose length depends on the page.
+         *
+         * ScrollArea is for a box that always overflows and has a height of its
+         * own. See /docs/components/scroll-area.
          */}
-        <aside className="hidden lg:sticky lg:top-14 lg:block lg:h-[calc(100dvh-3.5rem)] lg:py-8">
-          <ScrollArea className="h-full">
-            <DocsSidebarNav />
-          </ScrollArea>
+        <aside className="hidden lg:sticky lg:top-14 lg:block lg:h-[calc(100dvh-3.5rem)] lg:overflow-y-auto lg:py-8">
+          <DocsSidebarNav />
         </aside>
         <div className="min-w-0">{children}</div>
       </div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { Badge, ScrollArea } from '@velobitsio/ui';
+import { Badge } from '@velobitsio/ui';
 import { ChevronRightIcon } from '@velobitsio/icons';
 
 import { CodePanel } from '@/components/code-panel';
@@ -192,10 +192,8 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
         <DocsPager name={slug} />
       </main>
 
-      <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:py-8">
-        <ScrollArea className="h-full">
-          <DocsToc entries={toc} />
-        </ScrollArea>
+      <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:overflow-y-auto xl:py-8">
+        <DocsToc entries={toc} />
       </aside>
     </div>
   );

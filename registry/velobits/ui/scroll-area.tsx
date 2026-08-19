@@ -37,6 +37,29 @@ import { cn } from '../lib/cn';
  *   - `overflow-y-auto` on the same element is redundant at best. Use one or the
  *     other.
  *
+ * ## When NOT to reach for this
+ *
+ * A region whose content might FIT. Radix turns the viewport into a scroll
+ * container the moment a scrollbar renders, and does it unconditionally:
+ *
+ *     overflowY: scrollbarYEnabled ? 'scroll' : 'hidden'
+ *
+ * where `scrollbarYEnabled` is flipped by an effect in `ScrollAreaScrollbar` on
+ * mount. Not `auto`, and not gated on overflow. `type="auto"` does not change
+ * this either; it governs when the BAR is visible, not the viewport overflow,
+ * and no prop exposes the difference.
+ *
+ * So a short list inside one is a scroll container with nothing to scroll: the
+ * wheel is captured, the page does not move, and it lurches once the chain
+ * finally reaches the document. That is why the docs sidebar and the "On this
+ * page" columns use plain `overflow-y-auto` and not this component, despite this
+ * component existing for exactly that shape of problem. `auto` becomes a
+ * scroller only when it needs to be; a design-system scrollbar is not worth a
+ * dead scroll zone on every short page.
+ *
+ * Use it for a box that always overflows and owns its height: a fixed-height
+ * list, a capped code panel, a picker.
+ *
  * Keyboard scrolling, wheel, touch and the scroll-anchoring browsers do are all
  * preserved, because the viewport is a real scroll container. What is lost is the
  * OS scrollbar's own affordances, which is the trade being made deliberately.
