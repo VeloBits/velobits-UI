@@ -93,9 +93,13 @@
 }
 
 /*
- * The <pre> Shiki emits carries its own margin from the UA stylesheet, and the
- * padding is applied by the wrapper in `components/code-panel.tsx` so the scroll
- * container is the thing that scrolls rather than the padding scrolling with it.
+ * The <pre> Shiki emits carries its own margin from the UA stylesheet.
+ *
+ * Padding AND overflow are applied to that same <pre> by
+ * `components/code-panel.tsx`, deliberately: the background above lands on the
+ * <pre>, and a background covers only its own element's box, so scrolling a
+ * wrapper around it ran the code off the end of its own fill. See the comment
+ * there , this is the half of that arrangement that lives in CSS.
  */
 .shiki {
   margin: 0;

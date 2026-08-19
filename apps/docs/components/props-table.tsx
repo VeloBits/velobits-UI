@@ -14,7 +14,7 @@ import type { DocPropGroup } from '@/lib/generated/props';
  * The API reference, extracted from the TypeScript types by
  * `scripts/build-docs-data.ts` rather than written here.
  *
- * A hand-written table for 38 components is 38 places for the documentation to
+ * A hand-written table for 39 components is 39 places for the documentation to
  * disagree with the code, and it disagrees *silently* , which is the worst way
  * for documentation to be wrong, because a reader has no way to tell.
  *

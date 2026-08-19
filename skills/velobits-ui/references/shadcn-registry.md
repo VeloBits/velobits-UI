@@ -139,14 +139,15 @@ Installing one item brings what it needs: `add @velobits/data-table` also instal
 ## The agent skill is itself an installable item
 
 ```bash
-npx shadcn@latest add https://ui.velobits.dev/r/skill.json
+npx shadcn@latest add https://ui.velobits.dev/r/skill.json          # .claude/skills/
+npx shadcn@latest add https://ui.velobits.dev/r/skill-cursor.json   # .cursor/rules/
 ```
 
-Writes `.claude/skills/velobits-ui/` into the project, so an agent working in that
-repo has this guidance without being handed it. It is a `registry:file` item, not a
-component, so it appears in neither the sidebar nor `shadcn search`, and installing
-it pulls in no dependencies and touches no source file. Needs a `components.json`
-in the project like any other `add`; without one, fetch the files directly:
+Either one writes this guidance into the project, so an agent working in that repo
+has it without being handed it. They are `registry:file` items, not components, so
+they appear in neither the sidebar nor `shadcn search`, and installing one pulls in
+no dependencies and touches no source file. Both need a `components.json` in the
+project like any other `add`; without one, fetch the files directly:
 
 ```bash
 curl -sSfL https://ui.velobits.dev/skills/velobits-ui/SKILL.md -o SKILL.md

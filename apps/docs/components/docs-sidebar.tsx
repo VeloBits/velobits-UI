@@ -17,7 +17,15 @@ import { registryItemsByName } from '@/lib/generated/registry-data';
  * for a route is about six live layers; spending one on a static column that
  * never floats over anything is the wrong purchase.
  */
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({
+  href,
+  isNew,
+  children,
+}: {
+  href: string;
+  isNew?: boolean;
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   /*
    * `trailingSlash: true` is on for the static export, so `usePathname()` returns
@@ -35,14 +43,55 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
       className={cn(
         // Padding and radius on EVERY item, never only the active one: adding
         // them on activation would reflow the column on every navigation.
-        'block rounded-md px-3 py-1.5 text-sm font-medium transition-colors duration-micro ease-out',
+        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors duration-micro ease-out',
+        // `flex` rather than `block` so the dot sits on the baseline row with the
+        // label. Items without a dot are unaffected: a flex container with one
+        // text child lays out identically.
+        'flex items-center gap-2',
         current
           ? 'bg-primary-soft text-link'
           : 'text-muted-foreground hover:bg-highlight hover:text-fg',
       )}
     >
       {children}
+      {isNew && <NewDot />}
     </Link>
+  );
+}
+
+/**
+ * "This is new", as a dot rather than a word.
+ *
+ * ## Why `bg-accent-text` and not `bg-brand`
+ *
+ * Lime is asymmetric: as a fill it takes charcoal on top, and as a lone graphical
+ * mark on the cream page it measures 1.31:1, which is to say invisible.
+ * `--accent-text` is the token that exists for this , lime in dark, plum in light ,
+ * so the dot carries in both themes rather than one.
+ *
+ * ## Why there is a word for screen readers
+ *
+ * A pulsing dot means "new" by convention and colour, which on its own is 1.4.1.
+ * The visually-hidden text is what makes the link announce "Agent skill, new"
+ * instead of leaving the mark as decoration nobody hears, and the dot is
+ * `aria-hidden` so it is announced once rather than twice.
+ *
+ * The pulse needs no reduced-motion handling here: the token layer clamps every
+ * animation globally under `prefers-reduced-motion`, and what is left is a static
+ * dot, which still carries the meaning.
+ *
+ * ⚠️ It is driven by `isNew` in `lib/docs-nav.ts`, and that flag is meant to be
+ * deleted a release or two after the page lands. A permanent badge is noise.
+ */
+function NewDot() {
+  return (
+    <>
+      <span aria-hidden className="relative flex size-1.5 shrink-0">
+        <span className="absolute inline-flex size-full animate-ping rounded-pill bg-accent-text opacity-75" />
+        <span className="relative inline-flex size-1.5 rounded-pill bg-accent-text" />
+      </span>
+      <span className="sr-only">, new</span>
+    </>
   );
 }
 
@@ -61,7 +110,7 @@ export function DocsSidebarNav() {
       {GUIDE_NAV.map((group) => (
         <Group key={group.title} title={group.title}>
           {group.items.map((item) => (
-            <NavLink key={item.href} href={item.href}>
+            <NavLink key={item.href} href={item.href} isNew={item.isNew}>
               {item.title}
             </NavLink>
           ))}

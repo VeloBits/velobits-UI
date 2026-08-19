@@ -5,7 +5,7 @@ description: Install, configure and write UI with the VeloBits design system, th
 
 # VeloBits UI
 
-One token and component layer for every VeloBits surface. 36 semantic tokens, 38
+One token and component layer for every VeloBits surface. 36 semantic tokens, 39
 components built on Radix and Tailwind v4, 201 stroke icons, a two-tier glass
 material, and a contrast gate every colour pair has already passed.
 
@@ -185,7 +185,7 @@ cannot express, such as printing the current mode as text.
 
 ## 6. What already exists, so nothing gets rebuilt
 
-46 registry items: 38 components in three tiers, plus the foundation. Check this
+47 registry items: 39 components in three tiers, plus the foundation. Check this
 list before writing a component from scratch, and check `/r/registry.json` before
 concluding something is missing.
 

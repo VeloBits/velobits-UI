@@ -208,6 +208,16 @@
         "default": "./dist/native-select.cjs"
       }
     },
+    "./scroll-area": {
+      "import": {
+        "types": "./dist/scroll-area.d.ts",
+        "default": "./dist/scroll-area.js"
+      },
+      "require": {
+        "types": "./dist/scroll-area.d.cts",
+        "default": "./dist/scroll-area.cjs"
+      }
+    },
     "./separator": {
       "import": {
         "types": "./dist/separator.d.ts",
@@ -577,7 +587,7 @@
       ]
     },
     {
-      "name": "the whole barrel, our code only (38 components, minus the 2 subpath-only ones)",
+      "name": "the whole barrel, our code only (39 components, minus the 2 subpath-only ones)",
       "path": "dist/index.js",
       "limit": "32 kB",
       "ignore": [

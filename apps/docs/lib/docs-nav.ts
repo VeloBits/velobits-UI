@@ -23,6 +23,14 @@ export interface NavItem {
   href: string;
   /** Shown on the components index grid. Falls back to the registry description. */
   description?: string;
+  /**
+   * Marks the entry as new in the sidebar, with a pulsing dot.
+   *
+   * ⚠️ Remove it when it stops being true. A permanent "new" badge is noise that
+   * trains readers to ignore the next real one, so this flag is meant to be
+   * deleted a release or two after it lands, not left to rot.
+   */
+  isNew?: boolean;
 }
 
 export interface NavGroup {
@@ -44,6 +52,7 @@ export const GUIDE_NAV: NavGroup[] = [
         title: 'Agent skill',
         href: '/docs/skill',
         description: 'The same guidance, in the format a coding agent loads.',
+        isNew: true,
       },
     ],
   },
@@ -98,6 +107,7 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
       'field',
       'avatar',
       'kbd',
+      'scroll-area',
       'separator',
       'skeleton',
       'spinner',

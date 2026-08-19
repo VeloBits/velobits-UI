@@ -1,5 +1,7 @@
 import type { MDXComponents } from 'mdx/types';
 
+import { ScrollArea } from '@velobitsio/ui';
+
 import { MdxToc } from '@/components/mdx-toc';
 
 /**
@@ -18,8 +20,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         <main id="main" className="min-w-0 max-w-3xl py-8 pb-24">
           {children}
         </main>
-        <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:overflow-y-auto xl:py-8">
-          <MdxToc />
+        <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:py-8">
+          <ScrollArea className="h-full">
+            <MdxToc />
+          </ScrollArea>
         </aside>
       </div>
     ),

@@ -1,3 +1,5 @@
+import { SkillInstall } from '@/components/skill-install';
+
 export const metadata = {
   title: 'Agent skill',
   description:
@@ -13,15 +15,16 @@ exists, a `@source` line nobody added, and a `Tooltip` that throws the first tim
 anyone hovers.
 
 So the same rules ship a second way, as a **skill**: a `SKILL.md` with four
-reference files, in the format Claude Code and other agents load from a
-project. One command puts it in your repo.
+reference files, in the format Claude Code, Cursor and anything reading `AGENTS.md`
+load from a project. One command puts it in your repo:
 
 ```bash
 npx shadcn@latest add https://ui.velobits.dev/r/skill.json
 ```
 
-That writes `.claude/skills/velobits-ui/` and nothing else. No dependencies, no
-source files, no changes to anything you own.
+That writes five markdown files and nothing else. No dependencies, no source files,
+no changes to anything you own. [Install it](#install-it) has the command for your
+agent, wherever you want it.
 
 ## What it is
 
@@ -45,56 +48,27 @@ somebody is wiring something up in Astro.
 
 ## Install it
 
-**With the shadcn CLI**, if the project has a `components.json`:
+Pick the agent and where it should live. Every combination lands somewhere
+different, so the commands below are the ones for the pair you choose, and not a
+list to read past.
 
-```bash
-npx shadcn@latest add https://ui.velobits.dev/r/skill.json
-```
+<SkillInstall />
 
-Add `--overwrite` when updating an already-installed copy; the CLI prompts
-otherwise, and defaults to no. If you have pinned the `@velobits` mapping in your
-`components.json`, `npx shadcn@latest add @velobits/skill` is the same install.
-Resolving it by bare namespace does not work: the skill is not a component and is
-deliberately absent from the registry index, so the URL form is the reliable one.
-
-**With `curl`**, which needs nothing at all:
-
-```bash
-mkdir -p .claude/skills/velobits-ui/references
-base=https://ui.velobits.dev/skills/velobits-ui
-curl -sSfL "$base/SKILL.md" -o .claude/skills/velobits-ui/SKILL.md
-for f in frameworks shadcn-registry npm-packages design-rules; do
-  curl -sSfL "$base/references/$f.md" -o ".claude/skills/velobits-ui/references/$f.md"
-done
-```
-
-In PowerShell:
-
-```powershell
-$base = 'https://ui.velobits.dev/skills/velobits-ui'
-New-Item -ItemType Directory -Force .claude/skills/velobits-ui/references | Out-Null
-Invoke-WebRequest "$base/SKILL.md" -OutFile .claude/skills/velobits-ui/SKILL.md
-'frameworks','shadcn-registry','npm-packages','design-rules' | ForEach-Object {
-  Invoke-WebRequest "$base/references/$_.md" -OutFile ".claude/skills/velobits-ui/references/$_.md"
-}
-```
-
-Commit the directory. It is guidance about the dependency, so it belongs in the
-repository next to the dependency, and every agent anyone points at that project
-then starts from the same rules.
-
-For a machine rather than a project, the same files go in `~/.claude/skills/`.
+Two things that apply whatever you picked. **Add `--overwrite`** when the CLI is
+updating a copy that is already there; it prompts otherwise and defaults to no.
+And **the namespace form** works too if you have pinned the `@velobits` mapping in
+your `components.json` (`npx shadcn@latest add @velobits/skill`), but not by bare
+namespace: the skill is not a component and is deliberately absent from the
+registry index, which is why the URL form is the one printed above.
 
 ## Other agents
 
-The format is a markdown file with YAML frontmatter, which nothing about the
-content depends on. Any tool that can be pointed at a file works:
+The format is a markdown file with YAML frontmatter, and nothing in the content
+depends on it. Any tool that can be pointed at a file works:
 
-- **Cursor, Windsurf** , reference the installed path from your rules file, or
-  copy `SKILL.md` into `.cursor/rules/`.
-- **Codex, and anything reading `AGENTS.md`** , add one line pointing at
-  `.claude/skills/velobits-ui/SKILL.md`. A pointer beats a copy, because a copy is
-  a second thing to update.
+- **Windsurf and other rules-file tools** , install the Cursor variant and move
+  the `.mdc` to wherever that tool keeps its rules, or point its rules file at the
+  installed `SKILL.md`.
 - **An agent with web access and no filesystem** , give it
   `https://ui.velobits.dev/skills/velobits-ui/SKILL.md`. The files are served with
   `Access-Control-Allow-Origin: *` and no long-lived cache.
@@ -110,7 +84,8 @@ npx shadcn@latest view @velobits/data-table          # deps and targets, writes 
 npx shadcn@latest mcp init --client claude           # let the agent query and install directly
 ```
 
-`npx shadcn@latest mcp init` registers shadcn's MCP server for your client, after
+`mcp init` also takes `cursor`, `vscode`, `codex` and `opencode`. It registers
+shadcn's MCP server for that client, after
 which the agent can search this registry and install from it without shelling out
 to guessed commands. [`/r/registry.json`](https://ui.velobits.dev/r/registry.json)
 is the same index as a plain fetch.

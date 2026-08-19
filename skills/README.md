@@ -22,15 +22,21 @@ This is the source; `.claude/skills/velobits-ui/` is where it lands in a
 
 ## How it ships
 
-`scripts/build-docs-data.ts` does two things with this tree on every docs build:
+`scripts/build-docs-data.ts` does four things with this tree on every docs build:
 
 1. Copies it into `apps/docs/public/skills/`, so the docs origin serves the files
    directly at `https://ui.velobits.dev/skills/velobits-ui/SKILL.md`, which is what
    the `curl` install and any agent with web access reads.
-2. Compiles it into `apps/docs/public/r/skill.json`, a `registry:file` item whose
-   targets are `.claude/skills/velobits-ui/…`, so
-   `npx shadcn@latest add https://ui.velobits.dev/r/skill.json` installs it into a
-   project.
+2. Writes `velobits-ui.mdc` beside them: the same entry point with **Cursor's**
+   frontmatter (`description`, `alwaysApply: false`) instead of ours, and its
+   `references/x.md` links rewritten to `velobits-ui/x.md`. Cursor ignores a plain
+   `.md` in its rules directory, so this one has to be rewritten rather than copied.
+3. Compiles two `registry:file` items, so each agent's layout is one command:
+   `r/skill.json` targets `.claude/skills/velobits-ui/…`, and `r/skill-cursor.json`
+   targets `.cursor/rules/`.
+4. Emits `apps/docs/lib/generated/skill.ts`, the file list the installer on
+   `/docs/skill` builds its `curl` loops from. A hand-written list there is a
+   five-file skill with a four-file install command the day a reference is added.
 
 It also fails the build if `SKILL.md` links a reference file that does not exist, or
 if a reference file exists that `SKILL.md` never points at. A skill whose pointers

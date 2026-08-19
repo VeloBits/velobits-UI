@@ -25,7 +25,7 @@ import {
 } from '@velobitsio/tokens';
 import type { Metadata } from 'next';
 
-import { Badge } from '@velobitsio/ui';
+import { Badge, ScrollArea } from '@velobitsio/ui';
 
 import { DocsToc, type TocEntry } from '@/components/docs-toc';
 
@@ -521,8 +521,10 @@ export default function ColorsPage() {
         </Section>
       </main>
 
-      <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:overflow-y-auto xl:py-8">
-        <DocsToc entries={TOC} />
+      <aside className="hidden xl:sticky xl:top-14 xl:block xl:h-[calc(100dvh-3.5rem)] xl:py-8">
+        <ScrollArea className="h-full">
+          <DocsToc entries={TOC} />
+        </ScrollArea>
       </aside>
     </div>
   );

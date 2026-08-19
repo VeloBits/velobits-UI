@@ -1,3 +1,5 @@
+import { ScrollArea } from '@velobitsio/ui';
+
 import { DocsSidebarNav } from '@/components/docs-sidebar';
 
 /**
@@ -18,8 +20,16 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6">
       <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-10">
-        <aside className="hidden lg:sticky lg:top-14 lg:block lg:h-[calc(100dvh-3.5rem)] lg:overflow-y-auto lg:py-8">
-          <DocsSidebarNav />
+        {/*
+         * ScrollArea rather than overflow-y-auto, so the nav scrolls under the
+         * scrollbar this design system ships instead of whatever the OS draws.
+         * The bounded box still comes from the aside: the Root needs a height
+         * from somewhere, and the sticky track already gives it one.
+         */}
+        <aside className="hidden lg:sticky lg:top-14 lg:block lg:h-[calc(100dvh-3.5rem)] lg:py-8">
+          <ScrollArea className="h-full">
+            <DocsSidebarNav />
+          </ScrollArea>
         </aside>
         <div className="min-w-0">{children}</div>
       </div>

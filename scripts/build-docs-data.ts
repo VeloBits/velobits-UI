@@ -36,7 +36,7 @@
  * same failure that already forced one for `public/r`.
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { withCustomConfig, type PropItem } from 'react-docgen-typescript';
@@ -369,8 +369,8 @@ writeFileSync(
 /* ── 3. Prop tables, from the TypeScript types ─────────────────────────────── */
 
 /**
- * Props are extracted rather than written, because a hand-written table for 38
- * components is 38 places for the documentation to disagree with the code , and
+ * Props are extracted rather than written, because a hand-written table for 39
+ * components is 39 places for the documentation to disagree with the code , and
  * it disagrees silently, which is the worst way for documentation to be wrong.
  *
  * The filter is a DENYLIST of the packages a component forwards to, not an
@@ -748,15 +748,18 @@ writeFileSync(
 /* ── 6. The agent skill ────────────────────────────────────────────────────── */
 
 /**
- * `skills/velobits-ui/` is the source, and it leaves here two ways:
+ * `skills/velobits-ui/` is the source, and it leaves here three ways:
  *
  *   public/skills/velobits-ui/…   the files themselves, so the docs origin serves
  *                                 them for the `curl` install and for any agent
- *                                 that can fetch a URL
+ *                                 that can fetch a URL. `velobits-ui.mdc` sits
+ *                                 alongside them: the same entry point with
+ *                                 Cursor's frontmatter instead of ours
  *   public/r/skill.json           a `registry:file` item whose targets are
  *                                 `.claude/skills/…`, so
  *                                 `npx shadcn add <origin>/r/skill.json` installs
  *                                 it into a consumer's repo
+ *   public/r/skill-cursor.json    the same, into `.cursor/rules/`
  *
  * Deliberately NOT an entry in `registry/registry.ts`: it has no source under
  * `registry/velobits/`, and every item in that list gets a component page plus a
@@ -805,38 +808,109 @@ if (skillProblems.length) {
 const skillFiles = ['SKILL.md', ...skillReferences];
 const publicSkillDir = join(docsDir, 'public/skills', SKILL_NAME);
 
-const skillItemFiles = skillFiles.map((relative) => {
-  const source = readFileSync(join(skillDir, relative), 'utf8');
-  const installed = `.claude/skills/${SKILL_NAME}/${relative}`;
+/** Read once, then used by all three outputs. */
+const skillSources = new Map(
+  skillFiles.map((relative) => [relative, readFileSync(join(skillDir, relative), 'utf8')]),
+);
 
+for (const [relative, source] of skillSources) {
   const copy = join(publicSkillDir, relative);
   mkdirSync(dirname(copy), { recursive: true });
   writeFileSync(copy, source, 'utf8');
+}
 
-  return { path: installed, content: source, type: 'registry:file', target: `~/${installed}` };
-});
-
-/** The frontmatter `description`, so the registry item cannot describe it differently. */
+/** The frontmatter `description`, so nothing downstream describes it differently. */
 const skillDescription =
   /^---\r?\n[\s\S]*?^description:\s*(.+)$/m.exec(skillEntry)?.[1]?.trim() ?? '';
 
+/**
+ * Cursor's variant of the same content.
+ *
+ * `.cursor/rules/` takes `.mdc` files with ITS frontmatter (`description`,
+ * `globs`, `alwaysApply`) and **ignores a plain `.md` placed there**, so the entry
+ * point is rewritten rather than copied. `alwaysApply: false` with no `globs` is
+ * the closest Cursor gets to how a skill behaves: the description is what it
+ * matches on, rather than a file pattern.
+ *
+ * The reference files move to a subfolder, where being ignored by the rules system
+ * is exactly right , they are meant to be read on demand, by path, which is also
+ * why the links inside the entry are rewritten to point there.
+ */
+const cursorEntry =
+  `---\ndescription: ${skillDescription}\nalwaysApply: false\n---\n\n` +
+  skillSources
+    .get('SKILL.md')!
+    .replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n+/, '')
+    .replace(/references\/([a-z0-9-]+\.md)/g, `${SKILL_NAME}/$1`);
+
+writeFileSync(join(publicSkillDir, `${SKILL_NAME}.mdc`), cursorEntry, 'utf8');
+
+/** `[installed path, content]` for each agent's layout. */
+const skillLayouts = {
+  'skill.json': {
+    title: 'VeloBits agent skill',
+    docs: `Installed to .claude/skills/${SKILL_NAME}/. A new session picks it up; ask the agent to read SKILL.md before it touches UI.`,
+    files: [...skillSources].map(
+      ([relative, content]) => [`.claude/skills/${SKILL_NAME}/${relative}`, content] as const,
+    ),
+  },
+  'skill-cursor.json': {
+    title: 'VeloBits agent skill, for Cursor',
+    docs: `Installed to .cursor/rules/. Reload the window so Cursor re-reads its rules directory.`,
+    files: [
+      [`.cursor/rules/${SKILL_NAME}.mdc`, cursorEntry] as const,
+      ...skillReferences.map(
+        (relative) =>
+          [
+            `.cursor/rules/${SKILL_NAME}/${basename(relative)}`,
+            skillSources.get(relative)!,
+          ] as const,
+      ),
+    ],
+  },
+};
+
+/*
+ * What the installer on `/docs/skill` reads. The commands it renders name every
+ * reference file one by one (a `curl` loop has to), so deriving the list here is
+ * what stops a fifth reference file shipping with a four-file install command.
+ */
 writeFileSync(
-  join(docsDir, 'public/r/skill.json'),
-  JSON.stringify(
-    {
-      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-      name: 'skill',
-      type: 'registry:file',
-      title: 'VeloBits agent skill',
-      description: skillDescription,
-      files: skillItemFiles,
-      docs: `Installed to .claude/skills/${SKILL_NAME}/. Point your agent at it, or ask it to read SKILL.md before touching UI.`,
-    },
-    null,
-    2,
-  ) + '\n',
+  join(outDir, 'skill.ts'),
+  BANNER +
+    `/** The skill's directory name, in every agent's layout. */\n` +
+    `export const SKILL_NAME = ${JSON.stringify(SKILL_NAME)};\n\n` +
+    `/** Paths relative to the skill root, entry point first. */\n` +
+    `export const SKILL_FILES: string[] = ${JSON.stringify(skillFiles, null, 2)};\n\n` +
+    `/** The frontmatter description, as the registry items and the .mdc carry it. */\n` +
+    `export const SKILL_DESCRIPTION = ${JSON.stringify(skillDescription)};\n`,
   'utf8',
 );
+
+for (const [fileName, layout] of Object.entries(skillLayouts)) {
+  writeFileSync(
+    join(docsDir, 'public/r', fileName),
+    JSON.stringify(
+      {
+        $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+        name: fileName.replace('.json', ''),
+        type: 'registry:file',
+        title: layout.title,
+        description: skillDescription,
+        files: layout.files.map(([installed, content]) => ({
+          path: installed,
+          content,
+          type: 'registry:file',
+          target: `~/${installed}`,
+        })),
+        docs: layout.docs,
+      },
+      null,
+      2,
+    ) + '\n',
+    'utf8',
+  );
+}
 
 /* ── 7. Report ─────────────────────────────────────────────────────────────── */
 
@@ -846,7 +920,9 @@ console.log(`  registry-data.ts  ${emittedItems.length} items`);
 console.log(`  content.ts        ${Object.keys(emittedContent).length} items with content`);
 console.log(`  props.ts          ${Object.keys(componentProps).length} items with prop tables`);
 console.log(`  search-index.json ${searchIndex.length} entries`);
-console.log(`  skills/${SKILL_NAME}  ${skillFiles.length} files, plus r/skill.json`);
+console.log(
+  `  skills/${SKILL_NAME}  ${skillFiles.length} files + ${SKILL_NAME}.mdc, plus ${Object.keys(skillLayouts).join(' and ')}`,
+);
 
 if (noProps.length) {
   /*

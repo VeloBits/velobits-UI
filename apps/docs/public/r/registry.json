@@ -43,6 +43,7 @@
         "https://ui.velobits.dev/r/kbd.json",
         "https://ui.velobits.dev/r/label.json",
         "https://ui.velobits.dev/r/native-select.json",
+        "https://ui.velobits.dev/r/scroll-area.json",
         "https://ui.velobits.dev/r/separator.json",
         "https://ui.velobits.dev/r/skeleton.json",
         "https://ui.velobits.dev/r/spinner.json",
@@ -485,6 +486,25 @@
           "path": "registry/velobits/ui/native-select.tsx",
           "type": "registry:ui",
           "target": "@ui/velobits/native-select.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "title": "ScrollArea",
+      "description": "A scrollable region with a styled scrollbar. The thumb is --field-border, not --border: it is an interactive control, so 1.4.11 applies to it.",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "https://ui.velobits.dev/r/cn.json"
+      ],
+      "files": [
+        {
+          "path": "registry/velobits/ui/scroll-area.tsx",
+          "type": "registry:ui",
+          "target": "@ui/velobits/scroll-area.tsx"
         }
       ]
     },

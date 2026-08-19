@@ -296,6 +296,27 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
     examples: [{ name: 'kbd-demo', title: 'Basic' }],
   },
 
+  'scroll-area': {
+    usage: `import { ScrollArea, ScrollBar } from '@velobitsio/ui';
+
+<ScrollArea className="h-56">
+  {/* Root needs a bounded height from somewhere, or it grows and never scrolls */}
+</ScrollArea>
+
+<ScrollArea className="w-full">
+  <div className="flex gap-3">{/* wider than the box */}</div>
+  <ScrollBar orientation="horizontal" />
+</ScrollArea>`,
+    examples: [{ name: 'scroll-area-demo', title: 'Both axes' }],
+    notes: [
+      'The thumb is --field-border, where Separator is --border. A scrollbar reports position and accepts a drag, so 1.4.11 applies to it and it has to clear 3:1; a separator divides nothing a reader must perceive and is free to recede. That is what the two line tokens are for.',
+      'One thumb colour covers every case: --field-border is asserted at 3:1 against both --bg and --panel, in light and dark, from a single value. So it is correct on the page and inside a panel without a variant.',
+      'The track is transparent on purpose. It would be the widest block of flat colour on a long page, and filling it is most of what makes a custom scrollbar look dated.',
+      'Radix moves the overflow to an inner viewport, so the Root needs a bounded height from a class, a grid track or a flex parent. Given none it grows to fit its content and never scrolls, which reads as the component being broken rather than unconstrained.',
+      'ScrollArea renders a vertical ScrollBar itself. Pass one explicitly only for the horizontal axis, as the demo does.',
+    ],
+  },
+
   separator: {
     usage: `import { Separator } from '@velobitsio/ui';
 

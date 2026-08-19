@@ -68,6 +68,7 @@ const CLIENT = {
   kbd: `${R}/ui/kbd.tsx`,
   label: `${R}/ui/label.tsx`,
   'native-select': `${R}/ui/native-select.tsx`,
+  'scroll-area': `${R}/ui/scroll-area.tsx`,
   separator: `${R}/ui/separator.tsx`,
   skeleton: `${R}/ui/skeleton.tsx`,
   spinner: `${R}/ui/spinner.tsx`,

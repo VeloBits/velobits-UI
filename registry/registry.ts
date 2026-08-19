@@ -248,6 +248,16 @@ const ui: RegistryItem[] = [
     files: [{ path: 'registry/velobits/ui/native-select.tsx', type: 'registry:ui' }],
   },
   {
+    name: 'scroll-area',
+    type: 'registry:ui',
+    title: 'ScrollArea',
+    description:
+      'A scrollable region with a styled scrollbar. The thumb is --field-border, not --border: it is an interactive control, so 1.4.11 applies to it.',
+    dependencies: [RADIX],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/scroll-area.tsx', type: 'registry:ui' }],
+  },
+  {
     name: 'separator',
     type: 'registry:ui',
     title: 'Separator',

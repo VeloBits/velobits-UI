@@ -45,7 +45,8 @@ apps/docs/public/skills/
 #   apps/docs/public/r/*.json the compiled registry the CLI actually fetches.
 #                             Committed for the same reason , and because the
 #                             docs deploy serves these as static files. That
-#                             includes r/skill.json, which is compiled from
-#                             `skills/` rather than from registry/registry.ts.
+#                             includes r/skill.json and r/skill-cursor.json, both
+#                             compiled from `skills/` rather than from
+#                             registry/registry.ts.
 
 .vercel
