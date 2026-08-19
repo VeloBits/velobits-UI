@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { cn } from '@velobitsio/ui';
 
-import { COMPONENT_GROUPS, GUIDE_NAV, componentHref } from '@/lib/docs-nav';
+import { COMPONENT_GROUPS, GUIDE_NAV, NEW_COMPONENTS, componentHref } from '@/lib/docs-nav';
 import { registryItemsByName } from '@/lib/generated/registry-data';
 
 /**
@@ -120,7 +120,7 @@ export function DocsSidebarNav() {
       {COMPONENT_GROUPS.map((group) => (
         <Group key={group.title} title={group.title}>
           {group.names.map((name) => (
-            <NavLink key={name} href={componentHref(name)}>
+            <NavLink key={name} href={componentHref(name)} isNew={NEW_COMPONENTS.has(name)}>
               {registryItemsByName[name]?.title ?? name}
             </NavLink>
           ))}

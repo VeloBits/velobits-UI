@@ -146,6 +146,20 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
   },
 ];
 
+/**
+ * Components that get the pulsing "new" dot in the sidebar.
+ *
+ * A set rather than a field on the group, because `names` is a flat `string[]`
+ * that five other call sites read as names, and widening it to objects to carry
+ * one boolean would touch all of them.
+ *
+ * ⚠️ Same contract as `isNew` on a guide item: entries here are meant to be
+ * DELETED a release or two after the component lands. A dot that never goes away
+ * stops meaning "new" and becomes decoration, which is worse than no dot, since
+ * it also announces ", new" to a screen reader every time.
+ */
+export const NEW_COMPONENTS = new Set<string>(['scroll-area']);
+
 /** Every registry item name this file places, in sidebar order. */
 export const GROUPED_COMPONENT_NAMES: string[] = COMPONENT_GROUPS.flatMap((g) => g.names);
 
