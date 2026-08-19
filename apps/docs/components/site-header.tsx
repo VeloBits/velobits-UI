@@ -82,7 +82,7 @@ export function SiteHeader() {
               <MenuIcon />
             </Button>
           </SidePanelTrigger>
-          {/* `left`, which the component maps to the inline START edge , it uses
+          {/* `left`, which the component maps to the inline START edge; it uses
               logical properties, so this mirrors correctly under RTL. */}
           <SidePanelContent side="left">
             <SidePanelHeader>

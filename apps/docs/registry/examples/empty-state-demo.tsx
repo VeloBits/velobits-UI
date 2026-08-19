@@ -17,7 +17,7 @@ export default function EmptyStateDemo() {
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-2">
         <p className="text-sm font-medium">
-          surface=&quot;glass&quot; , the page-level first run, which is the case that wants it
+          surface=&quot;glass&quot;, the page-level first run, which is the case that wants it
         </p>
         <EmptyState
           surface="glass"

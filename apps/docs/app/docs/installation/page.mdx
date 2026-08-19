@@ -14,19 +14,20 @@ preference.
 | ----------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Module-federated app          | **npm**                       | Federation needs `@velobitsio/ui` to be a real singleton so the shell's `TooltipProvider` context reaches into each remote. Copied files cannot cross a remote boundary. |
 | Existing Tailwind v4 + shadcn | **npm**                       | One `@theme inline` bridge; the palette swap is one file.                                                                                                                |
-| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook, an edit to an unclaimed file is silently reverted.              |
+| Keycloak login theme          | **`@velobitsio/tokens` only** | Its component sources are git-ignored and re-vended by a `keycloakify sync-extensions` postinstall hook; an edit to an unclaimed file is silently reverted.              |
 | Greenfield / one-off          | **shadcn CLI**                | You own the source. No dependency to bump, and no singleton either, which is exactly why federated apps should not use this path.                                        |
 
 ## shadcn CLI
 
-This is a standard shadcn registry, so the setup is shadcn's own, VeloBits adds
-one line to it. Three steps from nothing.
+`@velobits` is a **registered shadcn namespace**, so there is nothing to add to
+your `components.json`; a current CLI resolves it out of the box. Two steps from
+nothing, and the second one is the install.
 
 ### 1. Set up shadcn
 
 Already running shadcn? Skip to step 2.
 
-**Starting a new project**, `init` scaffolds one, wired up:
+**Starting a new project.** `init` scaffolds one, wired up:
 
 ```bash
 npx shadcn@latest init --template next
@@ -49,12 +50,32 @@ matter most here are `aliases.ui` (where the `velobits/` folder goes) and
 `@theme`; there is no v3 JS-config bridge, and `tailwind.config` is an empty
 string on v4 by design.
 
-You can also skip `init` entirely and hand-write `components.json`, the CLI only
+You can also skip `init` entirely and hand-write `components.json`; the CLI only
 needs that file plus a `tsconfig.json` whose `paths` resolve your aliases.
 
-### 2. Add the VeloBits registry
+### 2. Install components
 
-One entry in the `registries` block, once:
+```bash
+npx shadcn@latest add @velobits/velobits   # the whole system
+npx shadcn@latest add @velobits/button     # one component
+```
+
+Each item pulls its own npm dependencies and any other registry items it imports,
+so `add @velobits/data-table` also brings `table`, `cn` and `use-row-selection`
+without you naming them.
+
+Each item is also addressable by its full URL, which needs no index lookup and
+works on any CLI version:
+
+```bash
+npx shadcn@latest add https://ui.velobits.dev/r/button.json
+```
+
+### Pinning the origin
+
+Namespace resolution goes through shadcn's public index. If you would rather your
+build not depend on that (an older CLI, an air-gapped mirror, or pointing at a
+staging copy), map `@velobits` explicitly and it takes precedence:
 
 ```json
 {
@@ -66,25 +87,8 @@ One entry in the `registries` block, once:
 ```
 
 `{name}` is substituted per item, so `@velobits/button` fetches
-`https://ui.velobits.dev/r/button.json`.
-
-### 3. Install components
-
-```bash
-npx shadcn@latest add @velobits/velobits   # the whole system
-npx shadcn@latest add @velobits/button     # one component
-```
-
-Each item pulls its own npm dependencies and any other registry items it imports,
-so `add @velobits/data-table` also brings `table`, `cn` and `use-row-selection`
-without you naming them.
-
-Namespaced registries need **shadcn CLI v3 or newer**. On anything older, or for a
-one-off with no config at all, the full URL works everywhere:
-
-```bash
-npx shadcn@latest add https://ui.velobits.dev/r/button.json
-```
+`https://ui.velobits.dev/r/button.json`. Everything else below is identical
+either way.
 
 ### Where the files land
 
@@ -107,7 +111,7 @@ lib/utils.ts          ← our cn
 import { Button } from '@/components/ui/velobits/button';
 ```
 
-`components/ui/` and `lib/` come from **your** `components.json`, a project whose
+`components/ui/` and `lib/` come from **your** `components.json`, so a project whose
 `aliases.ui` is `@/parts/widgets` gets `parts/widgets/velobits/`. Only the
 `velobits/` segment is ours.
 
@@ -128,7 +132,7 @@ the point: one `cn`, not two. If a file is already there the CLI asks:
 It **defaults to no**. Answer **yes**, or pass `--overwrite`, which is also the
 only form that works unattended: `--yes` does not cover this prompt.
 
-Ours is a strict **superset**, same signature, same behaviour on every standard
+Ours is a strict **superset**: same signature, same behaviour on every standard
 utility, plus the class groups this system needs: `rounded-pill`, the `z-*`
 ladder (`z-sticky`, `z-dropdown`, `z-modal`, …), the named durations
 (`duration-micro`, `duration-enter`, …), and a bidirectional
@@ -142,7 +146,7 @@ is what quietly degrades ours.
 later run it discards edits you have made to them too. Reach for it when the
 prompt appears, not by default.
 
-[Registry](/docs/registry) covers the rest, `view`, `search`, and what the JSON
+[Registry](/docs/registry) covers the rest: `view`, `search`, and what the JSON
 actually contains.
 
 ## npm
@@ -151,7 +155,7 @@ actually contains.
 npm i @velobitsio/tokens @velobitsio/icons @velobitsio/ui framer-motion
 ```
 
-`framer-motion` is a **required** peer, not an optional one, the barrel imports
+`framer-motion` is a **required** peer, not an optional one; the barrel imports
 `MotionConfig` through `VelobitsProvider`, so an install without it fails to
 resolve. `react-hook-form` is the only optional peer; it is needed solely by
 `Form`, which is why `Form` ships on its own subpath and never in the barrel.

@@ -15,7 +15,7 @@ export default function AlertDemo() {
         <FlagIcon />
         <AlertTitle>Neutral, panel</AlertTitle>
         <AlertDescription>
-          surface=&quot;panel&quot; , for use inside a glass parent.
+          surface=&quot;panel&quot;, for use inside a glass parent.
         </AlertDescription>
       </Alert>
       <Alert variant="info">

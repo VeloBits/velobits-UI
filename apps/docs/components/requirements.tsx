@@ -30,7 +30,7 @@ import { NPM_PACKAGES } from '@/lib/site';
 /** Peers the npm package declares, with why each one is not optional. */
 const PEER_NOTES: Record<string, string> = {
   'framer-motion':
-    'A REQUIRED peer, not an optional one , VelobitsProvider imports MotionConfig, so a barrel import fails to resolve without it.',
+    'A REQUIRED peer, not an optional one; VelobitsProvider imports MotionConfig, so a barrel import fails to resolve without it.',
   'react-hook-form':
     'The one OPTIONAL peer. Needed only by Form, which is why Form ships on its own subpath and never in the barrel.',
   '@velobitsio/icons': 'The icon set this component renders glyphs from.',
@@ -64,7 +64,7 @@ export function Requirements({ item }: { item: DocRegistryItem }) {
             <p>
               The <code>@source</code> line is <strong>not optional</strong>. Tailwind v4 does not
               scan <code>node_modules</code>, so utilities used inside the package are never
-              generated and the component arrives completely unstyled , with no warning anywhere.
+              generated and the component arrives completely unstyled, with no warning anywhere.
             </p>
             <p>
               Installing through the CLI copies the source into your own tree, where Tailwind
@@ -146,7 +146,7 @@ export function Requirements({ item }: { item: DocRegistryItem }) {
           <AlertTitle>Already using shadcn/ui? Overwrite `utils`</AlertTitle>
           <AlertDescription>
             <p>
-              This installs our <code>cn</code> to your <code>utils</code> module , the same place
+              This installs our <code>cn</code> to your <code>utils</code> module, the same place
               shadcn puts its own, so you end up with one <code>cn</code> rather than two. If a file
               is already there the CLI asks, and <strong>defaults to no</strong>. Answer yes, or
               pass the flag:

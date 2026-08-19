@@ -7,7 +7,7 @@
  * Two things this exists to prevent:
  *  1. Hand-maintaining `registry.json`, where the theme item's ~70 CSS variables
  *     would silently drift from `@velobitsio/tokens`.
- *  2. Publishing a registry whose file paths do not exist , the CLI fails at the
+ *  2. Publishing a registry whose file paths do not exist; the CLI fails at the
  *     consumer's machine, not ours, so the check happens here.
  */
 import { execFileSync } from 'node:child_process';
@@ -61,7 +61,7 @@ if (danglingDeps.length) {
 /**
  * ## A bare `registryDependency` is a shadcn/ui item, NOT one of ours
  *
- * This is the whole reason this step exists, and it is not a subtlety , it is the
+ * This is the whole reason this step exists, and it is not a subtlety; it is the
  * difference between a registry that installs and one that does not. Per the
  * shadcn docs: *"Bare names keep their existing behavior. `button` means the
  * built-in shadcn `button` item, not an item from the same repository."*
@@ -70,7 +70,7 @@ if (danglingDeps.length) {
  * CLI goes and asks `https://ui.shadcn.com/r/styles/new-york-v4/cn.json`, which
  * does not exist, and the install dies on the consumer's machine with an error
  * naming a URL they have never heard of. That happens on EVERY item here that
- * depends on another , which is nearly all of them , and it happens on both
+ * depends on another (which is nearly all of them), and it happens on both
  * install paths, the namespaced one and the plain URL.
  *
  * The source in `registry/registry.ts` keeps writing bare names, because that is
@@ -78,15 +78,16 @@ if (danglingDeps.length) {
  * work against. The rewrite happens here, on the way out, so exactly one
  * representation is published and it is the one the CLI can resolve.
  *
- * Absolute URLs rather than the namespaced `@velobits/cn` form on purpose: a
- * namespaced dependency only resolves for a consumer who has already added the
- * namespace to their `components.json`, which would silently break the
- * zero-config `add https://ui.velobits.dev/r/button.json` path we document as the
- * fallback. A URL resolves for everyone, with no configuration and on any CLI
- * version.
+ * Absolute URLs rather than the namespaced `@velobits/cn` form on purpose, even
+ * though `@velobits` is a registered namespace and would now resolve for most
+ * consumers. A namespaced dependency resolves only where the namespace does
+ * (through shadcn's public index, or an explicit `registries` mapping), so it
+ * would quietly fail on an older CLI and inside an air-gapped mirror, both of
+ * which we document as supported. A URL depends on nothing: not the consuming
+ * repo's config, not the index, not the CLI version.
  *
  * `REGISTRY_BASE_URL` exists so a build can be pointed at a local server and
- * genuinely verified end to end , otherwise a localhost install would quietly
+ * genuinely verified end to end; otherwise a localhost install would quietly
  * pull its dependencies from production and prove nothing about the build in
  * front of you.
  */
@@ -163,7 +164,7 @@ try {
 /* ── 5. Rewrite the imports to match where the files actually land ─────────── */
 
 /**
- * Rewriting here rather than in the sources keeps the npm half untouched , tsup
+ * Rewriting here rather than in the sources keeps the npm half untouched: tsup
  * needs the directory layout, and `packages/ui`'s per-entry `exports` map is built
  * from it. One source, two shapes, and the difference is applied on the way out.
  * `scripts/registry-layout.ts` carries the reasoning and the rules.
@@ -195,7 +196,7 @@ for (const fileName of registryFiles) {
     /*
      * The invariant that would have caught the original bug. Every surviving `../`
      * specifier points outside the one flat folder the CLI writes, so it cannot
-     * resolve on a consumer's machine , and the only place that shows up is their
+     * resolve on a consumer's machine, and the only place that shows up is their
      * build, not ours.
      */
     for (const match of file.content.matchAll(/from\s+(['"])(\.\.\/[^'"]*)\1/g)) {
@@ -224,4 +225,4 @@ console.log(`\ncompiled → apps/docs/public/r/`);
 console.log('Consumers install with:');
 console.log('  npx shadcn@latest add @velobits/velobits   # everything');
 console.log('  npx shadcn@latest add @velobits/button     # one component');
-console.log('(after adding the @velobits namespace to components.json , see /docs/registry)');
+console.log('(@velobits is a registered shadcn namespace, no consumer config needed)');

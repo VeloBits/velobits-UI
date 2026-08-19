@@ -32,7 +32,7 @@ import { DocsToc, type TocEntry } from '@/components/docs-toc';
 export const metadata: Metadata = {
   title: 'Colors',
   description:
-    'Every semantic token, its contrast gate, and the glass composites , computed from @velobitsio/tokens at build time.',
+    'Every semantic token, its contrast gate, and the glass composites, computed from @velobitsio/tokens at build time.',
 };
 
 /**
@@ -232,7 +232,7 @@ export default function ColorsPage() {
           intro={
             <>
               The names components actually consume, resolved per theme. These and{' '}
-              <code>css/tokens.css</code> describe the same values , the suite parses the CSS and
+              <code>css/tokens.css</code> describe the same values; the suite parses the CSS and
               asserts they agree, so the two cannot drift. <strong>Gated</strong> means the token
               appears in at least one contrast pair; <strong>exempt</strong> means it is
               deliberately excluded, with the reason recorded in the package and repeated below.
@@ -351,8 +351,8 @@ export default function ColorsPage() {
           title={`Measured pairs (${CONTRAST_PAIRS.length})`}
           intro={
             <>
-              The full flat-pair registry, not a selection , every ratio is computed here by the
-              same functions the gate uses. A pair scoped to one theme prints <code>,</code> in the
+              The full flat-pair registry, not a selection: every ratio is computed here by the same
+              functions the gate uses. A pair scoped to one theme prints <code>,</code> in the
               other.
             </>
           }
@@ -400,7 +400,7 @@ export default function ColorsPage() {
             <>
               A chip is never seen against the colour it is declared with. Each wash is flattened
               over the page, the panel and the Tier-S glass composite, and the text measured on the
-              result , which is the gate a flat pair cannot express.
+              result, which is the gate a flat pair cannot express.
             </>
           }
         >
@@ -445,7 +445,7 @@ export default function ColorsPage() {
             <>
               Translucency is worthless if the result is the colour underneath it. Every tier must
               clear <strong>{PERCEPTIBILITY_FLOOR}/255</strong> max-channel distance from what it
-              sits on , Tier S from both the page and the opaque panel, since it has to read as
+              sits on; Tier S from both the page and the opaque panel, since it has to read as
               raised without becoming the panel. This gate is what caught a dark overlay that
               composited to byte-identical with the page.
             </>

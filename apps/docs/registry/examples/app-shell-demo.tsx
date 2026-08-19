@@ -130,7 +130,7 @@ export default function AppShellDemo() {
           </Table>
           {Array.from({ length: 8 }, (_, i) => (
             <p key={i} className="text-sm text-muted-foreground">
-              The main region scrolls under the sticky glass header , scroll it and watch content
+              The main region scrolls under the sticky glass header; scroll it and watch content
               pass behind the blur.
             </p>
           ))}

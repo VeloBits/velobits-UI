@@ -10,9 +10,35 @@ registry the shadcn CLI fetches. Both come out of a single `npm run build`, so
 the docs you are reading and the JSON the CLI installs are always the same
 revision, there is no arrangement in which one is stale.
 
-## Adding the namespace
+## The namespace
 
-Once, in your `components.json`:
+`@velobits` is a **registered shadcn namespace**, so it resolves with no
+configuration in any project that has run `shadcn init`:
+
+```bash
+npx shadcn@latest add @velobits/button
+npx shadcn@latest add @velobits/data-table @velobits/use-row-selection
+npx shadcn@latest add @velobits/velobits          # everything
+```
+
+There is no `components.json` entry to add. Resolution goes through shadcn's
+public registry index, which needs a **current CLI**; older ones do not know
+about the index and need one of the two forms below.
+
+## Two explicit forms, for when you do not want the index
+
+**By full URL.** Needs no configuration and no index lookup, on any CLI version:
+
+```bash
+npx shadcn@latest add https://ui.velobits.dev/r/button.json
+```
+
+This form is never going away. It is what CI scripts and one-off scaffolds should
+use, since it depends on nothing: not the consuming repo's config, and not the
+index.
+
+**By explicit mapping.** Pins the origin, and takes precedence over the index,
+so it is also how you point a project at a staging copy or an internal mirror:
 
 ```json
 {
@@ -22,27 +48,7 @@ Once, in your `components.json`:
 }
 ```
 
-`{name}` is replaced with the item name. After that:
-
-```bash
-npx shadcn@latest add @velobits/button
-npx shadcn@latest add @velobits/data-table @velobits/use-row-selection
-npx shadcn@latest add @velobits/velobits          # everything
-```
-
-Namespaced registries need **shadcn CLI v3 or newer**.
-
-## Without the namespace
-
-Every item is also addressable by its full URL, which needs no configuration and
-works on any CLI version:
-
-```bash
-npx shadcn@latest add https://ui.velobits.dev/r/button.json
-```
-
-This form is never going away. It is what CI scripts and one-off scaffolds
-should use, since it depends on nothing in the consuming repo.
+`{name}` is replaced with the item name.
 
 ## Inspecting before installing
 

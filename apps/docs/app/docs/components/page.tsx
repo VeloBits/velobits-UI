@@ -29,7 +29,7 @@ export default function ComponentsIndexPage() {
       <header className="space-y-3">
         <h1 className="text-3xl font-semibold tracking-tight">Components</h1>
         <p className="max-w-3xl leading-7 text-muted-foreground">
-          {componentCount} components across three tiers, on 36 semantic tokens , every one of which
+          {componentCount} components across three tiers, on 36 semantic tokens, every one of which
           is either contrast-gated or carries a recorded exemption. Each page carries its install
           command, what it depends on, and a prop table extracted from the source.
         </p>

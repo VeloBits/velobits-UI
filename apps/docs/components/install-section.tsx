@@ -17,7 +17,7 @@ import { LayersIcon } from '@velobitsio/icons';
 
 import type { DocRegistryItem } from '@/lib/generated/registry-data';
 import { componentHref } from '@/lib/docs-nav';
-import { itemUrl, namespacedItem, REGISTRY_CONFIG_SNIPPET, REGISTRY_NAMESPACE } from '@/lib/site';
+import { itemUrl, namespacedItem, REGISTRY_NAMESPACE } from '@/lib/site';
 
 import { CodePanel } from './code-panel';
 import { CommandSnippet, InstallSnippet } from './command-snippet';
@@ -27,7 +27,7 @@ import { CommandSnippet, InstallSnippet } from './command-snippet';
  * that is one command, and a Manual tab that is the dependencies plus the file.
  *
  * The dependency lists, the file paths and the file contents all come from
- * `registry/registry.ts` by way of the codegen , the same source the CLI reads.
+ * `registry/registry.ts` by way of the codegen, the same source the CLI reads.
  * So the Manual instructions cannot describe a different install from the one the
  * CLI performs, which is the failure mode of every hand-written "or copy this
  * file" section.
@@ -50,28 +50,36 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
             command={`shadcn@latest add ${namespacedItem(item.name)}`}
             label={`install ${item.name}`}
           />
-          <Alert variant="info">
+          {/*
+           * No setup step. `@velobits` is registered in shadcn's public index, so
+           * the command above works in any project that has run `shadcn init`.
+           * This block used to open with "One-time setup" and a components.json
+           * snippet; keeping that would now be telling every reader to do
+           * something they do not need to do.
+           */}
+          <Alert>
             <LayersIcon />
-            <AlertTitle>One-time setup</AlertTitle>
+            <AlertTitle>Nothing to configure</AlertTitle>
             <AlertDescription>
               <p>
-                <code>{REGISTRY_NAMESPACE}</code> resolves once you add it to your{' '}
-                <code>components.json</code>. Full instructions on the{' '}
-                <Link href="/docs/registry" className="text-link underline underline-offset-4">
-                  Registry
-                </Link>{' '}
-                page.
+                <code>{REGISTRY_NAMESPACE}</code> is a registered shadcn namespace, so it resolves
+                out of the box, with no <code>components.json</code> entry needed.
               </p>
-              <CodeBlock language="json" copyable label="components.json" className="mt-3">
-                {REGISTRY_CONFIG_SNIPPET}
-              </CodeBlock>
               <p className="mt-3">
-                Without it , or on a CLI older than v3 , the full URL works anywhere and needs no
-                configuration:
+                Two cases still want an explicit form: a CLI too old to know the index, or pinning
+                the origin (a staging mirror, an air-gapped copy). Either way the full URL is
+                addressable directly:
               </p>
               <CodeBlock variant="terminal" wrap copyable label="install by URL" className="mt-2">
                 {`npx shadcn@latest add ${itemUrl(item.name)}`}
               </CodeBlock>
+              <p className="mt-3">
+                The{' '}
+                <Link href="/docs/registry" className="text-link underline underline-offset-4">
+                  Registry
+                </Link>{' '}
+                page covers pinning, <code>view</code> and <code>search</code>.
+              </p>
             </AlertDescription>
           </Alert>
         </TabsContent>
@@ -94,7 +102,7 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
           {item.registryDependencies.length > 0 && (
             <div className="space-y-2">
               <p className="text-sm font-medium">
-                Add these registry items first , this one imports them:
+                Add these registry items first; this one imports them:
               </p>
               <div className="flex flex-wrap gap-2">
                 {item.registryDependencies.map((dep) => (
@@ -122,7 +130,7 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
             ))
           ) : (
             <p className="text-sm text-muted-foreground">
-              This item ships no files of its own , it is a bundle of the items listed above, so
+              This item ships no files of its own; it is a bundle of the items listed above, so
               installing it by hand means installing each of those.
             </p>
           )}

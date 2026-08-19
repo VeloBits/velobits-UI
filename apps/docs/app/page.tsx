@@ -53,7 +53,7 @@ export default function HomePage() {
         </h1>
         <p className="max-w-2xl text-lg leading-8 text-muted-foreground text-pretty">
           Accessible, contrast-gated React components on a warm neutral palette and a two-tier glass
-          material. Install them with the CLI and own the source, or take the npm package , same
+          material. Install them with the CLI and own the source, or take the npm package: same
           components either way, authored once.
         </p>
 
@@ -74,11 +74,11 @@ export default function HomePage() {
             {`npx shadcn@latest add ${namespacedItem('velobits')}`}
           </CodeBlock>
           <p className="mt-2 text-sm text-muted-foreground">
-            Add the{' '}
+            A{' '}
             <Link href="/docs/registry" className="text-link underline underline-offset-4">
-              registry namespace
+              registered shadcn namespace
             </Link>{' '}
-            once, then install anything by name.
+            with nothing to configure. Install anything by name.
           </p>
         </div>
       </section>
@@ -89,7 +89,7 @@ export default function HomePage() {
           {
             icon: DropletIcon,
             title: 'Contrast is a gate, not a guideline',
-            body: 'Every semantic colour pair is asserted against its WCAG target in both themes, composited in gamma-encoded sRGB , because that is what browsers actually do. A palette edit that breaks contrast fails CI instead of shipping.',
+            body: 'Every semantic colour pair is asserted against its WCAG target in both themes, composited in gamma-encoded sRGB, because that is what browsers actually do. A palette edit that breaks contrast fails CI instead of shipping.',
             href: '/docs/colors',
             cta: 'See the measurements',
           },
@@ -165,7 +165,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-border py-10 text-sm text-muted-foreground">
-        Built by VeloBits. The registry and these docs deploy as one artefact , see{' '}
+        Built by VeloBits. The registry and these docs deploy as one artefact; see{' '}
         <Link href="/docs/registry" className="text-link underline underline-offset-4">
           Registry
         </Link>

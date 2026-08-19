@@ -14,9 +14,9 @@ standard `shadcn` commands are the whole interface.
 npx shadcn@latest init
 ```
 
-Creates [`components.json`](/docs/components-json) and wires up your aliases. Add
-the `registries` block afterwards, `init` does not prompt for third-party
-registries.
+Creates [`components.json`](/docs/components-json) and wires up your aliases.
+Nothing else to add for VeloBits: `@velobits` is a registered namespace and
+resolves through shadcn's public index once `init` has run.
 
 ## add
 
@@ -36,7 +36,7 @@ Useful flags:
 | `--overwrite`  | Replace files that already exist. Off by default, deliberately. |
 | `--path <dir>` | Write somewhere other than the configured alias.                |
 | `--yes`        | Skip confirmation prompts, but not the one below.               |
-| `--cwd <dir>`  | Run against another directory, useful in a monorepo.            |
+| `--cwd <dir>`  | Run against another directory; useful in a monorepo.            |
 
 Install the whole system in one command:
 
@@ -46,7 +46,7 @@ npx shadcn@latest add @velobits/velobits
 
 ### The one prompt `--yes` does not cover
 
-Our `cn` installs to your `utils` module, deliberately, so you end up with one
+Our `cn` installs to your `utils` module. That is deliberate, so you end up with one
 `cn` rather than two. If a file is already there, the CLI **prompts** and defaults
 to no:
 
@@ -73,8 +73,8 @@ copied components, so on a later run it discards your edits to them as well.
 npx shadcn@latest view @velobits/dialog
 ```
 
-Prints what would be installed, dependencies, registry dependencies and file
-targets, and writes nothing. Worth running before an `--overwrite`.
+Prints what would be installed (dependencies, registry dependencies and file
+targets) and writes nothing. Worth running before an `--overwrite`.
 
 ## search
 
@@ -95,7 +95,7 @@ npx shadcn@latest build registry.json --output apps/docs/public/r
 ```
 
 In this repository that runs as part of `npm run build` rather than by hand, so
-the published JSON cannot drift from the sources, see [Registry](/docs/registry).
+the published JSON cannot drift from the sources; see [Registry](/docs/registry).
 
 ## Older CLIs
 
