@@ -297,15 +297,14 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   },
 
   'scroll-area': {
-    usage: `import { ScrollArea, ScrollBar } from '@velobitsio/ui';
+    usage: `import { ScrollArea } from '@velobitsio/ui';
 
 <ScrollArea className="h-56">
   {/* Root needs a bounded height from somewhere, or it grows and never scrolls */}
 </ScrollArea>
 
-<ScrollArea className="w-full">
+<ScrollArea axis="x" className="w-full">
   <div className="flex gap-3">{/* wider than the box */}</div>
-  <ScrollBar orientation="horizontal" />
 </ScrollArea>`,
     examples: [{ name: 'scroll-area-demo', title: 'Both axes' }],
     notes: [
@@ -314,7 +313,8 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
       'The track is transparent on purpose. It would be the widest block of flat colour on a long page, and filling it is most of what makes a custom scrollbar look dated.',
       'Radix moves the overflow to an inner viewport, so the Root needs a bounded height from a class, a grid track or a flex parent. Given none it grows to fit its content and never scrolls, which reads as the component being broken rather than unconstrained.',
       'Do not use it for a region whose content might fit. Radix sets the viewport to overflow: scroll the moment a scrollbar mounts, not overflow: auto, and not gated on whether anything overflows; type="auto" only governs when the bar is visible. A short list then captures the wheel, the page does not move, and it lurches when the scroll chain reaches the document. That is why this site scrolls its sidebar and its On this page columns with plain overflow-y-auto rather than with this component.',
-      'ScrollArea renders a vertical ScrollBar itself. Pass one explicitly only for the horizontal axis, as the demo does.',
+      'Choose axes with axis: "y" (the default), "x" or "both". Do not pass ScrollBar as a child to get a second axis. Children render inside the viewport, so a bar passed that way sits in the scrolling content and slides away with the very thing it is measuring, which looks exactly like a scrollbar that is stuck.',
+      'axis also decides which axes scroll at all. Radix turns the viewport overflow on per axis according to whether a scrollbar for it is mounted, so the default leaves overflow-x hidden instead of allowing silent sideways drift.',
     ],
   },
 

@@ -5,13 +5,17 @@
 Added `ScrollArea`, a scrollable region with a scrollbar the system controls.
 
 ```tsx
-import { ScrollArea, ScrollBar } from '@velobitsio/ui';
+import { ScrollArea } from '@velobitsio/ui';
 
 <ScrollArea className="h-56">{/* bounded height required */}</ScrollArea>;
+<ScrollArea axis="x">{/* or "y", the default, or "both" */}</ScrollArea>;
 ```
 
-`ScrollArea` renders its own vertical bar. Pass `ScrollBar` explicitly only for
-the horizontal axis.
+Pick axes with `axis`, and not by passing `ScrollBar` as a child. Children render
+inside the viewport, so a bar passed that way ends up in the scrolling content and
+slides away with what it is measuring. `axis` also decides which axes scroll at
+all, since Radix enables the viewport overflow per axis from whether a bar for it
+is mounted.
 
 **The thumb is `--field-border`, not `--border`.** That is the same distinction
 `Separator` documents from the other side, and it is why the palette carries two

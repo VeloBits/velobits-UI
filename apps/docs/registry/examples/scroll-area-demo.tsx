@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, ScrollArea, ScrollBar, Separator } from '@velobitsio/ui';
+import { Badge, ScrollArea, Separator } from '@velobitsio/ui';
 
 const REGIONS = [
   'us-east-1',
@@ -39,8 +39,8 @@ export default function ScrollAreaDemo() {
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium">Horizontal, via a second ScrollBar</p>
-        <ScrollArea className="w-full rounded-xl border border-border p-3">
+        <p className="text-sm font-medium">Horizontal, via axis="x"</p>
+        <ScrollArea axis="x" className="w-full rounded-xl border border-border p-3">
           <div className="flex gap-3 pb-3">
             {REGIONS.slice(0, 10).map((region) => (
               <div
@@ -53,7 +53,6 @@ export default function ScrollAreaDemo() {
               </div>
             ))}
           </div>
-          <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
     </div>

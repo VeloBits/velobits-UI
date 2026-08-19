@@ -67,11 +67,32 @@ import { cn } from '../lib/cn';
 function ScrollArea({
   className,
   children,
+  axis = 'y',
+  type = 'auto',
   ...props
-}: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
+}: React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
+  /**
+   * Which axes scroll. Defaults to vertical.
+   *
+   * A prop rather than something the caller composes, because a scrollbar has to
+   * be a SIBLING of the viewport while `children` go inside it. Passing
+   * `<ScrollBar orientation="horizontal" />` as a child puts the bar in the
+   * scrolling content, where it slides away with the very thing it is measuring.
+   * It looks stuck because it is being scrolled.
+   *
+   * It also decides which axes scroll AT ALL: Radix enables the viewport overflow
+   * per axis from whether a scrollbar for that axis is mounted, so the default
+   * leaves `overflow-x: hidden` rather than allowing silent sideways drift.
+   */
+  axis?: 'y' | 'x' | 'both';
+}) {
+  const showY = axis !== 'x';
+  const showX = axis !== 'y';
+
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
+      type={type}
       className={cn('relative', className)}
       {...props}
     >
@@ -86,15 +107,19 @@ function ScrollArea({
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar />
-      <ScrollAreaPrimitive.Corner />
+      {showY && <ScrollBar orientation="vertical" />}
+      {showX && <ScrollBar orientation="horizontal" />}
+      {showY && showX && <ScrollAreaPrimitive.Corner />}
     </ScrollAreaPrimitive.Root>
   );
 }
-
 /**
- * Rendered by `ScrollArea` already. Export exists for the two-axis case, where a
- * second one is passed with `orientation="horizontal"`.
+ * Rendered by `ScrollArea` from its `axis` prop. Exported for the case where the
+ * primitive is composed by hand, which is the only way to put a bar anywhere other
+ * than where `ScrollArea` puts it.
+ *
+ * Do NOT pass it as a child of `ScrollArea`: children render inside the viewport,
+ * so the bar would scroll along with the content it is measuring.
  */
 function ScrollBar({
   className,
