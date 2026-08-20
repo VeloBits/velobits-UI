@@ -14,7 +14,7 @@ is asserted by a test, so an icon added or lost in a merge fails CI.
   along with the `Icon` and `IconProps` types.
 - **Tree-shakes without per-icon entry points.** `sideEffects: false` and every
   export is a plain function, so a bundler drops what you do not reference. A
-  `size-limit` budget asserts it in CI — roughly 233 B for a single icon —
+  `size-limit` budget asserts it in CI , roughly 233 B for a single icon ,
   rather than taking it on trust.
 
 ### Known

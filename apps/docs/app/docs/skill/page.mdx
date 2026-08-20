@@ -1,0 +1,103 @@
+import { SkillInstall } from '@/components/skill-install';
+
+export const metadata = {
+  title: 'Agent skill',
+  description:
+    'The same guidance as these pages, in the format a coding agent loads before it writes any UI.',
+};
+
+# Agent skill
+
+Everything on this site is written for a person reading it. An agent writing code
+in your repository is not reading it, and the result is predictable: `bg-blue-500`
+instead of `bg-primary`, a fresh `Sheet` beside the `SidePanel` that already
+exists, a `@source` line nobody added, and a `Tooltip` that throws the first time
+anyone hovers.
+
+So the same rules ship a second way, as a **skill**: a `SKILL.md` with four
+reference files, in the format Claude Code, Cursor and anything reading `AGENTS.md`
+load from a project. One command puts it in your repo:
+
+```bash
+npx shadcn@latest add @velobits/skill
+```
+
+That writes five markdown files and nothing else. No dependencies, no source files,
+no changes to anything you own. [Install it](#install-it) has the command for your
+agent, wherever you want it.
+
+## What it is
+
+A skill is a directory the agent reads on demand: a short entry point that is
+always in context, and reference files it opens when it needs the detail. This one
+is authored in `skills/velobits-ui/` in this repository and built by the same
+`npm run build` that produces these pages, so it cannot describe an older system
+than the docs do.
+
+| File                            | Carries                                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `SKILL.md`                      | Which distribution to use, both quickstarts, the seven rules that fail silently, the token vocabulary, the item list, a symptom table |
+| `references/frameworks.md`      | Next, Vite, React Router, TanStack Start, Astro, Laravel, an existing shadcn project, monorepos, Module Federation, Keycloak          |
+| `references/shadcn-registry.md` | The three addressing forms, every command, install targets, mirrors, CI                                                               |
+| `references/npm-packages.md`    | The three packages, peers, subpath exports, the scope, auth and Docker                                                                |
+| `references/design-rules.md`    | Tokens, the two glass tiers, the contrast gate, motion, accessibility, Tailwind v4 traps                                              |
+
+The point of the split is that `SKILL.md` stays short enough to be worth loading in
+full on every task, while "how do I wire this up in Astro" costs nothing until
+somebody is wiring something up in Astro.
+
+## Install it
+
+Pick the agent and where it should live. Every combination lands somewhere
+different, so the commands below are the ones for the pair you choose, and not a
+list to read past.
+
+<SkillInstall />
+
+Two things that apply whatever you picked. **Add `--overwrite`** when the CLI is
+updating a copy that is already there; it prompts otherwise and defaults to no.
+And **`shadcn search @velobits` will not list these two.** Search reads our
+`/r/registry.json`, which is the component index, and the skill is not a component.
+Resolution does not go through that index though, so `add` finds it anyway: the
+public registry index maps `@velobits` to the URL template
+`https://ui.velobits.dev/r/{name}.json`, and the name is substituted into it.
+
+## Other agents
+
+The format is a markdown file with YAML frontmatter, and nothing in the content
+depends on it. Any tool that can be pointed at a file works:
+
+- **Windsurf and other rules-file tools** , install the Cursor variant and move
+  the `.mdc` to wherever that tool keeps its rules, or point its rules file at the
+  installed `SKILL.md`.
+- **An agent with web access and no filesystem** , give it
+  `https://ui.velobits.dev/skills/velobits-ui/SKILL.md`. The files are served with
+  `Access-Control-Allow-Origin: *` and no long-lived cache.
+
+## The registry is machine-readable on its own
+
+The skill tells an agent the rules. These tell it what exists, which is the other
+half of not inventing things:
+
+```bash
+npx shadcn@latest search @velobits --query "table"   # what is in the registry
+npx shadcn@latest view @velobits/data-table          # deps and targets, writes nothing
+npx shadcn@latest mcp init --client claude           # let the agent query and install directly
+```
+
+`mcp init` also takes `cursor`, `vscode`, `codex` and `opencode`. It registers
+shadcn's MCP server for that client, after
+which the agent can search this registry and install from it without shelling out
+to guessed commands. [`/r/registry.json`](https://ui.velobits.dev/r/registry.json)
+is the same index as a plain fetch.
+
+## What it will not do
+
+It is documentation, not a policy engine. It will not stop an agent painting a
+component with `bg-slate-800`, and nothing in it replaces the gates: the contrast
+suite, the axe pass, the registry parity test and `publint` all still run in this
+repository, and a consuming app still has to run `tsc`.
+
+What it does is remove the excuse. Every rule on this site that fails silently is
+in there, next to the symptom it produces, in the place the agent is already
+looking.

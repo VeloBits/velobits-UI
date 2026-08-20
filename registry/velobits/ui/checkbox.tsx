@@ -7,7 +7,7 @@ import { CheckIcon, MinusIcon } from '@velobitsio/icons';
 import { cn } from '../lib/cn';
 
 /**
- * Radix Checkbox, which is safe under happy-dom in a way Radix Select is not —
+ * Radix Checkbox, which is safe under happy-dom in a way Radix Select is not ,
  * it renders a real `<button role="checkbox">` and needs no measurement.
  *
  * Handles the indeterminate state, which matters for the bulk-selection headers

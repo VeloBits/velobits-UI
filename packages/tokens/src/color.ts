@@ -1,6 +1,6 @@
 /**
  * Colour maths for the design system. Hand-written, because @velobitsio/tokens
- * ships with ZERO dependencies — see the eslint rule and §4 of the plan for why
+ * ships with ZERO dependencies , see the eslint rule and §4 of the plan for why
  * that constraint is load-bearing (the Keycloak login theme consumes this
  * package and cannot consume anything React-shaped).
  *

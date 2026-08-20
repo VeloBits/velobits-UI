@@ -14,7 +14,7 @@ import { cn } from '../lib/cn';
  *
  * ## Why `role` is a prop rather than a hardcoded `alert`
  *
- * `role="alert"` is an assertive live region — it interrupts whatever the
+ * `role="alert"` is an assertive live region , it interrupts whatever the
  * screen reader is saying. Correct for an error that just appeared in response
  * to an action; wrong for a static informational panel rendered with the page,
  * where it announces on every navigation. Defaults to `status` (polite), and a
@@ -22,7 +22,7 @@ import { cn } from '../lib/cn';
  *
  * ## `surface` applies to the neutral variant ONLY, and that is not an oversight
  *
- * A neutral Alert is a panel, so it takes the Tier-S material by default —
+ * A neutral Alert is a panel, so it takes the Tier-S material by default ,
  * `.glass-surface`, the same material as `Card`. The four status variants keep
  * their `*-soft` wash, because a wash and a glass tier cannot coexist on one
  * element: `bg-danger-soft` is a utility, `.glass-surface` is in the `components`
@@ -33,7 +33,7 @@ import { cn } from '../lib/cn';
  * rather than being applied to the base.
  *
  * `surface="panel"` returns the opaque neutral panel, and is what a neutral Alert
- * nested inside a glass Card or a Tier-O overlay should use — glass over the same
+ * nested inside a glass Card or a Tier-O overlay should use , glass over the same
  * glass composites 2/255 apart, so the inner surface disappears.
  */
 const alertVariants = cva(

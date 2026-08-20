@@ -15,7 +15,7 @@ const FLAGS = [
 ] as const;
 
 export default function MotionStagger() {
-  // Remounting is what replays the entrance — the animation runs on mount, so a
+  // Remounting is what replays the entrance , the animation runs on mount, so a
   // demo of it needs a way to mount again.
   const [run, setRun] = useState(0);
 

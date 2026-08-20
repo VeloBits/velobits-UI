@@ -53,7 +53,7 @@ describe('paginationRange, the arithmetic', () => {
     /**
      * The property the naive implementation misses. It drops an ellipsis near
      * either end, so the control is 6 slots wide on page 1, 7 in the middle and 6
-     * again at the end — every button shifts sideways as you page and the number
+     * again at the end , every button shifts sideways as you page and the number
      * you were about to click moves out from under the pointer.
      */
     for (let page = 1; page <= 20; page++) {
@@ -94,7 +94,7 @@ describe('paginationRange, the arithmetic', () => {
      *
      * This is the off-by-one the usual implementation ships. With the textbook
      * `leftSibling > 2` / `rightSibling < pageCount - 1` bounds,
-     * `{ page: 5, pageCount: 8 }` renders `1 … 4 5 6 … 8` — where the second
+     * `{ page: 5, pageCount: 8 }` renders `1 … 4 5 6 … 8` , where the second
      * ellipsis stands in for page 7 and nothing else. Caught here, fixed in
      * `paginationRange`.
      */

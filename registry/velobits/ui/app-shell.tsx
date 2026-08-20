@@ -32,7 +32,7 @@ import { SidePanel, SidePanelContent, SidePanelTitle, SidePanelTrigger } from '.
  * ## Why `sidebar` is a prop and not a child
  *
  * Because it is rendered in **two places**: as a rail at `md` and up, and inside
- * a drawer below it. One definition, two presentations — which is the only way a
+ * a drawer below it. One definition, two presentations , which is the only way a
  * nav item added in one place cannot go missing from the other.
  *
  * The consequence a caller has to know: **the sidebar node must be idempotent.**
@@ -46,14 +46,14 @@ import { SidePanel, SidePanelContent, SidePanelTitle, SidePanelTrigger } from '.
  * ## The drawer is a `SidePanel`, not a hand-rolled overlay
  *
  * So it gets the focus trap, the Esc handler, the scroll lock, `aria-modal`, and
- * — the one that is invisible until you need it — **focus restoration to the
+ * , the one that is invisible until you need it , **focus restoration to the
  * hamburger** when it closes. A hand-rolled drawer typically has the first three
  * and not the fourth, so closing the menu drops focus to `<body>` and the next
  * Tab restarts from the top of the document.
  *
  * ## Two things this cannot do for you, and one it can
  *
- * It cannot close the drawer on navigation — it has no router. Do this once, in
+ * It cannot close the drawer on navigation , it has no router. Do this once, in
  * your own shell file:
  *
  * ```tsx
@@ -74,7 +74,7 @@ import { SidePanel, SidePanelContent, SidePanelTitle, SidePanelTrigger } from '.
 interface AppShellContextValue {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
-  /** Stable identity — safe as a `useEffect` dependency. */
+  /** Stable identity , safe as a `useEffect` dependency. */
   closeSidebar: () => void;
 }
 
@@ -89,7 +89,7 @@ export function useAppShell(): AppShellContextValue {
 export interface AppShellProps extends Omit<React.ComponentProps<'div'>, 'children'> {
   /** The sticky bar. Usually an `AppShellHeader`. */
   header?: React.ReactNode;
-  /** The nav. Rendered twice — see the docblock. */
+  /** The nav. Rendered twice , see the docblock. */
   sidebar?: React.ReactNode;
   /** Names both nav landmarks and the mobile drawer. */
   sidebarLabel?: string;
@@ -135,7 +135,7 @@ function AppShell({
    * The breakpoint comes from @velobitsio/tokens rather than being typed here,
    * because it has to agree with the `md:` variants below. When those two
    * disagree the failure is a narrow band of viewport widths in which the rail
-   * and the drawer are both showing — which nobody finds, because nobody resizes
+   * and the drawer are both showing , which nobody finds, because nobody resizes
    * a browser one pixel at a time.
    */
   const isDesktop = useMediaQuery(`(min-width: ${breakpoint.md})`);
@@ -151,7 +151,7 @@ function AppShell({
   return (
     <AppShellContext.Provider value={context}>
       {/* The Dialog root wraps the whole shell so `AppShellSidebarTrigger` can
-          sit in the header and still be a real Radix trigger — which is what
+          sit in the header and still be a real Radix trigger , which is what
           wires `aria-expanded`, `aria-controls` and the focus return. */}
       <SidePanel open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <div
@@ -166,7 +166,7 @@ function AppShell({
            * navigation. It is the first element in the DOM because a skip link
            * that is not first is not a skip link.
            *
-           * `sr-only focus:not-sr-only` — visible only once focused. A skip link
+           * `sr-only focus:not-sr-only` , visible only once focused. A skip link
            * that is permanently invisible (`left: -9999px` with no focus rule) is
            * the classic broken implementation: it exists, it is announced, and
            * sighted keyboard users cannot see where their focus went.
@@ -196,14 +196,14 @@ function AppShell({
                * Tier S, and applied WITHOUT overrides. A rail is one of the
                * surfaces `glass.css` names for this tier, and the temptation
                * here is to strip its shadow and three of its borders because
-               * they are off-screen anyway — which is exactly the mistake the
+               * they are off-screen anyway , which is exactly the mistake the
                * `Card` docblock warns about, since in dark mode the inset
                * specular highlight in that shadow list IS the material. They
                * cost nothing where they land: the side borders sit at the
                * viewport edge, the drop shadow points down past the fold.
                *
                * No blur. The rail sits BESIDE the scroll region, not over it, so
-               * there is nothing moving behind it — and it would be a second
+               * there is nothing moving behind it , and it would be a second
                * live backdrop layer on every page for no visual gain. The header
                * is the one that earns one.
                */
@@ -227,7 +227,7 @@ function AppShell({
              * `tabIndex={-1}` is what makes the skip link actually move FOCUS.
              * Without it the browser scrolls to the target and leaves focus on
              * the link, so the very next Tab goes back into the navigation the
-             * user just asked to skip — the link appears to do nothing.
+             * user just asked to skip , the link appears to do nothing.
              *
              * This is also the scroll container, so the header can be sticky
              * without the page scrolling underneath the whole shell.
@@ -295,13 +295,13 @@ export interface AppShellHeaderProps extends React.ComponentProps<'header'> {
  * ## Tier O, and it is the one place in the shell that earns a blur
  *
  * Page content genuinely passes underneath a sticky bar, so its backdrop is
- * unknowable — which is the definition of Tier O, and why `.glass` steps muted
+ * unknowable , which is the definition of Tier O, and why `.glass` steps muted
  * text up to `--muted-on-glass` for its descendants.
  *
  * `backdrop-filter` also makes this element a containing block for
  * `position: fixed` descendants. Anything fixed rendered *inside* the header is
  * therefore trapped in the header's box. In practice every overlay in this system
- * is portalled to `<body>` and so unaffected — but a hand-rolled fixed dropdown
+ * is portalled to `<body>` and so unaffected , but a hand-rolled fixed dropdown
  * put in here will land in the wrong place, and it will look like a CSS typo.
  *
  * ## The two overrides on `.glass` here, and why they are not the forbidden kind

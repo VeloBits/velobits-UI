@@ -32,7 +32,7 @@ export default function CommandPaletteDemo() {
       {/*
        * Bound to ⌘J rather than ⌘K: this docs site binds ⌘K itself for its own
        * search, and two listeners on one chord means whichever mounted last wins.
-       * A design system must not take a global key by merely being imported —
+       * A design system must not take a global key by merely being imported ,
        * which is why `shortcut` is opt-in in the first place.
        */}
       <CommandDialog open={open} onOpenChange={setOpen} shortcut="j">

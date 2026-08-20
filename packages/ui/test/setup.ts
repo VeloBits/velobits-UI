@@ -3,7 +3,7 @@ import { afterEach } from 'vitest';
 
 /**
  * Testing Library registers its own `afterEach(cleanup)` only when a global
- * `afterEach` exists — which it does not, because `globals: false` in
+ * `afterEach` exists , which it does not, because `globals: false` in
  * vitest.config.ts. Without this, every render accumulates in the same document
  * and the failure is `Found multiple elements with the role "button"`, which
  * reads like a component rendering twice.

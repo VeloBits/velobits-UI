@@ -176,7 +176,7 @@ describe('Tabs, styling contract', () => {
   it('uses the AA-gated muted step for an inactive tab, not an alpha guess', () => {
     /**
      * the dashboard app used `text-foreground/60`, which computes to roughly 3:1 over
-     * `--bg2` — under AA for 14px text — and then needed a `dark:` override that
+     * `--bg2` , under AA for 14px text , and then needed a `dark:` override that
      * made the themes disagree. `--muted-fg` is measured against both themes'
      * surfaces by @velobitsio/tokens.
      */
@@ -194,7 +194,7 @@ describe('Tabs, styling contract', () => {
   });
 
   it('crossfades the underline instead of animating its position', () => {
-    /** Opacity and transform only — an animated inset would invalidate layout. */
+    /** Opacity and transform only , an animated inset would invalidate layout. */
     render(<Fixture />);
     const cls = screen.getByRole('tab', { name: 'Overview' }).className;
     expect(cls).toContain('after:transition-opacity');

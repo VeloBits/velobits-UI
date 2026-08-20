@@ -7,13 +7,13 @@ import { neutral } from './generated/neutrals';
  * a single `#c8f135` fill, and the dashboard app's mark is `#007acc`.
  *
  * Their OKLCH values and every contrast pairing derived from them are asserted
- * in `test/contrast.test.ts` — see `docs/VelobitsUI/VELOBITS_DESIGN_SYSTEM.md`
+ * in `test/contrast.test.ts` , see `docs/VelobitsUI/VELOBITS_DESIGN_SYSTEM.md`
  * for the measurement table.
  */
 export const seed = {
-  /** `primary` — fills and the focus ring. NOT a text colour; see `primaryText`. */
+  /** `primary` , fills and the focus ring. NOT a text colour; see `primaryText`. */
   blue: '#007ACC',
-  /** `brand` — accent fills, badges, charts. Fill-only in light mode. */
+  /** `brand` , accent fills, badges, charts. Fill-only in light mode. */
   lime: '#C8F135',
   /** Light-mode page background. */
   cream: '#F4EDEA',
@@ -25,21 +25,21 @@ export const seed = {
 
 /**
  * Blue's derived text steps. The seed measures **3.90:1 on cream**, which fails
- * AA for text — so `primary` is a fill token and links use these instead. This
+ * AA for text , so `primary` is a fill token and links use these instead. This
  * is the single most common way to misuse this palette:
  * **never use `--primary` for a link, an icon beside text, or body copy.**
  */
 export const blueSteps = {
   /**
-   * L=.495 — 5.34:1 on cream, 6.18:1 on white. Darker than flat-pair AA alone
+   * L=.495 , 5.34:1 on cream, 6.18:1 on white. Darker than flat-pair AA alone
    * would need: this step also has to clear 4.5:1 *inside a soft chip*, i.e.
-   * composited over `primarySoft`/`infoSoft` on the cream page — the soft-chip
+   * composited over `primarySoft`/`infoSoft` on the cream page , the soft-chip
    * suite in `test/contrast.test.ts`. The previous `#006CBD` measured 4.08:1
    * there.
    */
   text: '#0062B3',
   /**
-   * L=.723 — 7.10:1 on the dark page. Lifted for the same reason `text` was
+   * L=.723 , 7.10:1 on the dark page. Lifted for the same reason `text` was
    * darkened: over `primarySoft` on the dark panel the previous `#42A4F9`
    * measured 4.23:1.
    */
@@ -48,7 +48,7 @@ export const blueSteps = {
   hover: '#0062A3',
   /** Dark hover fill, matching the dashboard app's existing `--accent-hover`. */
   hoverDark: '#1177BB',
-  /** Dark focus ring — 5.37:1 on the dark page, well past the 3:1 floor. */
+  /** Dark focus ring , 5.37:1 on the dark page, well past the 3:1 floor. */
   ringDark: '#3094E8',
 } as const;
 
@@ -59,27 +59,27 @@ export const blueSteps = {
 export const plumSteps = { text: '#582840' } as const;
 
 /**
- * Teal — the hue `info` is built from, and the reason `info` is no longer blue.
+ * Teal , the hue `info` is built from, and the reason `info` is no longer blue.
  *
  * ## Why this exists at all
  *
  * `--info` used to be `blueSteps.text`, which made it **byte-identical** to
  * `--primary-text` in both themes (`#0062B3` light, `#4AACFF` dark). "This is
  * informational" and "this is a link" were the same colour, so the distinction
- * could not be rendered — and no gate caught it, because every pair each token
+ * could not be rendered , and no gate caught it, because every pair each token
  * belongs to passed on its own. It stayed invisible only because
  * `Badge variant="info"` happened to be unused.
  *
  * Teal rather than a re-tuned blue: two blues one step apart would fail the same
  * way the first time anyone put a link inside an info chip. The hue is taken from
  * `chart5` (#368A8A / #3B8F8E), which already proves this family clears the
- * non-text floor against both pages — the steps below are that hue pushed to
+ * non-text floor against both pages , the steps below are that hue pushed to
  * clear *text* AA, which the isoluminant chart values are not required to do.
  *
  * ## Both steps are tuned against the SOFT CHIP, not the page
  *
  * Same discipline as the status tokens: the worst composite a teal chip sits on
- * is not the page but the wash flattened over its darkest/lightest backdrop —
+ * is not the page but the wash flattened over its darkest/lightest backdrop ,
  * for light that is the page, for dark the panel. The seed itself measures
  * 3.08:1 (light) and 3.13:1 (dark) inside a chip and is not usable as text.
  */
@@ -91,7 +91,7 @@ export const tealSteps = {
 } as const;
 
 /**
- * Rose — the one genuinely new hue in the palette, for tone assignment where the
+ * Rose , the one genuinely new hue in the palette, for tone assignment where the
  * meaning is categorical rather than a status.
  *
  * The five status/accent families the system had (blue, lime, green, red, amber)
@@ -102,7 +102,7 @@ export const tealSteps = {
  * Hue taken from `chart3` (#BC5F8D / #C06492) for the same reason teal comes from
  * `chart5`: that value is already measured against both pages, so this is an
  * existing hue promoted to a text-safe tone rather than a sixth seed invented
- * from nothing. It is deliberately NOT plum — plum is `--elevated` in dark mode
+ * from nothing. It is deliberately NOT plum , plum is `--elevated` in dark mode
  * and `--accent-text` flips to lime there, so the plum family cannot carry a
  * symmetric tone without colliding with a surface.
  *
@@ -120,7 +120,7 @@ export { neutral };
 export type { NeutralStep } from './generated/neutrals';
 
 /**
- * The seven worst-case backdrops the glass tier is measured against — the
+ * The seven worst-case backdrops the glass tier is measured against , the
  * palette's extremes in both directions plus every large chromatic fill a
  * surface can plausibly float over.
  */

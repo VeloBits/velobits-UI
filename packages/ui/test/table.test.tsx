@@ -85,7 +85,7 @@ describe('Table semantics', () => {
   it('gives every column header an explicit scope', () => {
     /**
      * The implicit scope a `<th>` in a `<thead>` gets is real HTML, but AT applies
-     * it unevenly once a table also has a footer or spanning cells — and the
+     * it unevenly once a table also has a footer or spanning cells , and the
      * failure is a screen reader reading the wrong column name for every cell in a
      * row, which is invisible on screen.
      */
@@ -121,7 +121,7 @@ describe('Table, THE GLASS RULE', () => {
   /**
    * A row must never be glass and must never carry backdrop-filter: the filter is
    * per-element, so N rows means N blur layers each re-sampling its own slice of
-   * the backdrop on every scrolled frame — the table gets worse the more data it
+   * the backdrop on every scrolled frame , the table gets worse the more data it
    * has. It also makes each row a stacking context and a containing block for
    * fixed descendants.
    */
@@ -222,7 +222,7 @@ describe('Table, the wrapper surface', () => {
     expect(wrapper()).toContain('glass-surface');
   });
 
-  it('NEVER blurs — the wrapper is the scroll container', () => {
+  it('NEVER blurs , the wrapper is the scroll container', () => {
     /**
      * `.glass-surface-blur` here would mount a live backdrop layer on an
      * element that scrolls, re-sampling its own backdrop region every frame.

@@ -9,18 +9,18 @@ import { themes } from './semantic';
  * a future palette edit that breaks contrast fails CI instead of shipping.
  *
  * Adding a semantic colour token without adding it here is the one way to get
- * an unmeasured colour into the system — `test/contrast.test.ts` also asserts
+ * an unmeasured colour into the system , `test/contrast.test.ts` also asserts
  * that every colour-valued key of {@link SemanticTokens} appears in at least
  * one pair, which closes that hole.
  */
 
 /** WCAG success criteria this system holds itself to. */
 export const TARGET = {
-  /** 1.4.3 Contrast (Minimum) — body text. */
+  /** 1.4.3 Contrast (Minimum) , body text. */
   text: 4.5,
-  /** 1.4.3 — text ≥18.66px bold or ≥24px. Used only where a token is large-text-only by contract. */
+  /** 1.4.3 , text ≥18.66px bold or ≥24px. Used only where a token is large-text-only by contract. */
   largeText: 3,
-  /** 1.4.11 Non-text Contrast — anything required to identify a component or its state. */
+  /** 1.4.11 Non-text Contrast , anything required to identify a component or its state. */
   nonText: 3,
 } as const;
 
@@ -36,7 +36,7 @@ export interface ContrastPair {
   target: ContrastTarget;
   /** Restrict to one theme when the pairing only exists there. */
   only?: ThemeName;
-  /** Why this pair is exempt or special-cased — printed in the test name. */
+  /** Why this pair is exempt or special-cased , printed in the test name. */
   note?: string;
 }
 
@@ -85,7 +85,7 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     fg: 'onBrand',
     bg: 'brand',
     target: 'text',
-    note: 'charcoal on lime, 10.89:1 — the ONLY sanctioned lime pairing. White on lime is 1.31:1.',
+    note: 'charcoal on lime, 10.89:1 , the ONLY sanctioned lime pairing. White on lime is 1.31:1.',
   },
   {
     label: 'brand fill vs page',
@@ -96,7 +96,7 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     note:
       'dark only, and that is the palette speaking rather than a concession. Lime on cream is ' +
       '1.13:1, so a lime fill CANNOT carry a 3:1 boundary in light mode. That is fine for a ' +
-      'badge or a button, where high-contrast text inside identifies the element — and NOT fine ' +
+      'badge or a button, where high-contrast text inside identifies the element , and NOT fine ' +
       'for a lone graphical indicator (a status dot, an indicator bar, an unlabelled chart mark), ' +
       'which needs an outline or a darker companion in light mode. Asserted below.',
   },
@@ -124,7 +124,7 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     target: 'text',
     note:
       'measured once and it holds for BOTH themes, because the pair is theme-invariant by ' +
-      'design — see semantic.ts. A revealed secret has to be transcribable, and this is the ' +
+      'design , see semantic.ts. A revealed secret has to be transcribable, and this is the ' +
       'only text in the product where a single wrong character is unrecoverable.',
   },
 
@@ -136,7 +136,7 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     fg: 'fieldBorder',
     bg: 'panel',
     target: 'nonText',
-    note: 'identifies an input, so 1.4.11 applies — unlike --border, which is decorative',
+    note: 'identifies an input, so 1.4.11 applies , unlike --border, which is decorative',
   },
   { label: 'field border vs page', fg: 'fieldBorder', bg: 'bg', target: 'nonText' },
 
@@ -176,11 +176,11 @@ export const CONTRAST_EXEMPT: Readonly<Record<string, string>> = {
   elevated: 'a backdrop',
   code: 'a backdrop, measured as the `bg` side of the on-code pair',
   border:
-    'decorative separators only (table rules, card outlines). WCAG 1.4.11 applies to visuals REQUIRED to identify a component — a divider is not one. Control edges use fieldBorder, which IS gated.',
+    'decorative separators only (table rules, card outlines). WCAG 1.4.11 applies to visuals REQUIRED to identify a component , a divider is not one. Control edges use fieldBorder, which IS gated.',
   primaryHover:
     'a hover state of an already-gated fill; 1.4.11 exempts states reachable only by pointer hover where the base state is conformant',
   brandHover:
-    'a backdrop, and gated as one: it is the `bg` side of the "on-brand over the brand HOVER fill" pair. Not exempt in the 1.4.11 sense the way `primaryHover` is — lime flips its only legal text colour, so a hover that drifts light enough to break charcoal must fail',
+    'a backdrop, and gated as one: it is the `bg` side of the "on-brand over the brand HOVER fill" pair. Not exempt in the 1.4.11 sense the way `primaryHover` is , lime flips its only legal text colour, so a hover that drifts light enough to break charcoal must fail',
   dangerHover:
     'a backdrop, and gated as one: the `bg` side of the "on-danger over the danger HOVER fill" pair. Measured rather than hover-exempted because dark mode lifts this fill, and lifting it is what broke white text on the base token in the first place',
   primarySoft: 'gated by the soft-chip composite suite, not by a flat pair',
@@ -229,7 +229,7 @@ export function resolvePair(
  * passing forever. That is the point: each token was individually legible against
  * every surface it sits on, and legibility is all the WCAG sweep and the
  * perceptibility gate measure. Neither asks whether two tokens are the same as
- * *each other* — a question that only has an answer once you know their roles,
+ * *each other* , a question that only has an answer once you know their roles,
  * which is what this registry supplies.
  *
  * It survived to ship only because `Badge variant="info"` happened to be unused
@@ -298,7 +298,7 @@ export const DISTINCT_ROLE_PAIRS: readonly DistinctRolePair[] = [
  * as OKLab ΔE.
  *
  * OKLab rather than a channel delta or a contrast ratio, because the question is
- * "do these look like different colours", not "is one readable on the other" —
+ * "do these look like different colours", not "is one readable on the other" ,
  * and contrast ratio is blind to hue entirely: teal `#256262` and a blue of the
  * same lightness have a contrast ratio of ~1.0 against each other while being
  * obviously different colours. ΔE is the measure that matches the question.
@@ -315,7 +315,7 @@ export const ROLE_DISTINCTION_FLOOR = 0.04;
  * The minimum 8-bit channel separation a tier-S composite must hold against
  * BOTH `--panel` and `--bg`.
  *
- * This is not a WCAG number — nothing in WCAG cares whether a card looks like
+ * This is not a WCAG number , nothing in WCAG cares whether a card looks like
  * glass. It is the gate that stops the retrofit from silently becoming a no-op:
  * the naive "panel colour at α 0.85" composites to within **3/255** of the
  * opaque panel in both themes, and blurring a uniform page returns the same
@@ -323,7 +323,7 @@ export const ROLE_DISTINCTION_FLOOR = 0.04;
  * difference at all. 8/255 is roughly where a flat-colour edge becomes visible
  * on a calibrated display, and it is comfortably clear of the 3/255 failure.
  *
- * Nothing in the WCAG pair sweep would ever have caught this — an invisible
+ * Nothing in the WCAG pair sweep would ever have caught this , an invisible
  * glass card has *better* contrast than a visible one.
  */
 export const PERCEPTIBILITY_FLOOR = 8;
@@ -333,8 +333,8 @@ export const PERCEPTIBILITY_FLOOR = 8;
  *
  * Tier O is NOT here and should not be moved here: an overlay's backdrop is
  * arbitrary, so it is swept across `worstCaseBackdrops` in the glass suite of
- * `test/contrast.test.ts` instead. Tier S has exactly one backdrop — the page
- * — which is what makes a single composite per theme the whole measurement.
+ * `test/contrast.test.ts` instead. Tier S has exactly one backdrop , the page
+ * , which is what makes a single composite per theme the whole measurement.
  */
 export interface GlassSurfacePair {
   /** Human-readable, and what the failure message prints. */
@@ -357,12 +357,12 @@ export type GlassStopName = 'top' | 'bottom';
  * `compositeOver` blends in GAMMA-ENCODED sRGB, which is what browsers do for
  * `rgba()`. Measuring these in linear light reports every composite several 8-bit
  * steps lighter and would report the perceptibility gate as passing on values
- * that are invisible in a browser — see the note on `compositeOver`.
+ * that are invisible in a browser , see the note on `compositeOver`.
  *
  * ## Why this returns `stops` and not one `composite`
  *
  * Tier S paints a two-stop gradient (see {@link GlassSurfaceTier.surfaceBottom}).
- * A gate that measured one colour would leave the other stop unmeasured — and
+ * A gate that measured one colour would leave the other stop unmeasured , and
  * the unmeasured one is the FAR stop, which is precisely the one that approaches
  * a wall: light's bottom lands on {@link PERCEPTIBILITY_FLOOR} exactly, and dark's
  * bottom is the stop nearest the page. Every caller walks `stops`, so adding a
@@ -370,7 +370,7 @@ export type GlassStopName = 'top' | 'bottom';
  */
 export function resolveGlassSurface(pair: GlassSurfacePair): {
   /**
-   * Both gradient stops flattened over the page — the colours text actually sits
+   * Both gradient stops flattened over the page , the colours text actually sits
    * on, one per stop, in paint order.
    */
   stops: { name: GlassStopName; composite: string }[];
@@ -401,7 +401,7 @@ export function resolveGlassSurface(pair: GlassSurfacePair): {
  * The tier-O counterpart to {@link GLASS_SURFACE_PAIRS}, and it exists because
  * of a shipped bug this file's gates did not catch.
  *
- * Tier O's dark surface was `neutral[900]` — which is also what `--bg` was — so
+ * Tier O's dark surface was `neutral[900]` , which is also what `--bg` was , so
  * a Popover or DropdownMenu composited to **exactly** the page colour, 0/255,
  * and was carried entirely by a 1.33:1 border. Every WCAG pair was green
  * throughout: an invisible overlay has *better* text contrast than a visible
@@ -411,7 +411,7 @@ export function resolveGlassSurface(pair: GlassSurfacePair): {
  * **Deliberately one-sided: this measures against `--bg` only, never `--panel`.**
  * A tier-S surface has to differ from the opaque panel, because "glass Card" and
  * "panel Card" are two materials a caller chooses between. A tier-O overlay has
- * no such twin — a light Dialog composites 3/255 from `--panel` and that is
+ * no such twin , a light Dialog composites 3/255 from `--panel` and that is
  * *correct*, it is meant to read as paper. What an overlay must never be is
  * indistinguishable from the page underneath it.
  *
@@ -422,7 +422,7 @@ export interface GlassOverlayPair {
   /** Human-readable, and what the failure message prints. */
   label: string;
   theme: ThemeName;
-  /** The tier-O entry in {@link glass}. `darkElevated` is excluded — it stacks
+  /** The tier-O entry in {@link glass}. `darkElevated` is excluded , it stacks
    *  on another overlay, so the page is not its backdrop. */
   tier: 'light' | 'dark';
 }
@@ -432,7 +432,7 @@ export const GLASS_OVERLAY_PAIRS: readonly GlassOverlayPair[] = [
   { label: 'dark overlay (Dialog, Popover, Toast)', theme: 'dark', tier: 'dark' },
 ];
 
-/** Flatten a tier-O entry over the page — the one backdrop it must differ from. */
+/** Flatten a tier-O entry over the page , the one backdrop it must differ from. */
 export function resolveGlassOverlay(pair: GlassOverlayPair): {
   composite: string;
   bg: string;
@@ -446,11 +446,11 @@ export function resolveGlassOverlay(pair: GlassOverlayPair): {
 
 /**
  * Badge's `*-soft` variants pair a translucent wash with the matching TEXT
- * token — `bg-success-soft text-success` — and `StatusChip` composes those same
+ * token , `bg-success-soft text-success` , and `StatusChip` composes those same
  * variants. Chip text is 12px, so WCAG 1.4.3's full 4.5:1 applies, and the
  * colour the text actually sits on is not the wash: it is the wash FLATTENED
  * over whatever surface the chip is placed on. A wash at α 0.10–0.12 barely
- * moves the backdrop, which is exactly the problem — the composite inherits the
+ * moves the backdrop, which is exactly the problem , the composite inherits the
  * backdrop's luminance, and the page is the worst case in light mode (cream is
  * darker than the white panel) while the panel is the worst case in dark
  * (lighter than the page).
@@ -461,7 +461,7 @@ export function resolveGlassOverlay(pair: GlassOverlayPair): {
  * {@link GLASS_SURFACE_PAIRS}; the assertions live in `test/contrast.test.ts`.
  *
  * `brandSoft` is deliberately absent: there is no soft-lime-with-lime-text
- * Badge variant, because lime on cream is 1.13:1 — see {@link CONTRAST_EXEMPT}.
+ * Badge variant, because lime on cream is 1.13:1 , see {@link CONTRAST_EXEMPT}.
  */
 export interface SoftChipPair {
   /** Human-readable, and what the failure message prints. */
@@ -485,7 +485,7 @@ export const SOFT_CHIP_PAIRS: readonly SoftChipPair[] = [
  * The surfaces a chip plausibly sits on, resolved per theme.
  *
  * The glass surface counts **twice**, once per sheen stop, and which stop is the
- * worst case flips with the theme — so neither can be dropped as redundant.
+ * worst case flips with the theme , so neither can be dropped as redundant.
  * Light-mode chip text is dark, so its worst backdrop is the DARKER stop
  * (`bottom`); dark-mode chip text is light, so its worst backdrop is the LIGHTER
  * one (`top`). A gate that measured a single stop would test the safe end in one
@@ -494,7 +494,7 @@ export const SOFT_CHIP_PAIRS: readonly SoftChipPair[] = [
 export type SoftChipBackdropName =
   'page' | 'panel' | 'glass surface (top)' | 'glass surface (bottom)';
 
-/** Parse `rgba(r, g, b, a)` — the only translucent spelling these tokens use. */
+/** Parse `rgba(r, g, b, a)` , the only translucent spelling these tokens use. */
 function parseRgba(css: string): { hex: string; alpha: number } {
   const m = /^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$/.exec(css);
   if (!m) throw new Error(`Not an rgba() colour: ${css}`);
@@ -510,7 +510,7 @@ function parseRgba(css: string): { hex: string; alpha: number } {
 /**
  * Flatten a soft-chip entry into the opaque colours the gate measures: the
  * wash composited over each backdrop, in GAMMA-encoded sRGB like everything
- * else in this file — see the note on `compositeOver`. The glass backdrop is
+ * else in this file , see the note on `compositeOver`. The glass backdrop is
  * itself a composite (the tier-S surface flattened over the page, i.e. the
  * same colour {@link resolveGlassSurface} reports), so a chip in a Card is a
  * wash-over-glass-over-page stack, flattened in order.

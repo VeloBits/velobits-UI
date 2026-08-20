@@ -36,7 +36,7 @@ function mockSystemDark(dark: boolean) {
     /**
      * Wrapped in `act` because the provider's listener calls `setState` from
      * outside React's event system. Without it the update is never flushed and
-     * the assertion reads the pre-change value — which looks exactly like the
+     * the assertion reads the pre-change value , which looks exactly like the
      * listener not being registered at all.
      */
     change(next: boolean) {
@@ -111,7 +111,7 @@ describe('storage keys', () => {
 
 describe('ThemeProvider', () => {
   it('reads the stored mode on first render, with no intermediate default', () => {
-    /** An effect-based read would paint light first — the flash this prevents. */
+    /** An effect-based read would paint light first , the flash this prevents. */
     localStorage.setItem(KEY, 'dark');
     render(
       <ThemeProvider storageKey={KEY}>
@@ -224,7 +224,7 @@ describe('the hydration hazard', () => {
      * the server HTML with error #418.
      *
      * `theme` is still safe to use for styling, because styling flows through the
-     * `dark` class. `mounted` is for the cases where markup must differ — and the
+     * `dark` class. `mounted` is for the cases where markup must differ , and the
      * better answer is usually to let CSS decide instead, as the docs header does.
      */
     const seen: boolean[] = [];
@@ -239,7 +239,7 @@ describe('the hydration hazard', () => {
         <MountProbe />
       </ThemeProvider>,
     );
-    // First render must report false — that is the render which has to match the
+    // First render must report false , that is the render which has to match the
     // server's output.
     expect(seen[0]).toBe(false);
     expect(screen.getByTestId('mounted').textContent).toBe('true');

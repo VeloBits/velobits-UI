@@ -4,7 +4,7 @@
  *
  * ## Why this is plain data and not MDX
  *
- * Everything here is consumed by `scripts/build-docs-data.ts` at build time —
+ * Everything here is consumed by `scripts/build-docs-data.ts` at build time ,
  * `usage` gets syntax-highlighted there, and every `examples[].name` is checked
  * against the files in `registry/examples/`. Both need the module to be readable
  * outside React, which rules out JSX. The cost is that prose lives in `notes` as
@@ -53,12 +53,12 @@ export function App() {
   );
 }`,
     notes: [
-      'You own the files afterwards, so the way to slim this down is to delete what you do not use rather than to install piecemeal. There is no dependency to bump and no singleton — which is exactly why a module-federated app should take the npm package instead.',
+      'You own the files afterwards, so the way to slim this down is to delete what you do not use rather than to install piecemeal. There is no dependency to bump and no singleton , which is exactly why a module-federated app should take the npm package instead.',
     ],
   },
 
   'velobits-theme': {
-    usage: `/* your app's CSS — one import */
+    usage: `/* your app's CSS , one import */
 @import '@velobitsio/tokens/theme.css';
 
 /* NOT OPTIONAL: Tailwind v4 does not scan node_modules, so utilities used
@@ -66,7 +66,7 @@ export function App() {
 @source "../node_modules/@velobitsio/ui/dist";`,
     notes: [
       'Installing this item writes every semantic token into your CSS as light and dark custom properties. It is a dependency of every component that paints a glass surface, so the CLI pulls it in whether or not you ask for it by name.',
-      'Colors renders the whole gate — every measured pair, every soft-chip composite and every perceptibility floor — computed at build time by the same functions CI uses.',
+      'Colors renders the whole gate , every measured pair, every soft-chip composite and every perceptibility floor , computed at build time by the same functions CI uses.',
     ],
   },
 
@@ -85,7 +85,7 @@ export function App() {
       },
     ],
     notes: [
-      'Mount it once, at the shell root. A second instance means a second TooltipProvider context — which under Module Federation is exactly the singleton violation the npm distribution exists to avoid.',
+      'Mount it once, at the shell root. A second instance means a second TooltipProvider context , which under Module Federation is exactly the singleton violation the npm distribution exists to avoid.',
     ],
   },
 
@@ -95,18 +95,18 @@ export function App() {
     usage: `import { GlassSurface } from '@velobitsio/ui';
 
 <GlassSurface tier="surface" className="rounded-lg p-4">
-  Tier S — the component-surface material.
+  Tier S , the component-surface material.
 </GlassSurface>`,
     examples: [
       {
         name: 'glass-surface-demo',
         title: 'The three tiers',
         description:
-          'Tier S ships without backdrop-filter — `blur` is the opt-in, so a twenty-card grid does not mount twenty blur layers.',
+          'Tier S ships without backdrop-filter , `blur` is the opt-in, so a twenty-card grid does not mount twenty blur layers.',
       },
     ],
     notes: [
-      'The nesting rule is the one that actually catches people: two instances of the same tier composite about 2/255 apart, so both layers disappear. Every surface-bearing component takes a `surface` prop for this reason — reach for it rather than a bg-* utility, which wins the cascade and takes the material with it.',
+      'The nesting rule is the one that actually catches people: two instances of the same tier composite about 2/255 apart, so both layers disappear. Every surface-bearing component takes a `surface` prop for this reason , reach for it rather than a bg-* utility, which wins the cascade and takes the material with it.',
     ],
   },
 
@@ -125,7 +125,7 @@ export function App() {
         name: 'card-demo',
         title: 'Glass and panel',
         description:
-          'surface="panel" is the opt-out — a prop, never a bg-* utility, which would win the cascade and take the material with it.',
+          'surface="panel" is the opt-out , a prop, never a bg-* utility, which would win the cascade and take the material with it.',
       },
     ],
   },
@@ -143,11 +143,11 @@ export function App() {
         name: 'alert-demo',
         title: 'Every variant',
         description:
-          'Colour is never the only signal — each variant carries its meaning in words as well. The `surface` axis applies to the neutral variant only; the status washes are utilities and would beat .glass-surface.',
+          'Colour is never the only signal , each variant carries its meaning in words as well. The `surface` axis applies to the neutral variant only; the status washes are utilities and would beat .glass-surface.',
       },
     ],
     notes: [
-      'Defaults to a polite role="status". Escalate to role="alert" deliberately, and only for something the reader must hear about immediately — an assertive live region interrupts whatever a screen reader was saying.',
+      'Defaults to a polite role="status". Escalate to role="alert" deliberately, and only for something the reader must hear about immediately , an assertive live region interrupts whatever a screen reader was saying.',
     ],
   },
 
@@ -190,7 +190,7 @@ export function App() {
 <Input type="search" placeholder="Search flags…" aria-label="Search flags" />`,
     examples: [{ name: 'input-demo', title: 'States' }],
     notes: [
-      'That is the half of the border palette 1.4.11 actually gates: a control boundary must clear 3:1 against what it sits on, while a purely decorative rule need not — which is why --border and --field-border are two tokens and not one.',
+      'That is the half of the border palette 1.4.11 actually gates: a control boundary must clear 3:1 against what it sits on, while a purely decorative rule need not , which is why --border and --field-border are two tokens and not one.',
     ],
   },
 
@@ -202,7 +202,7 @@ export function App() {
       {
         name: 'textarea-demo',
         title: 'Grows with its content',
-        description: 'field-sizing-content — it grows with what is typed into it.',
+        description: 'field-sizing-content , it grows with what is typed into it.',
       },
     ],
   },
@@ -216,7 +216,7 @@ export function App() {
 </NativeSelect>`,
     examples: [{ name: 'native-select-demo', title: 'Basic' }],
     notes: [
-      'The platform picker is also what a phone and a screen reader handle best, so the testability argument and the accessibility one point the same way here — which is rarer than it sounds.',
+      'The platform picker is also what a phone and a screen reader handle best, so the testability argument and the accessibility one point the same way here , which is rarer than it sounds.',
     ],
   },
 
@@ -230,7 +230,7 @@ export function App() {
         name: 'checkbox-demo',
         title: 'Checked, indeterminate, disabled',
         description:
-          'The indeterminate state is what a bulk-selection header needs — `checked="indeterminate"`, not a separate prop.',
+          'The indeterminate state is what a bulk-selection header needs , `checked="indeterminate"`, not a separate prop.',
       },
     ],
   },
@@ -242,7 +242,7 @@ export function App() {
 <Label htmlFor="auto">Enabled in Production</Label>`,
     examples: [{ name: 'switch-demo', title: 'Basic' }],
     notes: [
-      'A switch applies immediately — that is what distinguishes it from a checkbox, which stages a change until a form is submitted. If your change needs a Save button, you want a Checkbox.',
+      'A switch applies immediately , that is what distinguishes it from a checkbox, which stages a change until a form is submitted. If your change needs a Save button, you want a Checkbox.',
     ],
   },
 
@@ -253,7 +253,7 @@ export function App() {
 <Input id="env" />`,
     examples: [{ name: 'label-demo', title: 'Basic' }],
     notes: [
-      'Clicking the text focuses the control it names, which is behaviour you get from the element rather than from a handler — and lose the moment the root becomes a div.',
+      'Clicking the text focuses the control it names, which is behaviour you get from the element rather than from a handler , and lose the moment the root becomes a div.',
     ],
   },
 
@@ -271,7 +271,7 @@ export function App() {
         name: 'field-demo',
         title: 'Resting and error, side by side',
         description:
-          'Both ids stay in aria-describedby when a field has an error and a hint — dropping the hint on error is a common shortcut that loses the reader the rule they just broke.',
+          'Both ids stay in aria-describedby when a field has an error and a hint , dropping the hint on error is a common shortcut that loses the reader the rule they just broke.',
       },
     ],
   },
@@ -285,7 +285,7 @@ export function App() {
 </Avatar>`,
     examples: [{ name: 'avatar-demo', title: 'Image and fallback' }],
     notes: [
-      'The fallback is neutral rather than the brand fill — an avatar grid is one of the few places a wall of lime would be loud.',
+      'The fallback is neutral rather than the brand fill , an avatar grid is one of the few places a wall of lime would be loud.',
     ],
   },
 
@@ -294,6 +294,28 @@ export function App() {
 
 Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
     examples: [{ name: 'kbd-demo', title: 'Basic' }],
+  },
+
+  'scroll-area': {
+    usage: `import { ScrollArea } from '@velobitsio/ui';
+
+<ScrollArea className="h-56">
+  {/* Root needs a bounded height from somewhere, or it grows and never scrolls */}
+</ScrollArea>
+
+<ScrollArea axis="x" className="w-full">
+  <div className="flex gap-3">{/* wider than the box */}</div>
+</ScrollArea>`,
+    examples: [{ name: 'scroll-area-demo', title: 'Both axes' }],
+    notes: [
+      'The thumb is --field-border, where Separator is --border. A scrollbar reports position and accepts a drag, so 1.4.11 applies to it and it has to clear 3:1; a separator divides nothing a reader must perceive and is free to recede. That is what the two line tokens are for.',
+      'One thumb colour covers every case: --field-border is asserted at 3:1 against both --bg and --panel, in light and dark, from a single value. So it is correct on the page and inside a panel without a variant.',
+      'The track is transparent on purpose. It would be the widest block of flat colour on a long page, and filling it is most of what makes a custom scrollbar look dated.',
+      'Radix moves the overflow to an inner viewport, so the Root needs a bounded height from a class, a grid track or a flex parent. Given none it grows to fit its content and never scrolls, which reads as the component being broken rather than unconstrained.',
+      'Do not use it for a region whose content might fit. Radix sets the viewport to overflow: scroll the moment a scrollbar mounts, not overflow: auto, and not gated on whether anything overflows; type="auto" only governs when the bar is visible. A short list then captures the wheel, the page does not move, and it lurches when the scroll chain reaches the document. That is why this site scrolls its sidebar and its On this page columns with plain overflow-y-auto rather than with this component.',
+      'Choose axes with axis: "y" (the default), "x" or "both". Do not pass ScrollBar as a child to get a second axis. Children render inside the viewport, so a bar passed that way sits in the scrolling content and slides away with the very thing it is measuring, which looks exactly like a scrollbar that is stuck.',
+      'axis also decides which axes scroll at all. Radix turns the viewport overflow on per axis according to whether a scrollbar for it is mounted, so the default leaves overflow-x hidden instead of allowing silent sideways drift.',
+    ],
   },
 
   separator: {
@@ -357,7 +379,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'dialog-demo',
         title: 'A creation dialog, with a picker inside it',
         description:
-          'Focus is trapped while open, Escape closes, and focus returns to the trigger. The environment picker opens on the ELEVATED tier — glass stacked on glass, plum-tinted in dark so it does not sink into the dialog beneath.',
+          'Focus is trapped while open, Escape closes, and focus returns to the trigger. The environment picker opens on the ELEVATED tier , glass stacked on glass, plum-tinted in dark so it does not sink into the dialog beneath.',
       },
     ],
     notes: [
@@ -377,7 +399,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
 </SidePanel>`,
     examples: [{ name: 'side-panel-demo', title: 'The anchored reading sheet' }],
     notes: [
-      'Deliberately NOT a Dialog variant. The two differ in where focus lands on open — a reading sheet does not steal it, a form modal must — and that is not something a `side` prop can carry honestly. Do not merge them.',
+      'Deliberately NOT a Dialog variant. The two differ in where focus lands on open , a reading sheet does not steal it, a form modal must , and that is not something a `side` prop can carry honestly. Do not merge them.',
     ],
   },
 
@@ -393,7 +415,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
 </Popover>`,
     examples: [{ name: 'popover-demo', title: 'Anchored and non-modal' }],
     notes: [
-      'It is the elevated tier — glass stacked on glass — which is the one composite in the system no automated gate measures, because a `tier="elevated"` surface sitting on the page forms a different composite from the one that matters. The Dialog page nests a real one, which is where that gets checked.',
+      'It is the elevated tier , glass stacked on glass , which is the one composite in the system no automated gate measures, because a `tier="elevated"` surface sitting on the page forms a different composite from the one that matters. The Dialog page nests a real one, which is where that gets checked.',
     ],
   },
 
@@ -411,11 +433,11 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'dropdown-menu-demo',
         title: 'Items, checkboxes, a radio group and a submenu',
         description:
-          'Highlighting is data-[highlighted], never :hover — Radix drives keyboard focus through it, so pointer and keyboard must look identical.',
+          'Highlighting is data-[highlighted], never :hover , Radix drives keyboard focus through it, so pointer and keyboard must look identical.',
       },
     ],
     notes: [
-      'Cannot host a text input. A menu traps typing for its own typeahead, so a field inside it never receives the keystrokes — reach for Dialog or Popover.',
+      'Cannot host a text input. A menu traps typing for its own typeahead, so a field inside it never receives the keystrokes , reach for Dialog or Popover.',
     ],
   },
 
@@ -467,11 +489,11 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'app-shell-demo',
         title: 'The authenticated chrome',
         description:
-          'Embedded at a fixed height. The header is Tier-O glass, the rail is Tier S — scroll the main region and watch content pass behind the blur.',
+          'Embedded at a fixed height. The header is Tier-O glass, the rail is Tier S , scroll the main region and watch content pass behind the blur.',
       },
     ],
     notes: [
-      'The drawer below md is a real SidePanel rather than a hand-rolled one, which is what buys the focus trap and — the part hand-rolled drawers miss — focus restoration to the hamburger that opened it.',
+      'The drawer below md is a real SidePanel rather than a hand-rolled one, which is what buys the focus trap and , the part hand-rolled drawers miss , focus restoration to the hamburger that opened it.',
     ],
   },
 
@@ -490,12 +512,12 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'data-table-demo',
         title: 'Sorting, filtering, selection and row activation',
         description:
-          'Selection is DERIVED — the stored set intersected with the rows on screen — so filter the list while rows are selected and the count follows. A bulk action can never point at a row nobody can see.',
+          'Selection is DERIVED , the stored set intersected with the rows on screen , so filter the list while rows are selected and the count follows. A bulk action can never point at a row nobody can see.',
       },
     ],
     notes: [
       'This is the shape the dashboard’s flags table arrived at independently, which is why it is here rather than TanStack: adopting TanStack would cost roughly 14 kB for the grouping and pivoting no VeloBits surface does. A surface that needs virtualisation should use TanStack directly on Table.',
-      '`context` must be memoised. The rows are memo-compared against it, so a fresh object per render makes the memo dead code — and the symptom is not a crash, it is a filter box that stutters at a hundred rows.',
+      '`context` must be memoised. The rows are memo-compared against it, so a fresh object per render makes the memo dead code , and the symptom is not a crash, it is a filter box that stutters at a hundred rows.',
     ],
   },
 
@@ -511,7 +533,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'table-demo',
         title: 'On the page, and nested in a Card',
         description:
-          'The wrapper carries the surface and defaults to glass. Inside a Card — already Tier S — that is the nested case, which is why `surface` is a prop.',
+          'The wrapper carries the surface and defaults to glass. Inside a Card , already Tier S , that is the nested case, which is why `surface` is a prop.',
       },
     ],
     notes: [
@@ -542,7 +564,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
       },
     ],
     notes: [
-      'Several screen readers resolve a dangling aria-describedby id by announcing nothing at all — error included. That is the failure the props-not-children shape exists to make impossible, and it is why it is worth the asymmetry with every other component here.',
+      'Several screen readers resolve a dangling aria-describedby id by announcing nothing at all , error included. That is the failure the props-not-children shape exists to make impossible, and it is why it is worth the asymmetry with every other component here.',
       'FormError reads through useFormState, never useFormContext().formState. The latter is a Proxy recording which fields the CALLER of useForm subscribed to, so through context the reader never re-renders: it paints correctly once and then never updates, which passes a casual test.',
     ],
   },
@@ -573,7 +595,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
 </Tabs>`,
     examples: [{ name: 'tabs-demo', title: 'The default and the line variant' }],
     notes: [
-      'The inactive trigger is text-muted-foreground. The obvious spelling — foreground at 60% — measures about 3:1, which is under AA for text.',
+      'The inactive trigger is text-muted-foreground. The obvious spelling , foreground at 60% , measures about 3:1, which is under AA for text.',
     ],
   },
 
@@ -630,7 +652,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
       },
     ],
     notes: [
-      'Set `headingLevel` when the empty state IS the page — at that point it is the section heading, and a <p> leaves a gap in the outline.',
+      'Set `headingLevel` when the empty state IS the page , at that point it is the section heading, and a <p> leaves a gap in the outline.',
     ],
   },
 
@@ -663,7 +685,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
 </Breadcrumb>`,
     examples: [{ name: 'breadcrumb-demo', title: 'With a collapsed middle' }],
     notes: [
-      'Directional icons stay the caller’s job. The layout mirrors under RTL on its own, because it uses logical properties throughout — but nothing here can know that a "next" chevron should flip while a "download" arrow should not.',
+      'Directional icons stay the caller’s job. The layout mirrors under RTL on its own, because it uses logical properties throughout , but nothing here can know that a "next" chevron should flip while a "download" arrow should not.',
     ],
   },
 
@@ -678,11 +700,11 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'code-block-demo',
         title: 'A payload, and a one-time secret',
         description:
-          'The `terminal` variant is the theme-invariant --code / --on-code pair — a revealed secret has to be transcribed exactly, and a surface that flips changes which characters are easy to misread.',
+          'The `terminal` variant is the theme-invariant --code / --on-code pair , a revealed secret has to be transcribed exactly, and a surface that flips changes which characters are easy to misread.',
       },
     ],
     notes: [
-      'The copy button presence-checks navigator.clipboard — the whole object, not just the method — because the entire API is absent on an insecure origin, so the property access itself throws.',
+      'The copy button presence-checks navigator.clipboard , the whole object, not just the method , because the entire API is absent on an insecure origin, so the property access itself throws.',
     ],
   },
 
@@ -706,7 +728,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'motion-demo',
         title: 'PageTransition',
         description:
-          'mode="wait" serialises exit and enter. The default overlaps them, which for a full page means both routes are mounted and stacked — so the outgoing page’s focused element stays focusable while invisible.',
+          'mode="wait" serialises exit and enter. The default overlaps them, which for a full page means both routes are mounted and stacked , so the outgoing page’s focused element stays focusable while invisible.',
       },
       {
         name: 'motion-stagger',
@@ -718,12 +740,12 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'motion-fade-in',
         title: 'FadeIn',
         description:
-          'For the cases that are neither a route nor a list. Deliberately has no exit animation — that needs a parent AnimatePresence and a stable key, and PageTransition is the component that owns that complexity.',
+          'For the cases that are neither a route nor a list. Deliberately has no exit animation , that needs a parent AnimatePresence and a stable key, and PageTransition is the component that owns that complexity.',
       },
     ],
     notes: [
-      'Subpath-only: @velobitsio/ui/motion, never the barrel — nobody should pay for Framer’s runtime to import a Button.',
-      'These components assume VelobitsProvider is mounted. Without it they still animate — and silently stop honouring the reader’s reduced-motion preference, which is the one failure mode here worth knowing about.',
+      'Subpath-only: @velobitsio/ui/motion, never the barrel , nobody should pay for Framer’s runtime to import a Button.',
+      'These components assume VelobitsProvider is mounted. Without it they still animate , and silently stop honouring the reader’s reduced-motion preference, which is the one failure mode here worth knowing about.',
       'Everything animates transform and opacity and nothing else. Both are composited on the GPU: no layout, no paint, no main-thread work per frame.',
     ],
   },
@@ -733,12 +755,12 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   cn: {
     usage: `// npm
 import { cn } from '@velobitsio/ui';
-// shadcn CLI — installed to your utils module
+// shadcn CLI , installed to your utils module
 import { cn } from '@/lib/utils';
 
 cn('rounded-md px-3', isActive && 'bg-primary-soft', className)`,
     notes: [
-      'Installed to your `utils` alias rather than into the velobits folder, so a project already on shadcn keeps one `cn`. Ours is a strict SUPERSET of shadcn’s: identical signature and identical results on standard utilities, plus the class groups this system needs — `rounded-pill`, the `z-*` ladder, the named durations, and a bidirectional `control-material` ⇄ `shadow` conflict group. Pass `--overwrite` so ours wins; the reverse silently leaves two box-shadows alive on one element.',
+      'Installed to your `utils` alias rather than into the velobits folder, so a project already on shadcn keeps one `cn`. Ours is a strict SUPERSET of shadcn’s: identical signature and identical results on standard utilities, plus the class groups this system needs , `rounded-pill`, the `z-*` ladder, the named durations, and a bidirectional `control-material` ⇄ `shadow` conflict group. Pass `--overwrite` so ours wins; the reverse silently leaves two box-shadows alive on one element.',
       'The signature must stay twMerge(clsx(...)). Consumers point their components.json `utils` alias at it, so a change of shape breaks every component the CLI has already written into their tree.',
     ],
   },
@@ -748,7 +770,7 @@ cn('rounded-md px-3', isActive && 'bg-primary-soft', className)`,
 
 <script dangerouslySetInnerHTML={{ __html: themeInitScript(THEME_STORAGE_KEYS.dashboard) }} />`,
     notes: [
-      'React-free by design, so a Server Component can call it during render — which is what makes the blocking init script possible at all. It runs before first paint, so the correct theme is applied before React boots.',
+      'React-free by design, so a Server Component can call it during render , which is what makes the blocking init script possible at all. It runs before first paint, so the correct theme is applied before React boots.',
       'Two surfaces silently sharing a default key is a bug you find in production, which is why there is no default to fall back to.',
     ],
   },
@@ -766,7 +788,7 @@ const { mode, theme, setMode, toggle, mounted } = useTheme();`,
       },
     ],
     notes: [
-      '`mounted` is false during SSR and on the first client render. Style through the `dark` class, not through `theme` in JS — a JS branch renders the light arm on the server while the client already knows the stored value, and React discards the server HTML with #418.',
+      '`mounted` is false during SSR and on the first client render. Style through the `dark` class, not through `theme` in JS , a JS branch renders the light arm on the server while the client already knows the stored value, and React discards the server HTML with #418.',
     ],
   },
 
@@ -783,7 +805,7 @@ const isDesktop = useMediaQuery(\`(min-width: \${breakpoint.md})\`);`,
       },
     ],
     notes: [
-      'usePrefersReducedMotion is for imperative decisions Framer cannot see — whether to autoplay, for instance. Animations are already covered by MotionConfig and the token layer.',
+      'usePrefersReducedMotion is for imperative decisions Framer cannot see , whether to autoplay, for instance. Animations are already covered by MotionConfig and the token layer.',
     ],
   },
 
@@ -800,7 +822,7 @@ const selection = useRowSelection(rows, (row) => row.id);`,
       },
     ],
     notes: [
-      'The obvious alternative — pruning the stored set in an effect whenever the rows change — is a render behind by construction: for one commit the count says something the screen does not.',
+      'The obvious alternative , pruning the stored set in an effect whenever the rows change , is a render behind by construction: for one commit the count says something the screen does not.',
     ],
   },
 };

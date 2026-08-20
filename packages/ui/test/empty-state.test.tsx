@@ -72,7 +72,7 @@ describe('EmptyState', () => {
   /**
    * One audit per test. `audit()` renders its own `<main>` and RTL only cleans up
    * between tests, so a second audit in the same test trips
-   * `landmark-no-duplicate-main` — a violation of the harness, not the component.
+   * `landmark-no-duplicate-main` , a violation of the harness, not the component.
    */
   it('finds no axe violations as a filtered-to-nothing state', async () => {
     const violations = await audit(
@@ -97,7 +97,7 @@ describe('EmptyState', () => {
 describe('EmptyState, the surface default', () => {
   const root = () => document.querySelector('[data-slot="empty-state"]')!.className;
 
-  it('has NO surface by default — it is normally already inside one', () => {
+  it('has NO surface by default , it is normally already inside one', () => {
     /**
      * The deliberate odd one out. Table, Accordion and Card default to glass
      * because they are usually outermost; an EmptyState is usually inside a

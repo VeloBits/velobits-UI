@@ -19,7 +19,7 @@ export default function TableDemo() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-2">
-        <p className="text-sm font-medium">Default — surface=&quot;glass&quot;, on the page</p>
+        <p className="text-sm font-medium">Default: surface=&quot;glass&quot;, on the page</p>
         <Table>
           <TableCaption>Flag counts by environment.</TableCaption>
           <TableHeader>
@@ -58,7 +58,7 @@ export default function TableDemo() {
 
       <div className="space-y-2">
         <p className="text-sm font-medium">
-          The nested case — surface=&quot;none&quot; inside a Card
+          The nested case: surface=&quot;none&quot; inside a Card
         </p>
         <Card>
           <CardHeader>
@@ -67,7 +67,7 @@ export default function TableDemo() {
           <CardContent className="px-0">
             {/*
              * The Card is already Tier S. Leaving Table on its `glass` default
-             * here composites glass over glass — ~2/255 apart, both layers gone.
+             * here composites glass over glass , ~2/255 apart, both layers gone.
              * This is the call site that made `surface` a prop.
              */}
             <Table surface="none">

@@ -31,7 +31,7 @@ import { PlusIcon } from '@velobitsio/icons';
  * Logical properties throughout (`ms-`/`me-`/`text-start`/`ps-`/`pe-`), so RTL
  * needs no per-component work and no `dir` variants. This covers a composite as
  * well as a Card, because Table and Breadcrumb are where a physical property
- * would actually show — a `text-left` header or a `pr-0` cell survives every LTR
+ * would actually show , a `text-left` header or a `pr-0` cell survives every LTR
  * review.
  *
  * Directional ICONS remain the caller's job: nothing here can know that a "next"

@@ -13,9 +13,9 @@ export const metadata: Metadata = {
   /*
    * A template rather than a literal, now that there are ~60 pages: every one of
    * them sets a bare title and the suffix is appended here, so a component page
-   * reads "Button — VeloBits UI" in a tab strip and a bookmark list.
+   * reads "Button · VeloBits UI" in a tab strip and a bookmark list.
    */
-  title: { default: SITE.name, template: `%s — ${SITE.name}` },
+  title: { default: SITE.name, template: `%s · ${SITE.name}` },
   description: SITE.description,
   metadataBase: new URL(SITE.url),
   /*

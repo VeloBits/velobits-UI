@@ -20,8 +20,8 @@ import { DocsToc, type TocEntry } from './docs-toc';
  * The cost is honest and small: on a statically exported page this column is
  * absent from the HTML and appears on hydration. It is a secondary navigation
  * aid for prose that is a screen or two long, and every heading it would list is
- * already visible by scrolling. The component pages — which are the ones with
- * fifteen sections — build their table of contents at build time from the data
+ * already visible by scrolling. The component pages , which are the ones with
+ * fifteen sections , build their table of contents at build time from the data
  * they render, and do not go through here.
  *
  * Re-scans on pathname change: a client navigation between two guides swaps the

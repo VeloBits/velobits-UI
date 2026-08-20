@@ -16,7 +16,7 @@ export default function StatusChipDemo() {
         <StatusChip status="partial">40%</StatusChip>
         <StatusChip status="partial">5%</StatusChip>
         <span className="text-sm text-muted-foreground">
-          The label override — a percentage is strictly more information than &ldquo;Partial&rdquo;
+          The label override: a percentage is strictly more information than &ldquo;Partial&rdquo;
           in the same space, and it still says the state.
         </span>
       </div>

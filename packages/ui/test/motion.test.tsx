@@ -177,7 +177,7 @@ describe('FadeIn', () => {
 describe('reduced motion is not re-implemented here', () => {
   it('the module never reads a reduced-motion preference itself', async () => {
     /**
-     * Reduced motion is owned in exactly two places — `MotionConfig
+     * Reduced motion is owned in exactly two places , `MotionConfig
      * reducedMotion="user"` inside `VelobitsProvider`, and the token layer's
      * `prefers-reduced-motion` block. A third path in this file would be one more
      * thing to keep in step, and the failure would be silent: motion that honours

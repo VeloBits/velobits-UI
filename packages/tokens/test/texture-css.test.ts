@@ -18,7 +18,7 @@ import {
  * The page texture is the only thing in this system allowed to paint the page
  * background, and the page is what every tier-S measurement is taken against.
  * That makes it the one token group that can invalidate other people's numbers
- * without touching their values — so it gets its own gate.
+ * without touching their values , so it gets its own gate.
  *
  * The suite is built around one invariant (texture may only DARKEN) and one
  * binding constraint (`--muted-fg` where both layers stack in light mode).
@@ -44,12 +44,12 @@ function layerOverPage(theme: ThemeName, layer: TextureLayerName): string {
 }
 
 /**
- * Both layers stacked — the worst case a pixel of page can be, and the case the
+ * Both layers stacked , the worst case a pixel of page can be, and the case the
  * text assertions use.
  *
  * Stacked, deliberately, rather than weighted by coverage. A dot is 1px on a
  * 48px pitch (<0.2% of the page), so a coverage argument would let both layers
- * go far deeper — but the stacked case passes, so the cheap gate is also the
+ * go far deeper , but the stacked case passes, so the cheap gate is also the
  * honest one and there is no argument to have.
  */
 function stacked(theme: ThemeName): string {
@@ -58,12 +58,12 @@ function stacked(theme: ThemeName): string {
   return compositeOver(colour, field, alpha);
 }
 
-describe('THE DARKENS-ONLY INVARIANT — texture may never lighten the page', () => {
+describe('THE DARKENS-ONLY INVARIANT , texture may never lighten the page', () => {
   /**
    * The assertion the whole feature rests on.
    *
    * In both themes a tier-S glass surface composites LIGHTER than the page it
-   * sits on — that is what the perceptibility gate's "reads as RAISED" test
+   * sits on , that is what the perceptibility gate's "reads as RAISED" test
    * means. So the direction of the texture decides whether it is free or
    * expensive:
    *
@@ -88,11 +88,11 @@ describe('THE DARKENS-ONLY INVARIANT — texture may never lighten the page', ()
             `${themes[theme].bg} on some channel (Δ ${lift.join('/')}).\n\n` +
             `A lighter page narrows the gap the perceptibility gate measures between tier-S ` +
             `glass and --bg. Light's bottom sheen stop sits on the ${8}/255 floor exactly, so ` +
-            `this does not degrade gracefully — it invalidates the sheen, every soft chip and ` +
+            `this does not degrade gracefully , it invalidates the sheen, every soft chip and ` +
             `every glass pair simultaneously.\n\n` +
             `If you want a LIT bloom in dark mode it cannot live here: put it on a component, ` +
             `where the backdrop is known. In dark, note that the plum SEED lightens this page ` +
-            `(+7/+2/+4) — that is why texture.dark.field is a plum-black instead.`,
+            `(+7/+2/+4) , that is why texture.dark.field is a plum-black instead.`,
         ).toBeLessThanOrEqual(0);
       });
 
@@ -101,7 +101,7 @@ describe('THE DARKENS-ONLY INVARIANT — texture may never lighten the page', ()
          * Per-theme, because the themes are bounded by different things and the
          * ceiling means something different in each.
          *
-         * In light it is a formality — WCAG binds first, and the `--muted-fg`
+         * In light it is a formality , WCAG binds first, and the `--muted-fg`
          * assertion below is what actually fails when a light layer is deepened.
          * In dark it is the ONLY guard: darkening a near-black page raises text
          * contrast, so every accessibility assertion in this file gets *better* all
@@ -118,7 +118,7 @@ describe('THE DARKENS-ONLY INVARIANT — texture may never lighten the page', ()
             `${TEXTURE_DEPTH_CEILING[theme]}/255 ceiling for ${theme}. A layer that deep stops ` +
             `reading as detail ON the page and starts reading as a second page colour.` +
             (theme === 'dark'
-              ? `\n\nNote that no accessibility assertion will catch this for you in dark mode — ` +
+              ? `\n\nNote that no accessibility assertion will catch this for you in dark mode , ` +
                 `text contrast improves as the texture deepens. This ceiling is the whole guard.`
               : ''),
         ).toBeLessThanOrEqual(TEXTURE_DEPTH_CEILING[theme]);
@@ -180,7 +180,7 @@ describe('text stays readable on the textured page', () => {
    * THE BINDING CONSTRAINT, and it is not the glass gate.
    *
    * Light mode measures `--muted-fg` at 4.60:1 on the stacked worst case against
-   * AA's 4.5 — roughly 0.1 of margin, the tightest number the texture owns.
+   * AA's 4.5 , roughly 0.1 of margin, the tightest number the texture owns.
    * Deepening either light layer fails here first, and it fails as unreadable
    * secondary labels on the page rather than as ugly glass. Dark has room to
    * spare (7.72:1) because darkening a near-black page barely moves it.
@@ -199,7 +199,7 @@ describe('text stays readable on the textured page', () => {
       expect(
         ratio,
         `--muted-fg (${t.mutedFg}) on the stacked texture ${worst} = ${round2(ratio)}:1.\n\n` +
-          `This is the value that binds the texture depth — not the glass gate, which the ` +
+          `This is the value that binds the texture depth , not the glass gate, which the ` +
           `darkens-only invariant makes free. If you are here after deepening a layer, the ` +
           `texture is too dark for secondary text, and no amount of glass tuning fixes it.`,
       ).toBeGreaterThanOrEqual(TARGET.text);
@@ -264,7 +264,7 @@ describe('texture.css and tokens.css agree with texture.ts', () => {
      * The shorthand would reset `background-color`, and the page's colour comes
      * from `body { background: var(--bg) }` in theme.css's base layer. Resetting
      * it leaves the dots over transparent: invisible in light mode, and
-     * white-behind-dark-text in dark mode — on the consumer that opted in only.
+     * white-behind-dark-text in dark mode , on the consumer that opted in only.
      */
     const rules = textureCss.replace(/\/\*[\s\S]*?\*\//g, '');
     expect(
@@ -289,7 +289,7 @@ describe('texture.css and tokens.css agree with texture.ts', () => {
     expect(contrastBlock).toContain('background-image: none');
   });
 
-  it('the grid scrolls while the bloom is fixed — the blur needs movement', () => {
+  it('the grid scrolls while the bloom is fixed , the blur needs movement', () => {
     /**
      * The split is the entire point of the texture existing. A blur over a fully
      * fixed backdrop smears a static image, which reads as texture painted ON

@@ -9,7 +9,7 @@ import { cn } from '../lib/cn';
  *
  * It applies immediately, with no submit step. That is why the on-state is the
  * brand fill rather than a neutral tick, and why the thumb uses a `translate`
- * transition — the motion IS the feedback that something happened.
+ * transition , the motion IS the feedback that something happened.
  *
  * `translate-x-*` is not direction-aware, so the RTL case is handled explicitly
  * with `rtl:` variants. Getting this wrong produces a thumb that slides out of

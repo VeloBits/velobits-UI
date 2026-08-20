@@ -25,8 +25,8 @@ import { auditElement } from './axe';
  * Radix dialog marks every other body child `aria-hidden`, and the trigger inside
  * one is still tabbable as far as axe can tell. `FocusScope` is what actually
  * prevents reaching it, and no static rule can see that. Rooting the run at the
- * panel keeps the assertion about the panel — which is the part this component
- * owns — and still covers `aria-dialog-name`, so a missing `DialogTitle` fails
+ * panel keeps the assertion about the panel , which is the part this component
+ * owns , and still covers `aria-dialog-name`, so a missing `DialogTitle` fails
  * here rather than in a console warning nobody reads.
  */
 
@@ -62,7 +62,7 @@ async function open() {
   return screen.getByRole('dialog', { name: 'New environment' });
 }
 
-/** The body-level subtree an element sits in — what Radix hides, or does not. */
+/** The body-level subtree an element sits in , what Radix hides, or does not. */
 function bodyBranchOf(el: Element) {
   let node: Element = el;
   while (node.parentElement && node.parentElement !== document.body) node = node.parentElement;
@@ -85,7 +85,7 @@ describe('Dialog', () => {
   it('goes modal by hiding the rest of the document, not with aria-modal', async () => {
     /**
      * Worth pinning because it is the opposite of what most people assert. Radix
-     * sets no `aria-modal` — support for it is uneven and it does nothing about a
+     * sets no `aria-modal` , support for it is uneven and it does nothing about a
      * screen reader's virtual cursor. It marks every OTHER body-level subtree
      * `aria-hidden` instead, which is also why the axe run in this file is scoped
      * to the panel rather than to the document.
@@ -147,8 +147,8 @@ describe('Dialog', () => {
 /**
  * ## What this block can and cannot prove (the consumer ADR)
  *
- * The behaviour `focusFirstField` exists for — Radix's `FocusScope` focusing the
- * first tabbable node and beating a field's `autoFocus` — is a RACE between
+ * The behaviour `focusFirstField` exists for , Radix's `FocusScope` focusing the
+ * first tabbable node and beating a field's `autoFocus` , is a RACE between
  * React's autofocus commit and the scope's mount effect, and happy-dom with React
  * 19 resolves it the other way round: `autoFocus` appears to work here, and does
  * not in Chrome, which is where the dashboard app met it on "New environment".
@@ -249,7 +249,7 @@ describe('Dialog glass and layout invariants', () => {
   it('is the overlay glass tier, with no background utility to override it', async () => {
     /**
      * `.glass` lives in Tailwind's `components` layer, so ANY `bg-*` utility on
-     * the same element wins and replaces the glass background with a flat fill —
+     * the same element wins and replaces the glass background with a flat fill ,
      * silently, and only visibly wrong once there is content behind the dialog.
      */
     render(<FormDialog />);
@@ -270,7 +270,7 @@ describe('Dialog glass and layout invariants', () => {
     /**
      * Two bugs avoided at once: `left-1/2` is physical and wrong under
      * `dir="rtl"`, and `tw-animate-css`'s keyframes write the WHOLE `transform`
-     * property — so a layout `-translate-x-1/2` is discarded for the length of
+     * property , so a layout `-translate-x-1/2` is discarded for the length of
      * the animation, which is the off-centre jump stock shadcn dialogs do on open.
      */
     render(<FormDialog />);

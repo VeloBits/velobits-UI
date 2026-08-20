@@ -1,5 +1,5 @@
 /**
- * Theme resolution, with no React in it — so the Keycloak login theme and any
+ * Theme resolution, with no React in it , so the Keycloak login theme and any
  * plain-script consumer can use it, and so an app can run it in a blocking
  * `<head>` script to avoid a flash of the wrong theme.
  *
@@ -13,7 +13,7 @@
  *
  * The editor app additionally syncs the mode to the backend through RTK Query,
  * where the database is authoritative. For that app, localStorage is a cache to
- * avoid the flash — not the source of truth. Do not "simplify" it to local-only.
+ * avoid the flash , not the source of truth. Do not "simplify" it to local-only.
  */
 
 export type ThemeMode = 'light' | 'dark' | 'system';
@@ -21,7 +21,7 @@ export type ResolvedTheme = 'light' | 'dark';
 
 /**
  * The storage keys already in use across the consuming apps. The VALUES are
- * load-bearing — they are the live localStorage keys, so changing one silently
+ * load-bearing , they are the live localStorage keys, so changing one silently
  * discards every existing user's saved theme preference. Only ever add.
  */
 export const THEME_STORAGE_KEYS = {
@@ -46,7 +46,7 @@ export function resolveTheme(mode: ThemeMode): ResolvedTheme {
  *
  * Legacy values are accepted on purpose: the dashboard app persisted the bare
  * strings `'dark'` / `'light'`, and the editor app has `'system'` too. An
- * unrecognised value resolves to `'system'` rather than throwing — a corrupt
+ * unrecognised value resolves to `'system'` rather than throwing , a corrupt
  * preference should not white-screen an app.
  */
 export function readStoredMode(storageKey: string): ThemeMode {
@@ -106,7 +106,7 @@ export function watchSystemTheme(onChange: (theme: ResolvedTheme) => void): () =
  *
  * The editor app's auth work already established that a flash on refresh is a
  * real defect and not cosmetic; this is the same fix for theme. Must be rendered
- * synchronously — as a `<script dangerouslySetInnerHTML>` in an SSR document,
+ * synchronously , as a `<script dangerouslySetInnerHTML>` in an SSR document,
  * or inline in `index.html`. Deferring it defeats the point entirely.
  */
 export function themeInitScript(storageKey: string): string {

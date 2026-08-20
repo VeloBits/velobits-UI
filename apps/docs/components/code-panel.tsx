@@ -2,7 +2,7 @@
  * `@velobitsio/ui/cn`, not the barrel.
  *
  * This is a Server Component, and the barrel is bundled with a `'use client'`
- * banner — so importing `cn` from it and CALLING it fails the build with
+ * banner , so importing `cn` from it and CALLING it fails the build with
  * "Attempted to call cn() from the server but cn is on the client". Rendering a
  * client component from here is fine; invoking a function out of a client module
  * is not.
@@ -22,7 +22,7 @@ import { CopyButton } from './copy-button';
  * `dangerouslySetInnerHTML` is load-bearing and safe here: the markup is Shiki's
  * output for a file in this repository, produced during the build. Nothing on
  * this page is ever user input, and there is no runtime path that reaches this
- * prop — the alternative, shipping the highlighter to the browser, costs every
+ * prop , the alternative, shipping the highlighter to the browser, costs every
  * reader a megabyte of grammars to render text that never changes.
  *
  * The dual-theme CSS lives in `app/globals.css`: Shiki emits `--shiki-light` and
@@ -57,16 +57,37 @@ export function CodePanel({
         className="absolute end-2 top-2 z-raised bg-panel/80 backdrop-blur-sm"
       />
       <div
-        /*
-         * Focusable because it scrolls. A scroll container that keyboard users
-         * cannot reach is 2.1.1 — and this one scrolls by construction, since
-         * code does not wrap.
-         */
-        tabIndex={0}
         role={label ? 'region' : undefined}
         aria-label={label}
-        className="overflow-auto text-[0.8125rem] leading-relaxed [&_pre]:p-4 [&_pre]:font-mono"
-        style={maxHeight ? { maxHeight } : undefined}
+        className={cn(
+          'text-[0.8125rem] leading-relaxed',
+          /*
+           * ⚠️ The `<pre>` is the scroll container, NOT this wrapper.
+           *
+           * Shiki paints the block's background on the `<pre>` (as
+           * `--shiki-*-bg`), and a background only ever covers the element's own
+           * box. A `<pre>` is a block, so inside a scrolling wrapper it is exactly
+           * as wide as that wrapper , meaning the moment you scrolled right, the
+           * code ran off the end of its own fill and the page showed through, with
+           * a matching strip under the horizontal scrollbar, which belongs to the
+           * wrapper and never had the fill at all.
+           *
+           * Scrolling the painted element instead fixes both: its background is
+           * the padding box, which is what stays put while the content moves, and
+           * the scrollbar gutter is inside it. `w-max` on the `<pre>` would fix
+           * only the first half.
+           */
+          '[&_pre]:overflow-auto [&_pre]:p-4 [&_pre]:font-mono',
+          /*
+           * Shiki's own output already carries `tabindex="0"`, so the element that
+           * scrolls is the element that focuses (2.1.1) with nothing added here.
+           * The offset goes INWARD because the rounded wrapper clips overflow, and
+           * a 2px outline drawn outside the `<pre>` is a 2px outline nobody sees.
+           */
+          '[&_pre]:focus-visible:-outline-offset-2',
+          maxHeight && '[&_pre]:max-h-[var(--code-panel-max-h)]',
+        )}
+        style={maxHeight ? ({ '--code-panel-max-h': maxHeight } as React.CSSProperties) : undefined}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>

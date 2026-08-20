@@ -6,7 +6,7 @@ export const metadata = {
 # Dark mode
 
 Class-based: `.dark` on `<html>` swaps every semantic token. Both themes are
-first-class — dark is not a filter over light, and several tokens are not the
+first-class, dark is not a filter over light, and several tokens are not the
 same colour scaled.
 
 ## The two pieces
@@ -15,7 +15,7 @@ same colour scaled.
 the system preference.
 
 **`themeInitScript`** applies the stored theme _before first paint_. Without it,
-the page renders light and then flips — the flash of wrong theme.
+the page renders light and then flips, the flash of wrong theme.
 
 ```tsx
 import { THEME_STORAGE_KEYS, themeInitScript } from '@velobitsio/ui/theme';
@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
 `suppressHydrationWarning` is required precisely because that script mutates the
 element React is about to hydrate.
 
-`@velobitsio/ui/theme` is a **subpath**, and it is React-free by design — which
+`@velobitsio/ui/theme` is a **subpath**, and it is React-free by design, which
 is what lets a Server Component call `themeInitScript()` during render.
 
 ## The storage key is required, never defaulted
@@ -79,7 +79,7 @@ Render both and let CSS choose:
 ```
 
 The markup is then identical on both sides, and the right icon shows before React
-has even booted. The `aria-label` stays static for the same reason — "Switch to
+has even booted. The `aria-label` stays static for the same reason, "Switch to
 dark theme" would be wrong on the server in exactly the cases the icon was.
 
 `mounted` is the escape hatch for the cases CSS genuinely cannot express, such as
@@ -90,7 +90,7 @@ client render.
 
 Handled in two places, and adding a third is how they get out of step.
 `VelobitsProvider` mounts `<MotionConfig reducedMotion="user">`, which drops
-transform and opacity animations for users who asked for less motion — across
+transform and opacity animations for users who asked for less motion, across
 every component, without any of them knowing. The token layer's
 `@media (prefers-reduced-motion: reduce)` block clamps CSS durations globally.
 

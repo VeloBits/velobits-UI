@@ -8,7 +8,7 @@ import { CircleCheckIcon } from '@velobitsio/icons';
 
 /**
  * The case that is neither a route nor a list: a result that arrives after a
- * fetch. `FadeIn` deliberately has no exit animation — an element that fades OUT
+ * fetch. `FadeIn` deliberately has no exit animation , an element that fades OUT
  * on unmount has to stay mounted while it does, which needs a parent
  * `AnimatePresence` and a stable key. `PageTransition` is the component that owns
  * that complexity.

@@ -45,7 +45,7 @@ describe('CodeBlock structure', () => {
     /**
      * WCAG 2.1.1: a region that scrolls must be focusable, or a mouse user can
      * read a long snippet and a keyboard user cannot scroll it at all. axe calls
-     * this `scrollable-region-focusable` and needs real layout to detect it — so
+     * this `scrollable-region-focusable` and needs real layout to detect it , so
      * no unit test would ever catch its absence, only this one asserting it is
      * there.
      */
@@ -150,7 +150,7 @@ describe('CodeBlock, the copy button', () => {
   it('mounts the live region empty, so the message is a CHANGE to observe', () => {
     /**
      * A live region inserted into the DOM already containing its text is
-     * frequently not announced — there is nothing for the observer to observe.
+     * frequently not announced , there is nothing for the observer to observe.
      */
     const { container } = render(<CodeBlock copyable>{SNIPPET}</CodeBlock>);
     const live = container.querySelector('[aria-live="polite"]')!;

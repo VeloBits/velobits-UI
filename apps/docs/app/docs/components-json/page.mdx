@@ -43,7 +43,7 @@ Create it with `npx shadcn@latest init`, or write it yourself.
 current CLI resolves `@velobits/button` through the public index with no entry
 here at all.
 
-Add one anyway to _pin_ the origin — an older CLI, an internal mirror, a staging
+Add one anyway to _pin_ the origin: an older CLI, an internal mirror, a staging
 copy. An explicit mapping takes precedence over the index. `{name}` is replaced
 with the item name, so `@velobits/button` fetches
 `https://ui.velobits.dev/r/button.json`. See [Registry](/docs/registry).
@@ -58,26 +58,26 @@ registry lands in `<aliases.ui>/velobits/`, flat. With the default
 ## aliases.utils
 
 Where our `cn` goes, and what every component's `cn` import is rewritten to. These
-two have to agree, which they do in the default config — `utils: "@/lib/utils"`
+two have to agree, which they do in the default config, where `utils: "@/lib/utils"`
 alongside `lib: "@/lib"` puts the file at `lib/utils.ts` and the import at
 `@/lib/utils`.
 
 If you point `utils` somewhere that is not `<lib>/utils`, shadcn writes the file to
 the `lib` alias while rewriting imports to the `utils` alias, and they no longer
-match. That inconsistency is the CLI's, not ours — shadcn's own `utils` item has
+match. That inconsistency is the CLI's, not ours; shadcn's own `utils` item has
 it too. Keep the two conventional and it does not arise.
 
 **Our `cn` is a superset of shadcn's**, not a replacement with different
 behaviour: identical signature and identical results on standard utilities, plus
 `rounded-pill`, the `z-*` ladder, the named durations, and a bidirectional
-`control-material` ⇄ `shadow` conflict group. Pass `--overwrite` so ours wins — see
+`control-material` ⇄ `shadow` conflict group. Pass `--overwrite` so ours wins; see
 [Installation](/docs/installation).
 
 ## tailwind.css
 
 The stylesheet the CLI writes theme variables into. Installing
-`@velobits/velobits-theme` — which every component depends on, so it arrives
-whether or not you ask for it — appends the full token layer here as `:root` and
+`@velobits/velobits-theme` (which every component depends on, so it arrives
+whether or not you ask for it) appends the full token layer here as `:root` and
 `.dark` blocks.
 
 `cssVariables` must be `true`. The token layer is variables; with `false` the CLI
@@ -85,7 +85,7 @@ would try to write literal colour utilities and the theme would not switch.
 
 ## tailwind.config
 
-Empty string on Tailwind v4. There is no JS config file any more — `@theme` in
+Empty string on Tailwind v4. There is no JS config file any more; `@theme` in
 your CSS replaces it. Leave the key present and blank; the CLI still reads it.
 
 ## iconLibrary

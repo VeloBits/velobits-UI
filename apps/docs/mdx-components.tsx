@@ -7,7 +7,7 @@ import { MdxToc } from '@/components/mdx-toc';
  *
  * Deliberately thin on the element side: the guides are prose, and prose that
  * needs a component per element is a sign the design system should own the
- * pattern instead. The `wrapper` is the exception and does real work — it is
+ * pattern instead. The `wrapper` is the exception and does real work , it is
  * what gives every `.mdx` file under `app/docs/` the same two-column shell as the
  * component pages without each one importing a layout.
  */

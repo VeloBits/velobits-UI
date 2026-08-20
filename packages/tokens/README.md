@@ -1,7 +1,7 @@
 # @velobitsio/tokens
 
-The VeloBits design tokens — colour, type, spacing, motion and the glass
-material — as CSS custom properties and as TypeScript.
+The VeloBits design tokens , colour, type, spacing, motion and the glass
+material , as CSS custom properties and as TypeScript.
 
 **Zero dependencies and zero React.** That is deliberate: the shared Keycloak
 login theme cannot consume a React package, so the token layer has to stand on
@@ -56,7 +56,7 @@ individually too), alongside colour maths such as `contrastRatio`,
 
 Every semantic colour pair is contrast-asserted in both themes as a test, so a
 palette edit that breaks a WCAG target fails CI instead of shipping. That
-includes the composited cases that are easy to miss — text on a soft chip wash
+includes the composited cases that are easy to miss , text on a soft chip wash
 measured over the page, over a panel, and over the glass surface composite.
 
 ## Licence

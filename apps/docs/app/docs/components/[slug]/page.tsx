@@ -20,12 +20,12 @@ import { registryItems, registryItemsByName } from '@/lib/generated/registry-dat
  * One route for every registry item.
  *
  * `generateStaticParams` reads the registry, so **an item added to
- * `registry/registry.ts` gets a documentation page with no further edit** — the
+ * `registry/registry.ts` gets a documentation page with no further edit** , the
  * same anti-drift rule `/docs/colors` and `/docs/icons` follow by enumerating
  * their packages rather than listing entries by hand. The page a new component
  * gets is complete on its own: title, description, install commands,
  * requirements and prop table all come from the registry and the TypeScript
- * sources. `apps/docs/content/components.ts` only adds what cannot be derived —
+ * sources. `apps/docs/content/components.ts` only adds what cannot be derived ,
  * a usage snippet, which examples to show, and prose.
  *
  * This is why there are not 46 MDX files. Forty-six pages that must each be
@@ -98,8 +98,8 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
                 </Link>
               </li>
               <ChevronRightIcon className="size-3.5 rtl:rotate-180" aria-hidden />
-              {/* A plain span with aria-current, never a role="link" aria-disabled
-                  — that spelling announces static text as a broken link, which is
+              {/* A plain span with aria-current, never a role="link" aria-disabled:
+                  that spelling announces static text as a broken link, which is
                   the exact thing `Breadcrumb` in this registry exists to fix. */}
               <li aria-current="page" className="font-medium text-fg">
                 {item.title}
@@ -139,7 +139,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
             <p className="text-sm text-muted-foreground">
               Spelled for the npm package. If you installed through the CLI the component is in your
               own tree instead, so the import is <code>@/components/ui/velobits/{slug}</code> with
-              the default aliases — see{' '}
+              the default aliases; see{' '}
               <Link href="/docs/installation" className="text-link underline underline-offset-4">
                 Installation
               </Link>{' '}
@@ -182,7 +182,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
             <p className="max-w-3xl text-sm text-muted-foreground">
               Extracted from the TypeScript sources at build time, so it cannot disagree with the
               code. Props inherited from the underlying DOM element or Radix primitive are forwarded
-              but not listed — a table carrying 240 DOM handlers hides the three props that are
+              but not listed: a table carrying 240 DOM handlers hides the three props that are
               actually this component&apos;s.
             </p>
             <PropsTable groups={propGroups} />

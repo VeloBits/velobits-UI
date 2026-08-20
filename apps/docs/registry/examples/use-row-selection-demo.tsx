@@ -12,7 +12,7 @@ const FLAGS = [
 ];
 
 /**
- * The point of this hook in one screen: the selection is DERIVED — the stored set
+ * The point of this hook in one screen: the selection is DERIVED , the stored set
  * intersected with the rows currently on screen. Select every row, then filter
  * them away, and the count follows to zero rather than keeping a bulk action
  * pointed at rows nobody can see.

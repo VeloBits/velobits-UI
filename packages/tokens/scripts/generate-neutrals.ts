@@ -13,7 +13,7 @@
  * 1. **The hue column drifts** from 44.9° at the light end to 145.5° at the
  *    dark end, which looks like a mistake and is not. At chroma this low
  *    (0.002-0.009) a single 8-bit step in any channel swings the measured hue by
- *    tens of degrees — the quantisation grid is coarser than the hue difference.
+ *    tens of degrees , the quantisation grid is coarser than the hue difference.
  *    Each row records the hue the committed hex *actually measures*, so the
  *    ladder round-trips to the same hex byte-for-byte. A smooth
  *    hue-held-at-44.89° curve produces the same colours to within 1-3 8-bit
@@ -25,17 +25,17 @@
  *    plan's illustrative CSS carried over from the dashboard app (`#2E2E2E`)
  *    was tuned against that app's darker `#252526` panel; against this
  *    palette's lighter `#2C2D2C` it lands at 1.02:1, i.e. invisible. `750`
- *    measures 1.15:1 against the panel — a real but quiet edge, which is what a
+ *    measures 1.15:1 against the panel , a real but quiet edge, which is what a
  *    table rule wants.
  *
  * 3. **`925` exists for one job too:** the dark-mode `--bg`. A tier-S surface
  *    has to clear 8/255 from the page below it AND from `--panel` above it, so
  *    the page↔panel distance is its entire budget. With the page at `900` that
- *    distance was 18/255, leaving a legal window of exactly three values — the
+ *    distance was 18/255, leaving a legal window of exactly three values , the
  *    glass was pinned at 9/255 either side and read as flat. `--panel` cannot
  *    move up to widen it (at #2E2F2E the gated `primary fill vs panel` pair
  *    falls to 2.98:1), so the page moved down. `925` widens the budget to
- *    23/255 and every dark contrast pair measured against the page IMPROVED —
+ *    23/255 and every dark contrast pair measured against the page IMPROVED ,
  *    a darker page can only help light-on-dark text. Added 2026-08-06; see
  *    ADR-0038.
  *
@@ -71,7 +71,7 @@ const rows = Object.entries(LADDER).map(([step, oklch]) => {
 });
 
 const banner = `/**
- * GENERATED FILE — do not edit.
+ * GENERATED FILE , do not edit.
  * Regenerate with: npm run generate -w @velobitsio/tokens
  * Source of truth: scripts/generate-neutrals.ts
  *

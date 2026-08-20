@@ -8,7 +8,7 @@ import { cn } from '../lib/cn';
  * ## `TooltipProvider` is not optional, and its absence is a runtime throw
  *
  * Radix's `Tooltip.Root` reads context from a `Tooltip.Provider` ancestor and
- * throws without one. Mount it ONCE per app, at the shell root —
+ * throws without one. Mount it ONCE per app, at the shell root ,
  * `VelobitsProvider` does this.
  *
  * ### Under Module Federation this becomes a singleton requirement
@@ -22,7 +22,7 @@ import { cn } from '../lib/cn';
  *
  * Bump the pin and the package version in lockstep: exceeding the pin produces
  * `does not satisfy` console warnings and then a fatal
- * `does not provide an export named 'default'` — a blank page.
+ * `does not provide an export named 'default'` , a blank page.
  *
  * ## A tooltip is never the only source of information
  *

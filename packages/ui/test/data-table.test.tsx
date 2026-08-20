@@ -104,7 +104,7 @@ describe('DataTable, sorting', () => {
   it('puts aria-sort on the TH, not on the sort button', () => {
     /**
      * `aria-sort` describes the column and AT reads it from the header cell. On
-     * the button it is silently ignored — the arrow keeps working, the
+     * the button it is silently ignored , the arrow keeps working, the
      * announcement does not, and nothing anywhere reports a problem.
      */
     render(<Fixture sort={{ key: 'key', dir: 'asc' }} onSortChange={() => {}} />);
@@ -344,7 +344,7 @@ describe('useRowSelection, the selection is DERIVED', () => {
     /**
      * Load-bearing, not a micro-optimisation. This object reaches DataTable's
      * memoised rows, so a hook that re-identified per render would turn that memo
-     * into dead code — and a hundred rows, each formatting a date and mounting a
+     * into dead code , and a hundred rows, each formatting a date and mounting a
      * switch and a menu, would re-render on every keystroke in the filter box.
      */
     const { result, rerender } = renderHook(

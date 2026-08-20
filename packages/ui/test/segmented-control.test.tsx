@@ -29,7 +29,7 @@ describe('SegmentedControl, behaviour carried over from the dashboard app', () =
     expect(onValueChange).toHaveBeenCalledWith('prod');
   });
 
-  it('ignores a deselect — the selection can never be empty', async () => {
+  it('ignores a deselect , the selection can never be empty', async () => {
     /** Clicking the active item is what Radix reports as an empty value. */
     const onValueChange = vi.fn();
     render(
@@ -83,7 +83,7 @@ describe('SegmentedControl, behaviour carried over from the dashboard app', () =
     /**
      * Radix's ToggleGroup roving focus MOVES focus on an arrow key; it does not
      * select. That is a real gap against APG's radio-group pattern, where
-     * selection follows focus — pinned here so the behaviour is a recorded
+     * selection follows focus , pinned here so the behaviour is a recorded
      * decision rather than a surprise. Enter and Space both activate.
      */
     const onValueChange = vi.fn();
@@ -129,7 +129,7 @@ describe('SegmentedControl, behaviour carried over from the dashboard app', () =
   });
 });
 
-describe('SegmentedControl, FIX 1 — an accessible name that actually resolves', () => {
+describe('SegmentedControl, FIX 1 , an accessible name that actually resolves', () => {
   /**
    * These fail against the dashboard app's `src/ui/segmented-control.tsx`: it accepts
    * only `aria-label`, and its `<div>` root makes any external `<label htmlFor>`
@@ -139,7 +139,7 @@ describe('SegmentedControl, FIX 1 — an accessible name that actually resolves'
   it('takes its name from a real <label> element via aria-labelledby', () => {
     /**
      * This is the migration shape: keep the `<Label>`, drop `htmlFor`, reference
-     * it by id instead. `htmlFor` cannot work here — see the next test.
+     * it by id instead. `htmlFor` cannot work here , see the next test.
      */
     render(
       <>
@@ -152,7 +152,7 @@ describe('SegmentedControl, FIX 1 — an accessible name that actually resolves'
         />
       </>,
     );
-    // Not "the attribute is present" — the name has to RESOLVE. `getByRole` runs
+    // Not "the attribute is present" , the name has to RESOLVE. `getByRole` runs
     // the real accessible-name computation, so a dangling id fails here.
     expect(screen.getByRole('radiogroup', { name: 'Environment' })).toBeTruthy();
   });
@@ -172,7 +172,7 @@ describe('SegmentedControl, FIX 1 — an accessible name that actually resolves'
   it('has a non-labelable div root, which is the whole reason those two props exist', () => {
     /**
      * The root cause of the original bug, pinned. `<label htmlFor>` only
-     * associates with *labelable* elements — button, input, select, textarea,
+     * associates with *labelable* elements , button, input, select, textarea,
      * meter, output, progress. A `<div>` is not one, so the association is a no-op
      * with no console warning and no visual difference.
      */
@@ -197,12 +197,12 @@ describe('SegmentedControl, FIX 1 — an accessible name that actually resolves'
       />,
     );
     expect(screen.getByRole('radiogroup').getAttribute('aria-labelledby')).toBe('no-such-element');
-    // No name at all — the failure mode a presence-only assertion would miss.
+    // No name at all , the failure mode a presence-only assertion would miss.
     expect(screen.queryByRole('radiogroup', { name: /./ })).toBeNull();
   });
 });
 
-describe('SegmentedControl, id + aria-describedby — the wiring the dashboard app added', () => {
+describe('SegmentedControl, id + aria-describedby , the wiring the dashboard app added', () => {
   /**
    * The dashboard app's repaired control grew `id` and description wiring; this
    * is the same pair under the native ARIA spelling (`aria-describedby`, not a
@@ -235,7 +235,7 @@ describe('SegmentedControl, id + aria-describedby — the wiring the dashboard a
         <p id="env-hint">Production changes apply immediately.</p>
       </>,
     );
-    // Same rule as the name: not "the attribute is present" — the description
+    // Same rule as the name: not "the attribute is present" , the description
     // has to RESOLVE. `getByRole` runs the real accessible-description
     // computation, so a dangling id fails here.
     expect(
@@ -254,12 +254,12 @@ describe('SegmentedControl, id + aria-describedby — the wiring the dashboard a
       />,
     );
     expect(screen.getByRole('radiogroup').getAttribute('aria-describedby')).toBe('no-such-hint');
-    // No description at all — the failure mode a presence-only assertion would miss.
+    // No description at all , the failure mode a presence-only assertion would miss.
     expect(screen.queryByRole('radiogroup', { description: /./ })).toBeNull();
   });
 });
 
-describe('SegmentedControl, FIX 2 — a real disable, not pointer-events-none', () => {
+describe('SegmentedControl, FIX 2 , a real disable, not pointer-events-none', () => {
   /**
    * All of these fail against the dashboard app's version, which has no `disabled` prop
    * at all: a `pointer-events-none` "disable" leaves the control focusable,
@@ -322,7 +322,7 @@ describe('SegmentedControl, FIX 2 — a real disable, not pointer-events-none', 
   it('keeps a not-allowed cursor rather than removing pointer events', () => {
     /**
      * The disabled attribute already blocks activation, so there is no reason to
-     * also drop pointer events — and dropping them would take the `not-allowed`
+     * also drop pointer events , and dropping them would take the `not-allowed`
      * cursor with it, removing the only mouse-visible explanation for why the
      * click did nothing.
      */

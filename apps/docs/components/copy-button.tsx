@@ -9,7 +9,7 @@ import { CheckIcon, CopyIcon } from '@velobitsio/icons';
  * Copy-to-clipboard with a confirmation that decays.
  *
  * Presence-checks `navigator.clipboard` as a whole object rather than calling it
- * and catching — the entire API is absent on an insecure origin, so
+ * and catching , the entire API is absent on an insecure origin, so
  * `navigator.clipboard.writeText` throws a TypeError on the property access, not
  * a rejected promise. `CodeBlock` in the registry makes the same check for the
  * same reason; this is the docs-chrome copy of it, for buttons that are not

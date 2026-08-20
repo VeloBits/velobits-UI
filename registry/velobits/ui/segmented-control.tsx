@@ -17,7 +17,7 @@ export interface SegmentOption {
  * A `role="radiogroup"` with no accessible name is an unlabelled control, and
  * there is no way to give this one a name from outside (see the docblock). So the
  * name is required at the type level, and it is one of the two forms that
- * actually work — never both, since `aria-labelledby` silently wins over
+ * actually work , never both, since `aria-labelledby` silently wins over
  * `aria-label` and having both in a call site is a lie about which text is read.
  */
 type SegmentedControlName =
@@ -32,11 +32,11 @@ export type SegmentedControlProps = {
   id?: string;
   /**
    * id(s) of the hint or error text describing the group. A dangling id fails as
-   * silently as a dangling `aria-labelledby` — see the docblock.
+   * silently as a dangling `aria-labelledby` , see the docblock.
    */
   'aria-describedby'?: string;
   /**
-   * Disables every segment. This is a REAL disable — see the docblock; it is not
+   * Disables every segment. This is a REAL disable , see the docblock; it is not
    * `pointer-events-none`.
    */
   disabled?: boolean;
@@ -50,7 +50,7 @@ export type SegmentedControlProps = {
  * can render.
  *
  * `type="single"` is what makes Radix emit `role="radiogroup"` on the root and
- * `role="radio"` + `aria-checked` on each segment, which is the correct mapping —
+ * `role="radio"` + `aria-checked` on each segment, which is the correct mapping ,
  * a segmented control is a radio group that looks like a row of buttons.
  *
  * ## One known gap, recorded rather than silently inherited
@@ -58,7 +58,7 @@ export type SegmentedControlProps = {
  * Radix's roving focus MOVES focus on an arrow key without selecting; activation
  * is Enter or Space. APG's radio-group pattern says selection should follow focus.
  * Closing that would mean selecting on `focus`, which also fires on a mouse press
- * and on programmatic focus, so it is left alone deliberately — the group is one
+ * and on programmatic focus, so it is left alone deliberately , the group is one
  * tab stop either way, and the mismatch costs a keyboard user one extra keypress
  * rather than access. `segmented-control.test.tsx` pins the actual behaviour.
  *
@@ -75,7 +75,7 @@ export type SegmentedControlProps = {
  * ### 1. `htmlFor` could never label this, and now there is a path that can
  *
  * Radix renders the root as a `<div>`. A `<div>` is not a *labelable* element,
- * so `<label htmlFor="…">` pointing at it associates with nothing — the browser
+ * so `<label htmlFor="…">` pointing at it associates with nothing , the browser
  * computes no accessible name, no click-to-focus, and **nothing warns**. It looks
  * exactly like a working label in the markup and in a screenshot.
  *
@@ -99,7 +99,7 @@ export type SegmentedControlProps = {
  * The dashboard app's repaired control also grew the matching wiring in the
  * other direction, and so does this one: `id` is forwarded onto the root so
  * other elements can point at the group, and `aria-describedby` associates hint
- * or error text with it — both under their native ARIA spelling. A dangling
+ * or error text with it , both under their native ARIA spelling. A dangling
  * `aria-describedby` fails exactly as silently as a dangling `aria-labelledby`,
  * so its test asserts that the description resolves too.
  *
@@ -148,7 +148,7 @@ export function SegmentedControl({
         className,
       )}
       id={id}
-      // Description wiring — same native ARIA spelling as the name props below.
+      // Description wiring , same native ARIA spelling as the name props below.
       aria-describedby={ariaDescribedBy}
       {...nameProps}
     >
@@ -164,7 +164,7 @@ export function SegmentedControl({
             'outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40',
             'enabled:hover:text-fg',
             // A real disable needs a real cursor and a real dim. No
-            // `pointer-events-none` — the `disabled` attribute already stops
+            // `pointer-events-none` , the `disabled` attribute already stops
             // activation, and removing pointer events would also remove the
             // `not-allowed` cursor that tells a mouse user why nothing happened.
             'disabled:cursor-not-allowed disabled:opacity-50',

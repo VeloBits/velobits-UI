@@ -1,6 +1,6 @@
 # @velobitsio/icons
 
-The VeloBits icon set — 88 hand-drawn stroke icons on a 24×24 grid, tuned to
+The VeloBits icon set: 201 hand-drawn stroke icons on a 24×24 grid, tuned to
 read at 13–18px, which is where they actually get used.
 
 Merged from the two sets that had independently diverged across the VeloBits
@@ -39,7 +39,7 @@ The `Icon` and `IconProps` types are exported alongside it.
 There are no per-icon entry points and none are needed. The package is
 `sideEffects: false` and every export is a plain function, so a bundler drops
 what you do not reference. That is asserted by a `size-limit` budget in CI
-rather than assumed — a single icon costs about 233 B.
+rather than assumed , a single icon costs about 233 B.
 
 ## Licence
 

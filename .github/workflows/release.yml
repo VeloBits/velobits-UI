@@ -15,8 +15,8 @@ name: Release
 # switch on its own inputs, and two properties of it broke this pipeline before:
 # an empty `publish` input made the post-merge run a 0-second green no-op, and a
 # non-empty changeset directory routes it to "open a PR" no matter what else is
-# set. Under this design changesets can legitimately be pending on main — feature
-# PRs land on develop after a prepare — so that second branch would hijack every
+# set. Under this design changesets can legitimately be pending on main (feature
+# PRs land on develop after a prepare), so that second branch would hijack every
 # release. `changeset publish` on its own has no such switch: it publishes what is
 # unpublished and skips the rest.
 on:
@@ -48,16 +48,16 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
           # This is what writes the auth line into a temporary .npmrc. The
-          # committed .npmrc deliberately carries only the registry mapping —
+          # committed .npmrc deliberately carries only the registry mapping;
           # npm hard-fails on an unresolvable ${VAR} in it.
           registry-url: https://registry.npmjs.org
 
       # npm answers "you may not write here" with 404 on the PUT, not 403, so the
       # registry never confirms which names exist in a scope you cannot see. The
       # cost is that `changeset publish` reports "E404 Not Found - PUT
-      # …/<scope>%2ficons — Not found" for a package it is itself trying to create,
+      # …/<scope>%2ficons - Not found" for a package it is itself trying to create,
       # which reads like a missing dependency and is actually a permission. Two
-      # full release runs died that way in Aug 2026 before it was read as auth —
+      # full release runs died that way in Aug 2026 before it was read as auth;
       # the scope in use then belonged to someone else. See .npmrc for that history.
       #
       # So resolve the token to an account BEFORE the build, and print who owns the
@@ -74,11 +74,11 @@ jobs:
 
           if ! raw=$(npm whoami --registry=https://registry.npmjs.org 2>&1); then
             echo "$raw"
-            echo "::error::NPM_TOKEN does not resolve to an npm account — it is revoked, expired, or not an npm token. Issue a new one and update the secret."
+            echo "::error::NPM_TOKEN does not resolve to an npm account: it is revoked, expired, or not an npm token. Issue a new one and update the secret."
             exit 1
           fi
 
-          # `2>&1` above is deliberate — on failure the reason is on stderr and is
+          # `2>&1` above is deliberate: on failure the reason is on stderr and is
           # the only useful output. But it means npm's own chatter lands in the same
           # capture on SUCCESS, and setup-node writes `always-auth` into the temp
           # .npmrc it generates, so npm warns about an unknown config on every
@@ -117,7 +117,7 @@ jobs:
             # Status and body separately, because they mean different things and an
             # earlier version of this step conflated them: `curl -f … || echo '{}'`
             # turned a 404 into the same empty map a real org returns, so "the scope
-            # does not exist" — hard, actionable, knowable — arrived as the warning
+            # does not exist" (hard, actionable, knowable) arrived as the warning
             # for "members are private". Read them apart.
             #
             #   404          the name is unregistered. Nothing can publish into it.
@@ -130,12 +130,12 @@ jobs:
             echo "GET /-/org/$s/user -> HTTP $body  $members"
 
             if [ "$body" = "404" ]; then
-              echo "::error::The '@$s' scope does not exist on npm — the name '$s' is not a registered org or user. Create the org first; a scope with no account behind it can never be published to."
+              echo "::error::The '@$s' scope does not exist on npm: the name '$s' is not a registered org or user. Create the org first; a scope with no account behind it can never be published to."
               exit 1
             fi
 
             if ! node -e 'const m=JSON.parse(process.argv[1]); process.exit(Object.keys(m).length===0?1:0)' "$members" 2>/dev/null; then
-              # An org. Ask the registry with our own credentials — this is the only
+              # An org. Ask the registry with our own credentials: this is the only
               # check that distinguishes "not a member" from "member, cannot list",
               # and not-a-member is precisely what produces the masked 404.
               if roles=$(npm org ls "$s" --json 2>/dev/null); then
@@ -146,7 +146,7 @@ jobs:
                   exit 1
                 fi
               else
-                echo "::warning::'@$s' is a registered org but its members could not be enumerated with this token. That is expected for a restricted role, and also what a token scoped to a DIFFERENT org looks like — if the publish below fails with E404 on PUT, re-issue NPM_TOKEN against '@$s' specifically."
+                echo "::warning::'@$s' is a registered org but its members could not be enumerated with this token. That is expected for a restricted role, and also what a token scoped to a DIFFERENT org looks like; if the publish below fails with E404 on PUT, re-issue NPM_TOKEN against '@$s' specifically."
               fi
             else
               # A user scope: the owner is public, so this is decidable here.
@@ -159,7 +159,7 @@ jobs:
 
             # The trap per-package granular tokens fall into, said out loud because
             # it produces the same unreadable E404 as having no access at all.
-            echo "::notice::A granular token must grant read+write on the WHOLE '@$s' scope. Per-package selection cannot cover a package the registry does not have yet — which is every package in a first publish."
+            echo "::notice::A granular token must grant read+write on the WHOLE '@$s' scope. Per-package selection cannot cover a package the registry does not have yet, which is every package in a first publish."
           done
 
       # No auth needed to install: every @velobits/* dep here is a workspace
@@ -173,7 +173,7 @@ jobs:
         run: npm run package:check
 
       # A notice rather than a failure: under this design pending changesets on
-      # main are normal — they are next cycle's release, queued on develop and
+      # main are normal; they are next cycle's release, queued on develop and
       # carried along by a develop → main merge. Worth saying out loud though,
       # because it also describes the mistake of merging to main without running
       # Prepare release, where this job correctly publishes nothing.
@@ -200,7 +200,7 @@ jobs:
 
       # Does not fail the job. A multi-package publish can fail on one package
       # after succeeding on another, and when it does, the tags and Releases for
-      # what DID publish still need to be created — otherwise npm has a version
+      # what DID publish still need to be created; otherwise npm has a version
       # with no tag and no notes. The gate at the end turns this red.
       - name: Publish to npm
         id: publish
@@ -224,20 +224,32 @@ jobs:
           fi
 
       # Authoritative, and deliberately not dependent on `changeset publish` having
-      # tagged anything. The rule is "every version the registry has gets a tag",
-      # which covers three cases with one pass: what this run just published, what
-      # a previous run published before failing to tag it, and what changesets
-      # silently failed to tag. Without the npm check it would also tag versions
-      # main declares but never shipped, which is an unfinished release, not a
-      # missing tag.
+      # tagged anything. The rule is "every version the registry has is tagged ON
+      # THE REMOTE", which covers four cases in one pass: what this run just
+      # published, what changesets tagged locally and left there (it tags, it never
+      # pushes), what a previous run published before failing to tag it, and what
+      # changesets silently failed to tag. Without the npm check it would also tag
+      # versions main declares but never shipped, which is an unfinished release,
+      # not a missing tag.
       #
-      # This is what recovers an already-published version: `changeset publish`
+      # Testing the LOCAL ref instead is what broke @velobitsio/icons@0.1.0:
+      # `changeset publish` had just written that tag on the runner, this step read
+      # it as "already tagged", pushed nothing, and `gh release create` then refused
+      # the tag for existing locally and not on GitHub. A tag on a throwaway runner
+      # is not a tag. Note this only became reachable once the identity step above
+      # made changesets' annotated `git tag -m` succeed at all.
+      #
+      # This is also what recovers an already-published version: `changeset publish`
       # skips it forever once it is on the registry, so it will never be tagged by
       # the publish step again, no matter how many times the workflow is rerun.
       - name: Tag every published version
         if: always() && steps.publish.conclusion != 'skipped'
         run: |
-          tagged=0
+          # One list, up front. --refs drops the ^{} peel entries annotated tags
+          # add, so this is plain tag names and nothing else.
+          git ls-remote --refs --tags origin | sed 's,.*refs/tags/,,' | sort -u > "$RUNNER_TEMP/remote-tags.txt"
+
+          push_refs=""
           for dir in packages/*; do
             [ -f "$dir/package.json" ] || continue
             private=$(node -p "require('./$dir/package.json').private === true")
@@ -247,25 +259,35 @@ jobs:
             version=$(node -p "require('./$dir/package.json').version")
             tag="$name@$version"
 
-            if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
-              echo "$tag already tagged."
+            if grep -qxF "$tag" "$RUNNER_TEMP/remote-tags.txt"; then
+              echo "$tag is already tagged on the remote."
               continue
             fi
             if ! npm view "$tag" version > /dev/null 2>&1; then
-              echo "$tag is not on npm — not tagging an unshipped version."
+              echo "$tag is not on npm, so not tagging an unshipped version."
               continue
             fi
 
-            # Annotated, to match the tags changesets writes.
-            git tag -a "$tag" -m "$tag"
-            echo "Tagged $tag."
-            tagged=$((tagged + 1))
+            if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
+              # changesets wrote it during the publish step. Nothing to create; it
+              # just needs to leave the runner.
+              echo "$tag exists locally but not on the remote; pushing it."
+            else
+              # Annotated, to match the tags changesets writes.
+              git tag -a "$tag" -m "$tag"
+              echo "Tagged $tag."
+            fi
+            push_refs="$push_refs refs/tags/$tag"
           done
 
-          if [ "$tagged" -gt 0 ]; then
-            git push origin --tags
+          if [ -n "$push_refs" ]; then
+            # Unquoted on purpose, so each ref becomes its own argument: only the
+            # tags this release accounts for go up, never whatever else happens to
+            # be sitting in the local tag namespace.
+            git push origin $push_refs
+            echo "Pushed:$push_refs"
           else
-            echo "No new tags to push."
+            echo "Every published version is already tagged on the remote."
           fi
 
       # Idempotent and self-healing: a Release is created for any tag that exists
@@ -314,8 +336,12 @@ jobs:
             version=$(node -p "require('./$dir/package.json').version")
             tag="$name@$version"
 
-            if ! git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
-              echo "No tag $tag — $name@$version was not published by this run."
+            # The remote, not the local ref: `gh release create` rejects a tag it
+            # cannot see on GitHub, so the pushed tag is the only gate that means
+            # anything here. A local-only tag at this point means the step above
+            # declined to push it, i.e. the version is not on npm.
+            if ! git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null 2>&1; then
+              echo "No tag $tag on the remote, so $name@$version is not released."
               continue
             fi
             if gh release view "$tag" > /dev/null 2>&1; then
@@ -330,7 +356,7 @@ jobs:
           done
           echo "Created $created release(s)."
 
-      # Reports OBSERVED state — the registry, the remote, the Releases API — not
+      # Reports OBSERVED state (the registry, the remote, the Releases API), not
       # what any tool claimed to have done. `changeset publish` printing
       # "New tag: …" for a tag it silently failed to create is exactly why: the
       # earlier version of this step grepped for that line and would have reported

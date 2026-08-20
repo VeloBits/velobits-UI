@@ -20,7 +20,7 @@
  *   - The editor app MUST use npm. Module Federation needs `@velobitsio/ui` to
  *     be a real singleton package so the shell's TooltipProvider context reaches
  *     into each remote; copied files cannot be shared across remote boundaries.
- *   - The Keycloak login theme MUST use neither for components — it takes
+ *   - The Keycloak login theme MUST use neither for components , it takes
  *     tokens only, via `@velobitsio/tokens/keycloakify.css`.
  *   - Greenfield apps and one-off surfaces are better served by the CLI, where
  *     owning the source beats carrying a dependency.
@@ -83,7 +83,7 @@ const lib: RegistryItem[] = [
     type: 'registry:lib',
     title: 'cn',
     description:
-      'Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) — the dashboard app points components.json `utils` at it.',
+      'Tailwind-aware class merger. Signature must stay twMerge(clsx(...)) , the dashboard app points components.json `utils` at it.',
     dependencies: ['clsx', 'tailwind-merge'],
     files: [{ path: 'registry/velobits/lib/cn.ts', type: 'registry:lib' }],
   },
@@ -119,7 +119,7 @@ const hooks: RegistryItem[] = [
     type: 'registry:hook',
     title: 'useRowSelection',
     description:
-      'Row selection for DataTable. The selection is DERIVED — the stored set intersected with the rows on screen — so a bulk action can never point at a row the filter has hidden. Returns a stable object identity, which is what keeps DataTable’s memoised rows from re-rendering per keystroke.',
+      'Row selection for DataTable. The selection is DERIVED , the stored set intersected with the rows on screen , so a bulk action can never point at a row the filter has hidden. Returns a stable object identity, which is what keeps DataTable’s memoised rows from re-rendering per keystroke.',
     files: [{ path: 'registry/velobits/hooks/use-row-selection.ts', type: 'registry:hook' }],
   },
 ];
@@ -145,7 +145,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Alert',
     description:
-      'Status panel. Defaults to polite role="status"; escalate to "alert" deliberately. Tier-S glass on the neutral variant only — the four soft washes would replace the tint.',
+      'Status panel. Defaults to polite role="status"; escalate to "alert" deliberately. Tier-S glass on the neutral variant only , the four soft washes would replace the tint.',
     dependencies: [CVA],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/alert.tsx', type: 'registry:ui' }],
@@ -248,6 +248,16 @@ const ui: RegistryItem[] = [
     files: [{ path: 'registry/velobits/ui/native-select.tsx', type: 'registry:ui' }],
   },
   {
+    name: 'scroll-area',
+    type: 'registry:ui',
+    title: 'ScrollArea',
+    description:
+      'A scrollable region with a styled scrollbar. The thumb is --field-border, not --border: it is an interactive control, so 1.4.11 applies to it.',
+    dependencies: [RADIX],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/scroll-area.tsx', type: 'registry:ui' }],
+  },
+  {
     name: 'separator',
     type: 'registry:ui',
     title: 'Separator',
@@ -293,13 +303,13 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Tooltip',
     description:
-      'TooltipProvider is required — Radix throws without it, and under Module Federation it must be a singleton.',
+      'TooltipProvider is required , Radix throws without it, and under Module Federation it must be a singleton.',
     dependencies: [RADIX],
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/tooltip.tsx', type: 'registry:ui' }],
   },
 
-  /* ── Tier 2 — overlays. Every one of these is Tier-O glass, so each depends
+  /* ── Tier 2 , overlays. Every one of these is Tier-O glass, so each depends
    * on `velobits-theme` for `.glass`: a CLI consumer who copies the component
    * without the token layer gets an unstyled transparent box, not an error. ── */
   {
@@ -307,7 +317,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'CommandPalette',
     description:
-      'cmdk inside a Radix Dialog. The ⌘K listener is opt-in via `shortcut` — a design system must not bind a global key by merely being imported.',
+      'cmdk inside a Radix Dialog. The ⌘K listener is opt-in via `shortcut` , a design system must not bind a global key by merely being imported.',
     dependencies: ['cmdk', RADIX, '@velobitsio/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/command-palette.tsx', type: 'registry:ui' }],
@@ -327,7 +337,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'DropdownMenu',
     description:
-      'Highlight is data-[highlighted], never :hover — Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.',
+      'Highlight is data-[highlighted], never :hover , Radix drives keyboard focus through it. Cannot host a text input; use Dialog or Popover.',
     dependencies: [RADIX, '@velobitsio/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/dropdown-menu.tsx', type: 'registry:ui' }],
@@ -337,7 +347,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Popover',
     description:
-      'The elevated tier, for glass stacked on glass. PopoverTitle wires aria-labelledby — Radix content is role="dialog" with no Title part, so it is otherwise unnamed.',
+      'The elevated tier, for glass stacked on glass. PopoverTitle wires aria-labelledby , Radix content is role="dialog" with no Title part, so it is otherwise unnamed.',
     dependencies: [RADIX],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/popover.tsx', type: 'registry:ui' }],
@@ -347,7 +357,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'SidePanel',
     description:
-      'The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus — the two focus policies are opposites, so do not merge them behind a `side` variant. The bottom variant needs a definite 75dvh.',
+      'The anchored reading sheet. Deliberately NOT Dialog and deliberately does NOT redirect focus , the two focus policies are opposites, so do not merge them behind a `side` variant. The bottom variant needs a definite 75dvh.',
     dependencies: [CVA, RADIX, '@velobitsio/icons'],
     registryDependencies: ['cn', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/side-panel.tsx', type: 'registry:ui' }],
@@ -363,7 +373,7 @@ const ui: RegistryItem[] = [
     files: [{ path: 'registry/velobits/ui/toast.tsx', type: 'registry:ui' }],
   },
 
-  /* ── Tier 3 — composites. ─────────────────────────────────────────────── */
+  /* ── Tier 3 , composites. ─────────────────────────────────────────────── */
   {
     name: 'accordion',
     type: 'registry:ui',
@@ -379,7 +389,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'AppShell',
     description:
-      'The authenticated chrome. `sidebar` is a prop rather than a child because it is rendered TWICE — as a rail at md and up, and inside a drawer below it — so a nav item cannot exist in one and not the other. Ships the skip link, which is the most-skipped WCAG requirement in an admin UI.',
+      'The authenticated chrome. `sidebar` is a prop rather than a child because it is rendered TWICE , as a rail at md and up, and inside a drawer below it , so a nav item cannot exist in one and not the other. Ships the skip link, which is the most-skipped WCAG requirement in an admin UI.',
     dependencies: [RADIX, '@velobitsio/icons', '@velobitsio/tokens'],
     registryDependencies: ['cn', 'use-media-query', 'button', 'side-panel', 'velobits-theme'],
     files: [{ path: 'registry/velobits/ui/app-shell.tsx', type: 'registry:ui' }],
@@ -389,7 +399,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Breadcrumb',
     description:
-      'A named nav landmark around an ordered list. The leaf is a plain span with aria-current="page" — NOT shadcn’s role="link" aria-disabled, which announces static text as a broken link.',
+      'A named nav landmark around an ordered list. The leaf is a plain span with aria-current="page" , NOT shadcn’s role="link" aria-disabled, which announces static text as a broken link.',
     dependencies: [RADIX, '@velobitsio/icons'],
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/breadcrumb.tsx', type: 'registry:ui' }],
@@ -409,7 +419,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'DataTable',
     description:
-      'Sorting, selection and row activation over a column registry — deliberately not TanStack, whose grouping and pivoting nothing here uses. aria-sort goes on the th, not the sort button, and an activatable row needs tabIndex + Enter/Space + a target check or it is mouse-only.',
+      'Sorting, selection and row activation over a column registry , deliberately not TanStack, whose grouping and pivoting nothing here uses. aria-sort goes on the th, not the sort button, and an activatable row needs tabIndex + Enter/Space + a target check or it is mouse-only.',
     dependencies: ['@velobitsio/icons'],
     registryDependencies: ['cn', 'table', 'use-row-selection'],
     files: [{ path: 'registry/velobits/ui/data-table.tsx', type: 'registry:ui' }],
@@ -419,7 +429,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'DiffViewer',
     description:
-      'A unified line diff. The +/− gutter is the primary channel and the green/red wash the secondary — colour alone fails 1.4.1, and the gutter is also the only channel that survives greyscale. Ships `diffLines`, with a guard: LCS is O(n·m) in MEMORY.',
+      'A unified line diff. The +/− gutter is the primary channel and the green/red wash the secondary , colour alone fails 1.4.1, and the gutter is also the only channel that survives greyscale. Ships `diffLines`, with a guard: LCS is O(n·m) in MEMORY.',
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/diff-viewer.tsx', type: 'registry:ui' }],
   },
@@ -438,7 +448,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Form',
     description:
-      'react-hook-form bound to Field’s ARIA wiring. label and description are PROPS, not children, because aria-describedby is assembled before children render — a description left out while its id is still listed is a dangling reference. NOT exported from the npm barrel: react-hook-form is an optional peer.',
+      'react-hook-form bound to Field’s ARIA wiring. label and description are PROPS, not children, because aria-describedby is assembled before children render , a description left out while its id is still listed is a dangling reference. NOT exported from the npm barrel: react-hook-form is an optional peer.',
     dependencies: ['react-hook-form'],
     registryDependencies: ['cn', 'field'],
     files: [{ path: 'registry/velobits/ui/form.tsx', type: 'registry:ui' }],
@@ -448,7 +458,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Motion',
     description:
-      'Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobitsio/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer — do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.',
+      'Page transitions and capped list staggers on framer-motion, which was already a required peer for VelobitsProvider’s MotionConfig and until now bought nothing else. Subpath-only in the npm package (@velobitsio/ui/motion), like form, because the barrel’s own-code budget has ~4 kB left and nobody should pay for Framer to import a Button. Reduced motion is handled by MotionConfig and the token layer , do NOT add a third path. Stagger caps at STAGGER_LIMIT items so a 200-row list does not take eight seconds to arrive.',
     dependencies: ['framer-motion'],
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/motion.tsx', type: 'registry:ui' }],
@@ -468,7 +478,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'SegmentedControl',
     description:
-      'Radix ToggleGroup with a REAL disabled and a working accessible name — a div root makes an external htmlFor dangle, and pointer-events-none leaves the control focusable and unannounced.',
+      'Radix ToggleGroup with a REAL disabled and a working accessible name , a div root makes an external htmlFor dangle, and pointer-events-none leaves the control focusable and unannounced.',
     dependencies: [RADIX],
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/segmented-control.tsx', type: 'registry:ui' }],
@@ -488,7 +498,7 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'Table',
     description:
-      'Rows are never glass — one backdrop-filter per row repaints its own backdrop region on every scroll. Surface treatment belongs on the container.',
+      'Rows are never glass , one backdrop-filter per row repaints its own backdrop region on every scroll. Surface treatment belongs on the container.',
     registryDependencies: ['cn'],
     files: [{ path: 'registry/velobits/ui/table.tsx', type: 'registry:ui' }],
   },
@@ -551,7 +561,7 @@ const styles: RegistryItem[] = [
       'cmdk',
       'framer-motion',
       // Only `form` needs it, and only if you use `form`. Listed because this
-      // style installs every component, so the CLI must install it too — the npm
+      // style installs every component, so the CLI must install it too , the npm
       // half of the distribution treats it as an OPTIONAL peer instead.
       'react-hook-form',
       '@velobitsio/icons',
@@ -575,14 +585,14 @@ const styles: RegistryItem[] = [
 export const registry = {
   /**
    * The `@`-prefixed form, matching the namespace consumers put in their
-   * `components.json` `registries` block — so `shadcn search @velobits`, the
+   * `components.json` `registries` block , so `shadcn search @velobits`, the
    * `@velobits/button` they type, and the registry's own identity are one string
    * rather than three that happen to look alike.
    */
   name: '@velobits',
   /**
    * ⚠️ This origin is baked into every `registryDependencies` URL at build time
-   * (see `scripts/build-registry.ts`), so it is not merely a link — it is where a
+   * (see `scripts/build-registry.ts`), so it is not merely a link , it is where a
    * consumer's CLI goes for `cn`, `table` and every other item an install pulls
    * in transitively. Change it and the whole registry has to be rebuilt and
    * republished; leave it pointing somewhere that 404s and every multi-file
@@ -592,9 +602,9 @@ export const registry = {
    */
   homepage: 'https://ui.velobits.dev',
   description:
-    'An open source collection of accessible, contrast-gated React components on a warm neutral palette and a two-tier glass material — the VeloBits design system, authored once and shipped both as an npm package and as this registry.',
+    'An open source collection of accessible, contrast-gated React components on a warm neutral palette and a two-tier glass material , the VeloBits design system, authored once and shipped both as an npm package and as this registry.',
   items: [...styles, ...themes, ...lib, ...hooks, ...providers, ...ui],
 } as const;
 
-/** Every item that maps to a real source file — what the tsup entry map is built from. */
+/** Every item that maps to a real source file , what the tsup entry map is built from. */
 export const buildableItems = [...lib, ...hooks, ...providers, ...ui];

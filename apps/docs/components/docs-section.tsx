@@ -1,6 +1,6 @@
 /**
  * Section scaffolding for the two pages that are neither prose nor a component
- * page — `/docs/colors` and `/docs/icons`. Both enumerate a package rather than
+ * page , `/docs/colors` and `/docs/icons`. Both enumerate a package rather than
  * listing entries by hand, so what they need is headings and a frame, not a
  * layout engine.
  *

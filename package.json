@@ -2,7 +2,7 @@
   "name": "velobits-ui",
   "private": true,
   "version": "0.0.0",
-  "description": "VeloBits design system — shared tokens, icons and components for every VeloBits product surface",
+  "description": "VeloBits design system , shared tokens, icons and components for every VeloBits product surface",
   "type": "module",
   "packageManager": "npm@11.8.0",
   "engines": {

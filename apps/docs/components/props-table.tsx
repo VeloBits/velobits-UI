@@ -14,8 +14,8 @@ import type { DocPropGroup } from '@/lib/generated/props';
  * The API reference, extracted from the TypeScript types by
  * `scripts/build-docs-data.ts` rather than written here.
  *
- * A hand-written table for 38 components is 38 places for the documentation to
- * disagree with the code, and it disagrees *silently* — which is the worst way
+ * A hand-written table for 39 components is 39 places for the documentation to
+ * disagree with the code, and it disagrees *silently* , which is the worst way
  * for documentation to be wrong, because a reader has no way to tell.
  *
  * What you will not find in these tables is every prop the component accepts.
@@ -61,7 +61,7 @@ export function PropsTable({ groups }: { groups: DocPropGroup[] }) {
                     {prop.defaultValue ? (
                       <code className="text-xs">{prop.defaultValue}</code>
                     ) : (
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-muted-foreground">,</span>
                     )}
                   </TableCell>
                   <TableCell className="align-top text-sm text-muted-foreground">

@@ -1,6 +1,6 @@
 /**
  * The handful of strings that appear in dozens of places and must never disagree
- * with each other — most of all the registry namespace, which is copied out of
+ * with each other, most of all the registry namespace, which is copied out of
  * this site into consumers' `components.json` files.
  */
 
@@ -20,13 +20,13 @@ export const SITE = {
  * ## It resolves with NO configuration
  *
  * `@velobits` is registered in shadcn's public registry index, so a current CLI
- * resolves `@velobits/button` in any project that has run `shadcn init` —
+ * resolves `@velobits/button` in any project that has run `shadcn init`;
  * nothing to add to `components.json`. Verified against a project with no
  * `registries` key at all: `view`, `add` and `search` all work.
  *
  * The two explicit forms below are therefore FALLBACKS, not the happy path. They
- * still matter — an older CLI, an air-gapped mirror, or pinning to a staging
- * origin — which is why they stay documented rather than being deleted.
+ * still matter (an older CLI, an air-gapped mirror, or pinning to a staging
+ * origin), which is why they stay documented rather than being deleted.
  */
 export const REGISTRY_NAMESPACE = '@velobits';
 

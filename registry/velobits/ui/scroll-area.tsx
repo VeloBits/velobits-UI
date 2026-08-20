@@ -1,0 +1,149 @@
+'use client';
+
+import { ScrollArea as ScrollAreaPrimitive } from 'radix-ui';
+
+import { cn } from '../lib/cn';
+
+/**
+ * A scrollable region with a scrollbar we control the look of.
+ *
+ * ## Why the thumb is `bg-field-border` and not `bg-border`
+ *
+ * The palette carries two line tokens and the split is a WCAG one, the same
+ * distinction `Separator` documents from the other side. A separator divides
+ * nothing a reader must perceive, so 1.4.11 does not apply and it recedes on
+ * `--border`. A scrollbar is the opposite case: it is an interactive control that
+ * reports position and accepts a drag, so it has to clear 3:1 against whatever it
+ * sits on.
+ *
+ * `--field-border` is the token that does, and it is asserted to in both themes
+ * from a SINGLE value, against both `--bg` and `--panel`
+ * (`packages/tokens/test/contrast.test.ts`). So one thumb colour is correct on the
+ * page and inside a panel, in light and dark, without a variant.
+ *
+ * The track stays transparent. It is decoration, it would be the widest block of
+ * flat colour on any long page, and giving it a fill is what makes a custom
+ * scrollbar read as a browser from 2009.
+ *
+ * ## The native scrollbar is not merely hidden
+ *
+ * Radix moves the overflow onto an inner viewport, so `className` on the Root is
+ * layout for the BOX and the scrolling happens a level in. Two consequences worth
+ * knowing before reaching for this:
+ *
+ *   - The Root needs a bounded height from somewhere (`h-*`, a grid track, a
+ *     flex parent). Given none it grows to fit its content and never scrolls,
+ *     which looks like the component silently not working.
+ *   - `overflow-y-auto` on the same element is redundant at best. Use one or the
+ *     other.
+ *
+ * ## When NOT to reach for this
+ *
+ * A region whose content might FIT. Radix turns the viewport into a scroll
+ * container the moment a scrollbar renders, and does it unconditionally:
+ *
+ *     overflowY: scrollbarYEnabled ? 'scroll' : 'hidden'
+ *
+ * where `scrollbarYEnabled` is flipped by an effect in `ScrollAreaScrollbar` on
+ * mount. Not `auto`, and not gated on overflow. `type="auto"` does not change
+ * this either; it governs when the BAR is visible, not the viewport overflow,
+ * and no prop exposes the difference.
+ *
+ * So a short list inside one is a scroll container with nothing to scroll: the
+ * wheel is captured, the page does not move, and it lurches once the chain
+ * finally reaches the document. That is why the docs sidebar and the "On this
+ * page" columns use plain `overflow-y-auto` and not this component, despite this
+ * component existing for exactly that shape of problem. `auto` becomes a
+ * scroller only when it needs to be; a design-system scrollbar is not worth a
+ * dead scroll zone on every short page.
+ *
+ * Use it for a box that always overflows and owns its height: a fixed-height
+ * list, a capped code panel, a picker.
+ *
+ * Keyboard scrolling, wheel, touch and the scroll-anchoring browsers do are all
+ * preserved, because the viewport is a real scroll container. What is lost is the
+ * OS scrollbar's own affordances, which is the trade being made deliberately.
+ */
+function ScrollArea({
+  className,
+  children,
+  axis = 'y',
+  type = 'auto',
+  ...props
+}: React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
+  /**
+   * Which axes scroll. Defaults to vertical.
+   *
+   * A prop rather than something the caller composes, because a scrollbar has to
+   * be a SIBLING of the viewport while `children` go inside it. Passing
+   * `<ScrollBar orientation="horizontal" />` as a child puts the bar in the
+   * scrolling content, where it slides away with the very thing it is measuring.
+   * It looks stuck because it is being scrolled.
+   *
+   * It also decides which axes scroll AT ALL: Radix enables the viewport overflow
+   * per axis from whether a scrollbar for that axis is mounted, so the default
+   * leaves `overflow-x: hidden` rather than allowing silent sideways drift.
+   */
+  axis?: 'y' | 'x' | 'both';
+}) {
+  const showY = axis !== 'x';
+  const showX = axis !== 'y';
+
+  return (
+    <ScrollAreaPrimitive.Root
+      data-slot="scroll-area"
+      type={type}
+      className={cn('relative', className)}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        data-slot="scroll-area-viewport"
+        /*
+         * `focus-visible` on the viewport, not the Root: the viewport is what
+         * takes focus when the region is keyboard-scrollable, and a ring drawn on
+         * the Root would sit outside the clip and half-overlap the scrollbar.
+         */
+        className="size-full rounded-[inherit] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      {showY && <ScrollBar orientation="vertical" />}
+      {showX && <ScrollBar orientation="horizontal" />}
+      {showY && showX && <ScrollAreaPrimitive.Corner />}
+    </ScrollAreaPrimitive.Root>
+  );
+}
+/**
+ * Rendered by `ScrollArea` from its `axis` prop. Exported for the case where the
+ * primitive is composed by hand, which is the only way to put a bar anywhere other
+ * than where `ScrollArea` puts it.
+ *
+ * Do NOT pass it as a child of `ScrollArea`: children render inside the viewport,
+ * so the bar would scroll along with the content it is measuring.
+ */
+function ScrollBar({
+  className,
+  orientation = 'vertical',
+  ...props
+}: React.ComponentProps<typeof ScrollAreaPrimitive.Scrollbar>) {
+  return (
+    <ScrollAreaPrimitive.Scrollbar
+      data-slot="scroll-area-scrollbar"
+      orientation={orientation}
+      className={cn(
+        'flex touch-none select-none transition-colors duration-micro ease-out',
+        orientation === 'vertical' && 'h-full w-2.5 border-s border-s-transparent p-px',
+        orientation === 'horizontal' && 'h-2.5 flex-col border-t border-t-transparent p-px',
+        className,
+      )}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Thumb
+        data-slot="scroll-area-thumb"
+        className="relative flex-1 rounded-pill bg-field-border"
+      />
+    </ScrollAreaPrimitive.Scrollbar>
+  );
+}
+
+export { ScrollArea, ScrollBar };

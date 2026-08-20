@@ -8,7 +8,7 @@ import { controls } from '../src/controls';
 import { themes, type ThemeName } from '../src/semantic';
 
 /**
- * The control material is edge, light and depth — never a fill — so almost none of
+ * The control material is edge, light and depth , never a fill , so almost none of
  * it is gated by contrast. What IS worth asserting is the set of things that fail
  * SILENTLY: the `none`-in-a-shadow-list trap, the light-mode asymmetry, and the
  * degradation path.
@@ -32,11 +32,11 @@ function parseRgba(css: string): { hex: string; alpha: number } {
   return { hex, alpha: Number(m[4]!) };
 }
 
-describe('THE `none` TRAP — a control shadow may never be spelled `none`', () => {
+describe('THE `none` TRAP , a control shadow may never be spelled `none`', () => {
   /**
    * `.control-raised` composes `--control-lit` and `--control-shadow` into ONE
    * comma-separated `box-shadow`. `none` inside such a list is invalid CSS, so the
-   * browser drops the WHOLE declaration — which would take dark mode's lit edge,
+   * browser drops the WHOLE declaration , which would take dark mode's lit edge,
    * its only material, with it.
    *
    * This is not hypothetical: `--shadow-sm` IS `none` in dark mode, which is
@@ -60,13 +60,13 @@ describe('THE `none` TRAP — a control shadow may never be spelled `none`', () 
   });
 });
 
-describe('THE LIGHT-MODE ASYMMETRY — you cannot lighten white', () => {
+describe('THE LIGHT-MODE ASYMMETRY , you cannot lighten white', () => {
   /**
    * The measurement the whole design of this layer rests on, and the same one that
    * governs `--glass-surface-highlight`.
    *
    * Light mode's `--panel` is `#FFFFFF`. A white lit top edge over it measures
-   * **1.00:1 at every alpha** — there is no value that makes it visible, so light's
+   * **1.00:1 at every alpha** , there is no value that makes it visible, so light's
    * `lit` is `transparent` and its raised material is carried entirely by the drop
    * shadow. Dark mode's `--panel` is `#2C2D2C`, where the same white reads clearly.
    *
@@ -79,7 +79,7 @@ describe('THE LIGHT-MODE ASYMMETRY — you cannot lighten white', () => {
       const lit = compositeOver('#FFFFFF', panel, alpha);
       expect(
         round2(contrastRatio(lit, panel)),
-        `white at α${alpha} over ${panel} — if this is ever >1.05, light mode can have a lit edge`,
+        `white at α${alpha} over ${panel} , if this is ever >1.05, light mode can have a lit edge`,
       ).toBeLessThan(1.05);
     }
   });
@@ -104,7 +104,7 @@ describe('THE LIGHT-MODE ASYMMETRY — you cannot lighten white', () => {
   it('dark: the lit edge is far gentler than the tier-S surface highlight', () => {
     /**
      * Tier S runs its specular highlight at α 0.50, which is correct on a large
-     * card and wrong on a 36px control — there it is a bright white line across the
+     * card and wrong on a 36px control , there it is a bright white line across the
      * top of every button. The control value is deliberately a fraction of it.
      */
     expect(parseRgba(controls.dark.lit).alpha).toBeLessThan(0.25);
@@ -114,7 +114,7 @@ describe('THE LIGHT-MODE ASYMMETRY — you cannot lighten white', () => {
 describe('the recessed inset registers in both themes', () => {
   /**
    * Asserted per theme because the fills differ enormously: light's track is
-   * `#F2EBE8` and dark's is `#2C2D2C` — and in dark `--bg2` IS `--panel`, both
+   * `#F2EBE8` and dark's is `#2C2D2C` , and in dark `--bg2` IS `--panel`, both
    * already dark, so light's α 0.07 measures 1.04:1 there and does nothing. Dark
    * needs roughly 3x the alpha, which is why these are separate values rather than
    * one shared number.
@@ -184,7 +184,7 @@ describe('controls.css and tokens.css agree with controls.ts', () => {
   it('the raised edge is an INSET shadow, so it follows border-radius', () => {
     /**
      * A pseudo-element would need its own radius kept in sync, and would collide
-     * with components that already use one — `Tabs` draws its active underline with
+     * with components that already use one , `Tabs` draws its active underline with
      * an `::after`.
      */
     const rules = controlsCss.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -193,7 +193,7 @@ describe('controls.css and tokens.css agree with controls.ts', () => {
 
   it('honours reduced transparency, keeping raised and recessed distinguishable', () => {
     /**
-     * Both edge tokens are translucent by construction — they have to composite
+     * Both edge tokens are translucent by construction , they have to composite
      * over whatever fill the control carries. Under `prefers-reduced-transparency`
      * the edges go and the raised SHADOW stays, because a user who asked for less
      * transparency still needs to tell a button from an input.

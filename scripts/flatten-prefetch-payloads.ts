@@ -16,7 +16,7 @@
  *     out/docs/changelog/__next.docs/changelog/__PAGE__.txt
  *
  * So every prefetch 404s. On a dev server the two agree, because the request is
- * routed rather than resolved against the filesystem — which is why this is
+ * routed rather than resolved against the filesystem , which is why this is
  * invisible until the export is served, and then it is a 404 per link per page.
  *
  * ## Why this rather than turning prefetch off
@@ -26,7 +26,7 @@
  * sidebar carries ~60 links to small static payloads, which is close to the ideal
  * case for prefetching.
  *
- * Navigation itself is unaffected either way — it was verified working while every
+ * Navigation itself is unaffected either way , it was verified working while every
  * prefetch was failing, because Next falls back to the full route payload. This
  * is purely the difference between the fast path working and not.
  *
@@ -45,7 +45,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'apps/docs/out');
 
 if (!existsSync(outDir)) {
-  console.error(`no static export at ${outDir} — run \`next build\` first`);
+  console.error(`no static export at ${outDir} , run \`next build\` first`);
   process.exit(1);
 }
 

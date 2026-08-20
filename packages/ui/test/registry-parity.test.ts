@@ -8,9 +8,9 @@ import { buildableItems, registry } from '../../../registry/registry';
  * The dual distribution has three lists that must agree, maintained in three
  * files:
  *
- *   1. `registry/registry.ts`      — what the shadcn CLI serves
- *   2. `packages/ui/tsup.config.ts` — what gets built for npm
- *   3. `packages/ui/package.json`   — what npm consumers can import
+ *   1. `registry/registry.ts`      , what the shadcn CLI serves
+ *   2. `packages/ui/tsup.config.ts` , what gets built for npm
+ *   3. `packages/ui/package.json`   , what npm consumers can import
  *
  * Any one of them can be updated alone, and the failure is quiet: a component
  * that builds but is not importable, or is importable but 404s from the CLI.
@@ -53,7 +53,7 @@ function sourcePath(item: { files?: { path: string }[] }): string {
  * otherwise become mandatory for everyone. See the suite below.
  */
 /**
- * Subpath-only components. Two entries, two different reasons — both deliberate.
+ * Subpath-only components. Two entries, two different reasons , both deliberate.
  *
  *   form    `react-hook-form` is an OPTIONAL peer, and the barrel is one bundled
  *           module, so a re-export would put a top-level `import 'react-hook-form'`
@@ -61,7 +61,7 @@ function sourcePath(item: { files?: { path: string }[] }): string {
  *
  *   motion  A budget decision, not a dependency one. The barrel's own-code
  *           `size-limit` sits at ~28 kB of 32, and anything in the barrel is paid
- *           for by every consumer whether they import it or not — including
+ *           for by every consumer whether they import it or not , including
  *           Framer's runtime, for an app that only wanted a Button.
  */
 const BARREL_EXCLUDED = new Set(['form', 'motion']);
@@ -96,7 +96,7 @@ describe('registry ↔ tsup ↔ exports parity', () => {
     const missing = exportSubpaths.filter((s) => !tsupEntries.includes(s));
     expect(
       missing,
-      `Declared in "exports" but never built — a consumer gets a resolution error: ${missing.join(', ')}`,
+      `Declared in "exports" but never built , a consumer gets a resolution error: ${missing.join(', ')}`,
     ).toEqual([]);
   });
 
@@ -114,7 +114,7 @@ describe('registry ↔ tsup ↔ exports parity', () => {
       .map((i) => i.name);
     expect(
       missing,
-      `Built and exported as a subpath, but missing from the barrel — so ` +
+      `Built and exported as a subpath, but missing from the barrel , so ` +
         `\`import { X } from '@velobitsio/ui'\` fails while ` +
         `\`from '@velobitsio/ui/x'\` works: ${missing.join(', ')}`,
     ).toEqual([]);
@@ -122,7 +122,7 @@ describe('registry ↔ tsup ↔ exports parity', () => {
 
   describe('the barrel exclusions are a decision, not an oversight', () => {
     /**
-     * Two components are NOT re-exported from the barrel — see
+     * Two components are NOT re-exported from the barrel , see
      * {@link BARREL_EXCLUDED} for which and why. `Form` is a dependency
      * constraint: `react-hook-form` is an OPTIONAL peer and the barrel is one
      * bundled module, so a re-export would put a top-level
@@ -143,7 +143,7 @@ describe('registry ↔ tsup ↔ exports parity', () => {
         expect(
           barrel.includes(`'./${sourcePath(item)}'`),
           `${name} was re-exported from the barrel. If that is intended, the optional peer ` +
-            `dependency has to become a required one first — see the docblock in ` +
+            `dependency has to become a required one first , see the docblock in ` +
             `registry/velobits/ui/${name}.tsx.`,
         ).toBe(false);
       });
@@ -201,12 +201,12 @@ describe('registry hygiene', () => {
   /**
    * ## A bare name in the PUBLISHED json is a shadcn/ui item, not one of ours
    *
-   * The source above writes bare names, which is right — they are readable and
+   * The source above writes bare names, which is right , they are readable and
    * the parity checks work against them. `scripts/build-registry.ts` rewrites
    * them into absolute URLs on the way out, and this asserts that it did.
    *
    * Without that rewrite the CLI resolves `cn` against
-   * `https://ui.shadcn.com/r/styles/new-york-v4/cn.json`, which does not exist —
+   * `https://ui.shadcn.com/r/styles/new-york-v4/cn.json`, which does not exist ,
    * so `add button` dies on the CONSUMER'S machine, naming a URL they have never
    * heard of. It affects nearly every item here, and both install paths.
    *
@@ -243,7 +243,7 @@ describe('registry hygiene', () => {
    *
    * This is not hypothetical. Before `scripts/registry-layout.ts` existed, all 38
    * components published `from '../lib/cn'` and would not compile once installed
-   * — the files copied without complaint, so nothing here noticed for as long as
+   * , the files copied without complaint, so nothing here noticed for as long as
    * nothing here compiled the installed output.
    *
    * Reads the COMPILED output rather than the sources, because the sources are
@@ -267,6 +267,15 @@ describe('registry hygiene', () => {
         // Every file needs a target, or the CLI falls back to its per-type
         // default and scatters the flat folder back across three directories.
         if (!file.target) dangling.push(`${item.name} → ${file.path} has no target`);
+
+        /*
+         * Only code the CLI flattens into one folder. `r/skill.json` ships
+         * markdown to a nested target of its own, and a `../` inside a fenced
+         * example there is prose about a consumer's tree, not a specifier this
+         * registry has to resolve , without this line the agent skill fails a
+         * test about component imports, which names nothing that would help.
+         */
+        if (!/\.(?:tsx?|jsx?)$/.test(file.path)) continue;
 
         for (const match of file.content.matchAll(/from\s+(['"])(\.\.\/[^'"]*)\1/g)) {
           dangling.push(`${item.name} → ${file.path} imports ${match[2]}`);
@@ -303,7 +312,7 @@ describe('registry hygiene', () => {
   it('declares @velobitsio/icons wherever a component imports an icon', () => {
     /**
      * A CLI consumer copies the file and installs the listed dependencies. Miss
-     * this and their build fails on an unresolved import — on their machine, not
+     * this and their build fails on an unresolved import , on their machine, not
      * in our CI.
      */
     const checkbox = registry.items.find((i) => i.name === 'checkbox')!;

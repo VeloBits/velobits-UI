@@ -15,14 +15,14 @@ import { cn } from '../lib/cn';
  * ```
  *
  * The pulse is a CSS animation, so the token layer's `prefers-reduced-motion`
- * block already stills it — no JS check needed.
+ * block already stills it , no JS check needed.
  *
  * ## Why the fill is `--highlight` and NOT a glass tier
  *
  * A Skeleton is not a surface, it is a shape standing in for content, so it is
  * the one component in the Tier-S sweep that must NOT take the glass material.
  * Two instances of the same tier composite 2/255 apart, so a glass Skeleton
- * inside a glass Card would be invisible — which is the whole failure mode a
+ * inside a glass Card would be invisible , which is the whole failure mode a
  * placeholder cannot have.
  *
  * It also cannot be an opaque step off the ramp. `bg-bg2` was the previous fill,
@@ -42,10 +42,10 @@ import { cn } from '../lib/cn';
  *   dark  .glass-surface     12/255         9/255
  *
  * Every host now clears that 8/255 perceptibility floor, in both themes, on
- * glass and on opaque panels alike — the one column it gives up is the light
+ * glass and on opaque panels alike , the one column it gives up is the light
  * opaque panel, where the old fill was further away but every other host was
  * where it failed. Being
- * translucent is also what makes `animate-pulse` visible at all — an opaque fill
+ * translucent is also what makes `animate-pulse` visible at all , an opaque fill
  * that matches its host pulses between two identical colours.
  */
 function Skeleton({ className, ...props }: React.ComponentProps<'div'>) {

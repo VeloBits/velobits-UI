@@ -9,8 +9,8 @@
  * new registry item gets a documentation page whether or not anyone touches this
  * file. What this file decides is only which heading it appears under.
  *
- * The tiers exist only as section comments inside `registry/registry.ts` — one
- * flat `ui` array with `/* ── Tier 2 ── *\/` between the groups — so there is no
+ * The tiers exist only as section comments inside `registry/registry.ts` , one
+ * flat `ui` array with `/* ── Tier 2 ── *\/` between the groups , so there is no
  * exported structure to read them from. Rather than reach into the source with a
  * regex, membership is declared here, and `scripts/build-docs-data.ts` fails the
  * build listing any registry item this file does not place. So the failure mode
@@ -23,6 +23,14 @@ export interface NavItem {
   href: string;
   /** Shown on the components index grid. Falls back to the registry description. */
   description?: string;
+  /**
+   * Marks the entry as new in the sidebar, with a pulsing dot.
+   *
+   * ⚠️ Remove it when it stops being true. A permanent "new" badge is noise that
+   * trains readers to ignore the next real one, so this flag is meant to be
+   * deleted a release or two after it lands, not left to rot.
+   */
+  isNew?: boolean;
 }
 
 export interface NavGroup {
@@ -40,6 +48,12 @@ export const GUIDE_NAV: NavGroup[] = [
       { title: 'components.json', href: '/docs/components-json' },
       { title: 'Registry', href: '/docs/registry' },
       { title: 'CLI', href: '/docs/cli' },
+      {
+        title: 'Agent skill',
+        href: '/docs/skill',
+        description: 'The same guidance, in the format a coding agent loads.',
+        isNew: true,
+      },
     ],
   },
   {
@@ -66,13 +80,13 @@ export interface ComponentGroup {
 }
 
 /**
- * Component pages, grouped by tier — the same three tiers the system is designed
+ * Component pages, grouped by tier , the same three tiers the system is designed
  * in, which is also the order to read them in.
  */
 export const COMPONENT_GROUPS: ComponentGroup[] = [
   {
     title: 'Getting started',
-    note: 'The token layer and the provider stack. Install these first — every component below assumes both.',
+    note: 'The token layer and the provider stack. Install these first , every component below assumes both.',
     names: ['velobits', 'velobits-theme', 'velobits-provider'],
   },
   {
@@ -93,6 +107,7 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
       'field',
       'avatar',
       'kbd',
+      'scroll-area',
       'separator',
       'skeleton',
       'spinner',
@@ -101,7 +116,7 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
   },
   {
     title: 'Overlays',
-    note: 'Tier 2. Each floats above the page on Tier-O glass and manages focus. Every one opens from a real trigger — a still of an overlay proves nothing about focus, Escape or the material.',
+    note: 'Tier 2. Each floats above the page on Tier-O glass and manages focus. Every one opens from a real trigger , a still of an overlay proves nothing about focus, Escape or the material.',
     names: ['dialog', 'side-panel', 'popover', 'dropdown-menu', 'toast', 'command-palette'],
   },
   {
@@ -131,6 +146,20 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
   },
 ];
 
+/**
+ * Components that get the pulsing "new" dot in the sidebar.
+ *
+ * A set rather than a field on the group, because `names` is a flat `string[]`
+ * that five other call sites read as names, and widening it to objects to carry
+ * one boolean would touch all of them.
+ *
+ * ⚠️ Same contract as `isNew` on a guide item: entries here are meant to be
+ * DELETED a release or two after the component lands. A dot that never goes away
+ * stops meaning "new" and becomes decoration, which is worse than no dot, since
+ * it also announces ", new" to a screen reader every time.
+ */
+export const NEW_COMPONENTS = new Set<string>(['scroll-area']);
+
 /** Every registry item name this file places, in sidebar order. */
 export const GROUPED_COMPONENT_NAMES: string[] = COMPONENT_GROUPS.flatMap((g) => g.names);
 
@@ -140,7 +169,7 @@ export function componentHref(name: string): string {
 
 /**
  * Previous/next across the whole component sidebar, for the pager at the foot of
- * each page. Returns `null` at each end rather than wrapping — a "next" link that
+ * each page. Returns `null` at each end rather than wrapping , a "next" link that
  * silently returns you to the top of the list is worse than no link.
  */
 export function componentPager(name: string): {

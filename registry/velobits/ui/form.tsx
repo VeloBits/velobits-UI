@@ -45,11 +45,11 @@ import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '.
  *
  * `react-hook-form` is an **optional** peer dependency. The barrel is a single
  * bundled module, so a re-export here would put a top-level
- * `import 'react-hook-form'` at the top of `dist/index.js` — and then every app
+ * `import 'react-hook-form'` at the top of `dist/index.js` , and then every app
  * that imports a Button from the barrel would fail to resolve a package it has
  * no forms in and never installed. The marketing site is exactly that app.
  *
- * The alternative — bundling `react-hook-form` instead of externalising it —
+ * The alternative , bundling `react-hook-form` instead of externalising it ,
  * is worse and quieter: the bundled copy has its own module state, so
  * `useFormContext()` inside our `FormField` would read a different context from
  * the consumer's `useForm()`, and every field would silently register against
@@ -71,8 +71,8 @@ import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '.
  * ## Why a render prop here, when `Field` refused one
  *
  * `FieldControl` was deliberately built on `Slot` because a render prop cannot
- * cross an RSC boundary — *"Functions cannot be passed directly to Client
- * Components"* — and a plain form should drop into a server-rendered page.
+ * cross an RSC boundary , *"Functions cannot be passed directly to Client
+ * Components"* , and a plain form should drop into a server-rendered page.
  *
  * That constraint does not exist here. `useForm()` is a hook, so any file using
  * this is already a client component, and the render prop is `Controller`'s
@@ -95,11 +95,11 @@ export interface FormFieldProps<TValues extends FieldValues, TName extends Field
   label?: React.ReactNode;
   /**
    * The format hint. Kept in `aria-describedby` **alongside** the error rather
-   * than replaced by it — losing the hint at the moment validation fails is the
+   * than replaced by it , losing the hint at the moment validation fails is the
    * bug `Field` exists to prevent.
    */
   description?: React.ReactNode;
-  /** The control. Spread `field` onto it — see the note on `ref` below. */
+  /** The control. Spread `field` onto it , see the note on `ref` below. */
   render: (props: {
     field: ControllerRenderProps<TValues, TName>;
     fieldState: ControllerFieldState;
@@ -111,14 +111,14 @@ export interface FormFieldProps<TValues extends FieldValues, TName extends Field
 /**
  * One labelled, described, validated row.
  *
- * ## `label` and `description` are props, not children — and that is the point
+ * ## `label` and `description` are props, not children , and that is the point
  *
  * shadcn's version leaves both to the caller as `<FormLabel>` / `<FormDescription>`
  * inside the render tree. That reads more flexibly and gets the ARIA wrong by
  * omission: `Field` has to know **up front** whether a description will exist,
  * because `aria-describedby` is assembled before children render. Leave the
  * description out while the id is still listed and the control points at an
- * element that does not exist — a dangling reference, which several screen
+ * element that does not exist , a dangling reference, which several screen
  * readers resolve by announcing nothing at all, including the error.
  *
  * Passing them as props means the component knows, so the correct wiring is the
@@ -131,7 +131,7 @@ export interface FormFieldProps<TValues extends FieldValues, TName extends Field
  * `{...field}` carries `ref`, and `ref` is what react-hook-form uses to focus the
  * first invalid control on a failed submit (`shouldFocusError`, on by default).
  * A custom control that accepts `value`/`onChange` and swallows `ref` still
- * *works* — it validates, it shows its message — and submitting an invalid long
+ * *works* , it validates, it shows its message , and submitting an invalid long
  * form silently stops scrolling to the problem. Nothing warns.
  */
 function FormField<TValues extends FieldValues, TName extends FieldPath<TValues>>({
@@ -176,7 +176,7 @@ export interface FormErrorProps<
 }
 
 /**
- * The submit-level error — "that key already exists", "your session expired" —
+ * The submit-level error , "that key already exists", "your session expired" ,
  * as opposed to a field's own.
  *
  * Reads `errors.root`, which is where `setError('root', …)` puts a failure that
@@ -185,7 +185,7 @@ export interface FormErrorProps<
  * `console.error` and a submit button that appears to do nothing.
  *
  * `role="alert"` because it appears in response to the user pressing Submit and
- * should interrupt — the same escalation `FieldError` makes, and the opposite of
+ * should interrupt , the same escalation `FieldError` makes, and the opposite of
  * `Alert`'s polite default.
  *
  * Renders nothing when there is no error, so it can sit unconditionally above the
@@ -201,7 +201,7 @@ export interface FormErrorProps<
  * component that called `useForm()`, so this one is never told the error
  * appeared. `useFormState` registers its own subscription, which is the entire
  * reason the hook exists. The broken version renders correctly on first paint
- * and then never updates — so it passes a casual test and fails in use.
+ * and then never updates , so it passes a casual test and fails in use.
  */
 function FormError<TValues extends FieldValues = FieldValues>({
   control,

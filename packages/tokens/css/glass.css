@@ -5,26 +5,26 @@
  * TWO TIERS. The component surfaces ARE glassmorphic; the page background is
  * not, and stays exactly as it is.
  *
- *   TIER O — `.glass` / `.glass-elevated`
+ *   TIER O , `.glass` / `.glass-elevated`
  *     Overlays: Dialog · Sheet/SidePanel · Popover · DropdownMenu ·
  *     CommandPalette · Toast. The backdrop is arbitrary, so this tier is
  *     measured against all seven worst-case backdrops in the palette and steps
  *     muted text up to `--muted-on-glass`.
  *
- *   TIER S — `.glass-surface` / `.glass-surface-blur`
+ *   TIER S , `.glass-surface` / `.glass-surface-blur`
  *     Component surfaces: Card · Panel · Table shell · Sidebar · sticky TopBar.
  *     The backdrop is KNOWN (it is the page), so the values are measured against
  *     one thing and `--muted-fg` stays safe on it.
  *
  * FORBIDDEN on both: page/body backgrounds · nested glass. Page backgrounds are
  *   both the explicit product decision and where blur costs the most for the
- *   least effect — there is nothing behind them to see.
+ *   least effect , there is nothing behind them to see.
  *
  * ── WHY TIER S IS TINTED, AND WHY IT IS ASYMMETRIC ──────────────────────────
  *
  * Putting `.glass` on a Card is a NO-OP. Composited over the flat page, white
- * at α 0.85 over cream #F4EDEA gives #FDFCFC — 3/255 from the opaque #FFFFFF
- * panel — and blurring a uniform page returns that same uniform page. Dark is
+ * at α 0.85 over cream #F4EDEA gives #FDFCFC , 3/255 from the opaque #FFFFFF
+ * panel , and blurring a uniform page returns that same uniform page. Dark is
  * the same story: #2C2D2C at α 0.85 over #1A1B1A gives #292A29, also 3/255 off
  * the panel. The blur buys a backdrop repaint and zero visual change.
  *
@@ -33,12 +33,12 @@
  * the material differently, because a white top-edge specular highlight at
  * α 0.50 measures 5.05:1 over the dark composite and 1.03:1 over the light one:
  *
- *   dark   the specular highlight is the material — a lit top edge, a 2.18:1
+ *   dark   the specular highlight is the material , a lit top edge, a 2.18:1
  *          border, and (since 2026-08-06) a REAL drop shadow.
  *   light  NO highlight. The material is the tint (#FFFAF7 → composite
- *          #FDF8F5), a firmer 1.81:1 hairline — stronger than what `--border`
+ *          #FDF8F5), a firmer 1.81:1 hairline , stronger than what `--border`
  *          shows on `--panel` (1.61:1), where the tier-O border manages only
- *          1.21:1 — and a bottom-weighted shadow so the surface reads as raised
+ *          1.21:1 , and a bottom-weighted shadow so the surface reads as raised
  *          off the cream.
  *
  * ── WHY THE TINT CANNOT SIMPLY BE PUSHED FURTHER ────────────────────────────
@@ -46,13 +46,13 @@
  * A tier-S composite must clear 8/255 from the page BELOW it and from the
  * opaque `--panel` ABOVE it, so the page↔panel distance is the entire budget.
  * In light the composite is boxed between cream and pure white and is already
- * at its optimum — every one of the 3,303 legal integer composites was
+ * at its optimum , every one of the 3,303 legal integer composites was
  * enumerated, and none on the warm axis beats #FDF8F5's 11/10. Cooling the
  * tint moves it TOWARD the neutral panel, which the panel side then rejects.
  *
  * Dark had 18/255 to work with, leaving a legal window of exactly three
- * values. `--panel` cannot be lightened to widen it — at #2E2F2E the gated
- * `primary fill vs panel` pair drops to 2.98:1 — so on 2026-08-06 the PAGE was
+ * values. `--panel` cannot be lightened to widen it , at #2E2F2E the gated
+ * `primary fill vs panel` pair drops to 2.98:1 , so on 2026-08-06 the PAGE was
  * darkened instead, to `neutral-925` #151615. That is the only free direction:
  * all 17 dark pairs measured against `--bg` improved and none regressed.
  *
@@ -60,12 +60,12 @@
  *
  *   1. `backdrop-filter` is the expensive half, so `.glass-surface` DOES NOT USE
  *      IT. That is what makes Tier S safe on a repeated component. Opt in with
- *      `.glass-surface-blur` only where content genuinely scrolls behind —
+ *      `.glass-surface-blur` only where content genuinely scrolls behind ,
  *      a sticky bar, a sidebar over the scroll container.
  *   2. Cap roughly 6 live blur layers per view; each is a backdrop snapshot.
  *   3. Never nest glass. The inner surface blurs the outer's already-blurred
  *      output: double the cost, and both read as mud.
- *   4. Never animate the blur RADIUS — each frame forces a full backdrop
+ *   4. Never animate the blur RADIUS , each frame forces a full backdrop
  *      repaint. Animate opacity and transform.
  *
  * ── TWO BEHAVIOURS THAT WILL LOOK LIKE BUGS IF YOU MEET THEM COLD ───────────
@@ -83,13 +83,13 @@
    * The CSS pipeline (Lightning CSS, via Tailwind v4 and Next) treats the two
    * spellings as ONE logical property and keeps whichever is written last.
    * Written standard-first, the only declaration that survives into the served
-   * stylesheet is `-webkit-backdrop-filter` — and Chrome REMOVED that alias
+   * stylesheet is `-webkit-backdrop-filter` , and Chrome REMOVED that alias
    * (`CSS.supports('-webkit-backdrop-filter','blur(1px)')` is false from ~150).
    *
    * That is not a graceful degradation, it is a silent total failure: every
    * tier-O overlay in the system rendered as a flat translucent fill for as
    * long as the order was wrong, and the `@supports not (…)` fallback below
-   * CANNOT catch it — that condition asks whether the BROWSER supports blur
+   * CANNOT catch it , that condition asks whether the BROWSER supports blur
    * (it does), not whether our declaration survived the build.
    *
    * Tailwind's own generated `.backdrop-filter` utility writes `-webkit-`
@@ -111,7 +111,7 @@
  * holds 4.92:1. Scoped to descendants so a `text-muted-foreground` utility
  * inside a Dialog picks it up without every call site knowing.
  *
- * TIER O ONLY. `.glass-surface` deliberately does NOT do this — see below.
+ * TIER O ONLY. `.glass-surface` deliberately does NOT do this , see below.
  */
 .glass {
   --muted-fg: var(--muted-on-glass);
@@ -136,10 +136,10 @@ body.dark .glass-elevated {
  * visible, not the blur.
  *
  * The specular highlight rides in the same `box-shadow` as the drop shadow, as
- * an inset, rather than on a pseudo-element — it then follows `border-radius`
+ * an inset, rather than on a pseudo-element , it then follows `border-radius`
  * for free and cannot collide with a component's own ::before. The cost of that
  * choice: `--glass-surface-shadow` can never be `none`, because `none` inside a
- * comma-separated shadow list invalidates the WHOLE declaration — which would
+ * comma-separated shadow list invalidates the WHOLE declaration , which would
  * take the specular highlight with it. Both themes now ship a real shadow, so
  * nothing currently relies on the `0 0 0 transparent` spelling, but the hazard
  * is permanent and `tokens-css.test.ts` still asserts against `none`.
@@ -147,7 +147,7 @@ body.dark .glass-elevated {
  * Dark mode HAD no shadow at all until 2026-08-06 (`0 0 0 transparent`), on the
  * reasoning that dark delineates with borders. Measured, that reasoning was
  * half right: a black shadow over the dark page can only move it ~12/255 at
- * α 0.50, because the page is already near-black. It is a modest signal — but
+ * α 0.50, because the page is already near-black. It is a modest signal , but
  * a dark card was carrying a 1.50:1 border, a 3.18:1 lit edge and 9/255 of
  * tint, and nothing else. Three weak signals and no strong one is what "flat"
  * measures as.
@@ -158,7 +158,7 @@ body.dark .glass-elevated {
    *
    * Two stops, not one fill, so a surface has a direction: lit near the top,
    * falling away toward the bottom. Both stops live in `tokens.css` as separate
-   * variables and are composited and gated individually — a `linear-gradient()`
+   * variables and are composited and gated individually , a `linear-gradient()`
    * baked into one token would be opaque to the perceptibility gate, and the
    * stop it would hide is the far one, which is the stop that approaches a wall.
    *
@@ -170,13 +170,13 @@ body.dark .glass-elevated {
    *
    * `background-image`, NOT `background`. The shorthand would reset
    * `background-color` to transparent, and the two degradation blocks at the
-   * bottom of this file rely on setting a flat `background` — which must win, and
+   * bottom of this file rely on setting a flat `background` , which must win, and
    * does, because they come later. It also leaves `background-color` free for a
    * consumer that wants an opaque underlay behind the translucent stops.
    *
    * The separation is 5/255 in light and 4/255 in dark, which is the whole legal
    * budget. That is small; it is also the reason it must be a RAMP and not a
-   * step — gradient detection runs well below step-edge detection. This is not
+   * step , gradient detection runs well below step-edge detection. This is not
    * the surface's primary material and was never meant to be: light's is tint,
    * edge and shadow; dark's is the specular highlight below.
    * ─────────────────────────────────────────────────────────────────────────── */
@@ -196,7 +196,7 @@ body.dark .glass-elevated {
  *
  * That override exists because a tier-O overlay floats over an unknown backdrop
  * and --muted-fg sinks to 3.09:1 against the worst of them. Tier S has a known
- * backdrop — the page — and --muted-fg measures 5.57:1 in light and 6.19:1 in
+ * backdrop , the page , and --muted-fg measures 5.57:1 in light and 6.19:1 in
  * dark on the composite. Stepping it up here would darken every secondary label
  * in the product for no accessibility gain.
  */
@@ -204,12 +204,12 @@ body.dark .glass-elevated {
 /*
  * Tier S with the blur, for the surfaces where content genuinely scrolls behind:
  * sticky TopBar, Sidebar over the scroll container, a pinned table header. Each
- * instance is a live backdrop snapshot — see the ~6-layer cap above, and note
+ * instance is a live backdrop snapshot , see the ~6-layer cap above, and note
  * this is the class that brings the fixed-descendant and stacking-context
  * behaviours with it.
  */
 .glass-surface-blur {
-  /* `-webkit-` first — see the block comment on `.glass`. */
+  /* `-webkit-` first , see the block comment on `.glass`. */
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
 }
@@ -224,7 +224,7 @@ body.dark .glass-elevated {
  * `.glass-surface` is included even though it never blurred: a sticky bar
  * falling back to opaque while the cards beneath it stay translucent is a worse
  * artefact than either state on its own. The tier degrades as one material.
- * The border, shadow and specular highlight all survive — they are what make
+ * The border, shadow and specular highlight all survive , they are what make
  * the fallback still read as a raised surface.
  */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -235,13 +235,13 @@ body.dark .glass-elevated {
   }
 }
 
-/* A user preference, not a capability check — honour it even where blur works. */
+/* A user preference, not a capability check , honour it even where blur works. */
 @media (prefers-reduced-transparency: reduce) {
   .glass,
   .glass-surface,
   .glass-surface-blur {
     background: var(--panel);
-    /* `-webkit-` first — see the block comment on `.glass`. */
+    /* `-webkit-` first , see the block comment on `.glass`. */
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }

@@ -20,7 +20,7 @@ export interface SpinnerProps extends React.ComponentProps<'span'> {
  *
  * Reduced motion is handled by the token layer, which collapses animation
  * durations to ~0. A stopped spinner still communicates "busy" through its
- * `role="status"` label — which is exactly why the label is not optional by
+ * `role="status"` label , which is exactly why the label is not optional by
  * default.
  */
 function Spinner({ className, size = 16, label = 'Loading', ...props }: SpinnerProps) {

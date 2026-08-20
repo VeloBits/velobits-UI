@@ -8,7 +8,7 @@ export const metadata = {
 `ui.velobits.dev` is two things at one origin: this documentation, and the
 registry the shadcn CLI fetches. Both come out of a single `npm run build`, so
 the docs you are reading and the JSON the CLI installs are always the same
-revision — there is no arrangement in which one is stale.
+revision, there is no arrangement in which one is stale.
 
 ## The namespace
 
@@ -22,7 +22,7 @@ npx shadcn@latest add @velobits/velobits          # everything
 ```
 
 There is no `components.json` entry to add. Resolution goes through shadcn's
-public registry index, which needs a **current CLI** — older ones do not know
+public registry index, which needs a **current CLI**; older ones do not know
 about the index and need one of the two forms below.
 
 ## Two explicit forms, for when you do not want the index
@@ -34,10 +34,10 @@ npx shadcn@latest add https://ui.velobits.dev/r/button.json
 ```
 
 This form is never going away. It is what CI scripts and one-off scaffolds should
-use, since it depends on nothing — not the consuming repo's config, and not the
+use, since it depends on nothing: not the consuming repo's config, and not the
 index.
 
-**By explicit mapping.** Pins the origin, and takes precedence over the index —
+**By explicit mapping.** Pins the origin, and takes precedence over the index,
 so it is also how you point a project at a staging copy or an internal mirror:
 
 ```json
@@ -58,19 +58,19 @@ npx shadcn@latest search @velobits --query "table"
 ```
 
 `search` reads `https://ui.velobits.dev/r/registry.json`, the index of every item.
-`view` prints what a given item would install — its dependencies, its registry
-dependencies, and the files it writes — without writing anything.
+`view` prints what a given item would install, its dependencies, its registry
+dependencies, and the files it writes, without writing anything.
 
 ## What is in the JSON
 
 Each item at `/r/<name>.json` carries the [shadcn registry-item
 schema](https://ui.shadcn.com/schema/registry-item.json):
 
-- `dependencies` — npm packages to install
-- `registryDependencies` — other items to pull in first, resolved within this
+- `dependencies`, npm packages to install
+- `registryDependencies`, other items to pull in first, resolved within this
   registry
-- `files` — the source, with the target path it lands at
-- `cssVars` — only on `velobits-theme`, which carries the whole token layer
+- `files`, the source, with the target path it lands at
+- `cssVars`, only on `velobits-theme`, which carries the whole token layer
 
 The theme item's variables are **derived** from `@velobitsio/tokens` at build
 time rather than typed twice, so a palette change flows into the registry on the
@@ -82,14 +82,14 @@ Every item carries an explicit `target`, so placement does **not** follow the
 CLI's per-type default. Components, hooks, providers and the theme helper all go
 into one flat folder; only `cn` goes elsewhere.
 
-| Type             | Example                       | Lands in                            |
-| ---------------- | ----------------------------- | ----------------------------------- |
-| `registry:style` | `@velobits/velobits`          | everything below                    |
-| `registry:theme` | `@velobits/velobits-theme`    | your CSS                            |
-| `registry:ui`    | `@velobits/button`            | `components/ui/velobits/`           |
-| `registry:hook`  | `@velobits/use-row-selection` | `components/ui/velobits/`           |
-| `registry:lib`   | `@velobits/theme`             | `components/ui/velobits/`           |
-| `registry:lib`   | `@velobits/cn`                | `lib/utils.ts` — your `utils` alias |
+| Type             | Example                       | Lands in                           |
+| ---------------- | ----------------------------- | ---------------------------------- |
+| `registry:style` | `@velobits/velobits`          | everything below                   |
+| `registry:theme` | `@velobits/velobits-theme`    | your CSS                           |
+| `registry:ui`    | `@velobits/button`            | `components/ui/velobits/`          |
+| `registry:hook`  | `@velobits/use-row-selection` | `components/ui/velobits/`          |
+| `registry:lib`   | `@velobits/theme`             | `components/ui/velobits/`          |
+| `registry:lib`   | `@velobits/cn`                | `lib/utils.ts`, your `utils` alias |
 
 The targets use the CLI's `@ui/` and `@lib/` placeholders, so the prefix is
 whatever your `components.json` says. Only the `velobits/` segment is fixed.
@@ -99,12 +99,12 @@ whatever your `components.json` says. Only the `velobits/` segment is fixed.
 The sources live in `registry/velobits/{ui,lib,hooks,providers}/` because the npm
 build needs that shape, and they import each other relatively against it
 (`../lib/cn`, `../ui/tooltip`). The CLI does not reproduce that shape and does not
-rewrite relative specifiers — only alias-form ones.
+rewrite relative specifiers, only alias-form ones.
 
 So `scripts/build-registry.ts` rewrites them on the way out: `../lib/cn` becomes
 `@/lib/utils` (which the CLI then points at your own `aliases.utils`), and
 everything else flattens to `./sibling`. The build then asserts that **no `../`
-specifier survives**, because one that does cannot resolve where the files land —
+specifier survives**, because one that does cannot resolve where the files land,
 and the only place that shows up is your build, not ours.
 
 That check exists because it did happen: before this, all 38 components shipped
@@ -124,7 +124,7 @@ served `Access-Control-Allow-Origin: *` for browser-based consumers like v0.
 The pattern here is worth copying: `registry/registry.ts` is the typed source,
 `scripts/build-registry.ts` validates it and compiles it with `shadcn build`, and
 the output lands in the docs app's `public/r/`. Because the docs site is a static
-export, deploying the docs deploys the registry — one artefact, one URL.
+export, deploying the docs deploys the registry, one artefact, one URL.
 
 Two validations run before the compile, and both exist because the failure they
 prevent happens on a _consumer's_ machine rather than in our CI: every file a

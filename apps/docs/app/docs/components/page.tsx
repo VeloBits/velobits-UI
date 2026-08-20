@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 /**
  * The index.
  *
- * Counts are computed from the registry rather than typed — the prose on this
+ * Counts are computed from the registry rather than typed , the prose on this
  * site said "37 components" for as long as there were 37, and then `motion` was
  * added and it said 37 in four places. A number that is written once and derived
  * everywhere cannot do that.
@@ -29,7 +29,7 @@ export default function ComponentsIndexPage() {
       <header className="space-y-3">
         <h1 className="text-3xl font-semibold tracking-tight">Components</h1>
         <p className="max-w-3xl leading-7 text-muted-foreground">
-          {componentCount} components across three tiers, on 36 semantic tokens — every one of which
+          {componentCount} components across three tiers, on 36 semantic tokens, every one of which
           is either contrast-gated or carries a recorded exemption. Each page carries its install
           command, what it depends on, and a prop table extracted from the source.
         </p>

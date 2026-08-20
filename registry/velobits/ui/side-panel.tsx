@@ -10,7 +10,7 @@ import { cn } from '../lib/cn';
 /**
  * The edge-anchored reading sheet: flag detail, an audit entry, a rule's
  * evaluation trace. Built on Radix Dialog for the focus trap, the Esc handler,
- * the ARIA wiring and the scroll lock — and deliberately NOT the same component
+ * the ARIA wiring and the scroll lock , and deliberately NOT the same component
  * as `Dialog`.
  *
  * ## Why this is not just `<Dialog side="right">`
@@ -21,8 +21,8 @@ import { cn } from '../lib/cn';
  *  - `Dialog` is the ~480px centred FORM box. It offers `focusFirstField`,
  *    because `autoFocus` inside a Radix Dialog is silently swallowed by
  *    `FocusScope` and a form that opens with the caret nowhere is broken.
- *  - `SidePanel` is for READING. It keeps Radix's default — first tabbable node,
- *    which is the ✕ — and it must never redirect focus into a field. A reading
+ *  - `SidePanel` is for READING. It keeps Radix's default , first tabbable node,
+ *    which is the ✕ , and it must never redirect focus into a field. A reading
  *    sheet that yanks focus into the first input scrolls the panel, pops the
  *    mobile keyboard, and starts a screen-reader user in the middle of the
  *    content instead of at its heading.
@@ -67,7 +67,7 @@ function SidePanelClose({ ...props }: React.ComponentProps<typeof DialogPrimitiv
  *
  * Two reasons, both structural: the shadcn CLI copies each registry item as a
  * standalone file, so a cross-import would make every `side-panel` install drag
- * `dialog` in behind it — and keeping the two components separate is easier to
+ * `dialog` in behind it , and keeping the two components separate is easier to
  * keep honest when the two files share no code to drift through.
  */
 function SidePanelOverlay({
@@ -92,7 +92,7 @@ function SidePanelOverlay({
 const sidePanelContentVariants = cva(
   [
     // Tier O. `.glass` supplies the background, border and shadow from the
-    // `components` layer — a `bg-*` utility here would silently replace it.
+    // `components` layer , a `bg-*` utility here would silently replace it.
     'glass',
     /*
      * A non-scrolling flex column of definite height, and the scroll region goes
@@ -117,7 +117,7 @@ const sidePanelContentVariants = cva(
      * Duration goes through `animation-duration-(--duration-overlay)` rather than
      * the `duration-overlay` token utility: `animate-in` expands to the
      * `animation` SHORTHAND, and behind a `data-[state=…]` variant it beats a
-     * bare `animation-duration` longhand on order *and* specificity — so
+     * bare `animation-duration` longhand on order *and* specificity , so
      * `duration-overlay` would be dropped without a word.
      * `--tw-animation-duration` is the variable the shorthand reads.
      */
@@ -130,7 +130,7 @@ const sidePanelContentVariants = cva(
       /**
        * `right` and `left` are INLINE-relative, not physical: they anchor with
        * `end-0` / `start-0`, so under `dir="rtl"` a "right" panel attaches to the
-       * left edge — which is where a reader in an RTL locale expects the detail
+       * left edge , which is where a reader in an RTL locale expects the detail
        * sheet to come from.
        *
        * The slide has to agree with the anchor or the panel flies in from the
@@ -154,7 +154,7 @@ const sidePanelContentVariants = cva(
          * a scroll region needs an ancestor chain whose height actually resolves.
          * `h-[75%]` resolves against a fixed-position containing block whose
          * height is not always what you expect, and `max-h` with `h-auto` leaves
-         * an inner `flex-1`/`min-h-0` scroll region with nothing to measure — the
+         * an inner `flex-1`/`min-h-0` scroll region with nothing to measure , the
          * sheet then either collapses to its content or refuses to scroll. `dvh`
          * also tracks mobile browser chrome, which `vh` does not: with `vh` the
          * bottom of the sheet sits under the URL bar on iOS.
@@ -173,7 +173,7 @@ export interface SidePanelContentProps
   extends
     React.ComponentProps<typeof DialogPrimitive.Content>,
     VariantProps<typeof sidePanelContentVariants> {
-  /** The ✕. Also the node Radix focuses on open — see the note at the top. */
+  /** The ✕. Also the node Radix focuses on open , see the note at the top. */
   showCloseButton?: boolean;
 }
 
@@ -186,7 +186,7 @@ function SidePanelContent({
 }: SidePanelContentProps) {
   /*
    * No `onOpenAutoFocus` handler, and that is the point of this component. Radix
-   * focuses the first tabbable node — the ✕ below — and a reading sheet leaves it
+   * focuses the first tabbable node , the ✕ below , and a reading sheet leaves it
    * there. The redirect-to-first-field behaviour lives in `Dialog` alone.
    */
   return (
@@ -200,7 +200,7 @@ function SidePanelContent({
       >
         {/*
          * FIRST in the DOM, painted in the corner. It is therefore the first
-         * tabbable node and what Radix focuses on open — which for a reading
+         * tabbable node and what Radix focuses on open , which for a reading
          * sheet is the whole intent. Move it after `children` and
          * initial focus silently becomes "whatever the caller put first", which
          * for a detail panel containing an inline editor is a field.
@@ -213,7 +213,7 @@ function SidePanelContent({
              * `absolute`, never `fixed`: `backdrop-filter` makes `.glass` a
              * containing block for fixed descendants, so a fixed child is
              * positioned against this panel and cannot escape it. The same trap
-             * applies to any sticky footer a caller adds — keep it in flow.
+             * applies to any sticky footer a caller adds , keep it in flow.
              */
             className={cn(
               'absolute end-4 top-4 grid size-7 place-items-center rounded-md text-muted-foreground',

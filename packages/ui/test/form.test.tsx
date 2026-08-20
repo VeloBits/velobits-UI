@@ -68,11 +68,11 @@ describe('Form, the ARIA wiring it inherits from Field', () => {
     /**
      * The reason `description` is a prop and not a child. `aria-describedby` is
      * assembled before children render, so a component that assumes a description
-     * will exist points at an element that never appears — a dangling reference,
+     * will exist points at an element that never appears , a dangling reference,
      * which several screen readers resolve by announcing nothing at all,
      * including the error.
      */
-    // `null`, not `undefined` — Fixture's default parameter would swallow that.
+    // `null`, not `undefined` , Fixture's default parameter would swallow that.
     render(<Fixture description={null} />);
     expect(screen.getByLabelText('Flag key').getAttribute('aria-describedby')).toBeNull();
     expect(screen.queryByText('Lowercase and dashes only.')).toBeNull();
@@ -133,7 +133,7 @@ describe('Form, submission', () => {
     /**
      * `{...field}` carries `ref`, and `ref` is how react-hook-form implements
      * `shouldFocusError`. A custom control that takes `value`/`onChange` and
-     * swallows `ref` still validates and still shows its message — and submitting
+     * swallows `ref` still validates and still shows its message , and submitting
      * a long invalid form silently stops scrolling to the problem. Nothing warns.
      */
     render(<Fixture />);
@@ -185,7 +185,7 @@ describe('FormError, the submit-level failure', () => {
      * component read; reaching it through `useFormContext()` reads the
      * subscription belonging to the component that called `useForm()`, so this
      * one is never told. That version renders correctly on first paint and then
-     * never updates — it passes a casual test and fails in use. `useFormState`
+     * never updates , it passes a casual test and fails in use. `useFormState`
      * registers its own subscription, which is the whole reason the hook exists.
      */
     render(<RootFixture />);

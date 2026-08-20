@@ -9,7 +9,7 @@ import { registryItemsByName } from '@/lib/generated/registry-data';
 /**
  * Previous/next across the component sidebar.
  *
- * Ends are rendered as an absent link rather than a wrapped one — a "next" that
+ * Ends are rendered as an absent link rather than a wrapped one , a "next" that
  * silently returns you to the top of the list is worse than no next at all,
  * because it reads as more content rather than as the end of it.
  *

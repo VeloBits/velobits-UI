@@ -37,7 +37,7 @@ export default function AccordionDemo() {
         <AccordionItem value="b">
           <AccordionTrigger>When to reach for it</AccordionTrigger>
           <AccordionContent>
-            Inside a Card, inside a Dialog — anywhere the parent is already glass.
+            Inside a Card, inside a Dialog: anywhere the parent is already glass.
           </AccordionContent>
         </AccordionItem>
       </Accordion>

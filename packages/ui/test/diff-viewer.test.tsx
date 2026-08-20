@@ -29,7 +29,7 @@ describe('diffLines', () => {
     ]);
   });
 
-  it('is order-preserving — the output reads as the AFTER document', () => {
+  it('is order-preserving , the output reads as the AFTER document', () => {
     const lines = diffLines(BEFORE, AFTER);
     const after = lines.filter((l) => l.kind !== 'removed').map((l) => l.text);
     expect(after.join('\n')).toBe(AFTER);
@@ -37,7 +37,7 @@ describe('diffLines', () => {
 
   it('degrades to a whole-block replace beyond the guard', () => {
     /**
-     * LCS is O(n·m) in time AND MEMORY — the table is n × m numbers. Two
+     * LCS is O(n·m) in time AND MEMORY , the table is n × m numbers. Two
      * 5,000-line inputs is 25 million array slots allocated synchronously on the
      * main thread, so the tab dies rather than lags. Config payloads never reach
      * this; the guard exists because "never in practice" is where the
@@ -55,7 +55,7 @@ describe('DiffViewer, the marker is the primary channel', () => {
   it('gives every line a +, − or blank gutter', () => {
     /**
      * WCAG 1.4.1. The green/red wash is indistinguishable to a red/green-deficient
-     * reader, and `line-through` marks removals only — leaving additions and
+     * reader, and `line-through` marks removals only , leaving additions and
      * unchanged lines identical. The gutter is also the only channel that
      * survives greyscale and a screenshot pasted into a ticket.
      */

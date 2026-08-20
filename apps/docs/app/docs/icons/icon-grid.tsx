@@ -2,35 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
-import * as iconModule from '@velobitsio/icons';
-import { type Icon as IconComponent } from '@velobitsio/icons';
+import { CheckIcon, SearchIcon, type Icon as IconComponent } from '@velobitsio/icons';
 import { Badge, EmptyState, Input } from '@velobitsio/ui';
-import { CheckIcon, SearchIcon } from '@velobitsio/icons';
 
-/**
- * The searchable grid.
- *
- * ## It enumerates the module, not a list
- *
- * `import * as iconModule` and filter, using the same predicate
- * `packages/icons/test/icons.test.tsx` uses. An 89th icon appears here the moment
- * it is exported; nobody edits this file. The alternative — a literal array of
- * names — is precisely the drift the `/docs/colors` rebuild was undertaken to
- * remove, and at 88 entries it would be worse, because a single missing name is
- * invisible in a grid this size.
- *
- * `createIcon` has to be excluded BY NAME rather than by shape: it is a function
- * whose name ends in `Icon`, so a bare `endsWith('Icon')` counts 89. That is the
- * same off-by-one an unanchored `grep -c "export const \w+Icon"` produces.
- */
-const ICONS = Object.entries(iconModule)
-  .filter(
-    (entry): entry is [string, IconComponent] =>
-      entry[0].endsWith('Icon') && entry[0] !== 'createIcon' && typeof entry[1] === 'function',
-  )
-  .sort(([a], [b]) => a.localeCompare(b));
-
-export const ICON_COUNT = ICONS.length;
+import { ICONS } from './icons-data';
 
 function Swatch({ name, Icon }: { name: string; Icon: IconComponent }) {
   const [copied, setCopied] = useState(false);
@@ -48,7 +23,7 @@ function Swatch({ name, Icon }: { name: string; Icon: IconComponent }) {
       onClick={copy}
       /*
        * A real button, so it is focusable and Enter/Space activate it for free.
-       * The accessible name carries the OUTCOME rather than the icon's name —
+       * The accessible name carries the OUTCOME rather than the icon's name ,
        * "TrashIcon" alone does not say that activating this copies anything.
        */
       aria-label={copied ? `Copied import for ${name}` : `Copy import for ${name}`}
@@ -62,6 +37,13 @@ function Swatch({ name, Icon }: { name: string; Icon: IconComponent }) {
   );
 }
 
+/**
+ * The searchable grid.
+ *
+ * The list itself lives in ./icons-data, which carries no client directive, so
+ * the server-rendered page can read ICON_COUNT as a real number. That file
+ * records what happens when such a value crosses this boundary instead.
+ */
 export function IconGrid() {
   const [query, setQuery] = useState('');
 
@@ -100,7 +82,7 @@ export function IconGrid() {
         <EmptyState
           icon={<SearchIcon />}
           title="No icon matches that"
-          description="Names are the glyph plus an Icon suffix — try 'trash', 'chevron' or 'flag'."
+          description="Names are the glyph plus an Icon suffix, so try 'trash', 'chevron' or 'flag'."
         />
       )}
     </div>

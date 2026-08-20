@@ -18,7 +18,7 @@ export default function GlassSurfaceDemo() {
       <GlassSurface tier="overlay" className="rounded-lg p-4 text-sm">
         <p className="font-medium">tier=&quot;overlay&quot;</p>
         <p className="mt-1 text-muted-foreground">
-          Tier O — the default. Always blurred; muted text steps up.
+          Tier O, the default. Always blurred; muted text steps up.
         </p>
       </GlassSurface>
       <GlassSurface tier="elevated" className="rounded-lg p-4 text-sm">

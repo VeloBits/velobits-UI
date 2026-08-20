@@ -8,14 +8,14 @@ import { ArrowRightIcon } from '@velobitsio/icons';
  * A page that used to live somewhere else.
  *
  * `redirects()` in `next.config.mjs` is one of the features Next lists as
- * unsupported under `output: 'export'` — there is no server left to issue a 301.
+ * unsupported under `output: 'export'` , there is no server left to issue a 301.
  * So the redirect is a `<meta http-equiv="refresh">`, which every browser honours
  * and every static host serves without configuration.
  *
  * The visible link is not a fallback nicety: a meta refresh is invisible to a
  * screen reader until it fires, and a reader who lands here with JavaScript
  * disabled or a slow connection needs something to activate. `content="0"`
- * refreshes immediately, so in practice nobody reads it — which is the point of
+ * refreshes immediately, so in practice nobody reads it , which is the point of
  * keeping it to one sentence.
  *
  * These exist because three URLs were published before the docs were

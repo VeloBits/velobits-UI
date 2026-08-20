@@ -5,7 +5,7 @@ import { SCALES } from '../src/scales';
 
 /**
  * `SCALES` exists so `/tokens` can map over the scales instead of hand-listing
- * them. That only buys anything if the registry is guaranteed complete — a
+ * them. That only buys anything if the registry is guaranteed complete , a
  * registry that someone forgets to extend is exactly as lossy as the nine
  * literal `<ScaleTable>` calls it replaced, just harder to notice.
  *

@@ -1,5 +1,5 @@
 /**
- * The static scales — everything that is not a colour and therefore not
+ * The static scales , everything that is not a colour and therefore not
  * theme-dependent. These live in `@theme` (not `@theme inline`) on the CSS side.
  */
 
@@ -57,7 +57,7 @@ export const font = {
 /**
  * One ladder for the whole system. Portalled Radix content lands at
  * `dropdown` and above, which is why the sticky app chrome has to stay
- * below it — a topbar at 1100 swallows its own dropdown.
+ * below it , a topbar at 1100 swallows its own dropdown.
  */
 export const zIndex = {
   base: 0,
@@ -73,7 +73,7 @@ export const zIndex = {
 
 /**
  * Light mode uses real shadows; dark mode delineates with 1px borders instead,
- * with `overlay` carved out for the glass tier — a floating surface needs
+ * with `overlay` carved out for the glass tier , a floating surface needs
  * separation from the page in both themes.
  */
 export const shadow = {
@@ -93,7 +93,7 @@ export const duration = {
 } as const;
 
 export const easing = {
-  /** Entrances. Decelerates hard — the motion settles rather than coasting. */
+  /** Entrances. Decelerates hard , the motion settles rather than coasting. */
   out: 'cubic-bezier(0.32, 0.72, 0, 1)',
   /** Exits. */
   in: 'cubic-bezier(0.4, 0, 1, 1)',
@@ -123,7 +123,7 @@ export type Scale = Readonly<Record<string, string | number>>;
  *
  * This exists so nothing has to hand-list them. `/tokens` previously rendered
  * the scales as nine literal `<ScaleTable>` calls, which meant a tenth scale
- * added here would silently never appear on the page — the same class of drift
+ * added here would silently never appear on the page , the same class of drift
  * the contrast tables were restructured to eliminate. `scales.test.ts` asserts
  * this registry holds every scale the module exports, so the omission is a test
  * failure rather than a missing section.

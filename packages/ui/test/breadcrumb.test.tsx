@@ -74,7 +74,7 @@ describe('Breadcrumb, the leaf', () => {
   it('does NOT claim the leaf is a disabled link', () => {
     /**
      * shadcn adds `role="link" aria-disabled="true"`. That announces static,
-     * unfocusable text as "link, dimmed" — asserting an affordance that was never
+     * unfocusable text as "link, dimmed" , asserting an affordance that was never
      * there in order to then take it away. `aria-current` already says the one
      * true thing.
      */
@@ -125,7 +125,7 @@ describe('Breadcrumb, separator and ellipsis are opposites', () => {
     expect(sep.getAttribute('role')).toBe('presentation');
   });
 
-  it('flips the chevron under RTL — the one sanctioned rtl: variant', () => {
+  it('flips the chevron under RTL , the one sanctioned rtl: variant', () => {
     /**
      * The rule everywhere else is logical properties, but there is no logical
      * property for the direction a drawing points, and an unflipped chevron in

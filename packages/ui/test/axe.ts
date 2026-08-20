@@ -8,7 +8,7 @@ import { createElement } from 'react';
  *
  * The plan called for "axe-core on every Storybook story"; the docs site is
  * Next.js + MDX rather than Storybook, so the same guarantee lives in the test
- * suites instead — every component is rendered in a representative composition
+ * suites instead , every component is rendered in a representative composition
  * and audited.
  *
  * ## What this can and cannot catch
@@ -25,7 +25,7 @@ import { createElement } from 'react';
  * Per-suite violation SUBTRACTIONS. `dropdown-menu.test.tsx` and
  * `command-palette.test.tsx` filter `aria-hidden-focus` node by node on
  * Radix-specific attributes, because a modal Radix layer marks the rest of the
- * page `aria-hidden` while leaving it focusable — it relies on a focus SCOPE
+ * page `aria-hidden` while leaving it focusable , it relies on a focus SCOPE
  * that no static rule can see. Those filters stay in their own files: folding
  * them in here would silently exempt every other suite from a real rule.
  */
@@ -56,8 +56,8 @@ export async function auditElement(root: Element): Promise<axe.Result[]> {
 }
 
 /**
- * Render `ui` inside a `<main>` landmark — so region-scoped rules have somewhere
- * sensible to anchor — and audit the render container.
+ * Render `ui` inside a `<main>` landmark , so region-scoped rules have somewhere
+ * sensible to anchor , and audit the render container.
  *
  * `createElement` rather than JSX so this stays a `.ts` module and no suite has
  * to care whether the shared helper is `.ts` or `.tsx`.

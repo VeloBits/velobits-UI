@@ -14,10 +14,10 @@ export interface VelobitsProviderProps extends ThemeProviderProps {
  * Mount ONCE at the app shell root. It composes the three things that must exist
  * exactly once per application:
  *
- *  1. `ThemeProvider` — resolves and applies light/dark.
- *  2. `TooltipProvider` — Radix's `Tooltip.Root` THROWS without an ancestor
+ *  1. `ThemeProvider` , resolves and applies light/dark.
+ *  2. `TooltipProvider` , Radix's `Tooltip.Root` THROWS without an ancestor
  *     provider, and a missing one only surfaces when someone hovers a control.
- *  3. `MotionConfig reducedMotion="user"` — makes every Framer animation in the
+ *  3. `MotionConfig reducedMotion="user"` , makes every Framer animation in the
  *     tree honour the OS preference. CSS-driven motion is already handled by the
  *     `prefers-reduced-motion` block in the token layer, so between the two
  *     there is no path that ignores the setting.
@@ -43,7 +43,7 @@ export function VelobitsProvider({
 }: VelobitsProviderProps) {
   return (
     <ThemeProvider {...themeProps}>
-      {/* "user" defers to the OS rather than forcing a choice — `reducedMotion="always"`
+      {/* "user" defers to the OS rather than forcing a choice , `reducedMotion="always"`
           would disable motion for everyone, which is not what the setting means. */}
       <MotionConfig reducedMotion="user">
         <TooltipProvider delayDuration={tooltipDelayDuration}>{children}</TooltipProvider>

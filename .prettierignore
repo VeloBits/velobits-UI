@@ -19,10 +19,13 @@ apps/docs/public/r/
 # by hand would be overwritten on the next build.
 registry.json
 
-# The static export — the whole deployable, and it is minified output.
+# The static export , the whole deployable, and it is minified output.
 apps/docs/out/
 
 # Written by `scripts/build-docs-data.ts` on every dev and build run, and it
 # embeds component sources as escaped string literals.
 apps/docs/lib/generated/
 apps/docs/public/search-index.json
+
+# Copies of `skills/`, written by the same script. Format the source, not these.
+apps/docs/public/skills/

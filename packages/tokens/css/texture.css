@@ -6,7 +6,7 @@
  * that matter if you are only reading the CSS:
  *
  *   1. This is the ONE thing allowed to paint the page background. `glass.css`
- *      forbids glass there and that rule stands — this is not glass, it is what
+ *      forbids glass there and that rule stands , this is not glass, it is what
  *      glass is measured against. Without it every `backdrop-filter` in the
  *      system is a backdrop snapshot that moves zero pixels, because blurring a
  *      uniform page returns that same uniform page.
@@ -28,14 +28,14 @@
  *
  * The shorthand would reset `background-color`, and the page's colour comes from
  * `body { background: var(--bg) }` in theme.css's base layer. Resetting it here
- * would leave the dots floating over transparent — which renders as the browser's
+ * would leave the dots floating over transparent , which renders as the browser's
  * white in light mode (invisible) and as white-behind-dark-text in dark mode
  * (catastrophic, and only on the consumer that opted in).
  */
 .page-texture {
   background-image:
     /*
-     * The bloom goes FIRST because it must paint UNDER the grid — earlier layers
+     * The bloom goes FIRST because it must paint UNDER the grid , earlier layers
      * in a `background-image` list are on top. Off-centre and asymmetric on
      * purpose: a bloom centred on the viewport reads as a vignette artefact,
      * while one anchored off the top-left corner reads as light entering the
@@ -44,7 +44,7 @@
      */
     radial-gradient(ellipse 70% 55% at 18% -5%, var(--page-texture-field) 0%, transparent 65%),
     /*
-     * The grid. A 1px dot on a `--page-texture-grid` pitch — the high-frequency
+     * The grid. A 1px dot on a `--page-texture-grid` pitch , the high-frequency
      * half, and the only part a blur can actually smear into a haze.
      *
      * `transparent 1px` with no explicit shape gives a soft-edged dot, which is
@@ -71,7 +71,7 @@
 /*
  * Reduced transparency is a request for fewer see-through effects, and this is a
  * page-level one. The grid goes; the broad bloom stays, because it is opaque
- * tonal shaping rather than something you look through — and it is what stops the
+ * tonal shaping rather than something you look through , and it is what stops the
  * fallback from being a flat slab.
  *
  * Kept in step with the same media query in glass.css: a user who asked for less
@@ -94,7 +94,7 @@
  * `prefers-contrast: more` drops the texture entirely.
  *
  * The stacked worst case measures `--muted-fg` at 4.60:1 in light mode against
- * AA's 4.5 — it passes, and it is the tightest number the texture owns. A user
+ * AA's 4.5 , it passes, and it is the tightest number the texture owns. A user
  * asking for more contrast is telling us that margin is not enough for them, and
  * a decorative grid is the first thing that should go.
  */

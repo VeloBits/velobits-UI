@@ -23,7 +23,7 @@ interface SearchEntry {
 }
 
 /**
- * ⌘K search, built on the system's own `CommandPalette` — the docs are the first
+ * ⌘K search, built on the system's own `CommandPalette` , the docs are the first
  * consumer of every component they document, and this is the one that most
  * benefits from being used in anger.
  *
@@ -31,7 +31,7 @@ interface SearchEntry {
  *
  * `/search-index.json` is written by `scripts/build-docs-data.ts` into `public/`,
  * so importing it would be one line shorter. It would also put every page's
- * title and description into the JS bundle of every page — paid for on first
+ * title and description into the JS bundle of every page , paid for on first
  * load by every reader, to serve a feature most of them never open. Fetching on
  * first open costs one request, once, at the moment it is actually wanted.
  *
@@ -70,7 +70,7 @@ export function SearchCommand() {
     [router],
   );
 
-  // Grouped in the order the index was built, which is the sidebar's order —
+  // Grouped in the order the index was built, which is the sidebar's order ,
   // so the palette and the sidebar answer "what is there" the same way.
   const groups = (entries ?? []).reduce<Record<string, SearchEntry[]>>((acc, entry) => {
     (acc[entry.group] ??= []).push(entry);
@@ -95,7 +95,7 @@ export function SearchCommand() {
 
       {/*
        * `shortcut="k"` is the component's opt-in global binding. This site is the
-       * one place it is correct to take ⌘K — which is also why the
+       * one place it is correct to take ⌘K , which is also why the
        * CommandPalette demo page binds ⌘J instead: two listeners on one chord
        * means whichever mounted last wins, and the demo would steal the site's.
        */}
@@ -116,10 +116,26 @@ export function SearchCommand() {
                   value={`${entry.title} ${entry.description}`}
                   onSelect={() => go(entry.href)}
                 >
-                  <span className="font-medium">{entry.title}</span>
-                  {entry.description && (
-                    <span className="ms-2 truncate text-muted-foreground">{entry.description}</span>
-                  )}
+                  {/*
+                   * Stacked, not side by side. On one row the title and the
+                   * description were a weight change and a colour change apart,
+                   * which is not enough to parse at a glance, and a title long
+                   * enough to wrap ("Theme resolution") pushed the description
+                   * onto a second line at a different indent, so the column the
+                   * eye was following disappeared.
+                   *
+                   * min-w-0 is load-bearing: a flex child defaults to min-content
+                   * width, so without it `truncate` never engages and a long
+                   * description widens the dialog instead of ellipsing.
+                   */}
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="truncate font-medium">{entry.title}</span>
+                    {entry.description && (
+                      <span className="truncate text-xs text-muted-foreground">
+                        {entry.description}
+                      </span>
+                    )}
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>
