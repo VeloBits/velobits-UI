@@ -175,10 +175,10 @@ describe('controls.css and tokens.css agree with controls.ts', () => {
     }
   });
 
-  it('declares both material classes', () => {
+  it('declares both material utilities', () => {
     const rules = controlsCss.replace(/\/\*[\s\S]*?\*\//g, '');
-    expect(rules).toContain('.control-raised');
-    expect(rules).toContain('.control-recessed');
+    expect(rules).toContain('@utility control-raised');
+    expect(rules).toContain('@utility control-recessed');
   });
 
   it('the raised edge is an INSET shadow, so it follows border-radius', () => {
@@ -199,14 +199,63 @@ describe('controls.css and tokens.css agree with controls.ts', () => {
      * transparency still needs to tell a button from an input.
      */
     const rules = controlsCss.replace(/\/\*[\s\S]*?\*\//g, '');
-    const start = rules.indexOf('prefers-reduced-transparency');
-    expect(start, 'controls.css has no reduced-transparency block').toBeGreaterThan(-1);
 
-    const block = rules.slice(start);
-    expect(block).toContain('.control-raised');
-    expect(block).toContain('.control-recessed');
-    expect(block, 'the raised shadow must survive so the two stay distinguishable').toContain(
-      'var(--control-shadow)',
-    );
+    /*
+     * One query per utility now, rather than one shared block at the bottom of
+     * the file. `@utility` bodies are templates Tailwind re-emits per variant, so
+     * a bare `.control-raised` override outside them could not reach
+     * `data-[state=on]:control-raised` , the degradation would apply to some
+     * spellings of the material and not others.
+     */
+    const bodies = Object.fromEntries(
+      ['control-raised', 'control-recessed'].map((name) => {
+        const start = rules.indexOf(`@utility ${name}`);
+        expect(start, `controls.css does not declare @utility ${name}`).toBeGreaterThan(-1);
+        return [name, rules.slice(start, rules.indexOf('\n}', start))];
+      }),
+    ) as Record<'control-raised' | 'control-recessed', string>;
+
+    for (const [name, body] of Object.entries(bodies)) {
+      expect(body, `${name} has no reduced-transparency branch`).toContain(
+        'prefers-reduced-transparency',
+      );
+    }
+
+    expect(
+      bodies['control-raised'].slice(bodies['control-raised'].indexOf('prefers-reduced')),
+      'the raised shadow must survive so the two stay distinguishable',
+    ).toContain('var(--control-shadow)');
+  });
+
+  /**
+   * ## THE REGRESSION THIS FILE EXISTS TO PREVENT, AS OF 2026-08-20
+   *
+   * These were plain classes in a `layer(components)` import, and
+   * `data-[state=on]:control-raised` in `segmented-control.tsx` therefore
+   * generated NO CSS at all , a variant can only compose over a utility Tailwind
+   * owns. Nothing failed: not the build, not the type-checker, not a test, not
+   * the DOM (the class string is right there). Only `getComputedStyle` knew, and
+   * the visible symptom was a selected segment that looked unselected.
+   *
+   * Two assertions, because each half fails independently: the utility form is
+   * what makes variants work, and the un-layered import is what keeps `@utility`
+   * legal. Re-adding `layer(components)` would silently undo the whole fix.
+   */
+  it('is variant-composable , @utility, and imported OUTSIDE any layer', () => {
+    const rules = controlsCss.replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(
+      rules,
+      'A plain `.control-raised` rule is not a Tailwind utility, so ' +
+        '`data-[state=on]:control-raised` silently generates nothing.',
+    ).not.toMatch(/^\s*\.control-(raised|recessed)\s*\{/m);
+
+    const themeCss = readFileSync(join(here, '../css/theme.css'), 'utf8');
+    const importLine = /@import\s+'\.\/controls\.css'([^;]*);/.exec(themeCss);
+    expect(importLine, 'theme.css no longer imports controls.css').not.toBeNull();
+    expect(
+      importLine![1]!.trim(),
+      '`@utility` must be top-level. Importing controls.css into a layer makes ' +
+        'every variant form stop generating, with no error anywhere.',
+    ).toBe('');
   });
 });

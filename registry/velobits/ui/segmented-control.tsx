@@ -117,6 +117,40 @@ export type SegmentedControlProps = {
  * collection), blocks activation from any input device, and makes AT announce the
  * state. Per-segment `disabled` on a `SegmentOption` works the same way.
  * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * ## WHY THE SELECTION NEEDS A BORDER AND NOT JUST A FILL
+ *
+ * The active segment used to be `bg-panel` + `control-raised` on a `bg-bg2`
+ * track. Measured in the browser, that was **no indicator at all in dark mode**:
+ *
+ *   dark    track #2C2D2C, pill #2C2D2C   1.00:1   , `--bg2` IS `--panel` in dark
+ *   light   track #F2EBE8, pill #FFFFFF   1.18:1
+ *
+ * and `control-raised` , the lit edge that was supposed to carry dark mode , was
+ * generating nothing at all, because `data-[state=on]:control-raised` was a
+ * variant over a hand-written class rather than over a utility. That is fixed in
+ * `controls.css`, which now declares both as `@utility`; read the docblock there
+ * before touching either file.
+ *
+ * Restoring the edge is necessary and not sufficient. It is one translucent pixel
+ * at 1.56:1 over the fill, and the drop shadow beneath it is black-on-near-black
+ * in dark mode. So the fill still had to stop being the only other signal, and
+ * the remaining one , selected vs unselected TEXT , measures 1.13:1 inside a
+ * glass surface (`--fg` against `--muted-on-glass`).
+ *
+ * `--field-border` is the answer the palette already contains. It is the one ramp
+ * step documented as "the ONLY ramp step clearing 3:1 against both themes'
+ * surfaces", and it measures:
+ *
+ *   dark    #82827E on #2C2D2C            3.58:1
+ *   light   #82827E on #FFFFFF / #F2EBE8  3.86:1 / 3.27:1
+ *
+ * , i.e. it clears WCAG 2.2 §1.4.11's 3:1 bar for a non-text graphic against the
+ * pill AND against the track, in both themes. It is also not a new idea here:
+ * `border-field-border bg-panel control-raised` is exactly what
+ * `Button variant="secondary"` already is, which is the same object , a raised,
+ * distinct thing sitting on a surface.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 export function SegmentedControl({
   value,
@@ -168,7 +202,22 @@ export function SegmentedControl({
             // activation, and removing pointer events would also remove the
             // `not-allowed` cursor that tells a mouse user why nothing happened.
             'disabled:cursor-not-allowed disabled:opacity-50',
+            /*
+             * THE SELECTED SEGMENT , three signals, and it needs all three.
+             * See "WHY THE SELECTION NEEDS A BORDER" in the docblock for the
+             * measurements; the short version is that the fill carries none of
+             * the load in dark mode and the border carries all of it.
+             *
+             * The border is on EVERY segment, transparent until selected. Adding
+             * one only to the active segment grows it by 2px and shunts the rest
+             * of the row sideways on every change , the classic segmented-control
+             * jitter. A ring would avoid that too, but Tailwind composes `ring-*`
+             * into `box-shadow`, which `control-raised` sets outright, so the two
+             * cannot coexist on one element.
+             */
+            'border border-transparent',
             'data-[state=on]:bg-panel data-[state=on]:control-raised',
+            'data-[state=on]:border-field-border',
             option.tone === 'danger' ? 'data-[state=on]:text-danger' : 'data-[state=on]:text-fg',
           )}
         >

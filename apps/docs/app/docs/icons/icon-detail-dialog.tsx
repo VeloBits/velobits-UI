@@ -6,6 +6,7 @@ import {
   AlertTriangleIcon,
   CircleCheckIcon,
   DownloadIcon,
+  PlusIcon,
   RotateCcwIcon,
   type Icon as IconComponent,
 } from '@velobitsio/icons';
@@ -22,6 +23,7 @@ import {
   Label,
   NativeSelect,
   SegmentedControl,
+  Slider,
   Switch,
   Tabs,
   TabsContent,
@@ -32,10 +34,12 @@ import {
 } from '@velobitsio/ui';
 
 import {
+  ANIMATION_CHOICES,
   COLOR_CHOICES,
   CUSTOM_COLOR_ID,
   DEFAULT_CONFIG,
   END_STYLES,
+  GRADIENT_COLOR_ID,
   GRAPHIC_CONTRAST_MIN,
   SIZE_MAX,
   SIZE_MIN,
@@ -44,12 +48,18 @@ import {
   SURFACE_CHOICES,
   TRUE_SIZE_STRIP,
   accessibleName,
-  colorClassName,
   colorStyle,
   contrastRatio,
+  findAnimation,
   findColor,
   findSurface,
+  gradientCss,
+  gradientPaint,
+  gradientRender,
+  iconClassName,
   importLine,
+  isGradient,
+  parseHex,
   parseRgb,
   toFileName,
   toHex,
@@ -58,6 +68,7 @@ import {
   type EndStyle,
   type IconConfig,
 } from './icon-config';
+import { GradientEditor } from './gradient-editor';
 
 /**
  * The three output formats, declared once.
@@ -160,10 +171,27 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
   const colorRadioName = useId();
   const meaningfulId = useId();
   const labelFieldId = useId();
+  const animationLabelId = useId();
+
+  /*
+   * The live preview's gradient id, and why it is scrubbed.
+   *
+   * React 19's `useId` returns something like `«r7»`. Those guillemets are legal
+   * in an HTML id and NOT legal in a CSS identifier, so `url(#«r7»)` is a
+   * coin-flip across engines and unusable in a `querySelector`. Stripping to
+   * `[a-z0-9]` keeps the uniqueness (the counter survives) and makes the result a
+   * plain identifier. The emitted SNIPPET uses `GRADIENT_SNIPPET_ID` instead ,
+   * see the note there for why the two ids are deliberately different strings.
+   */
+  const rawGradientId = useId();
+  const gradientId = `velobits-grad-${rawGradientId.replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const surface = findSurface(config.surfaceId);
-  const iconClassName = colorClassName(config);
+  const glyphClassName = iconClassName(config);
   const iconStyle = colorStyle(config);
+  const paint = gradientPaint(config, gradientId);
+  const animation = findAnimation(config.animationId);
+  const liveGradient = gradientRender(config.gradient);
 
   /*
    * Every attribute the previews share, derived once.
@@ -172,17 +200,43 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
    * is how the strip ends up a version behind the hero after an edit , exactly the
    * drift a "true size" row exists to rule out.
    *
-   * `fill: undefined` rather than `'none'` when the toggle is off: `createIcon`
-   * already writes `fill="none"`, and passing `undefined` leaves it alone instead
-   * of restating it.
+   * ## `fill` MUST be spelled `'none'`, never left `undefined`
+   *
+   * This shipped as `fill: config.filled ? 'currentColor' : undefined` on the
+   * reasoning that `createIcon` "already writes `fill=\"none\"`, so `undefined`
+   * leaves it alone". That is exactly backwards, and it is the same mechanism
+   * this file gets RIGHT two blocks down for `aria-hidden`.
+   *
+   * `createIcon` renders `<svg fill="none" … {...props}>`. An object spread
+   * overwrites a key even when the incoming value is `undefined`, and React then
+   * omits an `undefined` attribute entirely. So `fill: undefined` did not leave
+   * `fill="none"` alone , it DELETED it, and SVG's initial `fill` is **black**.
+   *
+   * Every preview glyph was therefore painted with a black fill under its
+   * stroke. It hid for a release because the three dark surfaces (`--bg`
+   * #151615, `--panel` #2C2D2C, `--code` #101828) swallow black completely; on
+   * `--brand` lime it is unmissable, and on an open path like an arrow it is
+   * worse still , SVG closes the path implicitly and fills the chord, so the
+   * glyph gains a black wedge that is not in the geometry.
+   *
+   * `aria-hidden={undefined}` relies on precisely this behaviour to remove an
+   * attribute on purpose. Same rule, opposite intent: state `'none'` explicitly.
    */
   const shapeProps = {
     strokeWidth: config.strokeWidth,
     strokeLinecap: END_STYLES[config.ends].linecap,
     strokeLinejoin: END_STYLES[config.ends].linejoin,
-    fill: config.filled ? 'currentColor' : undefined,
-    className: iconClassName,
+    fill: config.filled ? 'currentColor' : 'none',
+    className: glyphClassName,
     style: iconStyle,
+    /*
+     * Spread LAST so a gradient's `stroke`/`fill` win over the two lines above.
+     * `createIcon` writes `stroke="currentColor"` and `fill="none"` before its
+     * own `{...props}`, so this is the same override mechanism the `aria-hidden`
+     * opt-out uses , and it is the reason a gradient can be applied at all from
+     * outside a component whose children are fixed.
+     */
+    ...paint,
   };
 
   /*
@@ -255,13 +309,35 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
     });
   }, [stage, name, config.colorId, config.customColor, config.surfaceId, theme]);
 
+  /*
+   * The verdict, and the one branch where it cannot read the DOM.
+   *
+   * For every colour choice the rendered stroke IS the glyph's computed `color`,
+   * so `getComputedStyle` gives the exact channel values the browser painted. A
+   * gradient breaks that: `stroke` points at a paint server and `color` stays
+   * whatever it inherited, so reading the DOM would confidently measure a colour
+   * that is nowhere on screen.
+   *
+   * So a gradient is measured from its two stops, and reported as the WORSE of
+   * the two. Not the average , a gradient that clears 3:1 at one end and fails at
+   * the other has a section of glyph nobody can see, and averaging is exactly how
+   * that gets waved through.
+   */
   const contrast = useMemo(() => {
     if (!resolved) return null;
-    const foreground = parseRgb(resolved.iconColor);
     const background = parseRgb(resolved.surfaceColor);
-    if (!foreground || !background) return null;
+    if (!background) return null;
+
+    if (isGradient(config)) {
+      const stops = config.gradient.stops.map((stop) => parseHex(stop.color));
+      if (!stops.length || stops.some((stop) => !stop)) return null;
+      return Math.min(...stops.map((stop) => contrastRatio(stop!, background)));
+    }
+
+    const foreground = parseRgb(resolved.iconColor);
+    if (!foreground) return null;
     return contrastRatio(foreground, background);
-  }, [resolved]);
+  }, [resolved, config]);
 
   const jsx = toJsx(name, config);
 
@@ -318,6 +394,58 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
          */
         className="gap-3"
       >
+        {/*
+         * THE PAINT SERVER FOR EVERY PREVIEW GLYPH IN THIS DIALOG.
+         *
+         * Rendered unconditionally rather than behind `isGradient`, so switching
+         * to the gradient swatch never has to wait a commit for the def to
+         * mount , an icon pointing at a `url(#…)` that does not resolve yet
+         * paints BLACK for that frame in most engines, which reads as a flash of
+         * broken rather than as a transition.
+         *
+         * Zero-sized and absolutely positioned, not `display: none`: a
+         * display-none subtree is not rendered at all, and paint servers inside
+         * one have historically failed to resolve in Chrome. This costs no
+         * layout and always resolves.
+         */}
+        <svg width={0} height={0} aria-hidden="true" className="absolute">
+          <defs>
+            {/*
+             * Built from `gradientRender`, the same descriptor the JSX snippet
+             * and the SVG export read. Three emitters over one source, so what
+             * is on screen and what gets copied cannot drift , which is the one
+             * failure a playground must not have.
+             */}
+            {liveGradient.kind === 'radial' ? (
+              <radialGradient
+                id={gradientId}
+                gradientUnits={liveGradient.units}
+                {...liveGradient.radial}
+              >
+                {liveGradient.stops.map((stop, index) => (
+                  <stop key={index} offset={stop.offset} stopColor={stop.color} />
+                ))}
+              </radialGradient>
+            ) : (
+              /*
+               * `gradientUnits` is load-bearing, not boilerplate. SVG's default
+               * is `objectBoundingBox`, which resolves per element and DROPS any
+               * path whose bbox is degenerate , `ArrowDownIcon`'s shaft is
+               * `M12 4v16`, width exactly 0, so the arrow rendered as a bare
+               * chevron. See GRADIENT_UNITS in icon-config.
+               */
+              <linearGradient
+                id={gradientId}
+                gradientUnits={liveGradient.units}
+                {...liveGradient.vector}
+              >
+                {liveGradient.stops.map((stop, index) => (
+                  <stop key={index} offset={stop.offset} stopColor={stop.color} />
+                ))}
+              </linearGradient>
+            )}
+          </defs>
+        </svg>
         <DialogHeader>
           <DialogTitle className="font-mono">{name}</DialogTitle>
           <DialogDescription>
@@ -364,13 +492,18 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                 <Icon size={config.size} {...shapeProps} {...stageAccessibility} />
               </div>
 
-              {/* The row that actually answers "does this survive at 13px". */}
-              <div
-                className={cn(
-                  'flex flex-wrap items-end justify-center gap-5 border-t px-4 py-3',
-                  surface.dividerClassName,
-                )}
-              >
+              {/*
+               * The row that actually answers "does this survive at 13px".
+               *
+               * No rule above it any more. It had one per surface, and on Brand
+               * and Code , where the divider was an on-* token at α 0.20 , it was
+               * the strongest edge in the frame, so a single flat fill read as
+               * two stacked surfaces. Measured: the stage is ONE colour with
+               * exactly one 1px row of something else. `icon-config.ts` carries
+               * the pixel counts. Whitespace and the captions separate this
+               * plenty; a rule was never load-bearing.
+               */}
+              <div className="flex flex-wrap items-end justify-center gap-5 px-4 pt-1 pb-4">
                 {TRUE_SIZE_STRIP.map((size) => (
                   <div key={size} className="flex flex-col items-center gap-1.5">
                     <Icon size={size} {...shapeProps} />
@@ -447,14 +580,10 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
              * a range input is the right control for "somewhere between 8 and 128"
              * , dragging it is how you find out that a glyph stops reading at 11px.
              *
-             * The slider is a native `<input type="range">` because there is no
-             * `Slider` in `@velobitsio/ui` (39 components; this is not one of
-             * them). That is a deliberate choice rather than a gap being papered
-             * over: the native control is keyboard-operable, announces its value,
-             * and is styled here through the same vendor pseudo-elements the
-             * custom-colour swatch uses. Adding a real `Slider` to the library is
-             * a library change , registry entry, barrel export, tsup entry,
-             * exports map, size budget, tests, docs page , not a docs one.
+             * The slider is a real `Slider` from `@velobitsio/ui`, added for this
+             * (see the comment on the control itself). Its `aria-label` is its
+             * own rather than shared with the dropdown's `<Label>`, because two
+             * controls pointing at one label leaves the second one unnamed.
              */}
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-2">
@@ -497,36 +626,37 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
               </div>
 
               <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min={SIZE_MIN}
-                  max={SIZE_MAX}
-                  value={config.size}
-                  onChange={(event) => setSize(Number(event.target.value))}
+                {/*
+                 * A real `Slider` since 2026-08-20. This was a native
+                 * `<input type="range">` styled through a dozen
+                 * `[&::-webkit-slider-*]` / `[&::-moz-range-*]` arbitrary
+                 * variants, because `@velobitsio/ui` had no slider , 39
+                 * components and this was not one of them.
+                 *
+                 * It is one now, which is a LIBRARY change and not a docs one:
+                 * registry entry, barrel export, tsup entry, exports map, size
+                 * budget, tests and its own docs page, all of which
+                 * `registry-parity.test.ts` checks agree. What that buys here is
+                 * two things the vendor-pseudo-element version could not have:
+                 * the same `control-recessed` track and `--field-border` thumb
+                 * as every other control in this panel, and `formatValue`.
+                 *
+                 * `formatValue` is the substantive one. A slider announces
+                 * `aria-valuenow`, a bare "24" , and whether that is pixels,
+                 * percent or items lived entirely in the visible label, heard
+                 * once on focus and never again through the drag. It writes
+                 * `aria-valuetext`, which replaces the number outright.
+                 */}
+                <Slider
+                  aria-label="Size in px"
                   /* The dropdown owns the visible "Size" label, so this needs its
                      own name rather than sharing that one , two controls pointing
                      at one label leaves the second one unnamed. */
-                  aria-label="Size in px"
-                  className={cn(
-                    'h-4 w-full cursor-pointer appearance-none rounded-pill bg-transparent',
-                    'outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40',
-                    // Track. Both vendors, because neither pseudo-element is
-                    // standardised and each browser ignores the other's.
-                    '[&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-pill',
-                    '[&::-webkit-slider-runnable-track]:border [&::-webkit-slider-runnable-track]:border-border',
-                    '[&::-webkit-slider-runnable-track]:bg-bg2',
-                    '[&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-pill',
-                    '[&::-moz-range-track]:border [&::-moz-range-track]:border-border',
-                    '[&::-moz-range-track]:bg-bg2',
-                    // Thumb. `-mt-[5px]` centres it on the track: a 6px track and
-                    // a 16px thumb differ by 10px, and WebKit aligns the thumb's
-                    // top edge to the track's, not its centre.
-                    '[&::-webkit-slider-thumb]:-mt-[5px] [&::-webkit-slider-thumb]:size-4',
-                    '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full',
-                    '[&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-primary',
-                    '[&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:rounded-full',
-                    '[&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary',
-                  )}
+                  value={[config.size]}
+                  onValueChange={([next]) => setSize(next ?? config.size)}
+                  min={SIZE_MIN}
+                  max={SIZE_MAX}
+                  formatValue={(value) => `${value} pixels`}
                 />
                 <span className="w-10 shrink-0 text-end font-mono text-xs tabular-nums text-muted-foreground">
                   {config.size}px
@@ -583,6 +713,49 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
             </div>
 
             {/*
+             * Motion , one dropdown rather than eight swatches.
+             *
+             * Eight options is past what a segmented control can hold in a 19rem
+             * column, and unlike colour there is nothing to SHOW in a swatch:
+             * a still of "bounce" and a still of "pulse" are the same picture.
+             * The preview above is the preview, and it starts the moment you
+             * choose , which is the only demonstration that means anything.
+             *
+             * Every option is a plain className, and the emitted snippet says so.
+             * Reduced motion needs no wiring at all here: the token layer's base
+             * block clamps animation-duration and iteration-count under
+             * `prefers-reduced-motion: reduce`, with `!important`, for every CSS
+             * animation on the page. See ANIMATION_CHOICES for why that ruled out
+             * a Framer implementation despite it being a required peer.
+             */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor={animationLabelId} className="text-sm font-medium text-fg">
+                  Motion
+                </Label>
+                <NativeSelect
+                  id={animationLabelId}
+                  value={config.animationId}
+                  onChange={(event) =>
+                    setConfig((previous) => ({ ...previous, animationId: event.target.value }))
+                  }
+                  // Same background caveat as the size select above: a background
+                  // utility here would evict the chevron data URI. Position only.
+                  className="h-7 w-auto ps-2 pe-7 text-xs bg-[position:right_0.375rem_center]"
+                >
+                  {ANIMATION_CHOICES.map((choice) => (
+                    <option key={choice.id} value={choice.id}>
+                      {choice.label}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </div>
+              {animation?.note ? (
+                <p className="text-xs text-muted-foreground">{animation.note}</p>
+              ) : null}
+            </div>
+
+            {/*
              * Colour , a native radio group, so arrow keys and announcements come
              * from the platform rather than from hand-rolled ARIA. A `<fieldset>`
              * also names the group without the dangling-`htmlFor` hazard
@@ -602,17 +775,21 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
               <div className="flex items-center justify-between gap-2">
                 <legend className="text-sm font-medium text-fg">Colour</legend>
                 <code className="truncate text-xs text-muted-foreground">
-                  {config.colorId === CUSTOM_COLOR_ID
-                    ? config.customColor
-                    : (findColor(config.colorId)?.className ?? 'currentColor')}
+                  {isGradient(config)
+                    ? `${config.gradient.kind}, ${config.gradient.stops.length} stops`
+                    : config.colorId === CUSTOM_COLOR_ID
+                      ? config.customColor
+                      : (findColor(config.colorId)?.className ?? 'currentColor')}
                 </code>
               </div>
 
               {/*
-               * A fixed 6-column grid, `w-fit`, rather than `flex-wrap`. Eleven
-               * 24px dots with 8px gaps measure 344px against a 304px column, so
-               * flex-wrap broke them 9 + 2 , a full row and an orphan. Six and
-               * five is a block.
+               * A fixed 6-column grid, `w-fit`, rather than `flex-wrap`. Twelve
+               * 24px dots with 8px gaps measure 376px against a 304px column, so
+               * flex-wrap would break them 9 + 3 , a full row and a remainder.
+               * Six and six is a block, and it is a happier number than the
+               * eleven this had before the gradient swatch arrived: that left a
+               * hole in the second row.
                *
                * And they stay 24px: WCAG 2.2's 2.5.8 sets 24×24 CSS px as the
                * minimum target, so shrinking them to 20px to win a single row was
@@ -686,51 +863,137 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                 ))}
 
                 {/*
-                 * The custom swatch IS the colour input.
+                 * ── THE GRADIENT SWATCH , a real radio, unlike the one below ──
                  *
-                 * A separate always-visible row with an OS-default colour well and
-                 * a hex field beside it was the least finished-looking thing in
-                 * the dialog. Styling the native input's swatch pseudo-elements
-                 * turns it into the eleventh dot, so one control both selects
-                 * "custom" and opens the picker , which is what reaching for it
-                 * meant anyway. The hex field then only appears when it applies.
+                 * This one IS part of `colorRadioName`, so arrow keys reach it
+                 * along with the ten tokens. It has nothing to open , the two
+                 * stops get their own row underneath when it is selected , so
+                 * there is no picker to launch and no reason for it to be
+                 * anything other than the eleventh member of the group.
+                 *
+                 * The dot previews the actual gradient, at the same angle the
+                 * glyph will use, which is the only honest thing a swatch for a
+                 * gradient can be. Inline `style` rather than an arbitrary
+                 * Tailwind value on purpose: the stops are runtime state, and a
+                 * `linear-gradient(...)` written as a class would need underscores
+                 * for every space (tailwind-merge splits on whitespace) while
+                 * still being unable to interpolate the colours.
+                 */}
+                <label title="A two-stop gradient stroke" className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name={colorRadioName}
+                    value={GRADIENT_COLOR_ID}
+                    checked={isGradient(config)}
+                    onChange={() =>
+                      setConfig((previous) => ({ ...previous, colorId: GRADIENT_COLOR_ID }))
+                    }
+                    className="peer sr-only"
+                  />
+                  <span
+                    className={cn(
+                      'block size-6 rounded-full border border-border',
+                      'transition-[box-shadow,border-color] duration-micro ease-out',
+                      'peer-checked:outline-2 peer-checked:outline-offset-2 peer-checked:outline-fg',
+                      'peer-focus-visible:ring-2 peer-focus-visible:ring-primary',
+                    )}
+                    style={{ backgroundImage: gradientCss(config.gradient) }}
+                  >
+                    <span className="sr-only">Gradient</span>
+                  </span>
+                </label>
+
+                {/*
+                 * ── THE CUSTOM SWATCH , and why it now LOOKS like a picker ────
+                 *
+                 * The swatch IS an `<input type="color">`, styled through its
+                 * vendor swatch pseudo-elements so it sits in the grid as the
+                 * twelfth dot. One control both selects "custom" and opens the
+                 * OS picker, which is what reaching for it meant anyway.
+                 *
+                 * That was the whole problem: it looked exactly like the eleven
+                 * dots beside it, so nothing said it opened anything. A dot that
+                 * is a button and a dot that is a swatch cannot be the same dot.
+                 * Two additions fix it without spending a row:
+                 *
+                 *  1. A conic-gradient RING around it , the universal "any
+                 *     colour" mark. It is the wrapper's background showing
+                 *     through 2px of padding, so the inner well still shows the
+                 *     colour actually chosen.
+                 *  2. A plus glyph over the centre when nothing custom is
+                 *     selected. It disappears once a colour is picked, because at
+                 *     that point the swatch has a colour to show and the plus
+                 *     would obscure the very thing it was advertising.
+                 *
+                 * Keyboard access is unchanged and deliberately so: a colour
+                 * input is not a radio, so it is not in `colorRadioName`'s
+                 * arrow-key ring , it is the next Tab stop after the group, which
+                 * is where a keyboard user will look for it. Making it a radio
+                 * would mean two controls (one to select, one to open) in a slot
+                 * that has room for one.
                  *
                  * Both vendor pseudo-elements are needed: WebKit paints
                  * `::-webkit-color-swatch` inside a padded wrapper, Firefox paints
                  * `::-moz-color-swatch`. Neither is reachable except as an
                  * arbitrary variant.
                  */}
-                <label
-                  title="A literal hex, for anything outside the palette"
-                  className="relative cursor-pointer"
+                <span
+                  className={cn(
+                    'relative block size-6 rounded-full p-[2px]',
+                    'transition-[outline-color] duration-micro ease-out',
+                    config.colorId === CUSTOM_COLOR_ID && 'outline-2 outline-offset-2 outline-fg',
+                  )}
+                  style={{
+                    // The hue wheel, as the ring. Inline for the same reason the
+                    // gradient dot's is: a conic-gradient with six stops written
+                    // as an arbitrary class is unreadable and space-sensitive.
+                    backgroundImage:
+                      'conic-gradient(#ff4d4d, #ffd24d, #4dff88, #4dd2ff, #4d4dff, #ff4dd2, #ff4d4d)',
+                  }}
                 >
-                  <span className="sr-only">Custom colour</span>
-                  <input
-                    type="color"
-                    aria-label="Custom icon colour"
-                    value={config.customColor}
-                    onChange={(event) => {
-                      setCustomText(event.target.value);
-                      setConfig((previous) => ({
-                        ...previous,
-                        colorId: CUSTOM_COLOR_ID,
-                        customColor: event.target.value,
-                      }));
-                    }}
-                    className={cn(
-                      'block size-6 cursor-pointer appearance-none rounded-full border border-border bg-transparent p-0',
-                      'transition-[box-shadow,outline-color] duration-micro ease-out',
-                      // Same split as the token dots above, for the same reasons.
-                      'outline-none focus-visible:ring-2 focus-visible:ring-primary',
-                      config.colorId === CUSTOM_COLOR_ID && 'outline-2 outline-offset-2 outline-fg',
-                      '[&::-webkit-color-swatch-wrapper]:p-0',
-                      '[&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0',
-                      '[&::-moz-color-swatch]:rounded-full [&::-moz-color-swatch]:border-0',
-                    )}
-                  />
-                </label>
+                  <label title="A literal hex, for anything outside the palette">
+                    <span className="sr-only">Custom colour</span>
+                    <input
+                      type="color"
+                      aria-label="Custom icon colour"
+                      value={config.customColor}
+                      onChange={(event) => {
+                        setCustomText(event.target.value);
+                        setConfig((previous) => ({
+                          ...previous,
+                          colorId: CUSTOM_COLOR_ID,
+                          customColor: event.target.value,
+                        }));
+                      }}
+                      className={cn(
+                        'block size-full cursor-pointer appearance-none rounded-full border-0 bg-transparent p-0',
+                        'outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                        '[&::-webkit-color-swatch-wrapper]:p-0',
+                        '[&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0',
+                        '[&::-moz-color-swatch]:rounded-full [&::-moz-color-swatch]:border-0',
+                      )}
+                    />
+                  </label>
+                  {config.colorId === CUSTOM_COLOR_ID ? null : (
+                    <PlusIcon
+                      size={12}
+                      /* Over the well, never in front of the click. The input is
+                         the target; an overlay that ate pointer events would
+                         make the affordance the one thing you cannot press. */
+                      className="pointer-events-none absolute inset-0 m-auto text-on-brand"
+                    />
+                  )}
+                </span>
               </div>
 
+              {/*
+               * The row under the grid, which is one slot shared by two editors.
+               *
+               * Custom shows a hex field; gradient shows its two stops. They are
+               * mutually exclusive by construction (both are `colorId` values), so
+               * this costs the dialog one row rather than two , which is the whole
+               * reason the gradient became a swatch instead of a mode.
+               */}
               {config.colorId === CUSTOM_COLOR_ID ? (
                 <input
                   type="text"
@@ -748,6 +1011,23 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                     'h-7 w-full rounded-md border border-input bg-panel px-2 font-mono text-xs text-fg',
                     'control-recessed outline-none focus-visible:ring-[3px] focus-visible:ring-ring/40',
                   )}
+                />
+              ) : null}
+
+              {isGradient(config) ? (
+                /*
+                 * One row, and the whole editor lives behind it.
+                 *
+                 * Type, angle, presets and a variable-length stop list is ~150px
+                 * of controls, against 79px of headroom in a dialog that is not
+                 * allowed to scroll. `GradientEditor` puts all of it in a Popover
+                 * and this row is its trigger , a preview bar that doubles as the
+                 * button's label. Net cost to the dialog: the same 28px the hex
+                 * field it shares this slot with already spent.
+                 */
+                <GradientEditor
+                  value={config.gradient}
+                  onChange={(gradient) => setConfig((previous) => ({ ...previous, gradient }))}
                 />
               ) : null}
             </fieldset>
@@ -889,7 +1169,7 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                     '[&_pre]:rounded-none [&_pre]:border-0 [&_pre]:bg-transparent [&_pre]:shadow-none',
                     '[&_pre]:p-3',
                     /*
-                     * One floor for all three, one ceiling for the tall one.
+                     * One floor for all three, and now one ceiling for all three.
                      *
                      * Without the floor the panel was the height of its content,
                      * so switching JSX → SVG grew the dialog by ~130px and the
@@ -897,9 +1177,23 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                      * button moved after you had already aimed at it. A shared
                      * `min-h` makes the two short tabs identical, and the cap
                      * keeps a 9-attribute header from setting the dialog's height.
+                     *
+                     * The ceiling used to be SVG-only, because JSX was always one
+                     * element. A gradient made it two , the def block plus the
+                     * icon , and an uncapped JSX panel took the dialog to 856px
+                     * against a 905px viewport, taller than the SVG tab and 126px
+                     * out of step with Import. Capping every panel bounds the
+                     * dialog at 826px in the worst case and keeps JSX and Import
+                     * pixel-identical in the default configuration, which is the
+                     * pairing the rule was actually about.
+                     *
+                     * The residual: in gradient mode JSX is a capped 208px while
+                     * Import is 112px, so those two tabs do differ. That is a
+                     * mode the reader opted into, and the honest alternative ,
+                     * padding Import out to ten lines of whitespace to match a
+                     * snippet it has nothing to do with , is worse.
                      */
-                    '[&_pre]:min-h-28',
-                    tab.value === 'svg' && '[&_pre]:max-h-52',
+                    '[&_pre]:min-h-28 [&_pre]:max-h-52',
                   )}
                 >
                   {tab.value === 'jsx'

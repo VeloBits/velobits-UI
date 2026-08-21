@@ -238,6 +238,16 @@
         "default": "./dist/skeleton.cjs"
       }
     },
+    "./slider": {
+      "import": {
+        "types": "./dist/slider.d.ts",
+        "default": "./dist/slider.js"
+      },
+      "require": {
+        "types": "./dist/slider.d.cts",
+        "default": "./dist/slider.cjs"
+      }
+    },
     "./spinner": {
       "import": {
         "types": "./dist/spinner.d.ts",
@@ -587,7 +597,23 @@
       ]
     },
     {
-      "name": "the whole barrel, our code only (39 components, minus the 2 subpath-only ones)",
+      "name": "Slider alone, our code only (the newest primitive's per-entry proof)",
+      "path": "dist/slider.js",
+      "limit": "2 kB",
+      "ignore": [
+        "react",
+        "react-dom",
+        "framer-motion",
+        "@velobitsio/icons",
+        "@velobitsio/tokens",
+        "radix-ui",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "name": "the whole barrel, our code only (40 components, minus the 2 subpath-only ones)",
       "path": "dist/index.js",
       "limit": "32 kB",
       "ignore": [
@@ -603,9 +629,9 @@
       ]
     },
     {
-      "name": "the whole barrel, with every dependency (what a consumer pays; raised from 64 kB at T3)",
+      "name": "the whole barrel, with every dependency (what a consumer pays; 64 kB at T3, 68 kB before Slider)",
       "path": "dist/index.js",
-      "limit": "68 kB",
+      "limit": "72 kB",
       "ignore": [
         "react",
         "react-dom"

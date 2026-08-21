@@ -32,10 +32,16 @@
 @import './glass.css' layer(components);
 
 /* The control material , the same language as the glass tier, applied to controls.
- * Same layer so a `shadow-*` utility at a call site still wins. Before this every
- * control was a flat fill, which is why a Card read as glass and everything inside
- * it read as paper. */
-@import './controls.css' layer(components);
+ * Before this every control was a flat fill, which is why a Card read as glass and
+ * everything inside it read as paper.
+ *
+ * NOT `layer(components)`, unlike glass.css above. This file declares `@utility`
+ * rules, which must be top-level , wrapping them in a layer is invalid and makes
+ * every variant form (`data-[state=on]:control-raised`) silently stop generating.
+ * controls.css documents the bug that caused. Override safety does not depend on
+ * the layer here: `cn` declares control-material and shadow as conflicting groups
+ * in both directions, so only one box-shadow class ever reaches the DOM. */
+@import './controls.css';
 
 /* The page texture, same layer and for the same reason , plus one that is
  * specific to it: `.page-texture` sets `background-image`, and the page's
@@ -255,6 +261,89 @@
 }
 @utility z-tooltip {
   z-index: var(--z-index-tooltip);
+}
+
+/*
+ * ── ICON MOTION ─────────────────────────────────────────────────────────────
+ *
+ * Two animations Tailwind does not ship, added because the icon playground emits
+ * them into snippets that consumers paste. `animate-spin`, `animate-pulse` and
+ * `animate-bounce` are Tailwind's own and need nothing here.
+ *
+ * They live in the TOKEN layer rather than in the docs app for one reason: a
+ * snippet that only works on the site that generated it is a broken snippet.
+ * Anyone who has `@import '@velobitsio/tokens/theme.css'` , which is everyone
+ * with the palette , gets these from the same line.
+ *
+ * ## Reduced motion is already handled, and must not be handled again here
+ *
+ * The base layer's `@media (prefers-reduced-motion: reduce)` block clamps
+ * `animation-duration` to 0.01ms and `animation-iteration-count` to 1 with
+ * `!important`, for every animation on the page. So neither of these needs its
+ * own query, and adding one would be the third mechanism for a preference that
+ * already has two coherent ones (that block, and Framer's `MotionConfig`).
+ *
+ * Note what the clamp does to each: the looping wiggle runs one imperceptible
+ * cycle and stops, and the draw , which is `forwards` , lands on its final frame
+ * immediately, i.e. a fully drawn glyph. Both degrade to the correct still.
+ */
+
+/* A small rotational shake. For invalid input and failed actions.
+ *
+ * Rotation, not translation: `translateX` on a 16px glyph beside a label shifts
+ * it out of optical alignment with the text, and the eye reads that as a layout
+ * bug rather than as feedback. 6deg is deliberately small , this fires next to
+ * an error message that is already doing the explaining. */
+@keyframes velobits-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+@utility animate-wiggle {
+  animation: velobits-wiggle 500ms var(--ease-out) infinite;
+}
+
+/*
+ * The stroke drawing itself on, once.
+ *
+ * ⚠️ TIMING IS PER-PATH AND CANNOT BE MADE EVEN FROM OUT HERE.
+ *
+ * `stroke-dasharray` is in USER UNITS, so a dash of 120 covers a long path
+ * proportionally less than a short one , a chevron finishes early and a
+ * many-segment glyph finishes late, and a glyph made of several paths draws all
+ * of them concurrently rather than in sequence.
+ *
+ * The fix would be `pathLength="1"` on every path, which normalises each one to
+ * the same nominal length. That has to be authored INTO the geometry, and
+ * `createIcon` renders fixed children , there is no prop that reaches them. So
+ * 120 is chosen as comfortably longer than the longest path on the 24×24 grid
+ * (the diagonal is ~34, and no glyph in the set approaches four times that),
+ * which guarantees every path fully hides at offset 120 and fully draws at 0.
+ *
+ * Good for a flourish on one glyph. Not choreography , do not build a sequence
+ * out of it.
+ */
+@keyframes velobits-draw {
+  from {
+    stroke-dashoffset: 120;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@utility animate-draw {
+  stroke-dasharray: 120;
+  /* `forwards`, or the glyph snaps back to fully hidden on the last frame. */
+  animation: velobits-draw 1.2s var(--ease-out) forwards;
 }
 
 @utility duration-micro {

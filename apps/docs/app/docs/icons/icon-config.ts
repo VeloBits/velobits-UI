@@ -87,6 +87,364 @@ export const CUSTOM_COLOR_ID = 'custom';
 
 export const DEFAULT_CUSTOM_COLOR = '#7c3aed';
 
+/**
+ * The id for "stroke this with a two-stop gradient".
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * ## A GRADIENT CANNOT BE A PROP, AND THAT SHAPES EVERY PART OF THIS
+ *
+ * An SVG stroke takes a paint server: `stroke="url(#some-id)"` pointing at a
+ * `<linearGradient>`. The def does NOT have to be inside the same `<svg>` , it
+ * only has to exist somewhere in the document , which is the fact that makes any
+ * of this possible from the outside.
+ *
+ * But `createIcon` renders a fixed `children` and spreads `{...props}` onto the
+ * `<svg>`. There is no slot for a `<defs>`, so an icon can never carry its own
+ * gradient. That splits cleanly into three cases, and they are NOT equally
+ * clean , which is the honest thing to say rather than paper over:
+ *
+ *   PREVIEW   fine. The dialog renders one hidden `<svg><defs>` of its own and
+ *             every preview glyph points at it.
+ *   EXPORT    fine, and fully self-contained: `toSvgMarkup` builds the whole file
+ *             here, so it writes its own `<defs>` and the gradient travels with
+ *             the file into Figma, an `<img>`, or a `background-image`.
+ *   JSX       two parts. The consumer renders the def once, anywhere, and the
+ *             icon references it by id. `toGradientDefsJsx` emits that half and
+ *             the snippet shows both together, because a copied one-liner that
+ *             silently renders a black glyph is worse than a snippet that is
+ *             visibly two things.
+ *
+ * At icon sizes a gradient is also nearly free of meaning: across a 16px glyph
+ * with a 2px stroke it resolves to a handful of perceptible steps. It earns its
+ * place at export sizes and on marketing surfaces, not at 13-18px , which is
+ * why it is one swatch among twelve rather than a mode the dialog is built
+ * around.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const GRADIENT_COLOR_ID = 'gradient';
+
+export type GradientKind = 'linear' | 'radial';
+
+export interface GradientStop {
+  /**
+   * Stable identity for the editor's list.
+   *
+   * Not the array index: stops are reordered whenever an offset is dragged past
+   * a neighbour, and a keyed-by-index colour input would carry its DOM state
+   * (including an open OS colour picker) onto whichever stop slid into that
+   * slot.
+   */
+  id: string;
+  color: string;
+  /** 0–100, as a percentage along the gradient line. */
+  offset: number;
+}
+
+export interface GradientConfig {
+  kind: GradientKind;
+  /**
+   * Degrees in the CSS convention: 0 points to the top, 90 to the right,
+   * measured clockwise. Linear only , a radial gradient has no direction.
+   *
+   * CSS is the convention rather than SVG's because it is the one people can
+   * predict, and because it is what the swatch preview uses. `gradientVector`
+   * does the conversion; see the trig there.
+   */
+  angle: number;
+  stops: GradientStop[];
+}
+
+export const DEFAULT_GRADIENT: GradientConfig = {
+  kind: 'linear',
+  // 135°, i.e. corner to corner, top-left to bottom-right. The one angle at
+  // which the gradient line covers the glyph's full diagonal.
+  angle: 135,
+  stops: [
+    { id: 'a', color: '#007ACC', offset: 0 },
+    { id: 'b', color: '#C8F135', offset: 100 },
+  ],
+};
+
+/**
+ * Ready-made pairs, built from the palette's THEME-PINNED values.
+ *
+ * Every gradient is a literal by construction , a paint server takes stop
+ * colours, not `var(--primary)` resolved per theme , so a preset built from a
+ * token that differs across themes would silently freeze one theme's value into
+ * both. `--primary` (#007ACC), `--brand` (#C8F135) and `--code` (#101828) are
+ * the same in light and dark, and `--elevated`'s plum (#592941) is dark-only but
+ * is the brand's non-blue seed rather than a surface, so it reads deliberately
+ * on either. Those four are the whole vocabulary here, which is the honest
+ * boundary: a curated gradient can be on-brand, it cannot be theme-aware.
+ */
+export const GRADIENT_PRESETS: { id: string; label: string; stops: [string, string] }[] = [
+  { id: 'signature', label: 'Primary → Brand', stops: ['#007ACC', '#C8F135'] },
+  { id: 'plum', label: 'Plum → Brand', stops: ['#592941', '#C8F135'] },
+  { id: 'deep', label: 'Deep → Primary', stops: ['#101828', '#007ACC'] },
+  { id: 'sky', label: 'Brand → Sky', stops: ['#C8F135', '#4AACFF'] },
+];
+
+/** How many stops the editor allows. Two is a gradient; past six it is a mess. */
+export const GRADIENT_MIN_STOPS = 2;
+export const GRADIENT_MAX_STOPS = 6;
+
+/**
+ * The id the emitted snippet uses, and the one the export writes.
+ *
+ * A readable literal rather than the dialog's live `useId()` value: the preview
+ * needs a document-unique id (several dialogs could exist), but a SNIPPET is
+ * going into someone else's file, where `«r3»` would be both baffling and
+ * fragile. React 19's `useId` output is not a valid CSS identifier either, so
+ * the two ids were never going to be the same string.
+ */
+export const GRADIENT_SNIPPET_ID = 'velobits-icon-gradient';
+
+/**
+ * The grid every glyph in the set is drawn on, and the coordinate system every
+ * gradient here is expressed in. `createIcon` hard-codes `viewBox="0 0 24 24"`,
+ * so this is a constant of the icon package rather than a choice made here.
+ */
+export const ICON_GRID = 24;
+
+/**
+ * ⚠️ EVERY GRADIENT MUST BE `userSpaceOnUse`. NEVER `objectBoundingBox`.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * `objectBoundingBox` is SVG's DEFAULT, and it silently deletes parts of icons.
+ *
+ * It resolves a paint server against the **referencing element's own bounding
+ * box**. Two consequences, and the first one is a disappearing glyph:
+ *
+ *  1. **A degenerate bbox means the element is not rendered AT ALL.** Per the
+ *     spec, if the bounding box has zero width or zero height, the paint server
+ *     cannot be resolved and the element is dropped , not fallback-coloured,
+ *     dropped. `ArrowDownIcon`'s shaft is `M12 4v16`: a perfectly vertical line,
+ *     so its bbox width is exactly 0. Under `objectBoundingBox` the arrow
+ *     rendered as a bare chevron with no shaft, and the same fate awaits every
+ *     axis-aligned path in the set , `PlusIcon`, `MinusIcon`, dividers, the
+ *     stems of most arrows. Measured, not inferred: `getBBox().width === 0` and
+ *     `getBoundingClientRect().width === 0` on that path.
+ *
+ *  2. **Per-element resolution is the wrong picture anyway.** Each child gets
+ *     its own independent copy of the full ramp, so a two-path glyph shows the
+ *     gradient twice at different scales rather than once across the whole
+ *     shape , which is not what anyone means by a gradient icon.
+ *
+ * `userSpaceOnUse` fixes both: coordinates are in the current user space, i.e.
+ * the `0 0 24 24` viewBox, so they are independent of any element's geometry AND
+ * shared by every path in the glyph. It stays size-independent because the
+ * viewBox maps onto whatever `width`/`height` the icon is rendered at, so the
+ * same numbers are correct at 13px and at 512px.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const GRADIENT_UNITS = 'userSpaceOnUse';
+
+/**
+ * A CSS angle, as the SVG vector a `<linearGradient>` actually takes.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * SVG has no angle attribute. It has `x1,y1 → x2,y2`, and under
+ * `GRADIENT_UNITS` those are user-space coordinates on the 24x24 grid.
+ *
+ * The conversion, with y pointing DOWN as it does on screen:
+ *
+ *   dx =  sin θ        0° → (0,-1) up      90° → (1,0) right
+ *   dy = -cos θ      180° → (0, 1) down   270° → (-1,0) left
+ *
+ * and the line has to be long enough to cover the box rather than just its
+ * centre. For a square that length is (|sin θ| + |cos θ|) × 24 , the box's own
+ * width and height projected onto the gradient direction , which is the same
+ * rule CSS uses to size a gradient line. Half of it either side of the centre:
+ *
+ *   (x1,y1) = 12 − d · L/2      (x2,y2) = 12 + d · L/2
+ *
+ * Sanity: 135° gives exactly (0,0) → (24,24), the full diagonal, and 90° gives
+ * (0,12) → (24,12), edge to edge across the middle. Both are what a reader would
+ * draw by hand, which is the point of doing the trig rather than exposing four
+ * coordinate fields.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export function gradientVector(angle: number): { x1: string; y1: string; x2: string; y2: string } {
+  const radians = (angle * Math.PI) / 180;
+  const dx = Math.sin(radians);
+  const dy = -Math.cos(radians);
+  const centre = ICON_GRID / 2;
+  const half = ((Math.abs(dx) + Math.abs(dy)) * ICON_GRID) / 2;
+
+  // Three decimals: enough that 135° lands on a clean 0 and 24, short enough
+  // that the emitted snippet stays readable.
+  const round = (value: number) => String(Number(value.toFixed(3)));
+  return {
+    x1: round(centre - dx * half),
+    y1: round(centre - dy * half),
+    x2: round(centre + dx * half),
+    y2: round(centre + dy * half),
+  };
+}
+
+/**
+ * Everything the three renderers need, computed once.
+ *
+ * The live preview (React elements), the JSX snippet (a string) and the SVG
+ * export (a different string) all describe the same `<defs>`. Three hand-written
+ * emitters over the raw config is three chances for the copied code to disagree
+ * with what is on screen , which is the single worst failure a playground can
+ * have. They each render THIS instead.
+ */
+export interface GradientRender {
+  kind: GradientKind;
+  /** Always `userSpaceOnUse` , see GRADIENT_UNITS for why this is not optional. */
+  units: string;
+  /** Linear only. User-space coordinates on the 24x24 grid. */
+  vector: { x1: string; y1: string; x2: string; y2: string };
+  /** Radial only , centred on the grid, reaching its corners. */
+  radial: { cx: string; cy: string; r: string };
+  stops: { offset: string; color: string }[];
+}
+
+export function gradientRender(gradient: GradientConfig): GradientRender {
+  return {
+    kind: gradient.kind,
+    units: GRADIENT_UNITS,
+    vector: gradientVector(gradient.angle),
+    /*
+     * The radial is centred with r = 0.5, and none of that is configurable.
+     *
+     * A focal point (`fx`/`fy`) and a radius are real `<radialGradient>`
+     * attributes, and on a 16px glyph drawn from 2px strokes they are
+     * invisible , the stroke samples the gradient along a line a few pixels
+     * wide. Offering them would be an SVG reference rather than a design
+     * control, which is the same call `END_STYLES` makes about exposing all
+     * five linecap/linejoin values.
+     */
+    radial: {
+      cx: String(ICON_GRID / 2),
+      cy: String(ICON_GRID / 2),
+      /*
+       * Reaches the CORNERS, not the edge midpoints , 12·√2 ≈ 16.971 rather
+       * than 12. That is CSS's `farthest-corner`, which is what
+       * `radial-gradient(circle at center, …)` defaults to, and `gradientCss`
+       * previews with exactly that. Using 12 here would make the swatch and the
+       * glyph disagree about where the last stop lands, which is the one thing
+       * this descriptor exists to prevent.
+       */
+      r: String(Number(((ICON_GRID / 2) * Math.SQRT2).toFixed(3))),
+    },
+    /*
+     * Sorted, because SVG does not sort for you , it CLAMPS. A stop whose
+     * offset is lower than the one before it is silently rendered at the
+     * previous stop's offset, so dragging one stop past another produces a hard
+     * edge instead of a reorder, and nothing anywhere reports it.
+     */
+    stops: [...gradient.stops]
+      .sort((a, b) => a.offset - b.offset)
+      .map((stop) => ({ offset: `${stop.offset}%`, color: stop.color })),
+  };
+}
+
+/** The `background-image` that previews a gradient in the DOM, for the swatches. */
+export function gradientCss(gradient: GradientConfig): string {
+  const stops = [...gradient.stops]
+    .sort((a, b) => a.offset - b.offset)
+    .map((stop) => `${stop.color} ${stop.offset}%`)
+    .join(', ');
+  /*
+   * CSS and SVG agree on the angle here because `GradientConfig.angle` is stored
+   * in CSS's convention and only converted at the SVG boundary. A radial in CSS
+   * needs `circle at center` spelled out, or it defaults to an ellipse that
+   * matches the swatch's box rather than the circle the SVG will paint.
+   */
+  return gradient.kind === 'radial'
+    ? `radial-gradient(circle at center, ${stops})`
+    : `linear-gradient(${gradient.angle}deg, ${stops})`;
+}
+
+/* ── Animation ────────────────────────────────────────────────────────────── */
+
+export interface AnimationChoice {
+  id: string;
+  label: string;
+  /** The utility to emit, or `null` for "no animation". */
+  className: string | null;
+  /** Shown under the control when the choice needs a caveat. */
+  note?: string;
+}
+
+/**
+ * The animations on offer, and why they are CSS classes rather than Framer.
+ *
+ * `framer-motion` is a required peer of `@velobitsio/ui` and `motion.tsx` exists,
+ * so reaching for it would have been defensible. It is the wrong tool here for
+ * two reasons that both favour the copied snippet:
+ *
+ *  1. **The emitted code stays one attribute.** A Framer version means importing
+ *     `motion`, wrapping the icon, and handing it a variants object , four lines
+ *     that teach nothing about the icon.
+ *  2. **Reduced motion is already handled, globally and for free.** The token
+ *     layer's base block clamps `animation-duration` to 0.01ms and
+ *     `animation-iteration-count` to 1 under
+ *     `@media (prefers-reduced-motion: reduce)`, with `!important`. So every
+ *     entry below honours the preference with no JS, no `usePrefersReducedMotion`
+ *     call, and no `MotionConfig` in the consumer's tree. (That hook stays what
+ *     `motion.tsx` says it is for: imperative decisions Framer cannot see.)
+ *
+ * `animate-spin`, `animate-pulse` and `animate-bounce` are Tailwind's own.
+ * `animate-wiggle` and `animate-draw` are added by the token layer , see the
+ * "icon motion" block in `@velobitsio/tokens/theme.css` , so a consumer who
+ * copies the snippet gets them from the same `@import` that gives them the
+ * palette, rather than from a keyframe they have to go and define.
+ */
+export const ANIMATION_CHOICES: AnimationChoice[] = [
+  { id: 'none', label: 'None', className: null },
+  {
+    id: 'spin',
+    label: 'Spin',
+    className: 'animate-spin',
+    note: 'For work in progress. Pair with a Spinner instead if that is all it means.',
+  },
+  { id: 'pulse', label: 'Pulse', className: 'animate-pulse', note: 'Live, recording, unsaved.' },
+  { id: 'bounce', label: 'Bounce', className: 'animate-bounce' },
+  {
+    id: 'wiggle',
+    label: 'Wiggle',
+    className: 'animate-wiggle',
+    note: 'Invalid input. Loops, so drive it from state rather than leaving it on.',
+  },
+  {
+    id: 'draw',
+    label: 'Draw on',
+    className: 'animate-draw',
+    /*
+     * The caveat is real and belongs on screen, not only in a docblock. Even
+     * timing needs `pathLength="1"` on every path so each one is normalised to
+     * the same nominal length , and `createIcon` renders fixed children, so
+     * there is no prop that can add it. The utility picks a dasharray longer
+     * than any glyph in the set instead, which means a short path finishes early
+     * and a long one late. Fine for a flourish, wrong for choreography.
+     */
+    note: 'Runs once. Timing varies by glyph , see the docs page.',
+  },
+  {
+    id: 'hover-scale',
+    label: 'Scale on hover',
+    // The most useful of the set, and the only one that is a genuine affordance
+    // rather than decoration: an idle animation in a toolbar is noise, a hover
+    // response tells you the thing is interactive.
+    className: 'transition-transform duration-micro ease-out hover:scale-125',
+  },
+  {
+    id: 'hover-spin',
+    label: 'Spin on hover',
+    className: 'transition-transform duration-enter ease-out hover:rotate-180',
+  },
+];
+
+export const DEFAULT_ANIMATION_ID = 'none';
+
+export function findAnimation(id: string): AnimationChoice | undefined {
+  return ANIMATION_CHOICES.find((choice) => choice.id === id);
+}
+
 /* ── Surfaces ─────────────────────────────────────────────────────────────── */
 
 export interface SurfaceChoice {
@@ -103,17 +461,34 @@ export interface SurfaceChoice {
    * `--on-code` / `--on-brand` tokens' entire reason for existing.
    */
   labelClassName: string;
-  /**
-   * The hairline between the hero preview and the size strip under it.
-   *
-   * Named per surface rather than left as `border-border`, and not as
-   * `border-current/15` either , `current` inside the strip is the ICON's colour,
-   * so a lime icon on the lime surface would have drawn an invisible divider. The
-   * on-* tokens exist precisely because they are the one colour guaranteed to be
-   * legible on their surface.
-   */
-  dividerClassName: string;
 }
+
+/*
+ * ── WHY THERE IS NO `dividerClassName` ANY MORE (2026-08-20) ─────────────────
+ *
+ * Each surface used to name a hairline for the rule between the hero preview and
+ * the true-size strip: `border-border` on Page and Panel, `border-on-code/20` and
+ * `border-on-brand/20` on the two pinned surfaces.
+ *
+ * It was reported as "the Brand stage shows two different colours". Sampling the
+ * rendered pixels says otherwise, and the real answer is more interesting than
+ * the bug report: the interior is ONE fill, rgb(200,241,53), 109,572 pixels of
+ * it, and exactly one 1px row of rgb(168,202,50) , which is `--on-brand`
+ * charcoal at α 0.20 composited over lime, to the integer. Neither the hero nor
+ * the strip paints a background at all; both are transparent over `bg-brand`.
+ *
+ * So nothing was two colours. What the eye did was read one dark rule across a
+ * large flat field as a boundary between two SURFACES, because on a saturated
+ * fill a 20%-charcoal hairline is the strongest edge in the frame , far firmer
+ * than `border-border` looks on Page. The divider was correct in code, correct
+ * in intent, and wrong in effect on exactly the two surfaces that needed it
+ * least.
+ *
+ * The strip is now separated by whitespace and by its own captions, which is
+ * enough: it is a row of glyphs with numbers under them, and nothing about it
+ * reads as continuous with the hero above. One surface, one colour, no rule.
+ * (The fill toggle was never involved , `filled` only ever touched the icons.)
+ */
 
 /** The default, and `findSurface`'s fallback , named so neither is an index. */
 export const PAGE_SURFACE: SurfaceChoice = {
@@ -121,7 +496,6 @@ export const PAGE_SURFACE: SurfaceChoice = {
   label: 'Page',
   className: 'bg-bg',
   labelClassName: 'text-muted-foreground',
-  dividerClassName: 'border-border',
 };
 
 /**
@@ -145,21 +519,18 @@ export const SURFACE_CHOICES: SurfaceChoice[] = [
     label: 'Panel',
     className: 'bg-panel',
     labelClassName: 'text-muted-foreground',
-    dividerClassName: 'border-border',
   },
   {
     id: 'code',
     label: 'Code',
     className: 'bg-code',
     labelClassName: 'text-on-code',
-    dividerClassName: 'border-on-code/20',
   },
   {
     id: 'brand',
     label: 'Brand',
     className: 'bg-brand',
     labelClassName: 'text-on-brand',
-    dividerClassName: 'border-on-brand/20',
   },
 ];
 
@@ -200,10 +571,14 @@ export type EndStyle = keyof typeof END_STYLES;
 
 export interface IconConfig {
   size: number;
-  /** A `ColorChoice.id`, or `CUSTOM_COLOR_ID`. */
+  /** A `ColorChoice.id`, or `CUSTOM_COLOR_ID`, or `GRADIENT_COLOR_ID`. */
   colorId: string;
   /** The literal hex, used only when `colorId === CUSTOM_COLOR_ID`. */
   customColor: string;
+  /** The paint server, used only when `colorId === GRADIENT_COLOR_ID`. */
+  gradient: GradientConfig;
+  /** An `AnimationChoice.id`. */
+  animationId: string;
   strokeWidth: number;
   ends: EndStyle;
   /**
@@ -233,6 +608,8 @@ export const DEFAULT_CONFIG: IconConfig = {
   size: 24,
   colorId: 'current',
   customColor: DEFAULT_CUSTOM_COLOR,
+  gradient: DEFAULT_GRADIENT,
+  animationId: DEFAULT_ANIMATION_ID,
   strokeWidth: DEFAULT_STROKE_WIDTH,
   ends: 'round',
   filled: false,
@@ -249,15 +626,51 @@ export function findSurface(surfaceId: string): SurfaceChoice {
   return SURFACE_CHOICES.find((choice) => choice.id === surfaceId) ?? PAGE_SURFACE;
 }
 
-/** The `className` the preview and the emitted JSX both use, if any. */
-export function colorClassName(config: IconConfig): string | undefined {
-  if (config.colorId === CUSTOM_COLOR_ID) return undefined;
-  return findColor(config.colorId)?.className ?? undefined;
+/** `true` when the stroke is a paint server rather than a colour. */
+export function isGradient(config: IconConfig): boolean {
+  return config.colorId === GRADIENT_COLOR_ID;
+}
+
+/**
+ * The `className` the preview and the emitted JSX both use, if any.
+ *
+ * Colour and animation are one string because they land on one attribute. A
+ * gradient contributes no colour class , it paints through `stroke`, not through
+ * the inherited `color` , so only the animation survives in that branch.
+ */
+export function iconClassName(config: IconConfig): string | undefined {
+  const parts = [
+    config.colorId === CUSTOM_COLOR_ID || isGradient(config)
+      ? undefined
+      : findColor(config.colorId)?.className,
+    findAnimation(config.animationId)?.className,
+  ].filter(Boolean);
+  return parts.length ? parts.join(' ') : undefined;
 }
 
 /** The inline `color` the preview and the emitted JSX both use, if any. */
 export function colorStyle(config: IconConfig): { color: string } | undefined {
   return config.colorId === CUSTOM_COLOR_ID ? { color: config.customColor } : undefined;
+}
+
+/**
+ * The `stroke` (and `fill`) override a gradient needs, pointed at `id`.
+ *
+ * Two ids in play on purpose: the live preview passes a `useId()`-derived one so
+ * two dialogs cannot collide, and the snippet passes `GRADIENT_SNIPPET_ID`
+ * because it is going into someone else's file.
+ *
+ * `createIcon` writes `stroke="currentColor"` and `fill="none"` BEFORE spreading
+ * `{...props}`, so both are overridable from a call site , the same mechanism
+ * the `aria-hidden` opt-out relies on.
+ */
+export function gradientPaint(
+  config: IconConfig,
+  id: string,
+): { stroke: string; fill?: string } | undefined {
+  if (!isGradient(config)) return undefined;
+  const paint = `url(#${id})`;
+  return config.filled ? { stroke: paint, fill: paint } : { stroke: paint };
 }
 
 /* ── Code generation ──────────────────────────────────────────────────────── */
@@ -335,11 +748,22 @@ export function toJsx(name: string, config: IconConfig): string {
     props.push(`strokeLinecap="${linecap}"`, `strokeLinejoin="${linejoin}"`);
   }
 
-  // `currentColor`, not the resolved hex: in JSX the fill should track whatever
-  // colour the icon inherits, which is what the stroke already does.
-  if (config.filled) props.push('fill="currentColor"');
+  if (isGradient(config)) {
+    /*
+     * The paint server, by id. `stroke` and `fill` both point at the def the
+     * block above the snippet renders , NOT at `currentColor`, which is the one
+     * case in this dialog where the icon stops inheriting its colour.
+     */
+    const paint = `url(#${GRADIENT_SNIPPET_ID})`;
+    props.push(`stroke="${paint}"`);
+    if (config.filled) props.push(`fill="${paint}"`);
+  } else if (config.filled) {
+    // `currentColor`, not the resolved hex: in JSX the fill should track whatever
+    // colour the icon inherits, which is what the stroke already does.
+    props.push('fill="currentColor"');
+  }
 
-  const className = colorClassName(config);
+  const className = iconClassName(config);
   if (className) props.push(`className="${className}"`);
 
   const style = colorStyle(config);
@@ -350,8 +774,81 @@ export function toJsx(name: string, config: IconConfig): string {
   const oneLine = `<${name} ${props.join(' ')} />`;
   // 100 is the repo's Prettier `printWidth`, so a snippet that would have been
   // reformatted on paste is broken here instead of pretending it fits.
-  if (oneLine.length <= 100) return oneLine;
-  return `<${name}\n${props.map((prop) => `  ${prop}`).join('\n')}\n/>`;
+  const element =
+    oneLine.length <= 100
+      ? oneLine
+      : `<${name}\n${props.map((prop) => `  ${prop}`).join('\n')}\n/>`;
+
+  return isGradient(config) ? `${toGradientDefsJsx(config)}\n\n${element}` : element;
+}
+
+/**
+ * The half of a gradient snippet that is NOT the icon.
+ *
+ * Emitted above the element rather than hidden behind a "you'll also need…"
+ * note, because the failure mode of forgetting it is silent and confusing: an
+ * unresolvable `url(#id)` paints the shape BLACK in most engines rather than
+ * falling back to `currentColor`, so the icon looks broken in a way that does
+ * not point at a missing def.
+ *
+ * `width={0} height={0}` with `position: absolute` rather than `display: none`:
+ * a display-none subtree is not rendered, and Chrome has historically refused to
+ * resolve paint servers inside one. Zero-sized and out of flow costs no layout
+ * and always resolves.
+ */
+export function toGradientDefsJsx(config: IconConfig): string {
+  const { kind, units, vector, radial, stops } = gradientRender(config.gradient);
+
+  /*
+   * `gradientUnits` is written out explicitly and must stay that way. Omitting
+   * it takes SVG's default, `objectBoundingBox`, which DELETES any path whose
+   * bounding box is degenerate , the vertical shaft of an arrow, a plus, a
+   * divider. See GRADIENT_UNITS.
+   */
+  const open =
+    kind === 'radial'
+      ? `    <radialGradient id="${GRADIENT_SNIPPET_ID}" gradientUnits="${units}" cx="${radial.cx}" cy="${radial.cy}" r="${radial.r}">`
+      : `    <linearGradient id="${GRADIENT_SNIPPET_ID}" gradientUnits="${units}" x1="${vector.x1}" y1="${vector.y1}" x2="${vector.x2}" y2="${vector.y2}">`;
+
+  return [
+    '{/* Render this ONCE, anywhere in the app. The icon below points at it by id. */}',
+    '<svg width={0} height={0} aria-hidden="true" style={{ position: \'absolute\' }}>',
+    '  <defs>',
+    open,
+    // `stopColor`, camelCase , this half is JSX. The SVG export writes the
+    // hyphenated `stop-color`, which is why the two emitters are not one.
+    ...stops.map((stop) => `      <stop offset="${stop.offset}" stopColor="${stop.color}" />`),
+    kind === 'radial' ? '    </radialGradient>' : '    </linearGradient>',
+    '  </defs>',
+    '</svg>',
+  ].join('\n');
+}
+
+/**
+ * The `<defs>` block for the EXPORTED file.
+ *
+ * Nearly the same shape as `toGradientDefsJsx` and deliberately not shared with
+ * it: SVG attributes are hyphenated (`stop-color`) while JSX props are camelCase
+ * (`stopColor`), and the indentation differs because one sits inside a `<svg>`
+ * the exporter is building and the other inside a snippet the reader will paste.
+ * Both take their numbers from `gradientRender`, which is the part that must not
+ * drift.
+ */
+function toGradientDefsSvg(config: IconConfig): string {
+  const { kind, units, vector, radial, stops } = gradientRender(config.gradient);
+
+  const open =
+    kind === 'radial'
+      ? `    <radialGradient id="${GRADIENT_SNIPPET_ID}" gradientUnits="${units}" cx="${radial.cx}" cy="${radial.cy}" r="${radial.r}">`
+      : `    <linearGradient id="${GRADIENT_SNIPPET_ID}" gradientUnits="${units}" x1="${vector.x1}" y1="${vector.y1}" x2="${vector.x2}" y2="${vector.y2}">`;
+
+  return [
+    '  <defs>',
+    open,
+    ...stops.map((stop) => `      <stop offset="${stop.offset}" stop-color="${stop.color}" />`),
+    kind === 'radial' ? '    </radialGradient>' : '    </linearGradient>',
+    '  </defs>',
+  ].join('\n');
 }
 
 /**
@@ -370,19 +867,49 @@ export function toJsx(name: string, config: IconConfig): string {
  */
 export function toSvgMarkup(config: IconConfig, paths: string, resolvedColor: string): string {
   const { linecap, linejoin } = END_STYLES[config.ends];
+
+  /*
+   * A gradient stroke is a paint server reference, and the def travels INSIDE
+   * the file. This is the one output where a gradient costs nothing extra: the
+   * exported `.svg` is self-contained, so it renders correctly in Figma, in an
+   * `<img>`, and as a `background-image` , none of which can see a def that
+   * lives elsewhere in a React tree. Contrast `toGradientDefsJsx`, which has to
+   * hand the consumer a second thing to render.
+   */
+  const gradient = isGradient(config);
+  const paint = gradient ? `url(#${GRADIENT_SNIPPET_ID})` : resolvedColor;
+
   const attributes = [
     'xmlns="http://www.w3.org/2000/svg"',
+    /*
+     * ── THE EXPORT KEEPS ITS INTRINSIC SIZE, AND THAT IS A DECISION ──────────
+     *
+     * Opening this file straight in a browser renders a 24px glyph in the corner
+     * of a full-size tab, which reads as a blank page. That is real, and it is
+     * still the right output.
+     *
+     * `width`/`height` are what make an SVG behave like an image everywhere it
+     * is actually USED: an `<img src="…">` takes its intrinsic size from them,
+     * and without them the replaced element falls back to 300x150 and the glyph
+     * is scaled up 12x. Dropping them to make a browser tab look better would
+     * trade the common case for the diagnostic one.
+     *
+     * `viewBox` is present alongside, so the file still scales cleanly whenever
+     * a container does constrain it. Both, not either.
+     */
     `width="${config.size}"`,
     `height="${config.size}"`,
     'viewBox="0 0 24 24"',
     // The fill is a literal when it is on, for the same reason the stroke is: a
     // standalone file has nothing to inherit `currentColor` from.
-    `fill="${config.filled ? resolvedColor : 'none'}"`,
-    `stroke="${resolvedColor}"`,
+    `fill="${config.filled ? paint : 'none'}"`,
+    `stroke="${paint}"`,
     `stroke-width="${config.strokeWidth}"`,
     `stroke-linecap="${linecap}"`,
     `stroke-linejoin="${linejoin}"`,
   ];
+
+  const defs = gradient ? `${toGradientDefsSvg(config)}\n` : '';
 
   /*
    * `paths` arrives as one line of DOM-serialised markup, and it needs two passes
@@ -404,7 +931,7 @@ export function toSvgMarkup(config: IconConfig, paths: string, resolvedColor: st
     .map((line) => `  ${line.trim()}`)
     .join('\n');
 
-  return `<svg\n  ${attributes.join('\n  ')}\n>\n${body}\n</svg>`;
+  return `<svg\n  ${attributes.join('\n  ')}\n>\n${defs}${body}\n</svg>`;
 }
 
 /** `TrashIcon` → `trash-icon.svg`, for the download. */
@@ -440,6 +967,22 @@ export function parseRgb(value: string): [number, number, number] | null {
   const channels = [Number(match[1]), Number(match[2]), Number(match[3])] as const;
   if (channels.some((channel) => !Number.isFinite(channel))) return null;
   return [channels[0], channels[1], channels[2]];
+}
+
+/**
+ * Parses `#rrggbb`, which is what the two gradient stops are.
+ *
+ * A gradient stroke never reaches `getComputedStyle` , the glyph's `color` stays
+ * whatever it inherited while `stroke` points at a paint server , so the
+ * contrast readout cannot read the rendered colour back off the DOM the way it
+ * does for every other choice. It has to measure the stops directly, which means
+ * parsing the literal rather than an `rgb()` string.
+ */
+export function parseHex(value: string): [number, number, number] | null {
+  const match = /^#([0-9a-f]{6})$/i.exec(value.trim());
+  if (!match) return null;
+  const int = parseInt(match[1]!, 16);
+  return [(int >> 16) & 255, (int >> 8) & 255, int & 255];
 }
 
 /** Undoes the sRGB transfer function for one 0–255 channel. */
