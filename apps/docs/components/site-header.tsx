@@ -21,6 +21,19 @@ import { SITE } from '@/lib/site';
 import { DocsSidebarNav } from './docs-sidebar';
 import { SearchCommand } from './search-command';
 
+/**
+ * `Button variant="ghost"` is `text-fg hover:bg-highlight`. Both are theme tokens,
+ * and the header is the one surface in this app that does NOT follow the theme ,
+ * `text-fg` on `bg-chrome` is 1.06:1 in light mode, and `hover:bg-highlight` is
+ * charcoal at alpha 0.05, which darkens an already-dark bar.
+ *
+ * Applied per control instead of becoming a `chrome` Button variant on purpose:
+ * chrome is a property of the container a button happens to sit in, not of the
+ * button, so a variant would let it be selected anywhere and be wrong everywhere
+ * else.
+ */
+const CHROME_GHOST = 'text-chrome-fg hover:bg-chrome-highlight hover:text-chrome-fg';
+
 const NAV = [
   { href: '/docs', label: 'Docs' },
   { href: '/docs/components', label: 'Components' },
@@ -65,11 +78,20 @@ export function SiteHeader() {
 
   return (
     /*
-     * A sticky bar over scrolling content , one of the sanctioned Tier-O glass
-     * surfaces, and the only blurred layer on most routes. `z-sticky` sits BELOW
-     * `z-dropdown` deliberately, or the header would paint over its own menus.
+     * The app-chrome tier , the PLUM bar, in both themes. This was Tier-O glass,
+     * which in light mode meant a near-white bar on a near-white page: the row
+     * carrying the product name and the primary nav read as part of the document
+     * rather than as the frame around it.
+     *
+     * Everything inside therefore uses the `chrome*` foregrounds, NOT `fg` /
+     * `muted-foreground` / `link`. On plum those measure 1.23:1, 1.84:1 and
+     * 1.87:1 , the surface does not flip with the theme, so the theme's own text
+     * tokens do not apply to it. See `SemanticTokens.chrome`.
+     *
+     * `z-sticky` sits BELOW `z-dropdown` deliberately, or the header would paint
+     * over its own menus.
      */
-    <header className="glass sticky top-0 z-sticky border-x-0 border-t-0">
+    <header className="sticky top-0 z-sticky border-b border-chrome-border bg-chrome text-chrome-fg">
       <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center gap-3 px-4 sm:px-6">
         {/*
          * The whole sidebar, in a real SidePanel below the lg breakpoint. Same
@@ -78,7 +100,16 @@ export function SiteHeader() {
          */}
         <SidePanel open={navOpen} onOpenChange={setNavOpen}>
           <SidePanelTrigger asChild>
-            <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation">
+            <Button
+              variant="ghost"
+              size="icon"
+              /* `ghost` is `text-fg hover:bg-highlight` , two theme tokens on a
+                 surface that does not follow the theme. Overridden per control
+                 rather than by adding a Button variant: chrome is a property of
+                 the container, not of the button. */
+              className={cn('lg:hidden', CHROME_GHOST)}
+              aria-label="Open navigation"
+            >
               <MenuIcon />
             </Button>
           </SidePanelTrigger>
@@ -102,27 +133,39 @@ export function SiteHeader() {
           </SidePanelContent>
         </SidePanel>
 
+        {/* `text-chrome-accent` , lime, 8.85:1 on plum. Not `text-link`, which is
+            the light-theme blue step and measures 1.87:1 on this surface. */}
         <Link href="/" className="shrink-0 font-semibold tracking-tight">
-          VeloBits <span className="text-link">UI</span>
+          VeloBits <span className="text-chrome-accent">UI</span>
         </Link>
 
         {/*
          * The current page is signalled THREE ways, and that is not belt-and-
          * braces , it is 1.4.1. A colour shift alone leaves the answer invisible
-         * to anyone who cannot separate `--fg` from `--muted-fg`, and invisible
-         * to a screen reader entirely.
+         * to anyone who cannot separate two greys, and invisible to a screen
+         * reader entirely.
          *
-         *   aria-current="page"   the machine-readable one; the only channel AT has
-         *   text-link             muted → the AA-safe blue step (never `--primary`,
-         *                         which is 3.90:1 on cream and is a FILL colour)
-         *   bg-primary-soft       a filled shape, so colour never carries it alone
+         *   aria-current="page"     the machine-readable one; the only channel AT has
+         *   text-chrome-accent      LIME , the brand accent, 8.85:1 on plum
+         *   bg-chrome-accent-soft   a filled shape, so colour never carries it alone
          *
-         * `bg-primary-soft` + `text-link` is `Badge variant="primary"`, which the
-         * SOFT_CHIP_PAIRS suite gates over the page, the panel and the Tier-S
-         * composite. This header is Tier O, which that suite does not cover, so
-         * it was measured directly: the chip composites to #e4eff7 light /
-         * #163243 dark and `--primary-text` on it holds 5.30–5.49:1 across both
-         * themes and both plausible backdrops. Comfortably over AA.
+         * Every colour here is a `chrome*` token, and none of them is what the
+         * obvious version of this component reaches for:
+         *
+         *   text-link              the LIGHT-theme blue step , 1.87:1 on plum
+         *   text-muted-foreground  the light-theme grey      , 1.84:1 on plum
+         *   hover:bg-highlight     charcoal at alpha 0.05, i.e. DARKENS an already
+         *                          dark bar , invisible
+         *
+         * All three pass every gate they belong to, and all three are wrong here.
+         * That is the reason chrome is a token tier rather than one class on the
+         * header element.
+         *
+         * Measured for the active item: the lime wash composites to #6B493F over
+         * plum and `--chrome-accent` on it holds 6.07:1. One number for both themes,
+         * because the tier is theme-invariant. The hovered inactive item composites
+         * to #663A50, where the muted label is 5.17:1 , so the label promotion in
+         * the hover rule below is a design choice, not a requirement.
          *
          * EVERY item carries the padding, radius and font-weight; only the fill
          * and the text colour change. Nothing is inserted, moved or resized when
@@ -139,8 +182,8 @@ export function SiteHeader() {
                 className={cn(
                   'rounded-md px-3 py-1.5 font-medium transition-colors duration-micro ease-out',
                   current
-                    ? 'bg-primary-soft text-link'
-                    : 'text-muted-foreground hover:bg-highlight hover:text-fg',
+                    ? 'bg-chrome-accent-soft text-chrome-accent'
+                    : 'text-chrome-muted-fg hover:bg-chrome-highlight hover:text-chrome-fg',
                 )}
               >
                 {item.label}
@@ -151,7 +194,12 @@ export function SiteHeader() {
 
         <div className="ms-auto flex items-center gap-2">
           <SearchCommand />
-          <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className={cn('hidden sm:inline-flex', CHROME_GHOST)}
+          >
             <a href={SITE.repo} target="_blank" rel="noreferrer noopener">
               GitHub
             </a>
@@ -171,7 +219,13 @@ export function SiteHeader() {
            * The label is static for the same reason: "Switch to dark theme" would
            * be wrong on the server in exactly the cases the icon was.
            */}
-          <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            className={CHROME_GHOST}
+            aria-label="Toggle theme"
+          >
             <SunIcon className="hidden dark:block" />
             <MoonIcon className="dark:hidden" />
           </Button>

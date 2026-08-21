@@ -18,8 +18,8 @@
  *
  * `--border` and `--field-border` are OPAQUE, and that is deliberate. A
  * translucent border composites against whatever sits beneath it, so a single
- * token renders as several different colours , #2E2E2E over the page but
- * #343435 inside a card. The borders are supposed to *match*. The two glass
+ * token renders as several different colours , #373636 over the page but
+ * a lighter composite inside a card. The borders are supposed to *match*. The two glass
  * borders are the sanctioned exceptions: `--glass-border` because an overlay
  * has no fixed backdrop by definition, and `--glass-surface-border` because it
  * has to track whatever its own translucent surface composites to , an opaque
@@ -28,46 +28,46 @@
 
 :root {
   /* ── warm neutral ramp (generated , see scripts/generate-neutrals.ts) ───── */
-  --neutral-50: #fcf5f2;
-  --neutral-100: #f2ebe8;
-  --neutral-200: #e4dedb;
-  --neutral-300: #d0cbc7;
-  --neutral-400: #a5a39f;
-  --neutral-500: #82827e;
-  --neutral-600: #646562;
-  --neutral-700: #464745;
-  --neutral-750: #383635;
-  --neutral-800: #2c2d2c;
-  --neutral-900: #1a1b1a;
-  --neutral-925: #151615;
-  --neutral-950: #0e0f0e;
+  --neutral-50: #f8f6f3;
+  --neutral-100: #eeece9;
+  --neutral-200: #e1dfdc;
+  --neutral-300: #c4c2c0;
+  --neutral-400: #a4a3a1;
+  --neutral-500: #838180;
+  --neutral-600: #61605f;
+  --neutral-700: #474645;
+  --neutral-750: #373636;
+  --neutral-800: #2d2d2c;
+  --neutral-900: #1b1b1a;
+  --neutral-925: #161615;
+  --neutral-950: #0f0f0e;
 
   /* ── surfaces ───────────────────────────────────────────────────────────── */
-  --bg: #f4edea;
-  --bg2: #f2ebe8;
+  --bg: #efedea;
+  --bg2: #e1dfdc;
   --panel: #ffffff;
   --elevated: #ffffff;
 
   /* ── text ───────────────────────────────────────────────────────────────── */
   --fg: #2a2b2a;
-  --muted-fg: #646562;
+  --muted-fg: #61605f;
   /* Muted text on a glass surface. --muted-fg drops to 3.09:1 over the worst
    * backdrop once glass is composited over it; this step holds 4.92:1. */
-  --muted-on-glass: #464745;
+  --muted-on-glass: #474645;
 
   /* ── lines ──────────────────────────────────────────────────────────────── */
   /* Structural separators. Decorative, so WCAG 1.4.11 does not apply. */
-  --border: #d0cbc7;
+  --border: #c4c2c0;
   /* The edge of an interactive control. 1.4.11 DOES apply , 3.86:1 on panel,
    * 3.33:1 on page. neutral-400 was the intuitive pick and fails at 2.52:1. */
-  --field-border: #82827e;
+  --field-border: #838180;
 
   /* ── brand blue: a fill and a text step, never interchangeable ──────────── */
   --primary: #007acc;
   --primary-hover: #0062a3;
   --on-primary: #ffffff;
   /* Links, inline icons, active nav labels. --primary itself measures 3.90:1 on
-   * the cream page, which fails AA for text. NEVER use --primary for a link. */
+   * the page, which fails AA for text. NEVER use --primary for a link. */
   --primary-text: #0062b3;
   --primary-soft: rgba(0, 122, 204, 0.1);
 
@@ -95,11 +95,11 @@
 
   --ring: #007acc;
   --highlight: rgba(42, 43, 42, 0.05);
-  --overlay: rgba(26, 27, 26, 0.45);
+  --overlay: rgba(27, 27, 26, 0.45);
 
   /* ── status ─────────────────────────────────────────────────────────────── */
-  /* Text steps tuned against the soft-chip COMPOSITE (wash over the cream
-   * page), not the flat page , 12px chip text holds 4.5:1 there. See the
+  /* Text steps tuned against the soft-chip COMPOSITE (wash over the page),
+   * not the flat page , 12px chip text holds 4.5:1 there. See the
    * soft-chip suite in test/contrast.test.ts. */
   --success: #226e25;
   --success-soft: rgba(34, 110, 37, 0.12);
@@ -109,12 +109,12 @@
    * dark mode's is not, which is the whole reason this token exists. */
   --on-danger: #ffffff;
   --danger-hover: #9e231e;
-  --warning: #855600;
-  --warning-soft: rgba(133, 86, 0, 0.12);
+  --warning: #954800;
+  --warning-soft: rgba(149, 72, 0, 0.12);
   /* TEAL, not blue. This was #0062b3 , the same bytes as --primary-text , so
    * "informational" and "this is a link" rendered identically. Hue from chart5,
-   * pushed until it clears text AA inside its own chip: 5.08:1 on the cream page
-   * (the seed #368A8A measures 3.08 there and is not usable as text). */
+   * pushed until it clears text AA inside its own chip: 5.04:1 on the page
+   * (the seed #368A8A measures ~3.1 there and is not usable as text). */
   --info: #256262;
   --info-soft: rgba(37, 98, 98, 0.12);
   /* A category colour with no status reading , for axes whose values are kinds,
@@ -135,6 +135,49 @@
   --chart-4: #af7011;
   --chart-5: #368a8a;
 
+  /* ── app chrome: the top bar , PLUM IN BOTH THEMES ──────────────────────── */
+  /* The light theme's header used to be tier-O glass, i.e. a near-white bar on a
+   * near-white page: the product's identity and its primary navigation read as
+   * part of the document rather than as the frame around it.
+   *
+   * PLUM, not a neutral. The first version of this tier was neutral-800 and read
+   * as near-black , correct, and characterless. The plum seed is already a
+   * sanctioned dark surface (it is --elevated in dark mode), its OKLCH lightness
+   * (0.355) sits ABOVE charcoal's (0.288) so it is genuinely lighter, and it
+   * carries brand rather than only contrast. 196/255 from the light page,
+   * 67/255 from the dark one , nearly 3x the neutral bar's separation there.
+   *
+   * THEME-INVARIANT: the .dark block restates every value identically. Chrome does
+   * not sit against the page, it sits above it, and it is dark in both themes.
+   *
+   * Every value is an existing palette entry: the plum seed, the lime seed, and
+   * three ramp steps. A branded dark bar needs no new colours.
+   *
+   * NONE of the theme's own foregrounds work here. Charcoal --fg on plum is
+   * 1.23:1, --muted-fg 1.84:1, --primary-text 1.87:1. That is why the tier ships
+   * six tokens. */
+  --chrome: #592941;
+  /* 9.80:1. */
+  --chrome-fg: #eeece9;
+  /* Inactive nav labels , 6.50:1. neutral-300, two steps lighter than the
+   * neutral-400 a near-black bar could afford: on plum that step is 4.58:1 flat
+   * and 3.64:1 over --chrome-highlight, so it is not usable here. */
+  --chrome-muted-fg: #c4c2c0;
+  /* The bar's bottom edge , 1.84:1. Decorative, like --border. */
+  --chrome-border: #61605f;
+  /* Hover wash. NOT --highlight, which is charcoal at α 0.05 and would darken an
+   * already-dark bar. Composites to #663A50, where every chrome foreground still
+   * clears AA (fg 7.79, muted 5.17, accent 7.04) , so promoting a hovered label
+   * to --chrome-fg is optional here. On the old near-black bar muted-over-wash was
+   * 4.25:1 and the promotion was mandatory. */
+  --chrome-highlight: rgba(255, 255, 255, 0.08);
+  /* The active nav item, as text over --chrome-accent-soft. LIME , 8.85:1 flat,
+   * 6.07:1 over its own wash. The brand pair, both seeds. NOT --primary-text
+   * (1.87:1 here) and not the dark blue step (4.75:1); in dark mode --accent-text
+   * is already lime, so this is an existing pairing reused, not a new one. */
+  --chrome-accent: #c8f135;
+  --chrome-accent-soft: rgba(200, 241, 53, 0.16);
+
   /* ── glass, tier O: overlays only , see css/glass.css ───────────────────── */
   /* α 0.85. The measured floor for body text over the worst backdrop in the
    * palette is 0.72; the test suite fails if a tier drops below it. */
@@ -143,22 +186,30 @@
   --glass-border: rgba(42, 43, 42, 0.1);
 
   /* ── glass, tier S: component surfaces (Card, Panel, Sidebar, TopBar) ───── */
-  /* #FFFAF7 is oklch(0.99 0.0085 44.9) , neutral-50's own hue and chroma one
-   * notch further up the ramp's warm axis. It has to be TINTED: plain white at
-   * this alpha composites to #FDFCFC over the page, 3/255 from the opaque
-   * --panel, so the blur costs a repaint and changes nothing. This tint
-   * composites to #FDF8F5 , 11/255 off the page, 10/255 off the panel.
-   * fg 13.48:1, --muted-fg 5.57:1 (so NOT --muted-on-glass on this tier).
+  /* #FCFAF8 is oklch(0.9855 0.0035 74) , the neutral ramp's own hue and chroma,
+   * one notch above neutral-50. It has to be TINTED: plain white at this alpha
+   * composites to #FDFCFC over the page, 3/255 from the opaque --panel, so the
+   * blur costs a repaint and changes nothing. This tint composites to #FAF8F6 ,
+   * 12/255 off the page, 9/255 off the panel.
+   * fg 13.42:1, --muted-fg 5.92:1 (so NOT --muted-on-glass on this tier).
+   *
+   * BOTH STOPS MOVED DOWN when the palette was de-pinked, and the reason is worth
+   * keeping: the old pair got its separation from the page's pink cast on the BLUE
+   * channel. The gate takes the max over channels, so a warm tint over a warmer
+   * page passed on blue alone while being nearly identical in LUMINANCE. With the
+   * ramp at chroma 0.0045 there is no chroma lever left, so this tier is now
+   * separated by lightness , which is what "raised" actually means.
    *
    * TWO STOPS, and they are separate variables on purpose: glass.css composes
    * them into the gradient, and the perceptibility gate measures each one over
    * the page. A gradient written as a single value would be opaque to that gate,
-   * and the stop it would hide is the far one , the stop that sits ON the floor.
-   * The far stop composites to #FCF5F0: 8/255 off the page (the floor exactly),
-   * 15/255 off the panel. 5/255 of separation is all light mode has; see the
-   * docblock on GlassSurfaceTier.surfaceBottom for why that still reads. */
-  --glass-surface-bg-top: rgba(255, 250, 247, 0.85);
-  --glass-surface-bg-bottom: rgba(253, 246, 241, 0.85);
+   * and the stop it would hide is the far one , the stop nearest the floor.
+   * The far stop composites to #F7F5F3: 9/255 off the page (a step of margin,
+   * where the old far stop sat exactly ON the floor), 12/255 off the panel. 3/255
+   * of separation between the stops; see the docblock on
+   * GlassSurfaceTier.surfaceBottom for why that still reads. */
+  --glass-surface-bg-top: rgba(252, 250, 248, 0.85);
+  --glass-surface-bg-bottom: rgba(248, 246, 244, 0.85);
   /* 1.81:1 over that composite , deliberately FIRMER than what --border shows
    * on --panel (1.61:1), because the light tint is capped by the gate and the
    * edge has to carry the difference. The tier-O border at α 0.10 measures
@@ -170,11 +221,11 @@
    * Raising GLASS_SPECULAR_ALPHA does not change that, which is why the
    * asymmetry survives the re-tune. */
   --glass-surface-highlight: transparent;
-  /* Bottom-weighted, so the surface reads as raised off the cream page rather
+  /* Bottom-weighted, so the surface reads as raised off the page rather
    * than recessed into it. Three stops, not two: a 1px contact shadow for the
    * edge, a short mid stop for near-field separation, and a long soft stop for
    * the actual lift. Shadows are the one lever with no contrast ceiling , black
-   * at α 0.08 already moves the cream page 20/255 , and the previous two-stop
+   * at α 0.08 already moves the page 20/255 , and the previous two-stop
    * ramp was using a small fraction of that. */
   --glass-surface-shadow:
     0 1px 2px rgba(42, 43, 42, 0.06), 0 4px 10px -3px rgba(42, 43, 42, 0.1),
@@ -208,7 +259,9 @@
   --page-texture-dot: rgba(42, 43, 42, 0.03);
   /* The plum seed , a non-blue hue under everything. 5/255 at the bloom's peak.
    * The binding constraint on both light layers is --muted-fg where they STACK:
-   * #EAE2E0 at 4.60:1 against AA's 4.5. Deepening either fails there first. */
+   * #E5E2E0 at 4.87:1 against AA's 4.5. Deepening either fails there first ,
+   * the headroom is 0.37 rather than 0.10 only because --muted-fg went darker
+   * when --bg2 deepened. */
   --page-texture-field: rgba(89, 41, 65, 0.025);
   /* Theme-independent, and the only texture value that is not a colour. 48px
    * matches velobits-website, whose grid is why its glass always read correctly. */
@@ -228,25 +281,25 @@ body.dark {
    * to fit inside. Every dark pair measured against the page improved , a
    * darker page can only help light-on-dark text , and --panel could not move
    * the other way (at #2E2F2E `primary fill vs panel` falls to 2.98:1). */
-  --bg: #151615;
-  --bg2: #2c2d2c;
-  --panel: #2c2d2c;
+  --bg: #161615;
+  --bg2: #2d2d2c;
+  --panel: #2d2d2c;
   /* Plum, not a lighter grey. Its OKLCH lightness (0.355) sits ABOVE
    * charcoal's (0.288), so it reads as elevation while staying branded. */
   --elevated: #592941;
 
-  --fg: #f2ebe8;
-  --muted-fg: #a5a39f;
-  --muted-on-glass: #e4dedb;
+  --fg: #eeece9;
+  --muted-fg: #a4a3a1;
+  --muted-on-glass: #e1dfdc;
 
   /* neutral-750 exists for this one token. #2E2E2E , the value this palette
    * inherited from the dashboard app , was tuned against that app's darker
-   * #252526 panel; against #2C2D2C it lands at 1.02:1, i.e. an invisible
-   * border. */
-  --border: #383635;
+   * #252526 panel; against this palette's #2D2D2C it lands at ~1.02:1, i.e. an
+   * invisible border. */
+  --border: #373636;
   /* Same value as light mode: neutral-500 is the ONLY ramp step clearing 3:1
    * against both themes' surfaces. */
-  --field-border: #82827e;
+  --field-border: #838180;
 
   --primary: #007acc;
   --primary-hover: #1177bb;
@@ -271,8 +324,8 @@ body.dark {
   --on-code: #7df3b1;
 
   --ring: #3094e8;
-  --highlight: rgba(242, 235, 232, 0.06);
-  --overlay: rgba(14, 15, 14, 0.6);
+  --highlight: rgba(238, 236, 233, 0.06);
+  --overlay: rgba(15, 15, 14, 0.6);
 
   /* The washes run thinner than light mode (0.12): in dark mode a wash
    * LIGHTENS its backdrop, and the soft-chip composite over the panel is where
@@ -305,9 +358,18 @@ body.dark {
   --chart-4: #b37519;
   --chart-5: #3b8f8e;
 
+  /* ── app chrome , IDENTICAL to light, deliberately. See the light block. ─── */
+  --chrome: #592941;
+  --chrome-fg: #eeece9;
+  --chrome-muted-fg: #c4c2c0;
+  --chrome-border: #61605f;
+  --chrome-highlight: rgba(255, 255, 255, 0.08);
+  --chrome-accent: #c8f135;
+  --chrome-accent-soft: rgba(200, 241, 53, 0.16);
+
   /* #1E1F1E, NOT neutral-900. Tier O's dark surface used to BE the page token,
-   * so a Popover or DropdownMenu composited to exactly #1A1B1A over an #1A1B1A
-   * page , 0/255, carried entirely by a 1.33:1 border. The perceptibility gate
+   * so a Popover or DropdownMenu composited to exactly the page colour over that
+   * same page , 0/255, carried entirely by a 1.33:1 border. The perceptibility gate
    * never saw it because that gate only covered tier S; it now covers both.
    * This value composites 8/255 off the page and still holds fg 5.53:1 /
    * --muted-on-glass 4.89:1 against the worst of the seven backdrops. */

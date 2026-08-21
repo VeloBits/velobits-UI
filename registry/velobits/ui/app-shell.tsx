@@ -276,8 +276,11 @@ function AppShell({
 }
 
 export interface AppShellHeaderProps extends React.ComponentProps<'header'> {
-  /** Tier-O glass (the default) or the opaque panel. */
-  surface?: 'glass' | 'panel';
+  /**
+   * `chrome` (the default) , the dark app bar. Tier-O glass, or the opaque panel,
+   * for a shell that wants the bar to read as part of the document instead.
+   */
+  surface?: 'chrome' | 'glass' | 'panel';
 }
 
 /**
@@ -292,7 +295,27 @@ export interface AppShellHeaderProps extends React.ComponentProps<'header'> {
  * bar", and raising the dropdown to fix it starts an arms race with the modal
  * and toast layers.
  *
- * ## Tier O, and it is the one place in the shell that earns a blur
+ * ## Why the default is `chrome` and not glass
+ *
+ * It was glass, and in light mode that made the bar a near-white strip on a
+ * near-white page: the row carrying the product's identity and its primary
+ * navigation read as the first paragraph of the document rather than as the frame
+ * around it. The app had no chrome, which is most of what separates "an
+ * application" from "a web page".
+ *
+ * `chrome` is the PLUM seed, in BOTH themes , see the docblock on
+ * `SemanticTokens.chrome`. The consequence for anything rendered inside this
+ * header: **none of the ordinary foreground utilities apply.** On plum, `text-fg`
+ * is 1.23:1, `text-muted-foreground` 1.84:1 and `text-link` 1.87:1. Use
+ * `text-chrome-fg`, `text-chrome-muted-fg`, and `text-chrome-accent` (lime, at
+ * 8.85:1) for the current item. `hover:bg-chrome-highlight` is safe with any of
+ * them.
+ *
+ * `surface="glass"` and `surface="panel"` are still here for a shell that wants
+ * the bar to belong to the document , a docs reader, a marketing page.
+ *
+ * ## Tier O, which `surface="glass"` selects, is the one place in the shell that
+ * earns a blur
  *
  * Page content genuinely passes underneath a sticky bar, so its backdrop is
  * unknowable , which is the definition of Tier O, and why `.glass` steps muted
@@ -318,15 +341,15 @@ export interface AppShellHeaderProps extends React.ComponentProps<'header'> {
  * `box-shadow` is a plain drop shadow. Doing the same to a Tier-S component would
  * delete the inset specular highlight that is dark mode's entire material.
  */
-function AppShellHeader({ className, surface = 'glass', ...props }: AppShellHeaderProps) {
+function AppShellHeader({ className, surface = 'chrome', ...props }: AppShellHeaderProps) {
   return (
     <header
       data-slot="app-shell-header"
       className={cn(
         'sticky top-0 z-sticky flex h-13 shrink-0 items-center gap-2 px-3 sm:px-4',
-        surface === 'glass'
-          ? 'glass border-x-0 border-t-0 shadow-sm'
-          : 'border-b border-border bg-panel',
+        surface === 'chrome' && 'border-b border-chrome-border bg-chrome text-chrome-fg',
+        surface === 'glass' && 'glass border-x-0 border-t-0 shadow-sm',
+        surface === 'panel' && 'border-b border-border bg-panel',
         className,
       )}
       {...props}

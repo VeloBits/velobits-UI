@@ -23,9 +23,9 @@
  * ── WHY TIER S IS TINTED, AND WHY IT IS ASYMMETRIC ──────────────────────────
  *
  * Putting `.glass` on a Card is a NO-OP. Composited over the flat page, white
- * at α 0.85 over cream #F4EDEA gives #FDFCFC , 3/255 from the opaque #FFFFFF
+ * at α 0.85 over the light page #EFEDEA gives #FDFCFC , 3/255 from the opaque #FFFFFF
  * panel , and blurring a uniform page returns that same uniform page. Dark is
- * the same story: #2C2D2C at α 0.85 over #1A1B1A gives #292A29, also 3/255 off
+ * the same story: the dark panel at α 0.85 over the dark page lands 3/255 off
  * the panel. The blur buys a backdrop repaint and zero visual change.
  *
  * So Tier S is TINTED off both the page and the panel (10-11/255 in light,
@@ -35,19 +35,19 @@
  *
  *   dark   the specular highlight is the material , a lit top edge, a 2.18:1
  *          border, and (since 2026-08-06) a REAL drop shadow.
- *   light  NO highlight. The material is the tint (#FFFAF7 → composite
- *          #FDF8F5), a firmer 1.81:1 hairline , stronger than what `--border`
+ *   light  NO highlight. The material is the tint (#FCFAF8 → composite
+ *          #FAF8F6), a firmer 1.81:1 hairline , stronger than what `--border`
  *          shows on `--panel` (1.61:1), where the tier-O border manages only
  *          1.21:1 , and a bottom-weighted shadow so the surface reads as raised
- *          off the cream.
+ *          off the page.
  *
  * ── WHY THE TINT CANNOT SIMPLY BE PUSHED FURTHER ────────────────────────────
  *
  * A tier-S composite must clear 8/255 from the page BELOW it and from the
  * opaque `--panel` ABOVE it, so the page↔panel distance is the entire budget.
- * In light the composite is boxed between cream and pure white and is already
+ * In light the composite is boxed between the page and pure white and is already
  * at its optimum , every one of the 3,303 legal integer composites was
- * enumerated, and none on the warm axis beats #FDF8F5's 11/10. Cooling the
+ * enumerated, and none on the warm axis beats #FAF8F6's 12/9. Cooling the
  * tint moves it TOWARD the neutral panel, which the panel side then rejects.
  *
  * Dark had 18/255 to work with, leaving a legal window of exactly three

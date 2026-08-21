@@ -132,16 +132,123 @@ export interface SemanticTokens {
   chart3: string;
   chart4: string;
   chart5: string;
+  /**
+   * App chrome , the top bar surface. **The plum seed, in BOTH themes.**
+   *
+   * ## Why chrome is its own tier
+   *
+   * Before this, the header was Tier-O glass, so in light mode it was a
+   * near-white bar on a near-white page: the app had no visual frame, and the
+   * strip carrying the product's identity and its primary navigation looked like
+   * a piece of the document. A dark bar over a light page is what separates
+   * "chrome" from "content", and it is the single change that does most to make a
+   * light theme read as an application rather than a web page.
+   *
+   * ## Why plum, and not a neutral
+   *
+   * The first version of this tier was `neutral-800`, and it read as near-black:
+   * correct, and characterless. Plum is the palette's own answer , it is already
+   * sanctioned as a dark surface (`elevated` in dark mode), its OKLCH lightness
+   * (0.355) sits ABOVE charcoal's (0.288) so it is genuinely lighter than the
+   * neutral it replaces, and it carries brand rather than just contrast.
+   *
+   * It also unlocks the pairing the neutral bar could not have:
+   * {@link SemanticTokens.chromeAccent} is **lime**, and lime on plum is 8.85:1.
+   * That is the VeloBits brand pair, both seeds, at high contrast, on the one
+   * surface in the product whose job is to say whose product this is. The blue
+   * step a grey bar needs (`blueSteps.textDark`, 4.75:1 on plum) is dimmer *and*
+   * off-brand.
+   *
+   * ## Why theme-INVARIANT, when nothing else here is
+   *
+   * Every other surface flips because it has to stay legible against a page that
+   * flips. Chrome does not sit against the page , it sits *above* it, and it is
+   * dark in both themes, so the same value works in both:
+   *
+   *   light  over a `#EFEDEA` page , 196/255. Unmistakably a frame.
+   *   dark   over a `#161615` page ,  67/255, reading as raised chrome. (Nearly
+   *          three times the separation the neutral bar had, which is the second
+   *          thing plum buys: a chromatic bar cannot be confused with the page.)
+   *
+   * That it equals dark mode's `elevated` is not a collision , both are "plum as
+   * a dark surface", which is what the seed is for. They never abut.
+   *
+   * The consequence worth knowing: **none of the theme's text tokens work on it in
+   * light mode.** Charcoal `fg` on plum is 1.23:1, `mutedFg` 1.84:1, `primaryText`
+   * 1.87:1. Every foreground that lands on chrome needs the `chrome*` token beside
+   * it, which is why this tier ships six tokens rather than one.
+   */
+  chrome: string;
+  /** Text and icons on `chrome` , 9.80:1. Never `fg`, which is 1.23:1 there. */
+  chromeFg: string;
+  /**
+   * Secondary text on `chrome` (inactive nav labels) , 6.50:1.
+   *
+   * `neutral-300`, two steps lighter than the `neutral-400` a near-black bar could
+   * afford. On plum that step measures 4.58:1 flat and drops to 3.64:1 over
+   * {@link SemanticTokens.chromeHighlight}, so it is not usable here at all.
+   */
+  chromeMutedFg: string;
+  /** The bar's bottom edge , 1.84:1. Decorative, like `border`. */
+  chromeBorder: string;
+  /**
+   * Hover wash on an otherwise transparent chrome control. `highlight` cannot be
+   * reused here: it is charcoal at α 0.05, i.e. it DARKENS, and chrome is already
+   * dark.
+   *
+   * Composites to `#663A50`, where every chrome foreground still clears AA ,
+   * `chromeFg` 7.79:1, `chromeMutedFg` 5.17:1, `chromeAccent` 7.04:1. That is a
+   * property of the `neutral-300` muted step and worth stating, because it is what
+   * makes hover a free change here: a hovered item MAY promote its label to
+   * `chromeFg`, and nothing breaks if it does not. The near-black version of this
+   * tier had no such slack (muted over the wash was 4.25:1, under AA), so the
+   * promotion was mandatory and the fill and text had to move together.
+   */
+  chromeHighlight: string;
+  /**
+   * The active nav item on `chrome`: this as the text, `chromeAccentSoft` as the
+   * fill. **Lime** , 8.85:1 flat, 6.07:1 over its own wash, which is the pairing
+   * an active item actually renders.
+   *
+   * Note what this is NOT. `primaryText` is the light-theme blue step and measures
+   * 1.87:1 here; `blueSteps.textDark` manages 4.75:1 and is the value a grey bar
+   * would have to use. Lime beats both by a wide margin on plum, and in dark mode
+   * `accentText` is already lime , so this is the palette's existing
+   * lime-on-a-dark-plum-surface pairing, reused rather than invented.
+   */
+  chromeAccent: string;
+  /** The active nav item's fill , see {@link SemanticTokens.chromeAccent}. */
+  chromeAccentSoft: string;
 }
 
 export const light: SemanticTokens = {
-  bg: seed.cream,
-  bg2: neutral[100],
+  bg: seed.paper,
+  // neutral-200, NOT neutral-100 , and this is the light theme's second
+  // structural fix after the ramp itself.
+  //
+  // At neutral-100 this token measured **2/255** from the page. `--bg2` is the
+  // recessed surface: a table header, an inset well, `Button variant="secondary"`,
+  // and everything shadcn's `--color-muted`/`--color-secondary` paints. All of
+  // them were invisible against the page, so a table header read as body rows and
+  // a secondary button read as a ghost one. Nothing caught it for the same reason
+  // the invisible glass tier went unnoticed for a release , a surface that is the
+  // same colour as its backdrop has *better* text contrast, not worse.
+  //
+  // One step down is 14/255 from the page and 30/255 from `--panel`: a real
+  // recess in both directions. It costs one thing, and `neutral[600]` pays it ,
+  // muted text on this surface is 4.44:1 at the old L, so the ramp step moved.
+  bg2: neutral[200],
   panel: '#FFFFFF',
   elevated: '#FFFFFF',
   fg: seed.charcoal,
   mutedFg: neutral[600],
   mutedOnGlass: neutral[700],
+  // neutral-300, whose L dropped 0.845 → 0.815 for this token: 1.81:1 on
+  // `--panel`, up from 1.60:1. A card outline and a table rule were faint enough
+  // that a Card was carried by its shadow alone, which is most of what made the
+  // light theme read as unfinished. Decorative, so WCAG 1.4.11 does not gate it
+  // and this is purely a judgement about crispness , see `fieldBorder` below for
+  // the half that IS gated.
   border: neutral[300],
   // neutral-500 is the ONLY ramp step that clears 3:1 against both this theme's
   // surfaces AND the dark theme's, which is why one value serves both. The
@@ -163,10 +270,10 @@ export const light: SemanticTokens = {
   onCode: '#7DF3B1',
   ring: seed.blue,
   highlight: 'rgba(42, 43, 42, 0.05)',
-  overlay: 'rgba(26, 27, 26, 0.45)',
+  overlay: 'rgba(27, 27, 26, 0.45)',
   // The status text steps are tuned against the WORST composite they sit on,
   // not against the page: a soft chip (`bg-*-soft text-*`) flattens its wash
-  // over the cream page, and 12px chip text holds the 4.5:1 target there ,
+  // over the page, and 12px chip text holds the 4.5:1 target there ,
   // the soft-chip suite in `test/contrast.test.ts`. That is why `success` is
   // #226E25 and not the flat-pair-sufficient #2B762D (4.16:1 inside the chip),
   // and the same one-step darkening applies to `danger` and `warning`. Each
@@ -179,10 +286,20 @@ export const light: SemanticTokens = {
   // is not, which is the whole reason this token exists.
   onDanger: '#FFFFFF',
   dangerHover: '#9E231E',
-  warning: '#855600',
-  warningSoft: 'rgba(133, 86, 0, 0.12)',
+  // An amber, at last. `#855600` is hue 72.7° at chroma 0.105, which is not a
+  // warning colour , it is **olive-brown**, and a brown chip beside a red one
+  // reads as "old" rather than as "caution". This is hue 62° at chroma 0.132: the
+  // same lightness band as every other status token, more chroma, rotated toward
+  // orange. It measures BETTER than the value it replaces inside its own chip
+  // (4.72:1 against 4.58:1) because the extra chroma buys more separation from
+  // the wash than the hue rotation costs.
+  //
+  // Still ΔE 0.088 from `danger` in OKLab, so "caution" and "destructive" remain
+  // distinguishable , the constraint that keeps this from going further orange.
+  warning: '#954800',
+  warningSoft: 'rgba(149, 72, 0, 0.12)',
   // Teal, not blue , this used to be `blueSteps.text`, the same bytes as
-  // `primaryText`. 5.08:1 inside its own chip on the cream page.
+  // `primaryText`. 5.04:1 inside its own chip on the page.
   info: tealSteps.text,
   infoSoft: 'rgba(37, 98, 98, 0.12)',
   rose: roseSteps.text,
@@ -192,6 +309,18 @@ export const light: SemanticTokens = {
   chart3: '#BC5F8D',
   chart4: '#AF7011',
   chart5: '#368A8A',
+  // The chrome tier. EVERY value is an existing palette entry doing a second job:
+  // the plum seed, the lime seed, three ramp steps. A branded dark bar needs no
+  // new colours , it needs the two seeds the palette already reserves for dark
+  // surfaces and dark-surface accents. Restated identically in the dark block
+  // below rather than inherited; see `code`/`onCode` for the same discipline.
+  chrome: seed.plum,
+  chromeFg: neutral[100],
+  chromeMutedFg: neutral[300],
+  chromeBorder: neutral[600],
+  chromeHighlight: 'rgba(255, 255, 255, 0.08)',
+  chromeAccent: seed.lime,
+  chromeAccentSoft: 'rgba(200, 241, 53, 0.16)',
 };
 
 export const dark: SemanticTokens = {
@@ -235,8 +364,8 @@ export const dark: SemanticTokens = {
   code: '#101828',
   onCode: '#7DF3B1',
   ring: blueSteps.ringDark,
-  highlight: 'rgba(242, 235, 232, 0.06)',
-  overlay: 'rgba(14, 15, 14, 0.60)',
+  highlight: 'rgba(238, 236, 233, 0.06)',
+  overlay: 'rgba(15, 15, 14, 0.60)',
   // The four status washes run THINNER than light mode's story would suggest
   // (0.12, down from 0.16): in dark mode a wash LIGHTENS its backdrop, and the
   // soft-chip composite over the panel is where these pairs bottom out , the
@@ -269,6 +398,16 @@ export const dark: SemanticTokens = {
   chart3: '#C06492',
   chart4: '#B37519',
   chart5: '#3B8F8E',
+  // Identical to light, deliberately , see the docblock on `chrome`. Chrome is
+  // dark in both themes, so the tier does not flip; it is restated rather than
+  // omitted so that editing one half cannot silently change the other.
+  chrome: seed.plum,
+  chromeFg: neutral[100],
+  chromeMutedFg: neutral[300],
+  chromeBorder: neutral[600],
+  chromeHighlight: 'rgba(255, 255, 255, 0.08)',
+  chromeAccent: seed.lime,
+  chromeAccentSoft: 'rgba(200, 241, 53, 0.16)',
 };
 
 export const themes = { light, dark } as const;

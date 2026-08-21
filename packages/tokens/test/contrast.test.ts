@@ -5,6 +5,7 @@ import { GLASS_ALPHA_FLOOR, GLASS_SPECULAR_ALPHA, glass } from '../src/glass';
 import { worstCaseBackdrops } from '../src/palette';
 import { themes, type SemanticTokens, type ThemeName } from '../src/semantic';
 import {
+  CHROME_COMPOSITE_PAIRS,
   CONTRAST_EXEMPT,
   CONTRAST_PAIRS,
   DISTINCT_ROLE_PAIRS,
@@ -14,6 +15,7 @@ import {
   ROLE_DISTINCTION_FLOOR,
   SOFT_CHIP_PAIRS,
   TARGET,
+  resolveChromeComposite,
   resolveGlassOverlay,
   resolveGlassSurface,
   resolvePair,
@@ -197,10 +199,13 @@ describe('the specific claims the palette was designed around', () => {
    * palette's *shape* rests on. If any of them moves, a documented design
    * decision has silently changed meaning.
    */
-  it('blue fails as text on cream, which is why --primary-text exists', () => {
-    // 3.90:1 , the whole reason `primary` is a fill-only token.
-    expect(round2(contrastRatio('#007ACC', '#F4EDEA'))).toBe(3.9);
-    expect(contrastRatio('#007ACC', '#F4EDEA')).toBeLessThan(TARGET.text);
+  it('blue fails as text on the page, which is why --primary-text exists', () => {
+    // 3.86:1 , the whole reason `primary` is a fill-only token. Written against
+    // `themes.light.bg` rather than a hex literal: the claim is about the PAGE, and
+    // a literal here is how this assertion came to quote a page colour that had
+    // been replaced (it read `#F4EDEA` for a release after the seed changed name).
+    expect(round2(contrastRatio(themes.light.primary, themes.light.bg))).toBe(3.86);
+    expect(contrastRatio(themes.light.primary, themes.light.bg)).toBeLessThan(TARGET.text);
   });
 
   it('blue works as a fill with white on it', () => {
@@ -212,12 +217,12 @@ describe('the specific claims the palette was designed around', () => {
     // White on lime is the mistake this number exists to forbid.
     expect(round2(contrastRatio('#FFFFFF', '#C8F135'))).toBe(1.31);
     // And lime is never text, never a border, never a focus ring in light mode.
-    expect(round2(contrastRatio('#C8F135', '#F4EDEA'))).toBe(1.13);
+    expect(round2(contrastRatio(themes.light.brand, themes.light.bg))).toBe(1.12);
   });
 
   it('a lime fill cannot be a lone graphical indicator in light mode', () => {
     /**
-     * 1.13:1 against the cream page , far below the 3:1 that WCAG 1.4.11 asks of
+     * 1.12:1 against the light page , far below the 3:1 that WCAG 1.4.11 asks of
      * a graphical object conveying information. So in LIGHT mode:
      *
      *   fine    a badge or button, where the charcoal text inside (10.89:1) is
@@ -240,11 +245,13 @@ describe('the specific claims the palette was designed around', () => {
   it('plum is a dark SURFACE, not a dark accent', () => {
     expect(round2(contrastRatio('#592941', '#2A2B2A'))).toBe(1.23);
     // Its real light-mode job:
-    expect(round2(contrastRatio('#582840', '#F4EDEA'))).toBe(10.12);
+    expect(round2(contrastRatio(themes.light.accentText, themes.light.bg))).toBe(10.03);
   });
 
   it('the blue text steps clear AA in their own theme', () => {
-    expect(contrastRatio('#0062B3', '#F4EDEA')).toBeGreaterThanOrEqual(TARGET.text);
+    expect(contrastRatio(themes.light.primaryText, themes.light.bg)).toBeGreaterThanOrEqual(
+      TARGET.text,
+    );
     expect(contrastRatio('#4AACFF', themes.dark.bg)).toBeGreaterThanOrEqual(TARGET.text);
   });
 
@@ -372,9 +379,9 @@ describe('THE PERCEPTIBILITY GATE , tier-S glass is not an opaque panel in disgu
    * sweep reports green while the feature does nothing.
    *
    * The failure being prevented is specific and was the first attempt at this
-   * tier: white at α 0.85 over the cream page composites to #FDFCFC, 3/255 from
-   * the opaque #FFFFFF panel, and #2C2D2C at α 0.85 over the dark page gives
-   * #292A29, also 3/255 off its panel. Blurring a uniform page returns that same
+   * tier: white at α 0.85 over the light page composites to #FDFCFC, 3/255 from
+   * the opaque #FFFFFF panel, and the dark panel at α 0.85 over the dark page
+   * lands 3/255 off its own panel. Blurring a uniform page returns that same
    * uniform page, so the browser pays for a backdrop repaint per surface and the
    * pixels do not move.
    */
@@ -605,6 +612,75 @@ describe('THE PERCEPTIBILITY GATE , tier-S glass is not an opaque panel in disgu
             `has to look the same wherever a card is placed.`,
         ).toBeLessThanOrEqual(4);
       }
+    }
+  });
+});
+
+describe('the chrome composites , a fill and a text token that must move together', () => {
+  /**
+   * The app bar's two translucent washes, measured over `--chrome` rather than in
+   * isolation, in the same spirit as the soft-chip suite.
+   *
+   * The entry worth reading is the hover one. Both `chromeMutedFg` and
+   * `chromeHighlight` pass every flat pair they belong to, and the combination
+   * still fails: the wash lifts the bar to #3E3E3D, where muted chrome text is
+   * 4.25:1. The rule that resolves it , hover promotes the label to `chromeFg` ,
+   * is a relationship between two tokens, which is exactly the class of bug
+   * `DISTINCT_ROLE_PAIRS` exists for and which no single-token gate can see.
+   */
+  for (const pair of CHROME_COMPOSITE_PAIRS) {
+    for (const theme of THEMES) {
+      it(`${theme}: ${pair.label} , ${pair.because}`, () => {
+        const { fg, composite } = resolveChromeComposite(pair, theme);
+        expect(round2(contrastRatio(fg, composite))).toBeGreaterThanOrEqual(TARGET.text);
+      });
+    }
+  }
+
+  it('EVERY chrome foreground survives the hover wash , the slack plum bought', () => {
+    /**
+     * The near-black version of this tier could not say this. Its `neutral-400`
+     * muted step measured 4.25:1 over the wash, so promoting a hovered label to
+     * `chromeFg` was mandatory rather than optional. Plum plus `neutral-300`
+     * clears all three, and this is the assertion that stops that slack being
+     * spent again without anyone noticing.
+     */
+    for (const theme of THEMES) {
+      const t = themes[theme];
+      const wash = parseRgba(t.chromeHighlight);
+      const hovered = compositeOver(wash.hex, t.chrome, wash.alpha);
+      for (const key of ['chromeFg', 'chromeMutedFg', 'chromeAccent'] as const) {
+        expect(
+          contrastRatio(t[key], hovered),
+          `${key} over the chrome hover wash`,
+        ).toBeGreaterThanOrEqual(TARGET.text);
+      }
+    }
+  });
+
+  it('the theme tokens do NOT work on chrome , which is why the tier has its own', () => {
+    // 1.23 / 1.84 / 1.87:1. The mistakes this tier exists to make impossible.
+    for (const key of ['fg', 'mutedFg', 'primaryText'] as const) {
+      expect(contrastRatio(themes.light[key], themes.light.chrome), key).toBeLessThan(TARGET.text);
+    }
+    // And the one that looks safest of all: the dark-theme blue step, which a grey
+    // bar would have had to use, manages only 4.75:1 on plum , lime is 8.85:1.
+    expect(contrastRatio(themes.light.chromeAccent, themes.light.chrome)).toBeGreaterThan(
+      contrastRatio('#4AACFF', themes.light.chrome),
+    );
+  });
+
+  it('chrome is theme-invariant', () => {
+    for (const key of [
+      'chrome',
+      'chromeFg',
+      'chromeMutedFg',
+      'chromeBorder',
+      'chromeHighlight',
+      'chromeAccent',
+      'chromeAccentSoft',
+    ] as const) {
+      expect(themes.light[key], key).toBe(themes.dark[key]);
     }
   });
 });

@@ -56,11 +56,18 @@ const NAV = (
   </ul>
 );
 
-function Fixture({ children, ...props }: Partial<React.ComponentProps<typeof AppShell>> = {}) {
+function Fixture({
+  children,
+  headerSurface,
+  ...props
+}: Partial<React.ComponentProps<typeof AppShell>> & {
+  /** Forwarded to `AppShellHeader`, so a test can exercise a non-default surface. */
+  headerSurface?: React.ComponentProps<typeof AppShellHeader>['surface'];
+} = {}) {
   return (
     <AppShell
       header={
-        <AppShellHeader>
+        <AppShellHeader surface={headerSurface}>
           <AppShellSidebarTrigger />
           <span>Acme</span>
         </AppShellHeader>
@@ -279,14 +286,31 @@ describe('useAppShell', () => {
 });
 
 describe('AppShell, glass', () => {
-  it('blurs the header and does NOT blur the rail', () => {
+  it('defaults the header to the chrome tier, NOT glass', () => {
     /**
-     * The header is Tier O: page content genuinely passes under a sticky bar, so
-     * its backdrop is unknowable. The rail sits BESIDE the scroll region, so a
-     * blur there is a second live backdrop layer on every page for no visual
-     * gain.
+     * The default was `glass`, and in light mode that made the bar a near-white
+     * strip on a near-white page , the app had no frame. `chrome` is the plum
+     * seed in both themes.
+     *
+     * The `bg-chrome` assertion is the load-bearing half: a header that silently
+     * fell back to glass would still render, still pass every contrast gate, and
+     * still look wrong, which is exactly how the original problem survived.
      */
     const { container } = render(<Fixture />);
+    const header = container.querySelector('[data-slot="app-shell-header"]')!.className;
+    expect(header).toContain('bg-chrome');
+    expect(header).toContain('text-chrome-fg');
+    expect(header).not.toContain('glass');
+  });
+
+  it('still offers the Tier-O glass header, and does NOT blur the rail', () => {
+    /**
+     * `surface="glass"` is Tier O: page content genuinely passes under a sticky
+     * bar, so its backdrop is unknowable. The rail sits BESIDE the scroll region,
+     * so a blur there is a second live backdrop layer on every page for no visual
+     * gain.
+     */
+    const { container } = render(<Fixture headerSurface="glass" />);
     expect(container.querySelector('[data-slot="app-shell-header"]')!.className).toContain('glass');
     const rail = container.querySelector('[data-slot="app-shell-rail"]')!.className;
     expect(rail).toContain('glass-surface');
