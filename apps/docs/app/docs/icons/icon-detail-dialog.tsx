@@ -39,6 +39,7 @@ import {
   CUSTOM_COLOR_ID,
   DEFAULT_CONFIG,
   END_STYLES,
+  FILL_OPACITY,
   GRADIENT_COLOR_ID,
   GRAPHIC_CONTRAST_MIN,
   SIZE_MAX,
@@ -56,6 +57,7 @@ import {
   gradientCss,
   gradientPaint,
   gradientRender,
+  hasFillableGeometry,
   iconClassName,
   importLine,
   isGradient,
@@ -186,10 +188,70 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
   const rawGradientId = useId();
   const gradientId = `velobits-grad-${rawGradientId.replace(/[^a-zA-Z0-9]/g, '')}`;
 
+  /*
+   * What the browser computed, re-read whenever anything upstream of it moved.
+   *
+   * `theme` is in the deps and has to be: none of the config values change when
+   * the site's theme toggle is used, but every token behind them does. Reading it
+   * here is safe rather than a frame late, because `ThemeProvider` calls
+   * `setTheme` and `applyTheme` in the SAME effect , so by the time `theme` has
+   * changed, `.dark` is already on the document and these values are the new ones.
+   */
+  const [resolved, setResolved] = useState<{
+    paths: string;
+    iconColor: string;
+    surfaceColor: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const svg = stage?.querySelector('svg');
+    if (!stage || !svg) return;
+
+    setResolved({
+      // The geometry, exactly as rendered. `innerHTML` on an SVG element gives
+      // the child shapes without the wrapper, which is what the export rebuilds
+      // around with its own attributes.
+      paths: svg.innerHTML,
+      iconColor: getComputedStyle(svg).color,
+      surfaceColor: getComputedStyle(stage).backgroundColor,
+    });
+  }, [stage, name, config.colorId, config.customColor, config.surfaceId, theme]);
+
+  /*
+   * Does this glyph have anything a fill can legitimately paint?
+   *
+   * 78 of 198 icons are made entirely of open paths, where a fill only ever
+   * invents a chord , so the toggle is disabled for those rather than left
+   * offering a change that cannot happen. Read from the icon's own rendered
+   * markup, so it stays true if the geometry changes.
+   *
+   * Before the first DOM read lands, treated as fillable so the switch does not
+   * flicker to disabled for one commit on open.
+   */
+  const fillable = resolved ? hasFillableGeometry(resolved.paths) : true;
+
+  /*
+   * The configuration as it will ACTUALLY render.
+   *
+   * The dialog's state survives closing and reopening on a different icon, so
+   * `filled` can arrive `true` on a glyph that has nothing to fill. Everything
+   * downstream , preview, snippet, export, and the switch itself , reads this, so
+   * the control can never claim a fill the output does not have.
+   *
+   * Memoised because `svgMarkup` depends on it: a fresh object literal every
+   * render would make that `useMemo` recompute on every keystroke elsewhere in
+   * the dialog, which is exactly what the identity-stability note in
+   * `use-row-selection` is about.
+   */
+  const effective: IconConfig = useMemo(
+    () => (fillable ? config : { ...config, filled: false }),
+    [config, fillable],
+  );
+
   const surface = findSurface(config.surfaceId);
-  const glyphClassName = iconClassName(config);
+  const glyphClassName = iconClassName(effective);
   const iconStyle = colorStyle(config);
-  const paint = gradientPaint(config, gradientId);
+  const paint = gradientPaint(effective, gradientId);
   const animation = findAnimation(config.animationId);
   const liveGradient = gradientRender(config.gradient);
 
@@ -226,7 +288,14 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
     strokeWidth: config.strokeWidth,
     strokeLinecap: END_STYLES[config.ends].linecap,
     strokeLinejoin: END_STYLES[config.ends].linejoin,
-    fill: config.filled ? 'currentColor' : 'none',
+    fill: effective.filled ? 'currentColor' : 'none',
+    /*
+     * The wash, not a solid. `undefined` when the toggle is off rather than `1`,
+     * so the attribute is absent entirely and the emitted snippet and the preview
+     * agree about what is set. See FILL_OPACITY for why a solid fill is not an
+     * option: it erases every container glyph in the set.
+     */
+    fillOpacity: effective.filled ? FILL_OPACITY : undefined,
     className: glyphClassName,
     style: iconStyle,
     /*
@@ -281,35 +350,6 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
   );
 
   /*
-   * What the browser computed, re-read whenever anything upstream of it moved.
-   *
-   * `theme` is in the deps and has to be: none of the config values change when
-   * the site's theme toggle is used, but every token behind them does. Reading it
-   * here is safe rather than a frame late, because `ThemeProvider` calls
-   * `setTheme` and `applyTheme` in the SAME effect , so by the time `theme` has
-   * changed, `.dark` is already on the document and these values are the new ones.
-   */
-  const [resolved, setResolved] = useState<{
-    paths: string;
-    iconColor: string;
-    surfaceColor: string;
-  } | null>(null);
-
-  useEffect(() => {
-    const svg = stage?.querySelector('svg');
-    if (!stage || !svg) return;
-
-    setResolved({
-      // The geometry, exactly as rendered. `innerHTML` on an SVG element gives
-      // the child shapes without the wrapper, which is what the export rebuilds
-      // around with its own attributes.
-      paths: svg.innerHTML,
-      iconColor: getComputedStyle(svg).color,
-      surfaceColor: getComputedStyle(stage).backgroundColor,
-    });
-  }, [stage, name, config.colorId, config.customColor, config.surfaceId, theme]);
-
-  /*
    * The verdict, and the one branch where it cannot read the DOM.
    *
    * For every colour choice the rendered stroke IS the glyph's computed `color`,
@@ -339,7 +379,7 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
     return contrastRatio(foreground, background);
   }, [resolved, config]);
 
-  const jsx = toJsx(name, config);
+  const jsx = toJsx(name, effective);
 
   const svgMarkup = useMemo(() => {
     if (!resolved) return '';
@@ -350,8 +390,8 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
      * like a right one , `currentColor` at least keeps the file inheriting, which
      * is what the package does anyway.
      */
-    return toSvgMarkup(config, resolved.paths, foreground ? toHex(foreground) : 'currentColor');
-  }, [config, resolved]);
+    return toSvgMarkup(effective, resolved.paths, foreground ? toHex(foreground) : 'currentColor');
+  }, [effective, resolved]);
 
   /*
    * The SVG panel is never empty, and never claims to be finished when it is not.
@@ -699,17 +739,34 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                 change the shape rather than the colour or the size. Expect it to
                 look wrong on open paths; `IconConfig.filled` records why, and the
                 preview shows it immediately, which is the point. */}
-            <div className="flex items-center justify-between gap-2">
-              <Label htmlFor={filledId} className="text-sm font-medium text-fg">
-                Fill
-              </Label>
-              <Switch
-                id={filledId}
-                checked={config.filled}
-                onCheckedChange={(checked) =>
-                  setConfig((previous) => ({ ...previous, filled: checked }))
-                }
-              />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor={filledId} className="text-sm font-medium text-fg">
+                  Fill
+                </Label>
+                <Switch
+                  id={filledId}
+                  // `effective`, so a fill carried over from a previous icon
+                  // cannot show as ON while nothing is filled.
+                  checked={effective.filled}
+                  disabled={!fillable}
+                  onCheckedChange={(checked) =>
+                    setConfig((previous) => ({ ...previous, filled: checked }))
+                  }
+                />
+              </div>
+              {/*
+               * A real reason, not a greyed-out control with no explanation. 78 of
+               * the 198 glyphs are drawn entirely from open paths, so there is no
+               * enclosed region for a fill to land in , and the honest thing is to
+               * say that rather than to offer a switch that moves and changes
+               * nothing. It also teaches the distinction the set is built on.
+               */}
+              {fillable ? null : (
+                <p className="text-xs text-muted-foreground">
+                  All open paths , nothing encloses a fillable region.
+                </p>
+              )}
             </div>
 
             {/*

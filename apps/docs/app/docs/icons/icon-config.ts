@@ -82,6 +82,154 @@ export const COLOR_CHOICES: ColorChoice[] = [
   { id: 'brand', label: 'brand', className: 'text-brand', note: 'Lime. Needs a dark surface' },
 ];
 
+/**
+ * ⚠️ FILL IS A WASH, NEVER SOLID. A SOLID FILL DESTROYS ~40 ICONS OUTRIGHT.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * `createIcon` writes `fill="none"` then spreads `{...props}`, so `fill` is
+ * overridable from a call site. The obvious thing to do with that ,
+ * `fill="currentColor"` , is wrong, and not subtly:
+ *
+ * A `fill` on the `<svg>` root inherits into EVERY child. Around forty glyphs in
+ * this set are drawn as a container plus its contents, e.g. `Adler32Icon`:
+ *
+ *     <rect x="3" y="3" width="18" height="18" rx="3" />   ← closed container
+ *     <path d="M8 16l2-8 2 8" />                            ← the "A"
+ *     <path d="M9 14h2" />
+ *     <path d="M16 8v4h-2" />
+ *
+ * The rect is a closed shape, so a solid fill turns it into an 18x18 slab. The
+ * inner paths DO paint on top of it , they are later in document order , but in
+ * the identical colour, so they disappear into it. The result is a plain rounded
+ * square: not a degraded icon, an erased one.
+ *
+ * ## Why not just fix those forty
+ *
+ * There is nothing to fix. A stroke-drawn set has no filled variant to derive:
+ * icon families that offer one (Material, Phosphor) DRAW it as separate
+ * geometry, because "which regions are interior" is a design decision that the
+ * outline alone does not contain. Nothing computable turns this set into that
+ * one.
+ *
+ * ## What does work for every glyph
+ *
+ * Fill at low alpha, stroke at full. SVG paints fill BEFORE stroke on the same
+ * element, so the linework always survives on top of its own wash, and the
+ * result is legible for all three shapes the set contains:
+ *
+ *   container glyphs   a tinted card with crisp contents , the duotone look
+ *   closed glyphs      a solid-ish shape with a defined edge
+ *   open glyphs        a faint wash over the implied chord, stroke unaffected
+ *
+ * 0.2 is the value the duotone convention settles on, and it leaves room for the
+ * one unavoidable artefact: fills COMPOUND where shapes overlap, because there
+ * is no group to apply a single opacity to (`createIcon` renders `children`
+ * straight into the `<svg>`, so there is no `<g>` to reach). A glyph inside a
+ * container composites 0.2 over 0.2 to about 0.36 , visible, and much closer to
+ * right than to wrong. Raising this past ~0.3 makes those overlaps read as a
+ * second colour.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const FILL_OPACITY = 0.2;
+
+/**
+ * ⚠️ A FILL MAY ONLY TOUCH GENUINELY CLOSED GEOMETRY.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * The wash above stopped a solid fill erasing container glyphs. It did not stop
+ * the other half of the problem: `fill` on the root inherits into EVERY child,
+ * and on an open path SVG fills the region as if the path were closed , the
+ * chord. That region is not in the drawing. `BrainfuckDecIcon` is two open
+ * chevrons, `M8 8l3 4-3 4` and `M16 8l-3 4 3 4`; filled, each closes into a
+ * solid triangle that the designer never drew.
+ *
+ * Counted across the set (198 icons, `packages/icons/src/icons.tsx`):
+ *
+ *   rect 59, circle 63, ellipse 1, polygon 3   126 shapes, ALWAYS closed
+ *   path without a Z                           347 paths, fill invents a chord
+ *   path with a Z                               31 paths, genuinely closed
+ *   polyline                                    19, also fills a chord
+ *   line                                        27, no area, never fills
+ *
+ * So filling everything is wrong 366 times and right 157 times. Filling only
+ * the intrinsically-closed ELEMENT TYPES is right 126 times and wrong never.
+ *
+ * ## The known cost, stated rather than hidden
+ *
+ * The 31 closed `<path>`s lose their fill , `AlertTriangleIcon`'s triangle is
+ * one. Recovering them needs to know whether a specific `d` ends in `Z`, and
+ * that is not something a selector can ask: it would take a per-icon
+ * `nth-child` rule emitted into every snippet. Trading 31 false negatives for
+ * 366 false positives is the better side of that deal by an order of magnitude,
+ * and a false negative is a fill that does not appear, where a false positive is
+ * a glyph with a wedge through it.
+ *
+ * ## Why this is a class and not a prop
+ *
+ * There is no prop that reaches a child. `createIcon` renders fixed `children`,
+ * so the only lever from outside is a CSS selector , which a `className` can
+ * carry into the copied snippet. A CSS `fill` also beats the inherited `fill`
+ * presentation attribute, so `fill: none` on the child wins over
+ * `fill="currentColor"` on the root without `!important`.
+ *
+ * `<line>` is deliberately absent: it encloses no area, so it never fills, and
+ * naming it would add a class that does nothing. The package uses no `<g>`, so
+ * the direct-child combinator is sufficient.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+/**
+ * The utilities that keep a fill off every open shape.
+ *
+ * ⚠️ WRITTEN OUT AS A LITERAL, AND IT HAS TO BE.
+ *
+ * This was `['path', 'polyline'].map((e) => `[&>${e}]:fill-none`).join(' ')`,
+ * which is tidier, produces the identical string at runtime, and generated NO
+ * CSS AT ALL. Tailwind v4 scans source files as PLAIN TEXT , it never evaluates
+ * them , so a class name assembled from a template literal is invisible to the
+ * scanner. The classes reached the DOM, `fill-none` appeared zero times in the
+ * stylesheet, and every open path stayed filled: the bug looked unfixed.
+ *
+ * Same family as the trap `native-select.tsx` documents (a class harvested out of
+ * a COMMENT, because comments are text too) and as the dead
+ * variant-over-a-hand-written-class in `controls.css`. The rule underneath all
+ * three: if Tailwind cannot see the finished string sitting in a source file,
+ * there is no rule, and nothing anywhere reports it.
+ */
+export const FILL_SUPPRESS_CLASS = '[&>path]:fill-none [&>polyline]:fill-none';
+
+/**
+ * The same element list, PARSED BACK OUT of the literal above.
+ *
+ * The SVG export cannot use a class , a standalone file has no stylesheet , so it
+ * needs these names to write `fill="none"` per element. Deriving them from the
+ * one string that Tailwind actually reads means the two can never disagree,
+ * which a hand-maintained second copy would eventually do silently: the preview
+ * would be right and every downloaded file would carry the chord wedge.
+ *
+ * Safe to compute, unlike the class: this value is never a class name, so
+ * nothing here has to survive a plain-text scan.
+ */
+export const FILL_SUPPRESSED_ELEMENTS = [...FILL_SUPPRESS_CLASS.matchAll(/\[&>(\w+)\]/g)].map(
+  (match) => match[1]!,
+);
+
+/** The element types a fill is allowed to paint. */
+export const FILLABLE_ELEMENTS = ['rect', 'circle', 'ellipse', 'polygon'] as const;
+
+/**
+ * Whether this glyph has anything a fill could legitimately paint.
+ *
+ * Read from the icon's own serialised markup rather than a lookup table, for the
+ * same reason the colours are read from `getComputedStyle`: a second copy of the
+ * icon package's geometry would go stale silently. 78 of 198 icons are made
+ * entirely of open paths and have no fillable shape at all , the dialog disables
+ * the toggle for those and says why, rather than offering a control that appears
+ * to do nothing.
+ */
+export function hasFillableGeometry(markup: string): boolean {
+  return FILLABLE_ELEMENTS.some((element) => markup.includes(`<${element}`));
+}
+
 /** The id the colour control uses for "not a token, a literal hex". */
 export const CUSTOM_COLOR_ID = 'custom';
 
@@ -582,15 +730,8 @@ export interface IconConfig {
   strokeWidth: number;
   ends: EndStyle;
   /**
-   * Paint the interior as well as the stroke.
-   *
-   * `createIcon` writes `fill="none"` and then spreads `{...props}`, so this is
-   * overridable exactly like the stroke attributes are. Worth exposing, and worth
-   * expecting to look wrong about half the time: the set is drawn as strokes, and
-   * only glyphs whose outline is a CLOSED path fill into a solid shape. An open
-   * path , a chevron, a plus, most arrows , has no interior, so SVG closes it
-   * implicitly and fills the chord, which reads as a blob. Watching that happen
-   * teaches the difference faster than being prevented from trying it.
+   * Wash the interior as well as stroking the outline , a DUOTONE fill, not a
+   * solid one. See `FILL_OPACITY` for why that distinction is the whole feature.
    */
   filled: boolean;
   surfaceId: string;
@@ -644,6 +785,9 @@ export function iconClassName(config: IconConfig): string | undefined {
       ? undefined
       : findColor(config.colorId)?.className,
     findAnimation(config.animationId)?.className,
+    // Only when a fill is actually on , the classes are inert otherwise, and an
+    // inert class in a copied snippet is a question the reader has to answer.
+    config.filled ? FILL_SUPPRESS_CLASS : undefined,
   ].filter(Boolean);
   return parts.length ? parts.join(' ') : undefined;
 }
@@ -667,10 +811,14 @@ export function colorStyle(config: IconConfig): { color: string } | undefined {
 export function gradientPaint(
   config: IconConfig,
   id: string,
-): { stroke: string; fill?: string } | undefined {
+): { stroke: string; fill?: string; fillOpacity?: number } | undefined {
   if (!isGradient(config)) return undefined;
   const paint = `url(#${id})`;
-  return config.filled ? { stroke: paint, fill: paint } : { stroke: paint };
+  // Same wash as a solid fill , see FILL_OPACITY. A gradient at full alpha
+  // erases a container glyph exactly as thoroughly as a flat colour does.
+  return config.filled
+    ? { stroke: paint, fill: paint, fillOpacity: FILL_OPACITY }
+    : { stroke: paint };
 }
 
 /* ── Code generation ──────────────────────────────────────────────────────── */
@@ -756,11 +904,16 @@ export function toJsx(name: string, config: IconConfig): string {
      */
     const paint = `url(#${GRADIENT_SNIPPET_ID})`;
     props.push(`stroke="${paint}"`);
-    if (config.filled) props.push(`fill="${paint}"`);
+    if (config.filled) props.push(`fill="${paint}"`, `fillOpacity={${FILL_OPACITY}}`);
   } else if (config.filled) {
-    // `currentColor`, not the resolved hex: in JSX the fill should track whatever
-    // colour the icon inherits, which is what the stroke already does.
-    props.push('fill="currentColor"');
+    /*
+     * `currentColor`, not the resolved hex: in JSX the fill should track whatever
+     * colour the icon inherits, which is what the stroke already does.
+     *
+     * `fillOpacity` travels WITH it and is not optional , at full alpha this one
+     * prop erases every container glyph in the set. See FILL_OPACITY.
+     */
+    props.push('fill="currentColor"', `fillOpacity={${FILL_OPACITY}}`);
   }
 
   const className = iconClassName(config);
@@ -901,8 +1054,10 @@ export function toSvgMarkup(config: IconConfig, paths: string, resolvedColor: st
     `height="${config.size}"`,
     'viewBox="0 0 24 24"',
     // The fill is a literal when it is on, for the same reason the stroke is: a
-    // standalone file has nothing to inherit `currentColor` from.
+    // standalone file has nothing to inherit `currentColor` from. `fill-opacity`
+    // rides along because a solid fill erases container glyphs , see FILL_OPACITY.
     `fill="${config.filled ? paint : 'none'}"`,
+    ...(config.filled ? [`fill-opacity="${FILL_OPACITY}"`] : []),
     `stroke="${paint}"`,
     `stroke-width="${config.strokeWidth}"`,
     `stroke-linecap="${linecap}"`,
@@ -924,8 +1079,27 @@ export function toSvgMarkup(config: IconConfig, paths: string, resolvedColor: st
    *     (`path`, `circle`, `rect`, `line`, `polyline`, `polygon`, `ellipse` , the
    *     package uses no `<g>`), so a flat indent is correct for all of them.
    */
-  const body = paths
-    .replace(/><\/[a-zA-Z]+>/g, ' />')
+  let body = paths.replace(/><\/[a-zA-Z]+>/g, ' />');
+
+  /*
+   * The open-geometry suppression, as ATTRIBUTES rather than as a class.
+   *
+   * The preview and the JSX snippet do this with `FILL_SUPPRESS_CLASS`, because a
+   * className is the only lever that reaches a child of `createIcon`. An exported
+   * `.svg` has no stylesheet , that is the entire point of it , so the same rule
+   * has to be written onto each element here. Skipping this step would put the
+   * chord wedge back into every downloaded file while the preview looked right,
+   * which is the exact preview-vs-output drift `gradientRender` exists to stop.
+   *
+   * Inserted immediately after the tag name so it precedes `d`, and so a
+   * subsequent attribute of the element's own cannot be shadowed by it.
+   */
+  if (config.filled) {
+    const open = FILL_SUPPRESSED_ELEMENTS.join('|');
+    body = body.replace(new RegExp(`<(${open})\\b`, 'g'), '<$1 fill="none"');
+  }
+
+  body = body
     .replace(/>(?=<)/g, '>\n')
     .split('\n')
     .map((line) => `  ${line.trim()}`)
