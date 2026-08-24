@@ -91,7 +91,7 @@ export function SiteHeader() {
      * `z-sticky` sits BELOW `z-dropdown` deliberately, or the header would paint
      * over its own menus.
      */
-    <header className="sticky top-0 z-sticky border-b border-chrome-border bg-chrome text-chrome-fg">
+    <header className="sticky top-0 z-sticky border-b border-chrome-border bg-chrome dark:bg-black text-chrome-fg">
       <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center gap-3 px-4 sm:px-6">
         {/*
          * The whole sidebar, in a real SidePanel below the lg breakpoint. Same
