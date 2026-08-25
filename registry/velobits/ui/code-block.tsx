@@ -268,7 +268,24 @@ function CodeBlock({
         // focusable, and this one scrolls by construction.
         tabIndex={0}
         role={label ? 'region' : undefined}
-        aria-label={label}
+        /*
+         * The NAME carries the language whenever there is a choice to be in.
+         *
+         * This is the half that survives without live regions: the announcement
+         * below fires at the moment of the switch, which is no help to a reader
+         * who tabs into the block later and meets a different listing under the
+         * name it had before. `CodePanel` in the docs app names its region the
+         * same way, and the two must agree , they are two renderers of one
+         * feature, and a screen-reader user should not be able to tell which one
+         * drew the page.
+         *
+         * Only when a selector exists: a single-language block has nothing to
+         * disambiguate, and "Usage in TypeScript" on a block that is only ever
+         * TypeScript is noise in every announcement of it.
+         */
+        aria-label={
+          label && hasSelector && shown ? `${label} in ${resolveCodeLanguage(shown).label}` : label
+        }
         data-slot="code-block-pre"
         data-language={shown}
         className={cn(

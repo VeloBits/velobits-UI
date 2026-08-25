@@ -284,8 +284,7 @@ export function isClosedPath(attributes: string): boolean {
  * construction , the constant is for the exporter, this literal is for Tailwind,
  * and only one of them is allowed to be computed.
  */
-export const FILL_SUPPRESS_CLASS =
-  '[&>path:not([d$=Z_i])]:fill-none [&>polyline]:fill-none';
+export const FILL_SUPPRESS_CLASS = '[&>path:not([d$=Z_i])]:fill-none [&>polyline]:fill-none';
 
 /**
  * The same element list, PARSED BACK OUT of the literal above.

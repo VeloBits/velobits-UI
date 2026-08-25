@@ -331,7 +331,23 @@ describe('CodeBlock, the language selector', () => {
     const pre = container.querySelector('pre')!;
     expect(pre.getAttribute('tabindex')).toBe('0');
     expect(pre.getAttribute('role')).toBe('region');
-    expect(pre.getAttribute('aria-label')).toBe('Usage');
+    /**
+     * The name gains the language, and that is the ONE thing about the `<pre>`
+     * that a selector is allowed to change. A reader who tabs in after a switch
+     * would otherwise meet different code under the name it had before , the live
+     * region only speaks at the moment of the change. `CodePanel` names its region
+     * identically; the two renderers of this feature must not be tellable apart.
+     */
+    expect(pre.getAttribute('aria-label')).toBe('Usage in TypeScript');
+  });
+
+  it('leaves the region name alone when there is no language to disambiguate', () => {
+    const { container } = render(
+      <CodeBlock label="Usage" copyable>
+        {TS}
+      </CodeBlock>,
+    );
+    expect(container.querySelector('pre')!.getAttribute('aria-label')).toBe('Usage');
   });
 
   it('paints a registered accent and merges its className onto the control', async () => {

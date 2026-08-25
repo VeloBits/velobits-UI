@@ -80,14 +80,36 @@ import { GradientEditor } from './gradient-editor';
  * nothing.
  */
 const OUTPUT_TABS = [
-  { value: 'jsx', label: 'JSX', language: 'tsx', wrap: true },
-  { value: 'import', label: 'Import', language: 'tsx', wrap: true },
+  /*
+   * `languages` is the tab's language DROPDOWN, and it is a different axis from
+   * the tab strip: the strip picks *which artefact* (the element, its import, the
+   * raw markup), the dropdown picks *which language* that artefact is spelled in.
+   *
+   * ⚠️ Both TypeScript entries carry the SAME string, and that is correct rather
+   * than lazy. These snippets are built here, in the browser, from string
+   * templates , JSX and one import line , so there is no type annotation in either
+   * for a transform to strip, and their JavaScript rendering is character-for-
+   * character their TypeScript one. The label is still the information: a reader
+   * who works in JavaScript needs to know the snippet is usable as-is, and an
+   * absent control tells them nothing. Same call as the docs' Usage snippets.
+   *
+   * There is no build step in reach here either. `scripts/code-transform.ts` runs
+   * at build time over files on disk; this dialog composes its output at runtime
+   * from the reader's own size, colour and gradient choices, so a derived variant
+   * could not be precomputed even if one existed.
+   */
+  { value: 'jsx', label: 'JSX', languages: ['ts', 'js'], wrap: true },
+  { value: 'import', label: 'Import', languages: ['ts', 'js'], wrap: true },
   /*
    * No `wrap` on the SVG. `wrap` is `break-all`, which is right for an opaque
    * key with no word boundaries and wrong for markup , it would break attribute
    * names mid-word. The panel scrolls instead.
+   *
+   * And ONE language: this tab is markup, not a program. A dropdown offering
+   * "JavaScript" over an `<svg>` element would be a control that lies, which is
+   * the one thing the language registry is meant not to do.
    */
-  { value: 'svg', label: 'SVG', language: 'svg', wrap: false },
+  { value: 'svg', label: 'SVG', languages: ['svg'], wrap: false },
 ] as const;
 
 export interface IconDetailDialogProps {
@@ -1255,13 +1277,42 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
             {OUTPUT_TABS.map((tab) => (
               <TabsContent key={tab.value} value={tab.value} className="min-w-0">
                 <CodeBlock
-                  language={tab.language}
+                  variants={tab.languages.map((language) => ({
+                    language,
+                    code:
+                      tab.value === 'jsx'
+                        ? jsx
+                        : tab.value === 'import'
+                          ? importLine(name)
+                          : svgOutput,
+                  }))}
+                  blockId={`icon:${name}:${tab.value}`}
                   copyable
                   label={tab.label === 'SVG' ? svgLabel : `${name} ${tab.label}`}
                   wrap={tab.wrap}
                   className={cn(
                     '[&_pre]:rounded-none [&_pre]:border-0 [&_pre]:bg-transparent [&_pre]:shadow-none',
-                    '[&_pre]:p-3',
+                    /*
+                     * ⚠️ Spelled per-side, and NOT as `p-3`, because `CodeBlock`
+                     * reserves a row for its own controls with `pt-12` on the
+                     * `<pre>` , while this `className` lands on the WRAPPER and
+                     * reaches the `<pre>` as a descendant, so `[&_pre]:p-3`
+                     * out-specifies it (0,1,1 against 0,1,0) and the first line
+                     * goes straight back under the dropdown. No warning: both
+                     * classes are perfectly valid and one simply wins.
+                     *
+                     * ⚠️ The row is reserved ONLY on the tabs that have a dropdown.
+                     * Reserving it on SVG too looks like the tidier rule and costs
+                     * real content: `max-h-52` caps the box, so 48px of empty
+                     * padding is 48px of markup the reader can no longer see , on
+                     * the one tab with the most of it. The parity the docblock
+                     * below is about is JSX↔Import, the two SHORT tabs; SVG is
+                     * explicitly the tall one and is bounded by the cap, not by
+                     * matching them.
+                     */
+                    tab.languages.length > 1
+                      ? '[&_pre]:px-3 [&_pre]:pb-3 [&_pre]:pt-12'
+                      : '[&_pre]:p-3',
                     /*
                      * One floor for all three, and now one ceiling for all three.
                      *
@@ -1289,13 +1340,7 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                      */
                     '[&_pre]:min-h-28 [&_pre]:max-h-52',
                   )}
-                >
-                  {tab.value === 'jsx'
-                    ? jsx
-                    : tab.value === 'import'
-                      ? importLine(name)
-                      : svgOutput}
-                </CodeBlock>
+                />
               </TabsContent>
             ))}
           </div>

@@ -1,6 +1,13 @@
 import type { Metadata } from 'next';
 
 import { FlagIcon } from '@velobitsio/icons';
+/*
+ * The SUBPATH, not the barrel. This is a Server Component: rendering a client
+ * component from here is fine, but pulling the whole `'use client'` barrel in to
+ * get one of them would ship every component in the library to this page's client
+ * bundle. `./code-block` is its own tsup entry for exactly this.
+ */
+import { CodeBlock } from '@velobitsio/ui/code-block';
 
 import { DocsToc, type TocEntry } from '@/components/docs-toc';
 import { Group, Section } from '@/components/docs-section';
@@ -12,6 +19,43 @@ export const metadata: Metadata = {
   title: 'Icons',
   description: 'Hand-drawn stroke icons on a 24×24 grid, tuned to read at 13–18px.',
 };
+
+/*
+ * The two prose snippets on this page, each offered in both languages.
+ *
+ * ⚠️ Both entries carry the SAME string, and that is the point rather than an
+ * oversight: these are JSX and an import line, so there is no type annotation for
+ * a transform to strip and the JavaScript rendering is character-for-character the
+ * TypeScript one. The label is still what the reader came for , "usable as-is in
+ * JavaScript" is an answer, and an absent control is not. Same call as the docs'
+ * Usage snippets and the icon dialog's JSX tab.
+ *
+ * Written out rather than derived because there is no build step in reach: these
+ * are string literals in a `.tsx` file, and `scripts/build-guide-code.ts` scans
+ * `.mdx` fences.
+ */
+const DECORATIVE_CODE = `// decorative: the label beside it does the work
+<TrashIcon /> Delete
+
+// meaningful on its own: all three props are required
+<TrashIcon aria-hidden={undefined} role="img" aria-label="Delete flag" />`;
+
+const CREATE_ICON_CODE = `import { createIcon } from '@velobitsio/icons';
+
+export const PentagonIcon = createIcon(
+  'PentagonIcon',
+  <path d="M12 3l9 6.5-3.5 10.5h-11L3 9.5z" />,
+);`;
+
+const DECORATIVE_SNIPPET = [
+  { language: 'ts', code: DECORATIVE_CODE },
+  { language: 'js', code: DECORATIVE_CODE },
+];
+
+const CREATE_ICON_SNIPPET = [
+  { language: 'ts', code: CREATE_ICON_CODE },
+  { language: 'js', code: CREATE_ICON_CODE },
+];
 
 /** The range the geometry was drawn for, per `createIcon`'s sizing contract. */
 const SIZES = [13, 14, 16, 18, 24] as const;
@@ -83,13 +127,13 @@ export default function IconsPage() {
             note="Icons render aria-hidden=true, because most sit beside a text label that already names the action. An icon carrying meaning alone has to opt out explicitly, and passing aria-label on its own is not enough, since aria-hidden wins and the label is never announced."
           >
             <div className="rounded-xl border border-dashed border-border p-6">
-              <pre className="overflow-x-auto font-mono text-xs">
-                <code>{`// decorative: the label beside it does the work
-<TrashIcon /> Delete
-
-// meaningful on its own: all three props are required
-<TrashIcon aria-hidden={undefined} role="img" aria-label="Delete flag" />`}</code>
-              </pre>
+              <CodeBlock
+                variants={DECORATIVE_SNIPPET}
+                blockId="icons:decorative"
+                copyable
+                label="decorative vs meaningful icons"
+                className="[&_pre]:border-0 [&_pre]:bg-transparent [&_pre]:p-0 [&_pre]:shadow-none [&_pre]:pt-12"
+              />
             </div>
           </Section>
 
@@ -99,14 +143,13 @@ export default function IconsPage() {
             note="Exported for one-off glyphs that need the same geometry: a 24×24 grid, currentColor, strokeWidth 2, round caps and joins, and a default size of 16. Anything reused across surfaces belongs in the package instead."
           >
             <div className="rounded-xl border border-dashed border-border p-6">
-              <pre className="overflow-x-auto font-mono text-xs">
-                <code>{`import { createIcon } from '@velobitsio/icons';
-
-export const PentagonIcon = createIcon(
-  'PentagonIcon',
-  <path d="M12 3l9 6.5-3.5 10.5h-11L3 9.5z" />,
-);`}</code>
-              </pre>
+              <CodeBlock
+                variants={CREATE_ICON_SNIPPET}
+                blockId="icons:create-icon"
+                copyable
+                label="createIcon"
+                className="[&_pre]:border-0 [&_pre]:bg-transparent [&_pre]:p-0 [&_pre]:shadow-none [&_pre]:pt-12"
+              />
             </div>
           </Section>
         </Group>
