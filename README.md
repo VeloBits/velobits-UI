@@ -196,7 +196,7 @@ default would silently orphan one app's preferences.
 
 ## Three things that will bite you
 
-**`--primary` is not a text colour.** `#007ACC` measures **3.90:1** on the cream
+**`--primary` is not a text colour.** `#007ACC` measures **3.86:1** on the paper
 page , fine as a fill behind white text (4.51:1), a WCAG failure as text. Links
 use `text-link`. No `Button` variant paints it as text, and a test enforces that.
 
@@ -205,9 +205,17 @@ the only sanctioned pairing , white on lime is 1.31:1. Lime _as text_ is 13.24:1
 in dark mode and 1.13:1 in light, so `--accent-text` is lime in dark and plum in
 light. A lime fill also cannot be a lone graphical indicator in light mode.
 
-**Glass is the overlay tier only.** Dialog, Sheet, Popover, DropdownMenu, Toast,
-CommandPalette, sticky headers. Never page backgrounds, table rows, anything
-inside a scroll container, or nested.
+**Glass is two tiers, and they are not the same material.** Tier O , overlay ,
+floats over arbitrary content: Dialog, SidePanel, Popover, DropdownMenu, Toast,
+CommandPalette. The backdrop is unknown, so every value is measured against all
+seven worst-case backdrops and muted text steps up to `--muted-on-glass`. Tier S
+, component surface , sits on the page: Card, Panel, Table shell, Accordion,
+EmptyState, Sidebar, sticky TopBar. There the backdrop is known, so `--muted-fg`
+is safe on it and the tier uses **no `backdrop-filter` at all**, which is what
+makes it safe on a repeated component; `.glass-surface-blur` opts back into blur
+for the sticky bars where content genuinely scrolls behind. Forbidden on both
+tiers: page and body backgrounds, and nesting. See `packages/tokens/src/glass.ts`
+, it carries the measurements, not just the rule.
 
 ## The gates
 
@@ -244,13 +252,23 @@ inside a scroll container, or nested.
 
 ## Publishing
 
-GitHub Packages, private, `@velobits/*`. Every published change needs a
-changeset (`npm run changeset`). `@velobitsio/tokens` versions independently so a
-palette tweak does not force a component release.
+**npmjs.org, public, `@velobitsio/*`.** All three packages carry
+`publishConfig.access: public`, so a consumer needs no token anywhere , not in CI,
+not in a Docker build. `@velobits-dev/*` was the previous scope and no longer
+exists on npm; nothing forwards, so anyone still on it migrates by changing the
+specifier. The shadcn namespace `@velobits` is a different thing entirely,
+resolved from a registry URL in `components.json` and never from npm.
 
-Reads require auth even for consumers. In Docker use a **BuildKit secret**
-(`RUN --mount=type=secret,id=npmrc`), never an `ARG` , an `ARG` is recorded in
-the image history.
+Every published change needs a changeset (`npm run changeset`).
+`@velobitsio/tokens` versions independently so a palette tweak does not force a
+component release.
+
+**Versioning and publishing are two branches, and that is not incidental.**
+`prepare-release.yml` applies the queued changesets on `develop`; `release.yml`
+publishes on push to `main`. `main`'s ruleset forbids any workflow pushing a
+version commit to it, so the bump can only arrive through the develop → main PR.
+The consequence worth knowing: changesets pending on `main` are normal, and a
+merge to `main` without a Prepare release run publishes nothing at all.
 
 When `@velobitsio/ui` gets a new version, the editor app's Federation
 `requiredVersion` pins in `apps/shell`, `apps/editor-remote` and

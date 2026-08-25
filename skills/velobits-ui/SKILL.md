@@ -5,7 +5,7 @@ description: Install, configure and write UI with the VeloBits design system, th
 
 # VeloBits UI
 
-One token and component layer for every VeloBits surface. 36 semantic tokens, 39
+One token and component layer for every VeloBits surface. 48 semantic tokens, 40
 components built on Radix and Tailwind v4, 201 stroke icons, a two-tier glass
 material, and a contrast gate every colour pair has already passed.
 
@@ -153,24 +153,30 @@ consumer's `components.json`.
 `text-gray-600` and a raw hex are all wrong here: they do not switch with the
 theme, and they are not in the contrast gate.
 
-| Want                 | Use                                                                            |
-| -------------------- | ------------------------------------------------------------------------------ |
-| Page, panel, raised  | `bg-bg`, `bg-bg2`, `bg-panel`, `bg-elevated`                                   |
-| Body and muted text  | `text-fg`, `text-muted-foreground`, on glass `text-muted-on-glass`             |
-| A link               | `text-link`                                                                    |
-| Brand fill           | `bg-brand` with `text-on-brand`, the only sanctioned pairing                   |
-| Primary fill         | `bg-primary` with `text-primary-foreground`                                    |
-| Edges                | `border-border`, and `border-field-border` on controls                         |
-| Status               | `bg-success` / `bg-success-soft`, likewise `danger`, `warning`, `info`, `rose` |
-| Code and terminal    | `bg-code` with `text-on-code`                                                  |
-| Radii, motion, layer | `rounded-md` / `rounded-pill`, `duration-enter`, `z-modal`                     |
+| Want                 | Use                                                                             |
+| -------------------- | ------------------------------------------------------------------------------- |
+| Page, panel, raised  | `bg-bg`, `bg-bg2`, `bg-panel`, `bg-elevated`                                    |
+| Body and muted text  | `text-fg`, `text-muted-foreground`, on glass `text-muted-on-glass`              |
+| A link               | `text-link`                                                                     |
+| Brand fill           | `bg-brand` with `text-on-brand`, the only sanctioned pairing                    |
+| Primary fill         | `bg-primary` with `text-primary-foreground`                                     |
+| Edges                | `border-border`, and `border-field-border` on controls                          |
+| Status               | `bg-success` / `bg-success-soft`, likewise `danger`, `warning`, `info`, `rose`  |
+| A solid danger fill  | `bg-danger` with `text-on-danger`, never white , white is 2.45:1 in dark        |
+| Code and terminal    | `bg-code` with `text-on-code`                                                   |
+| App chrome           | `bg-chrome` with `text-chrome-fg`, `text-chrome-muted-fg`, `text-chrome-accent` |
+| Data viz             | `chart-1` through `chart-5`                                                     |
+| Radii, motion, layer | `rounded-md` / `rounded-pill`, `duration-enter`, `z-modal`                      |
 
-**Three rules the palette encodes.** `--primary` is not a text colour, it measures
-3.90:1 on the cream page, so links use `text-link` and no `Button` variant paints
+**Four rules the palette encodes.** `--primary` is not a text colour, it measures
+3.86:1 on the paper page, so links use `text-link` and no `Button` variant paints
 it as text. Lime is asymmetric, `bg-brand` with `text-on-brand` is the only
 sanctioned pairing, and `--accent-text` is lime in dark and plum in light. Glass
-has two tiers, and nesting them cancels them out. `references/design-rules.md`
-carries the rest, including what changing a colour costs.
+has two tiers, and nesting them cancels them out. App chrome is plum in **both**
+themes, so none of the theme's own foregrounds apply to it , `--fg` on `--chrome`
+is 1.23:1, which is why the tier ships its own `chrome-*` foregrounds rather than
+borrowing. `references/design-rules.md` carries the rest, including what changing
+a colour costs.
 
 **Reach for a component's `surface` prop, not a `bg-*` utility.** A utility wins
 the cascade and takes the material with it.
@@ -185,15 +191,17 @@ cannot express, such as printing the current mode as text.
 
 ## 6. What already exists, so nothing gets rebuilt
 
-47 registry items: 39 components in three tiers, plus the foundation. Check this
+48 registry items: 40 components in three tiers, plus the foundation. Check this
 list before writing a component from scratch, and check `/r/registry.json` before
-concluding something is missing.
+concluding something is missing. Both numbers and every name below are asserted
+against the registry by `packages/ui/test/skill-parity.test.ts`, so this list
+cannot quietly fall behind the code it describes.
 
 - **Foundation** `velobits` (installs everything), `velobits-theme`, `cn`,
   `theme`, `velobits-provider`, `use-theme`, `use-media-query`, `use-row-selection`
 - **Primitives** `glass-surface`, `card`, `alert`, `button`, `badge`, `input`,
-  `textarea`, `native-select`, `checkbox`, `switch`, `label`, `field`, `avatar`,
-  `kbd`, `separator`, `skeleton`, `spinner`, `tooltip`
+  `textarea`, `native-select`, `checkbox`, `switch`, `slider`, `label`, `field`,
+  `avatar`, `kbd`, `separator`, `skeleton`, `spinner`, `tooltip`, `scroll-area`
 - **Overlays** `dialog`, `side-panel`, `popover`, `dropdown-menu`, `toast`,
   `command-palette`
 - **Composites** `app-shell`, `data-table`, `table`, `form`, `accordion`, `tabs`,

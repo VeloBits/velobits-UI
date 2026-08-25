@@ -269,13 +269,41 @@ jobs:
             fi
 
             if git rev-parse -q --verify "refs/tags/$tag" > /dev/null; then
-              # changesets wrote it during the publish step. Nothing to create; it
-              # just needs to leave the runner.
+              # changesets wrote it during the publish step, at this run's HEAD ,
+              # which IS the commit that was just published. Nothing to create; it
+              # only needs to leave the runner.
               echo "$tag exists locally but not on the remote; pushing it."
             else
+              # RECOVERY, and the case that needs care: this version is on npm
+              # from an EARLIER run, so HEAD is not what it was cut from. Tagging
+              # here points the tag at whatever main has drifted to since.
+              #
+              # Not hypothetical , it is how all three @velobitsio tags were made,
+              # and all three are wrong. They sit on ac6c50e while the packages
+              # were built from 6db4c5f eight commits earlier, so
+              # `git show @velobitsio/icons@0.1.0:packages/icons/src/icons.tsx`
+              # counts 201 glyphs for a tarball that ships 88. A tag that resolves
+              # to source the artefact does not contain is worse than no tag: it
+              # answers "what shipped?" confidently and wrongly.
+              #
+              # npm holds the answer. It records the publishing checkout's commit
+              # as `gitHead` in the packument, so ask, and refuse to guess when the
+              # answer is not there.
+              published_at=$(npm view "$tag" gitHead 2>/dev/null || true)
+
+              if [ -z "$published_at" ]; then
+                echo "::warning::$tag is on npm but its packument carries no gitHead, so the commit it was published from cannot be known here. Left untagged deliberately , tag it by hand once you have established which commit it was."
+                continue
+              fi
+
+              if ! git cat-file -e "${published_at}^{commit}" 2>/dev/null; then
+                echo "::warning::$tag was published from $published_at, which is not in this checkout. Left untagged deliberately rather than pointed at HEAD."
+                continue
+              fi
+
               # Annotated, to match the tags changesets writes.
-              git tag -a "$tag" -m "$tag"
-              echo "Tagged $tag."
+              git tag -a "$tag" -m "$tag" "$published_at"
+              echo "Tagged $tag at $published_at, the commit npm records it was published from."
             fi
             push_refs="$push_refs refs/tags/$tag"
           done
