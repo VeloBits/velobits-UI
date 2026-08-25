@@ -15,8 +15,30 @@ export const seed = {
   blue: '#007ACC',
   /** `brand` , accent fills, badges, charts. Fill-only in light mode. */
   lime: '#C8F135',
-  /** Light-mode page background. */
-  cream: '#F4EDEA',
+  /**
+   * Light-mode page background. Generated from `oklch(0.947 0.0045 74)`; the
+   * committed hex measures `oklch(0.947 0.005 78.3)`, because at chroma this low
+   * the 8-bit grid is coarser than the hue step , the same quantisation the
+   * neutral ramp records per row.
+   *
+   * **Was `cream: '#F4EDEA'`, and the rename is the point.** That value sat at
+   * hue 44.9° with chroma 0.0086, which is pink-orange: it put R ten 8-bit steps
+   * above B with G below the R..B midpoint, i.e. a magenta cast on the largest
+   * surface in the product. It read as dusty beige rather than as a page.
+   *
+   * This value carries the same warmth on the yellow side of orange, at half the
+   * chroma, so it reads as *paper*: R−B = 5. It also sits on {@link neutral}'s
+   * hue, which the old seed did not , the ramp drifted from 44.9° to 145.5°, so
+   * `--muted-fg` was a green-grey on a pink page. See
+   * `scripts/generate-neutrals.ts`.
+   *
+   * L dropped 0.951 → 0.947, which is under one 8-bit step of luminance and
+   * moves no contrast pair meaningfully. What it does buy is glass headroom: the
+   * Tier-S stops now clear 9–12/255 from BOTH the page and `--panel` on
+   * *luminance*, where the old pair scraped the 8/255 floor and got its
+   * separation from the pink cast on the blue channel alone.
+   */
+  paper: '#EFEDEA',
   /** Dark base, and the light-mode foreground. */
   charcoal: '#2A2B2A',
   /** Light-mode text accent, and the dark-mode elevated glass tint. */
@@ -24,16 +46,16 @@ export const seed = {
 } as const;
 
 /**
- * Blue's derived text steps. The seed measures **3.90:1 on cream**, which fails
+ * Blue's derived text steps. The seed measures **3.86:1 on the page**, which fails
  * AA for text , so `primary` is a fill token and links use these instead. This
  * is the single most common way to misuse this palette:
  * **never use `--primary` for a link, an icon beside text, or body copy.**
  */
 export const blueSteps = {
   /**
-   * L=.495 , 5.34:1 on cream, 6.18:1 on white. Darker than flat-pair AA alone
+   * L=.495 , 5.29:1 on the page, 6.18:1 on white. Darker than flat-pair AA alone
    * would need: this step also has to clear 4.5:1 *inside a soft chip*, i.e.
-   * composited over `primarySoft`/`infoSoft` on the cream page , the soft-chip
+   * composited over `primarySoft`/`infoSoft` on the page , the soft-chip
    * suite in `test/contrast.test.ts`. The previous `#006CBD` measured 4.08:1
    * there.
    */
@@ -54,7 +76,7 @@ export const blueSteps = {
 
 /**
  * Plum's light-mode text step. Marginally darker than the seed (10.12:1 vs
- * 9.98:1 on cream); the seed itself is what tints dark-mode elevated glass.
+ * 9.89:1 on the page); the seed itself is what tints dark-mode elevated glass.
  */
 export const plumSteps = { text: '#582840' } as const;
 
@@ -81,10 +103,10 @@ export const plumSteps = { text: '#582840' } as const;
  * Same discipline as the status tokens: the worst composite a teal chip sits on
  * is not the page but the wash flattened over its darkest/lightest backdrop ,
  * for light that is the page, for dark the panel. The seed itself measures
- * 3.08:1 (light) and 3.13:1 (dark) inside a chip and is not usable as text.
+ * ~3.1:1 in both themes inside a chip and is not usable as text.
  */
 export const tealSteps = {
-  /** 5.08:1 inside a soft chip on cream, 6.05:1 flat. `#2A6E6E` measures 4.37 in the chip. */
+  /** 5.04:1 inside a soft chip on the page, 5.99:1 flat. `#2A6E6E` measures ~4.37 in the chip. */
   text: '#256262',
   /** 4.94:1 inside a soft chip on the dark panel, 6.19:1 flat. `#59A8A7` measures 4.12. */
   textDark: '#6FBAB9',
@@ -110,7 +132,7 @@ export const tealSteps = {
  * status tokens were re-tuned to on 2026-08-06 (worst composite 4.61).
  */
 export const roseSteps = {
-  /** 4.65:1 inside a soft chip on cream, 5.51:1 flat. */
+  /** 4.61:1 inside a soft chip on the page, 5.45:1 flat. */
   text: '#9B3E6B',
   /** 4.56:1 inside a soft chip on the dark panel, 5.63:1 flat. */
   textDark: '#DA8FB2',
@@ -126,7 +148,7 @@ export type { NeutralStep } from './generated/neutrals';
  */
 export const worstCaseBackdrops = [
   seed.lime,
-  seed.cream,
+  seed.paper,
   '#FFFFFF',
   seed.charcoal,
   neutral[950],

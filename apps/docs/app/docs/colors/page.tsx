@@ -61,8 +61,13 @@ const TOC: TocEntry[] = [
  * The previous version rendered the seeds and the neutral ramp with
  * `Object.entries`, which self-extend, but listed the contrast table as an
  * eight-entry literal. So it claimed it "cannot drift from the palette" while
- * showing 8 of the 43 gated pairs, and none of the 36 semantic tokens the
- * components actually consume. Adding a pair to the gate changed nothing here.
+ * showing eight of the gated pairs and none of the semantic tokens the components
+ * actually consume. Adding a pair to the gate changed nothing here.
+ *
+ * Note the counts in this docblock are deliberately no longer written as figures:
+ * an earlier revision said "8 of the 43 gated pairs, and none of the 36 semantic
+ * tokens", and both numbers were stale within two releases , in the docblock whose
+ * entire argument is that hand-written numbers go stale.
  *
  * The rule now: if a section shows tokens, it maps over the exported registry.
  * A new token or a new pair appears on this page without anyone editing it.

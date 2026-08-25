@@ -16,7 +16,7 @@ import { seed } from './palette';
  * **Tier S , component surface.** Card · Panel · Table shell · Accordion ·
  * EmptyState · Sidebar · sticky TopBar. The backdrop is KNOWN , it is the page
  * , so the values are measured against exactly one thing and `--muted-fg` is
- * safe on it (5.57:1 in light, 6.34:1 in dark). Tiers `surfaceLight` /
+ * safe on it (5.92:1 in light, 6.34:1 in dark). Tiers `surfaceLight` /
  * `surfaceDark` below.
  *
  * Forbidden on both tiers: page and body backgrounds (nothing behind them to
@@ -27,8 +27,8 @@ import { seed } from './palette';
  * Composited over the flat page, the obvious "panel colour at α 0.85" is a
  * measurable NO-OP:
  *
- *   light  #FFFFFF @0.85 over #F4EDEA → #FDFCFC, **3/255** from opaque #FFFFFF
- *   dark   #2C2D2C @0.85 over #1A1B1A → #292A29, **3/255** from opaque #2C2D2C
+ *   light  #FFFFFF @0.85 over #EFEDEA → #FDFCFC, **3/255** from opaque #FFFFFF
+ *   dark   the dark panel @0.85 over the dark page → **3/255** from that panel
  *
  * Three 8-bit steps is below any perceptual threshold, and blurring a uniform
  * page returns that same uniform page , so the browser pays for a backdrop
@@ -45,7 +45,7 @@ import { seed } from './palette';
  *   dark   the specular highlight carries the material. It is what reads as
  *          "a lit edge", and it costs nothing.
  *   light  no highlight at all (`transparent`). The material comes from the
- *          tint (#FFFAF7 , neutral-50's own hue and chroma pushed to L 0.99,
+ *          tint (#FCFAF8 , the ramp's own hue and chroma at L 0.9855,
  *          the only direction with room left in the gamut), a FIRMER hairline
  *          border (1.81:1, against the opaque `--border`'s 1.61:1 on `--panel`
  *          where the Tier-O border manages only 1.21:1), and a bottom-weighted
@@ -62,9 +62,9 @@ import { seed } from './palette';
  * A Tier-S composite must clear {@link PERCEPTIBILITY_FLOOR} from the page
  * BELOW it and from the opaque `--panel` ABOVE it, so the page↔panel distance
  * is the whole budget and the tint is boxed in from both sides. In light,
- * enumerating all 3,303 legal integer composites finds nothing on the warm axis
- * better than the shipped 11/10 , cooling the tint only moves it toward the
- * neutral white panel. In dark the budget itself was widened (page → 925) to
+ * the shipped pair sits at 12/9 and the de-pinked ramp leaves no chroma lever ,
+ * cooling the tint only moves it toward the neutral white panel, so the
+ * separation has to come from lightness. In dark the budget itself was widened (page → 925) to
  * buy 9/9 → 12/11. Past that, the material has to come from edge, light and
  * elevation, and all three are effectively ungated.
  *
@@ -120,20 +120,22 @@ export interface GlassSurfaceTier extends GlassTier {
    *
    * **This effect is small, and it cannot be made large.** A Tier-S composite is
    * boxed between the page below and the opaque `--panel` above, and the sheen
-   * has to spend that same budget twice , once per stop. Enumerated, the widest
-   * legal separation is **5/255 in light and 4/255 in dark**:
+   * has to spend that same budget twice , once per stop. The shipped separation
+   * is **3/255 in light and 4/255 in dark**:
    *
-   *   light  top #FDF8F5 (Δbg 11, Δpanel 10) → bottom #FCF5F0 (Δbg  8, Δpanel 15)
+   *   light  top #FAF8F6 (Δbg 12, Δpanel  9) → bottom #F7F5F3 (Δbg  9, Δpanel 12)
    *   dark   top #232423 (Δbg 14, Δpanel  9) → bottom #1F201F (Δbg 10, Δpanel 13)
    *
-   * A 5/255 *step* would be invisible. A 5/255 *ramp* across a card-sized area is
+   * A 3-5/255 *step* would be invisible. A ramp of that size across a card is
    * not, because gradient detection runs well below step-edge detection , which
    * is the only reason this is worth a token at all. Do not expect it to carry a
    * surface on its own: in light the material is still tint + edge + shadow, and
    * in dark it is still the specular highlight.
    *
-   * Light's bottom stop sits **exactly on** {@link PERCEPTIBILITY_FLOOR}. That is
-   * deliberate, not an oversight: it is the widest sheen light mode has, and if
+   * Light's bottom stop used to sit **exactly on** {@link PERCEPTIBILITY_FLOOR}.
+   * De-pinking the ramp bought it one step of margin (9/255), because the tier
+   * stopped depending on a blue-channel chroma difference and started being
+   * separated by lightness. It is still the tightest number in the file, and if
    * `--bg` or `--panel` ever move the gate is supposed to fail loudly rather than
    * let the bottom of every card quietly merge into the page.
    */
@@ -167,7 +169,7 @@ export const GLASS_ALPHA_FLOOR = 0.72;
 /**
  * The alpha of the white top-edge specular highlight. One number, both themes,
  * and the whole asymmetry lives in what it measures: **5.05:1** over the dark
- * Tier-S composite (#212221) and **1.03:1** over the light one (#FDF8F5). Light
+ * Tier-S composite (#212221) and **1.03:1** over the light one (#FAF8F6). Light
  * mode therefore sets `highlight` to `transparent` instead of using it.
  *
  * Raised 0.35 → 0.50 on 2026-08-06. The light figure barely moves (1.02 → 1.03)
@@ -219,30 +221,42 @@ export const glass = {
   },
 
   /**
-   * Tier S, light. #FFFAF7 is `oklch(0.99 0.0085 44.9)` , neutral-50's exact
-   * hue and chroma with lightness raised from 0.9747 to 0.99, i.e. one notch
-   * further up the ramp's own warm axis than the ramp itself goes. That
-   * direction is the only one available: the composite has to sit ABOVE the
-   * cream page to read as raised, and pure white is 3/255 from the panel.
+   * Tier S, light. #FCFAF8 is `oklch(0.9855 0.0035 74)` , the neutral ramp's own
+   * hue and chroma, one notch above `neutral-50` (L 0.9747). The composite has to
+   * sit ABOVE the page to read as raised, and pure white is 3/255 from the panel,
+   * so up-the-ramp is the only direction available.
    *
-   * Composites to **#FDF8F5** over the page: 11/255 from `--bg`, 10/255 from
+   * Composites to **#FAF8F6** over the page: 12/255 from `--bg`, 9/255 from
    * `--panel` , both clear of the 8/255 gate, and lighter than the page on all
-   * three channels. fg 13.48:1, `--muted-fg` 5.57:1, so no `--muted-on-glass`
-   * on this tier.
+   * three channels. fg 12.94:1, `--muted-fg` 5.53:1, so no `--muted-on-glass` on
+   * this tier.
    *
-   * The alpha stays at Tier O's 0.85 deliberately. The alternative that lands
-   * on an almost identical composite , `--panel` at α 0.50 → #FAF6F4 , drifts
-   * 11/255 the moment anything but the page sits behind it; the tinted surface
-   * at 0.85 drifts 3/255. Tint, not transparency, is what makes Tier S visible.
+   * ## Why this moved DOWN when the palette was de-pinked
+   *
+   * The old pair (#FFFAF7 / #FDF6F1, at hue 44.9° and chroma 0.0085) got most of
+   * its separation from the page's pink cast on the **blue channel**: the
+   * perceptibility gate takes the max over channels, so a warm tint over a warmer
+   * page passed on blue alone while being nearly identical in luminance. That is a
+   * fragile way to be visible , it depends on the page staying pink, and the far
+   * stop was sitting exactly ON the 8/255 floor.
+   *
+   * With the ramp at chroma 0.0045 there is no chroma lever left, so this tier is
+   * now separated by LIGHTNESS, which is what "raised" actually means. Lower L
+   * than before, and both stops clear the floor by 1–4 steps in both directions.
+   *
+   * The alpha stays at Tier O's 0.85 deliberately. The alternative that lands on
+   * an almost identical composite , `--panel` at α 0.50 , drifts ~11/255 the
+   * moment anything but the page sits behind it; the tinted surface at 0.85 drifts
+   * 3/255. Tint, not transparency, is what makes Tier S visible.
    */
   surfaceLight: {
-    surface: '#FFFAF7',
-    // The sheen's far stop. Composites to #FCF5F0: 8/255 from `--bg` , ON the
-    // floor, see {@link GlassSurfaceTier.surfaceBottom} , and 15/255 from
-    // `--panel`, which is the wall with room to spare in this direction. Still
-    // lighter than the page on all three channels, so the surface reads as
-    // raised along its whole height and not just at the top.
-    surfaceBottom: '#FDF6F1',
+    surface: '#FCFAF8',
+    // The sheen's far stop. Composites to #F7F5F3: 9/255 from `--bg` and 12/255
+    // from `--panel`. The old far stop sat exactly ON the 8/255 floor against the
+    // page; this one has a step of margin, which is what the lightness-based
+    // separation above bought. Still lighter than the page on all three channels,
+    // so the surface reads as raised along its whole height, not just at the top.
+    surfaceBottom: '#F8F6F4',
     alpha: 0.85,
     blur: '16px',
     // 1.81:1 over the composite, deliberately FIRMER than what an opaque card
@@ -255,7 +269,7 @@ export const glass = {
     highlight: 'transparent',
     // Three stops: a 1px contact shadow, a short mid stop for near-field
     // separation, and a long soft stop for the lift. Shadows are the only lever
-    // with no contrast ceiling at all , black at α 0.08 already moves the cream
+    // with no contrast ceiling at all , black at α 0.08 already moves the light
     // page 20/255 , and the previous two-stop ramp used a fraction of it.
     shadow:
       '0 1px 2px rgba(42, 43, 42, 0.06), 0 4px 10px -3px rgba(42, 43, 42, 0.10), 0 18px 36px -14px rgba(42, 43, 42, 0.22)',

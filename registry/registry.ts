@@ -276,6 +276,16 @@ const ui: RegistryItem[] = [
     files: [{ path: 'registry/velobits/ui/skeleton.tsx', type: 'registry:ui' }],
   },
   {
+    name: 'slider',
+    type: 'registry:ui',
+    title: 'Slider',
+    description:
+      'The name goes on the THUMB , Radix puts role="slider" there, so htmlFor and a root aria-label both dangle.',
+    dependencies: [RADIX],
+    registryDependencies: ['cn'],
+    files: [{ path: 'registry/velobits/ui/slider.tsx', type: 'registry:ui' }],
+  },
+  {
     name: 'spinner',
     type: 'registry:ui',
     title: 'Spinner',

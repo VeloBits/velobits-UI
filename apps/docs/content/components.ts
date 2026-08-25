@@ -246,6 +246,28 @@ export function App() {
     ],
   },
 
+  slider: {
+    usage: `import { Slider } from '@velobitsio/ui';
+
+<span id="size-label">Size</span>
+<Slider
+  aria-labelledby="size-label"
+  value={size}
+  onValueChange={setSize}
+  min={8}
+  max={128}
+  formatValue={(value) => \`\${value} pixels\`}
+/>`,
+    examples: [{ name: 'slider-demo', title: 'Single value, range, and disabled' }],
+    notes: [
+      'The name goes on the THUMB, and this is the one thing to get right. Radix renders the root as a <span> and puts role="slider", tabindex and aria-valuenow on each thumb , so a <label htmlFor> pointing at the root associates with nothing, and an aria-label on the root names an element that has no role while the thing a screen reader actually focuses stays anonymous. Nothing warns about either. Slider requires aria-label or aria-labelledby at the type level and forwards it onto the thumbs; the test asserts the name resolves on the element with role="slider", not merely that the attribute is present somewhere.',
+      'Two thumbs need two names. Pass thumbLabels in thumb order , one shared name announces both handles identically, and a screen-reader user cannot tell which end of the range they are holding.',
+      'formatValue writes aria-valuetext, which replaces the bare number in the announcement. Without it a slider says "24", and whether that is pixels, percent or items lives entirely in a visible label heard once on focus and never again through the drag.',
+      'Reach for a slider only when the value is found by feel. If the useful answers are a short list of named values, a SegmentedControl or a NativeSelect beats it , and a slider you have to nudge with arrow keys to land on an exact number is a number input wearing a costume. The icon playground uses both together for exactly that reason: a dropdown names the tuned sizes, the slider explores between them.',
+      'The visible thumb is 16px but its pointer target is 24px, extended by an invisible ::before at -inset-1. WCAG 2.2 §2.5.8 sets 24×24 CSS px as the minimum target, and a 24px thumb is visually heavy on a 6px track.',
+    ],
+  },
+
   label: {
     usage: `import { Label, Input } from '@velobitsio/ui';
 

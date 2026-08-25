@@ -35,7 +35,11 @@ describe('OKLCH conversion', () => {
     // palette was chosen by.
     expect(formatOklch(hexToOklch(seed.blue))).toBe('oklch(0.567 0.155 248.5)');
     expect(formatOklch(hexToOklch(seed.lime))).toBe('oklch(0.898 0.203 121.8)');
-    expect(formatOklch(hexToOklch(seed.cream))).toBe('oklch(0.951 0.009 44.9)');
+    // Was `cream` at `oklch(0.951 0.009 44.9)`. Hue 44.9° is pink-orange and
+    // chroma 0.009 made it visible on the largest surface in the product; this
+    // seed carries the same warmth at 74°, on the neutral ramp's own hue, at half
+    // the chroma. See the docblock on `seed.paper`.
+    expect(formatOklch(hexToOklch(seed.paper))).toBe('oklch(0.947 0.005 78.3)');
     expect(formatOklch(hexToOklch(seed.charcoal))).toBe('oklch(0.288 0.002 145.5)');
     expect(formatOklch(hexToOklch(seed.plum))).toBe('oklch(0.355 0.077 350.5)');
   });

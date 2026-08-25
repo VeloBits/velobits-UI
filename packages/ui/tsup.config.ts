@@ -71,6 +71,7 @@ const CLIENT = {
   'scroll-area': `${R}/ui/scroll-area.tsx`,
   separator: `${R}/ui/separator.tsx`,
   skeleton: `${R}/ui/skeleton.tsx`,
+  slider: `${R}/ui/slider.tsx`,
   spinner: `${R}/ui/spinner.tsx`,
   switch: `${R}/ui/switch.tsx`,
   textarea: `${R}/ui/textarea.tsx`,

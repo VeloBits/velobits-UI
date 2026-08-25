@@ -59,7 +59,7 @@ import { seed } from './palette';
  * Not the glass gate , the invariant above makes that free. In LIGHT it is
  * `--muted-fg` where both layers stack:
  *
- *   dot over field over cream → #EAE2E0, `--muted-fg` **4.60:1** (AA needs 4.5)
+ *   dot over field over the page → #E5E2E0, `--muted-fg` **4.87:1** (AA needs 4.5)
  *
  * ~0.1 of margin, so light is at its ceiling: at 1.5× these alphas it measures
  * 4.42:1 and fails. Deepening a light layer fails as unreadable secondary labels
@@ -100,7 +100,7 @@ export interface TextureTheme {
    * is a small deliberate contribution to hue breadth: it puts a non-blue seed
    * at the very bottom of the stack, under everything. In light that is the plum
    * seed directly. In dark the seed itself would LIGHTEN the near-black page
-   * (#592941 over #151615 lifts it +7/+2/+4 , the invariant forbids it), so dark
+   * (the plum seed over the dark page lifts it , the invariant forbids it), so dark
    * uses a plum-black instead: it darkens on every channel while still pulling
    * the hue toward magenta rather than grey.
    */

@@ -103,6 +103,7 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
       'native-select',
       'checkbox',
       'switch',
+      'slider',
       'label',
       'field',
       'avatar',
@@ -158,7 +159,7 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
  * stops meaning "new" and becomes decoration, which is worse than no dot, since
  * it also announces ", new" to a screen reader every time.
  */
-export const NEW_COMPONENTS = new Set<string>(['scroll-area']);
+export const NEW_COMPONENTS = new Set<string>(['scroll-area', 'slider']);
 
 /** Every registry item name this file places, in sidebar order. */
 export const GROUPED_COMPONENT_NAMES: string[] = COMPONENT_GROUPS.flatMap((g) => g.names);

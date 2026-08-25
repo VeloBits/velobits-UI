@@ -30,6 +30,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version && npm install --package-lock-only",
     "release": "turbo run build && changeset publish",
+    "postinstall": "tsx scripts/patch-radix-pure-iife.ts",
     "registry:build": "tsx scripts/build-registry.ts",
     "docs:data": "tsx scripts/build-docs-data.ts",
     "docs": "npm run dev -w @velobitsio/docs",
