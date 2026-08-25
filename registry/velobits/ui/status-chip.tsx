@@ -50,6 +50,15 @@ import { Badge, type BadgeProps } from './badge';
  * screen readers spell a short all-caps token letter by letter , "oh en". A
  * `text-transform` changes only the glyphs, so the accessible name stays the
  * word. Free correctness; the visual result is identical.
+ *
+ * **The transform applies to `children` too.** `uppercase` sits on the chip, not
+ * on the built-in words, so a label override is painted in caps as well:
+ * `<StatusChip status="partial">Rolling out</StatusChip>` reads `ROLLING OUT`.
+ * That is easy to miss, because the override this component was designed for is
+ * a percentage , `25%` is case-invariant, so every example of the feature, here
+ * and in the docs, happens to be one of the values that cannot show it. Pass a
+ * word and it will shout. If it should not, override the class:
+ * `className="normal-case"`.
  */
 export type Status = 'on' | 'off' | 'partial' | 'pending' | 'archived';
 
@@ -95,6 +104,12 @@ export interface StatusChipProps extends Omit<BadgeProps, 'variant' | 'children'
    *
    * Whatever is passed still has to *say the state* , this is a label override,
    * not a slot for extra content.
+   *
+   * PAINTED UPPERCASE. The chip carries `uppercase`, so it applies to whatever
+   * is passed here, not only to the built-in words , `Rolling out` renders as
+   * `ROLLING OUT`. Add `className="normal-case"` if that is wrong for the value.
+   * Note that the case in the DOM is preserved either way, so this changes what
+   * is seen and never what is announced.
    */
   children?: React.ReactNode;
 }

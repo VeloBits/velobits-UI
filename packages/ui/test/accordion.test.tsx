@@ -270,7 +270,7 @@ describe('Accordion, styling contract', () => {
     expect(chevron.className).toContain('group-data-[state=open]/accordion-trigger:rotate-180');
     // Transform and colour only , never a blur radius.
     expect(chevron.className).toContain('transition-[transform,color]');
-    // --primary is 3.90:1 on the cream page; --primary-text has headroom.
+    // --primary is 3.86:1 on the paper page; --primary-text has headroom.
     expect(chevron.className).toContain('group-data-[state=open]/accordion-trigger:text-link');
     expect(chevron.className).not.toMatch(/:text-primary\b/);
     // Decorative by default, so it is not announced beside the title text.

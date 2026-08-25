@@ -254,6 +254,256 @@ describe('CommandDialog', () => {
   });
 });
 
+describe('CommandDialog, the cmdk props it routes past the Dialog', () => {
+  /**
+   * `CommandDialog` renders two roots , Radix's `Dialog.Root` and cmdk's
+   * `Command` , and only one of them can take the rest spread. It takes the
+   * dialog, so every cmdk root prop has to be named and re-routed by hand.
+   *
+   * An unrouted prop lands on `Dialog.Root`, which destructures six props and
+   * drops the rest: no throw, no warning, and a custom `filter` that never runs.
+   * TypeScript catches the literal form , the props interface is closed, so an
+   * unrouted prop is an excess-property error , and goes quiet exactly where the
+   * type system does: JavaScript, a spread-widened rest, a widened `string`.
+   *
+   * One test per routed prop, because each one goes missing on its own.
+   */
+  function Palette({ children, ...props }: React.ComponentProps<typeof CommandDialog>) {
+    return (
+      <CommandDialog open onOpenChange={() => {}} {...props}>
+        <CommandInput placeholder="Search…" />
+        <CommandList>
+          <CommandEmpty>No results.</CommandEmpty>
+          <CommandGroup heading="Flags">{children}</CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    );
+  }
+
+  const ROWS = (
+    <>
+      <CommandItem value="new-flag">New flag</CommandItem>
+      <CommandItem value="archive-flag">Archive flag</CommandItem>
+      <CommandItem value="new-environment">New environment</CommandItem>
+    </>
+  );
+
+  it('runs a custom `filter`, which is the whole reason for the split', async () => {
+    /**
+     * The reported gap. A palette whose rows are scored by the app , a fuzzy
+     * matcher, a slug, a description that is searchable but not displayed , is
+     * the ordinary case, and before the routing existed the function was
+     * accepted, type-checked and never called.
+     *
+     * Scored so ONLY `archive-flag` survives any search, which no default
+     * scorer would do: it is proof the function ran, not that cmdk did.
+     */
+    const filter = vi.fn((value: string) => (value === 'archive-flag' ? 1 : 0));
+    render(<Palette filter={filter}>{ROWS}</Palette>);
+    await waitFor(() => screen.getByRole('dialog'));
+
+    await userEvent.type(screen.getByRole('combobox'), 'new');
+    await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(1));
+    expect(screen.getByRole('option').textContent).toContain('Archive flag');
+    expect(filter).toHaveBeenCalled();
+  });
+
+  it('routes `shouldFilter={false}`, so a server-backed palette keeps its rows', async () => {
+    /**
+     * The remote-search case: the endpoint already decided what matches, and a
+     * second client-side pass over the response hides rows the server
+     * deliberately returned. Typing something no row contains must therefore
+     * leave all three standing.
+     */
+    render(<Palette shouldFilter={false}>{ROWS}</Palette>);
+    await waitFor(() => screen.getByRole('dialog'));
+
+    await userEvent.type(screen.getByRole('combobox'), 'zzzz');
+    await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(3));
+    expect(screen.queryByText('No results.')).toBeNull();
+  });
+
+  it('routes `value` and `onValueChange`, so the highlight can be controlled', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Palette value="new-environment" onValueChange={onValueChange}>
+        {ROWS}
+      </Palette>,
+    );
+    await waitFor(() => screen.getByRole('dialog'));
+
+    await waitFor(() => {
+      const selected = screen
+        .getAllByRole('option')
+        .find((option) => option.getAttribute('data-selected') === 'true');
+      expect(selected!.textContent).toContain('New environment');
+    });
+
+    // Up, not down: the controlled value is the LAST row, and without `loop`
+    // there is nowhere below it to move to , so a down arrow changes nothing and
+    // the callback would correctly never fire.
+    await userEvent.keyboard('{ArrowUp}');
+    await waitFor(() => expect(onValueChange).toHaveBeenCalledWith('archive-flag'));
+  });
+
+  it('routes `defaultValue` without leaking it onto cmdk\u2019s div', async () => {
+    /**
+     * cmdk reads `defaultValue` for its initial state but does NOT destructure
+     * it out of the rest it spreads onto its own element. React drops
+     * `defaultValue` on a non-form element with no attribute and no warning, so
+     * forwarding it is free , and this pins that, because it is exactly the kind
+     * of thing a React major quietly changes.
+     */
+    render(<Palette defaultValue="archive-flag">{ROWS}</Palette>);
+    const palette = await waitFor(() => document.querySelector('[data-slot="command-palette"]')!);
+
+    await waitFor(() => {
+      const selected = screen
+        .getAllByRole('option')
+        .find((option) => option.getAttribute('data-selected') === 'true');
+      expect(selected!.textContent).toContain('Archive flag');
+    });
+    expect(palette.hasAttribute('defaultValue')).toBe(false);
+    expect(palette.hasAttribute('defaultvalue')).toBe(false);
+  });
+
+  it('routes `loop`, `disablePointerSelection`, `vimBindings` and `label`', async () => {
+    /**
+     * Four props with no visible surface of their own, so they are checked
+     * through the behaviour each one buys. `label` is the exception , it is a
+     * DOM node. It names the INPUT: cmdk renders a hidden `<label htmlFor>` and
+     * points the combobox's `aria-labelledby` at it. Not the dialog (that is
+     * `title`) and not the listbox, which keeps cmdk's own "Suggestions".
+     */
+    const { unmount } = render(
+      <Palette loop label="Flag commands">
+        {ROWS}
+      </Palette>,
+    );
+    await waitFor(() => screen.getByRole('dialog'));
+    expect(document.querySelector('[cmdk-label]')!.textContent).toBe('Flag commands');
+    // Which role it actually lands on, asserted rather than assumed.
+    expect(screen.queryByRole('combobox', { name: 'Flag commands' })).toBeTruthy();
+    expect(screen.queryByRole('listbox', { name: 'Flag commands' })).toBeNull();
+
+    // `loop` wraps from the last row back to the first.
+    await userEvent.keyboard('{ArrowUp}');
+    await waitFor(() => {
+      const selected = screen
+        .getAllByRole('option')
+        .find((option) => option.getAttribute('data-selected') === 'true');
+      expect(selected!.textContent).toContain('New environment');
+    });
+    unmount();
+
+    // vimBindings is ON by default, so Ctrl+n moves the highlight; `false` is
+    // the opt-out an app that binds Ctrl+n itself needs.
+    render(<Palette vimBindings={false}>{ROWS}</Palette>);
+    await waitFor(() => screen.getByRole('dialog'));
+    await userEvent.keyboard('{Control>}n{/Control}');
+    await waitFor(() => {
+      const selected = screen
+        .getAllByRole('option')
+        .find((option) => option.getAttribute('data-selected') === 'true');
+      expect(selected!.textContent).toContain('New flag');
+    });
+  });
+
+  it('still sends the dialog\u2019s own props to the dialog', async () => {
+    /**
+     * The other half of the split, and the half that breaks if someone widens
+     * the destructure too far: `modal` and `defaultOpen` belong to
+     * `Dialog.Root`, and routing them to cmdk would spread them onto a div.
+     */
+    render(
+      <CommandDialog defaultOpen modal={false} title="Flag palette">
+        <CommandInput placeholder="Search…" />
+        <CommandList>
+          <CommandEmpty>No results.</CommandEmpty>
+        </CommandList>
+      </CommandDialog>,
+    );
+    const dialog = await waitFor(() => screen.getByRole('dialog'));
+    expect(document.getElementById(dialog.getAttribute('aria-labelledby')!)!.textContent).toBe(
+      'Flag palette',
+    );
+    // `modal={false}` leaves the rest of the page unhidden.
+    expect(document.body.getAttribute('aria-hidden')).toBeNull();
+  });
+
+  it('routes cmdk\u2019s root prop list EXACTLY , asserted in both directions', () => {
+    /**
+     * The routing is only correct while it is exhaustive, and the type layer
+     * does not make it so on its own: `PaletteRootProps['filter']` errors if
+     * cmdk REMOVES a prop, and says nothing when cmdk ADDS one. An added root
+     * prop would land on `Dialog.Root` and be dropped.
+     *
+     * So this reads cmdk's root declaration and compares SETS, not a subset.
+     * The earlier version of this test scanned the whole `.d.ts` with
+     * `/^\s{4}(\w+)\?:/` , which also swept up Item, Group, Input and Dialog
+     * props (`keywords`, `heading`, `forceMount`, `container`…) and then only
+     * checked that our nine were among them. That direction catches a rename
+     * and cannot catch the addition the comment claimed it did.
+     */
+    const source = readFileSync(
+      join(process.cwd(), '../../registry/velobits/ui/command-palette.tsx'),
+      'utf8',
+    );
+    const cmdkTypes = readFileSync(
+      join(process.cwd(), '../../node_modules/cmdk/dist/index.d.ts'),
+      'utf8',
+    );
+
+    /** Just the root: `declare const Command: …` up to the next declaration. */
+    const rootStart = cmdkTypes.indexOf('declare const Command:');
+    expect(
+      rootStart,
+      'cmdk no longer declares `Command` , this test cannot see the root',
+    ).toBeGreaterThan(-1);
+    const rootBlock = cmdkTypes.slice(rootStart, cmdkTypes.indexOf('\ndeclare ', rootStart + 1));
+
+    /**
+     * `ref` is React's, and `asChild` is deliberately NOT routed , this
+     * component owns the element it renders inside its own dialog, so there is
+     * nothing useful to substitute, and passing it is a type error. Both are
+     * listed here so the exclusion stays a decision.
+     */
+    const NOT_ROUTED = new Set(['ref', 'asChild']);
+    const declared = [...rootBlock.matchAll(/^ {4}(\w+)\?:/gm)]
+      .map((m) => m[1]!)
+      .filter((prop) => !NOT_ROUTED.has(prop));
+
+    const ROOT_PROPS = [
+      'label',
+      'shouldFilter',
+      'filter',
+      'defaultValue',
+      'value',
+      'onValueChange',
+      'loop',
+      'disablePointerSelection',
+      'vimBindings',
+    ];
+
+    // Set equality. A cmdk upgrade that adds a root prop fails HERE, naming it,
+    // rather than silently leaving it on the Dialog , update ROOT_PROPS, the
+    // interface and the destructure together.
+    expect([...declared].sort()).toEqual([...ROOT_PROPS].sort());
+
+    for (const prop of ROOT_PROPS) {
+      expect(source, `CommandDialogProps does not declare \`${prop}\``).toMatch(
+        new RegExp(`\\n  ${prop}\\?: PaletteRootProps\\['${prop}'\\];`),
+      );
+      expect(source, `CommandDialog does not destructure \`${prop}\``).toMatch(
+        new RegExp(`\\n  ${prop},\\n`),
+      );
+      expect(source, `CommandPalette is not passed \`${prop}\``).toMatch(
+        new RegExp(`\\n            ${prop}=\\{${prop}\\}`),
+      );
+    }
+  });
+});
+
 describe('CommandDialog, the ⌘K shortcut', () => {
   function Controlled({ shortcut }: { shortcut?: string | false }) {
     const [open, setOpen] = useState(false);

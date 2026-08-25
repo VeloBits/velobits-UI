@@ -500,6 +500,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:consumer": "vitest run --config vitest.consumer.config.ts",
     "size": "size-limit",
     "publint": "publint",
     "attw": "attw --pack . --profile node16",

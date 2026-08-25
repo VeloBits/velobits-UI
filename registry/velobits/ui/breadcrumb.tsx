@@ -95,7 +95,7 @@ export interface BreadcrumbLinkProps extends React.ComponentProps<'a'> {
 /**
  * `text-link` (`--primary-text`), never `text-primary`.
  *
- * `--primary` measures 3.90:1 on the cream page: fine as a fill behind white,
+ * `--primary` measures 3.86:1 on the paper page: fine as a fill behind white,
  * failing AA as text. A breadcrumb is small text, so it is the least forgiving
  * place in the system to get that pair wrong.
  */

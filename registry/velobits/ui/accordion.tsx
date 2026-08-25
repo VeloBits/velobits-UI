@@ -155,7 +155,7 @@ function AccordionTrigger({
               'shrink-0 text-muted-foreground',
               'transition-[transform,color] duration-micro ease-out',
               // `text-link` (--primary-text), not `text-primary`: --primary is
-              // 3.90:1 on the cream page, which clears the 3:1 non-text bar only
+              // 3.86:1 on the paper page, which clears the 3:1 non-text bar only
               // just. --primary-text has headroom in both themes and is the same
               // hue family.
               'group-data-[state=open]/accordion-trigger:rotate-180',

@@ -66,7 +66,7 @@ painting light grey in dark mode while `border-border` is correct.
 
 ## Three rules the palette encodes
 
-**`--primary` is not a text colour.** `#007ACC` measures 3.90:1 on the cream page:
+**`--primary` is not a text colour.** `#007ACC` measures 3.86:1 on the paper page:
 fine as a fill behind white text at 4.51:1, a WCAG failure as text. Links use
 `text-link`, no `Button` variant paints primary as a foreground, and a test enforces
 that.

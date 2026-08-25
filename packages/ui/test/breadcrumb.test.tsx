@@ -140,7 +140,7 @@ describe('Breadcrumb, separator and ellipsis are opposites', () => {
 
 describe('Breadcrumb, links', () => {
   it('uses --primary-text, never --primary, on hover', () => {
-    /** --primary is 3.90:1 on the cream page: a fill colour, not a text colour. */
+    /** --primary is 3.86:1 on the paper page: a fill colour, not a text colour. */
     render(<Fixture />);
     const cls = screen.getByRole('link', { name: 'Acme' }).className;
     expect(cls).toContain('hover:text-link');

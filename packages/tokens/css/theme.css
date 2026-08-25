@@ -95,7 +95,7 @@
   --color-field-border: var(--field-border);
   --color-highlight: var(--highlight);
   --color-overlay: var(--overlay);
-  /* Blue as TEXT. `--primary` is 3.90:1 on the cream page and fails AA for
+  /* Blue as TEXT. `--primary` is 3.86:1 on the paper page and fails AA for
    * text , `text-link` is the token for a link, never `text-primary`. */
   --color-link: var(--primary-text);
   --color-primary-text: var(--primary-text);
@@ -136,6 +136,10 @@
   --color-card-foreground: var(--fg);
   --color-popover: var(--panel);
   --color-popover-foreground: var(--fg);
+  /* Here for shadcn-generated code that expects `bg-primary`. It also makes
+   * `text-primary` a real utility as a side effect, and on TEXT that is the
+   * mistake , `text-link` is the token for blue text. On a non-text graphic it
+   * is legitimate: 1.4.11 asks 3:1 of an icon, which 3.86 clears. */
   --color-primary: var(--primary);
   --color-primary-foreground: var(--on-primary);
   --color-secondary: var(--bg2);

@@ -9,6 +9,9 @@
     "typecheck": {
       "dependsOn": ["^build"]
     },
+    "@velobitsio/ui#typecheck": {
+      "dependsOn": ["^build", "build"]
+    },
     "test": {
       "dependsOn": ["^build"]
     },
@@ -16,6 +19,9 @@
       "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
+    },
+    "test:consumer": {
+      "dependsOn": ["build"]
     },
     "dev": {
       "dependsOn": ["^build"],

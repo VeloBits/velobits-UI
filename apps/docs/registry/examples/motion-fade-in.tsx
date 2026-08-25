@@ -24,7 +24,8 @@ export default function MotionFadeIn() {
   return (
     <div className="max-w-md space-y-4">
       <Button variant="primary" onClick={run} disabled={state === 'loading'}>
-        {state === 'loading' && <Spinner size={16} />}
+        {/* label={null}: silenced so it stays out of the button's own name. */}
+        {state === 'loading' && <Spinner size={16} label={null} />}
         {state === 'loading' ? 'Evaluating…' : 'Evaluate flag'}
       </Button>
       {state === 'done' && (

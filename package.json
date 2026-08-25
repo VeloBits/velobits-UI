@@ -26,7 +26,7 @@
     "size": "turbo run size",
     "publint": "turbo run publint",
     "attw": "turbo run attw",
-    "package:check": "turbo run publint attw",
+    "package:check": "turbo run publint attw test:consumer",
     "changeset": "changeset",
     "version-packages": "changeset version && npm install --package-lock-only",
     "release": "turbo run build && changeset publish",

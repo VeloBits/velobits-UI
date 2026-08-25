@@ -55,11 +55,13 @@ export interface ColorChoice {
  * Two entries carry notes rather than being omitted, because omitting them would
  * hide a real asymmetry in the palette:
  *
- *  - **`primary`** is the blue FILL. As text it measures 4.51:1 and fails AA, so
- *    `button.tsx` documents that no variant paints it as text and `link`
- *    (`--primary-text`) exists instead. An icon is a non-text graphic and gated
- *    at 3:1 by WCAG 1.4.11, so `primary` is legitimate here , which is exactly
- *    the sort of thing that reads as an inconsistency unless it is written down.
+ *  - **`primary`** is the blue FILL. As text it measures 3.86:1 on the page and
+ *    fails AA's 4.5:1 (4.51:1 is the other direction , WHITE on primary, which
+ *    is what makes it a fill), so `button.tsx` documents that no variant paints
+ *    it as text and `link` (`--primary-text`) exists instead. An icon is a
+ *    non-text graphic and gated at 3:1 by WCAG 1.4.11, which 3.86 clears , so
+ *    `primary` is legitimate here, which is exactly the sort of thing that reads
+ *    as an inconsistency unless it is written down.
  *  - **`brand`** is lime, a fill token with no text pairing at all: on the cream
  *    page it measures ~1.1:1. It is listed so the contrast readout can say so
  *    out loud, which teaches the rule better than its absence would.

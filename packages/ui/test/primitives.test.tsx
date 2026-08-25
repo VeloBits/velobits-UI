@@ -10,7 +10,7 @@ import {
 } from '../../../registry/velobits/ui/alert';
 import { cn } from '../../../registry/velobits/lib/cn';
 import { Badge } from '../../../registry/velobits/ui/badge';
-import { Button } from '../../../registry/velobits/ui/button';
+import { Button, type ButtonProps } from '../../../registry/velobits/ui/button';
 import {
   Card,
   CardAction,
@@ -67,11 +67,58 @@ describe('Button', () => {
     expect(screen.queryByRole('button')).toBeNull();
   });
 
+  it('defaults to secondary, so a bare <Button> is NOT the blue one', () => {
+    /**
+     * Deliberate, and the opposite of shadcn/ui, whose default variant is named
+     * `default` and is the emphasised one. Pinned so the default cannot be
+     * flipped later as a styling preference.
+     */
+    const { container, unmount } = render(<Button>Save</Button>);
+    const bare = container.firstElementChild!.className;
+    unmount();
+    const { container: explicit } = render(<Button variant="secondary">Save</Button>);
+    expect(bare).toBe(explicit.firstElementChild!.className);
+    expect(bare).toContain('bg-panel');
+    expect(bare).not.toContain('bg-primary');
+    // The size half of the same trap: shadcn's `default` size is this one's `md`.
+    expect(bare).toContain('h-9');
+  });
+
+  it('emits NO classes for an unrecognised variant , cva does not fall back', () => {
+    /**
+     * The shadcn migration trap, and the intuition about it is wrong, so it is
+     * measured rather than described. cva consults `defaultVariants` only for
+     * `undefined`: `'default'` is truthy, so it looks up
+     * `variants.variant['default']`, finds nothing, and contributes nothing.
+     *
+     * The outcome is therefore NOT "quietly renders secondary" , it is a
+     * transparent, borderless button, and `size="default"` is a collapsed one
+     * with no height or padding. TypeScript rejects the literal; this is the
+     * shape of the failure once a value has been widened to `string`, which is
+     * why the cast below is the honest fixture rather than a cheat.
+     */
+    const asWidened = (value: string) => value as NonNullable<ButtonProps['variant']>;
+    const { container, unmount } = render(<Button variant={asWidened('default')}>Save</Button>);
+    const unknown = container.firstElementChild!.className;
+    unmount();
+    const { container: secondary } = render(<Button variant="secondary">Save</Button>);
+
+    expect(unknown).not.toBe(secondary.firstElementChild!.className);
+    for (const cls of ['bg-panel', 'bg-primary', 'border-field-border', 'control-raised']) {
+      expect(unknown, `an unknown variant should contribute no fill, got ${cls}`).not.toContain(
+        cls,
+      );
+    }
+    // The size dimension is untouched by a bad variant, and vice versa.
+    expect(unknown).toContain('h-9');
+  });
+
   it('never paints --primary as text', () => {
     /**
-     * #007ACC is 3.90:1 on the cream page , a fill colour, not a text colour.
-     * The `link` variant must use `text-link` (--primary-text). A regression here
-     * is an accessibility bug that looks like a styling preference.
+     * #007ACC is 3.86:1 on the paper page , a fill colour, not a text colour, and
+     * 4.01:1 on the dark page, so dark mode does not rescue it either. The `link`
+     * variant must use `text-link` (--primary-text). A regression here is an
+     * accessibility bug that looks like a styling preference.
      */
     const { container } = render(<Button variant="link">Docs</Button>);
     const cls = container.firstElementChild!.className;
@@ -597,6 +644,40 @@ describe('Separator, Skeleton, Spinner', () => {
     unmount();
     const { container } = render(<Spinner label={null} />);
     expect(container.firstElementChild!.getAttribute('aria-hidden')).toBe('true');
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it("Spinner's default label lands in an ancestor button's NAME, which is why label={null} exists", () => {
+    /**
+     * The trap the docblock warns about, asserted rather than described. An
+     * `aria-label` on a descendant is not a private announcement , accname
+     * concatenates it into the name of whatever control contains it. So a Save
+     * button that spins announces "Loading Saving…", and the name of a focused
+     * control changed underneath the user.
+     *
+     * Nothing else catches this: it renders correctly, and axe has no rule
+     * against a `status` inside a `button`. The only symptom is heard.
+     */
+    const { unmount } = render(
+      <Button disabled>
+        <Spinner size={16} />
+        Saving…
+      </Button>,
+    );
+    expect(screen.getByRole('button').textContent).toBe('Saving…');
+    // getByRole's `name` option computes the accessible name, so this IS the
+    // announcement, not the text content.
+    expect(screen.queryByRole('button', { name: 'Saving…' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Loading Saving…' })).toBeTruthy();
+    unmount();
+
+    render(
+      <Button disabled>
+        <Spinner size={16} label={null} />
+        Saving…
+      </Button>,
+    );
+    expect(screen.getByRole('button', { name: 'Saving…' })).toBeTruthy();
     expect(screen.queryByRole('status')).toBeNull();
   });
 });

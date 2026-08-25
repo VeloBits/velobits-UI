@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "velobits-theme",
   "title": "VeloBits theme",
-  "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobitsio/tokens test suite.",
+  "description": "The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobitsio/tokens test suite, but check what a pair was verified for: --primary is gated as a fill, white on it at 4.51:1, never as text. Blue text is --primary-text.",
   "cssVars": {
     "theme": {
       "radius-sm": "4px",

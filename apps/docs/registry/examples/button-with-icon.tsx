@@ -11,7 +11,8 @@ export default function ButtonWithIcon() {
         With icon
       </Button>
       <Button variant="primary" disabled>
-        <Spinner size={16} />
+        {/* label={null}: the button's name is "Saving…", not "Loading Saving…". */}
+        <Spinner size={16} label={null} />
         Saving…
       </Button>
       <Button variant="primary" disabled>

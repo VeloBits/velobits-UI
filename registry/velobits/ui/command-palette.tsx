@@ -263,6 +263,12 @@ function useGlobalShortcut(
   }, [key]);
 }
 
+/**
+ * cmdk's root props, borrowed so the ones `CommandDialog` re-declares below
+ * cannot drift from the version of `cmdk` actually installed.
+ */
+type PaletteRootProps = React.ComponentProps<typeof CommandPrimitive>;
+
 export interface CommandDialogProps extends React.ComponentProps<typeof DialogPrimitive.Root> {
   /**
    * Screen-reader name for the dialog. Radix requires a title and logs a
@@ -280,8 +286,101 @@ export interface CommandDialogProps extends React.ComponentProps<typeof DialogPr
    */
   shortcut?: string | false;
   className?: string;
+
+  /* ── routed to the palette, not to the dialog , see the note below ──────── */
+
+  /**
+   * Custom match scoring. `(value, search, keywords) => number`, 1 being a
+   * perfect match and 0 hidden entirely. cmdk's own `command-score` is the
+   * default. Reach for it when the thing being searched is not the thing being
+   * displayed , a page whose description should match while only its title
+   * shows, a key that should match on its slug.
+   */
+  filter?: PaletteRootProps['filter'];
+  /**
+   * `false` turns cmdk's filtering AND sorting off, which is what a
+   * server-backed palette needs: the results arriving from the endpoint are
+   * already the answer, and a second client-side pass over them hides rows the
+   * server deliberately returned. You render only the items you want.
+   *
+   * `CommandEmpty` keeps working, and changes meaning , which is more useful
+   * than it sounds. cmdk's counter short-circuits when filtering is off and sets
+   * the match count to the number of REGISTERED items, so the empty state stops
+   * asking "did the query match anything" and starts asking "did you render
+   * anything". For a remote palette that is the right question, so let it own
+   * the empty state rather than hand-rolling one beside it , two will stack.
+   */
+  shouldFilter?: PaletteRootProps['shouldFilter'];
+  /**
+   * The highlighted item's value, controlled. Pair with `onValueChange`. The
+   * uncontrolled default is the first matching row, which is almost always what
+   * you want , this is for restoring a previous selection.
+   */
+  value?: PaletteRootProps['value'];
+  /**
+   * Fires when the highlight moves, by arrow key or by pointer , but ONLY in
+   * the controlled form. cmdk gates the callback on `value !== undefined`, so
+   * passing this alone gets you silence. Pass both, always.
+   */
+  onValueChange?: PaletteRootProps['onValueChange'];
+  /** The initially highlighted item's value, uncontrolled. */
+  defaultValue?: PaletteRootProps['defaultValue'];
+  /** Arrow keys wrap from the last row to the first. Off by default. */
+  loop?: PaletteRootProps['loop'];
+  /** Stops hover moving the highlight. Off by default. */
+  disablePointerSelection?: PaletteRootProps['disablePointerSelection'];
+  /** Ctrl+n/j/p/k as arrow keys. ON by default; pass `false` to drop them. */
+  vimBindings?: PaletteRootProps['vimBindings'];
+  /**
+   * Accessible name for the INPUT , not for the dialog, which is `title`, and
+   * not for the listbox, which cmdk names "Suggestions" through `CommandList`'s
+   * own separate `label`. cmdk renders this into a visually hidden `<label
+   * htmlFor>` and points the input's `aria-labelledby` at it, so what changes is
+   * the combobox's name. Without it the input falls back to its placeholder.
+   */
+  label?: PaletteRootProps['label'];
 }
 
+/**
+ * ## One prop bag, two primitives , and the rest goes to the DIALOG
+ *
+ * This component renders two roots: Radix's `Dialog.Root` and cmdk's `Command`.
+ * Only one of them can receive `...props`, and it is the dialog, because that is
+ * the element this component *is* , `modal` and `defaultOpen` have to land
+ * somewhere.
+ *
+ * So every cmdk root prop is named explicitly above and destructured out here.
+ * A cmdk prop that is NOT on that list does not fall through to the palette; it
+ * falls through to `Dialog.Root`, which destructures six props and drops the
+ * rest on the floor , no throw, no warning, and a custom `filter` that never
+ * runs.
+ *
+ * How loud that is depends on who you are. Written as a literal, TypeScript
+ * catches it: `CommandDialogProps` is a closed interface, so an unrouted prop is
+ * an excess-property error rather than a silent no-op. It goes quiet exactly
+ * where the type system does , a JavaScript consumer, a spread-widened
+ * `{...rest}`, a value that arrived as `string`. So the type wall is the first
+ * line and this list is the second, and `command-palette.test.tsx` asserts the
+ * routing per prop plus the list itself, in BOTH directions, against the props
+ * cmdk actually declares.
+ *
+ * Three consequences of the split worth stating rather than discovering:
+ *
+ *  - The re-declarations carry their own JSDoc instead of inheriting cmdk's,
+ *    because the docs' prop-table generator drops anything whose only
+ *    declaration lives in `node_modules/cmdk`. Inherited, they would work and be
+ *    invisible. The *types* are still cmdk's, indexed off `PaletteRootProps`, so
+ *    a cmdk upgrade that REMOVES one is a type error here , a changed signature
+ *    is adopted silently and surfaces at the call sites instead.
+ *  - `asChild` is cmdk's tenth root prop and is deliberately not routed: this
+ *    component owns the element it renders inside its own dialog, and there is
+ *    nothing useful to substitute. Passing it is a type error, which is the
+ *    right answer rather than an omission.
+ *  - `defaultValue` is forwarded even though cmdk leaves it in the rest it
+ *    spreads onto its own `<div>`. React drops `defaultValue` on a non-form
+ *    element without an attribute and without a warning, so it costs nothing;
+ *    the test pins that, because it is the kind of thing a React major changes.
+ */
 function CommandDialog({
   title = 'Command palette',
   description = 'Search for a command to run',
@@ -290,6 +389,15 @@ function CommandDialog({
   children,
   open,
   onOpenChange,
+  filter,
+  shouldFilter,
+  value,
+  onValueChange,
+  defaultValue,
+  loop,
+  disablePointerSelection,
+  vimBindings,
+  label,
   ...props
 }: CommandDialogProps) {
   useGlobalShortcut(shortcut, open, onOpenChange);
@@ -329,7 +437,20 @@ function CommandDialog({
             <DialogPrimitive.Description>{description}</DialogPrimitive.Description>
           </VisuallyHidden.Root>
           {/* No rounding or border of its own , the dialog owns the frame. */}
-          <CommandPalette className="rounded-none">{children}</CommandPalette>
+          <CommandPalette
+            className="rounded-none"
+            filter={filter}
+            shouldFilter={shouldFilter}
+            value={value}
+            onValueChange={onValueChange}
+            defaultValue={defaultValue}
+            loop={loop}
+            disablePointerSelection={disablePointerSelection}
+            vimBindings={vimBindings}
+            label={label}
+          >
+            {children}
+          </CommandPalette>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

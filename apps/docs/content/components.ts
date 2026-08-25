@@ -166,7 +166,9 @@ export function App() {
       },
     ],
     notes: [
-      'The measurement behind that: #007ACC is 3.90:1 on the cream page. Fine as a fill behind white text at 4.51:1, a failure as text. --primary-text is the AA-safe blue step and is what `link` paints.',
+      'The default variant is secondary, not primary , a bare <Button> is the outlined one. Most buttons on a screen are not the primary action, so the emphasis is opt-in. This is the opposite of shadcn/ui, whose default variant is called `default` and is the emphasised one.',
+      'Porting shadcn markup, translate variant="default" to variant="primary" and size="default" to size="md" deliberately. cva does NOT fall back to its defaults for an unrecognised value, only for undefined, so variant="default" emits no fill and no border at all rather than quietly rendering secondary, and size="default" emits no height and no padding. TypeScript catches the literal; a value widened to string does not.',
+      'The measurement behind the missing primary text variant: #007ACC is 3.86:1 on the paper page. Fine as a fill behind white text at 4.51:1, a failure as text , and 4.01:1 on the dark page, so dark mode does not rescue it either. --primary-text is the AA-safe blue step and is what `link` paints.',
     ],
   },
 
@@ -366,6 +368,10 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
 
 <Spinner size={16} />`,
     examples: [{ name: 'spinner-demo', title: 'Sizes, and inside a button' }],
+    notes: [
+      'Inside a button, a link, a menu item or a tab, pass label={null}. The default label is an aria-label, and an aria-label on a child is concatenated into the accessible name of the control containing it , so a spinning Save button announces "Loading Saving…", leading with the least useful word and restating what the visible label already says. Standing on its own, keep the label: nothing else says the app is busy.',
+      'Nothing catches the un-silenced version. It renders correctly and axe has no rule against a status inside a button; the only symptom is heard.',
+    ],
   },
 
   tooltip: {
@@ -488,9 +494,25 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
     <CommandItem>New flag</CommandItem>
   </CommandList>
 </CommandDialog>`,
-    examples: [{ name: 'command-palette-demo', title: 'Opened from a button, or ⌘J' }],
+    examples: [
+      { name: 'command-palette-demo', title: 'Opened from a button, or ⌘J' },
+      {
+        name: 'command-palette-filter',
+        title: 'Matching on what is not on screen',
+        description:
+          'A custom filter scores each row by slug, team and former name while only the name is displayed , the ranking that stuffing everything into `value` cannot express.',
+      },
+      {
+        name: 'command-palette-remote',
+        title: 'Server-backed, with cmdk’s filtering off',
+        description:
+          'shouldFilter={false} and a custom filter are cmdk root props, and CommandDialog renders two roots , so it names and routes each one past the Dialog to the palette inside it.',
+      },
+    ],
     notes: [
       'This page is the proof of why that is opt-in: the docs site binds ⌘K for its own search, so the demo below takes ⌘J instead. Two listeners on one chord means whichever mounted last wins.',
+      'CommandDialog forwards filter, shouldFilter, value, onValueChange, defaultValue, loop, disablePointerSelection, vimBindings and label to the palette. The list is exhaustive on purpose, and a test asserts it against cmdk in both directions: anything not on it lands on the Dialog root, which drops what it does not recognise , no throw, no warning, and a custom filter that never runs. TypeScript catches the literal form, so the silent case is JavaScript, a spread, or a value widened to string. asChild is the one root prop deliberately not routed.',
+      'Turning filtering off does not disable CommandEmpty, it changes the question it asks: cmdk short-circuits its counter to the number of registered items, so the empty state stops tracking the query and starts tracking whether you rendered anything. Usually what a remote palette wants , let it own the empty state rather than putting a hand-rolled one beside it, or both render at once.',
     ],
   },
 
@@ -654,6 +676,9 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         description:
           'Every status ships a DISTINCT glyph. Colour alone fails 1.4.1, and on-versus-off is the distinction a control plane exists to make unambiguous.',
       },
+    ],
+    notes: [
+      'The chip is uppercased by CSS, never in the DOM , some screen readers spell a short all-caps token letter by letter, "oh en". The transform covers a children override too, so `Rolling out` is painted `ROLLING OUT`. That is easy to miss because the override was designed for a percentage, and digits cannot show a text-transform. Add className="normal-case" where caps are wrong for the value.',
     ],
   },
 

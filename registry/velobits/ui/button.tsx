@@ -6,12 +6,55 @@ import { Slot } from 'radix-ui';
 import { cn } from '../lib/cn';
 
 /**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * ## THE DEFAULT VARIANT IS `secondary`. A BARE `<Button>` IS NOT THE BLUE ONE.
+ *
+ * ```tsx
+ * <Button>Save</Button>                    // secondary , an outlined panel fill
+ * <Button variant="primary">Save</Button>  // the blue one
+ * ```
+ *
+ * Chosen that way because most buttons on a screen are not the primary action,
+ * and a system whose zero-config button is the loudest one produces pages with
+ * six primary buttons on them. The default here is the one that is right most
+ * often; the emphasis is opt-in.
+ *
+ * The cost is a MIGRATION TRAP. shadcn/ui's button names its default variant
+ * `default` and defaults to it; there is no `default` variant in this file, and
+ * `size="default"` is `size="md"` here.
+ *
+ * What that produces is worse than the wrong button, and worth knowing exactly,
+ * because the intuition is wrong: **cva does not fall back to
+ * `defaultVariants` for an unrecognised value.** It falls back only for
+ * `undefined`. `'default'` is truthy, so cva looks up
+ * `variants.variant['default']`, finds nothing, and emits NO classes for that
+ * dimension at all , measured, not assumed:
+ *
+ *  - `variant="default"` → base + size classes and no fill, no border. A
+ *    transparent, borderless button.
+ *  - `size="default"` → variant classes and no height, no padding. A collapsed
+ *    one.
+ *
+ * TypeScript does catch the literal , `'default'` is not in either union , so
+ * this bites where the value is widened to `string`, comes from JavaScript, or
+ * arrives through a spread. Nothing warns at runtime in any of those cases.
+ * When porting, translate `variant="default"` to `variant="primary"`
+ * deliberately: the two words mean opposite things.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
  * ## Why there is no `primary`-coloured text variant
  *
- * `--primary` (#007ACC) measures 3.90:1 on the cream page , fine as a fill
+ * `--primary` (#007ACC) measures 3.86:1 on the paper page , fine as a fill
  * behind white text (4.51:1), failing AA as text. The `link` variant therefore
- * uses `text-link` (`--primary-text`, 5.34:1), and no variant paints
+ * uses `text-link` (`--primary-text`, 5.29:1), and no variant paints
  * `--primary` on a page background.
+ *
+ * Dark mode does not rescue it: the same token is 4.01:1 on the dark page, still
+ * under 4.5:1. So `text-primary` on text is wrong in BOTH themes , worth saying
+ * because the utility exists (the token layer bridges `--color-primary` for
+ * shadcn-generated markup) and nothing stops you typing it. On a non-text
+ * graphic it is fine , 1.4.11 asks 3:1 of an icon, and both themes clear that ,
+ * which is why the icons page offers it deliberately.
  *
  * ## Radius
  *

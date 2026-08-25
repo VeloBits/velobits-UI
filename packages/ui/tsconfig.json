@@ -7,5 +7,12 @@
       "@velobitsio/icons": ["../icons/src/index.ts"]
     }
   },
-  "include": ["../../registry/velobits", "test", "tsup.config.ts", "vitest.config.ts"]
+  "include": [
+    "../../registry/velobits",
+    "test",
+    "test-consumer",
+    "tsup.config.ts",
+    "vitest.config.ts",
+    "vitest.consumer.config.ts"
+  ]
 }

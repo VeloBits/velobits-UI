@@ -59,6 +59,34 @@ describe('StatusChip, labelling', () => {
     expect(screen.getByText('25%')).toBeTruthy();
   });
 
+  it('uppercases a children override too, and every other test here hides that', () => {
+    /**
+     * `uppercase` sits on the chip, not on the built-in words, so it paints the
+     * override as well: `Rolling out` reads `ROLLING OUT`.
+     *
+     * Worth its own case because the rest of this suite cannot see it. The
+     * override was designed for a percentage, so every other assertion passes
+     * `25%` , digits are case-invariant, which is exactly the class of value that
+     * cannot reveal a text-transform. A word can.
+     */
+    const { container, unmount } = render(<StatusChip status="partial">Rolling out</StatusChip>);
+    const chip = container.querySelector('[data-slot="status-chip"]')!;
+    // The DOM keeps the case, so the announcement is still the words.
+    expect(chip.textContent).toBe('Rolling out');
+    expect(chip.className).toContain('uppercase');
+    unmount();
+
+    // And the documented escape, which has to actually win the merge.
+    const { container: plain } = render(
+      <StatusChip status="partial" className="normal-case">
+        Rolling out
+      </StatusChip>,
+    );
+    const cls = plain.querySelector('[data-slot="status-chip"]')!.className;
+    expect(cls).toContain('normal-case');
+    expect(cls).not.toMatch(/\buppercase\b/);
+  });
+
   it('uses tabular figures so a polling column does not ripple', () => {
     const { container } = render(<StatusChip status="partial">25%</StatusChip>);
     expect(container.querySelector('[data-slot="status-chip"]')!.className).toContain(

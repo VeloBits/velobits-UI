@@ -530,7 +530,7 @@ const themes: RegistryItem[] = [
     type: 'registry:theme',
     title: 'VeloBits theme',
     description:
-      'The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobitsio/tokens test suite.',
+      'The full token layer as CSS variables. Every colour pair here is contrast-verified in both themes by the @velobitsio/tokens test suite, but check what a pair was verified for: --primary is gated as a fill, white on it at 4.51:1, never as text. Blue text is --primary-text.',
     cssVars: {
       // Static scales. `@theme` in a consumer's CSS, so these become utilities.
       theme: {

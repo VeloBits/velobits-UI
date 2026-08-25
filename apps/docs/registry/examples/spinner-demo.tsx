@@ -8,7 +8,13 @@ export default function SpinnerDemo() {
       <Spinner />
       <Spinner size={24} />
       <Button variant="primary" disabled>
-        <Spinner size={16} />
+        {/*
+         * `label={null}` inside a control, always. The default label is an
+         * `aria-label`, and an `aria-label` on a child is concatenated into the
+         * accessible name of the button containing it , so without this the
+         * button announces "Loading Saving…" instead of "Saving…".
+         */}
+        <Spinner size={16} label={null} />
         Saving…
       </Button>
     </div>

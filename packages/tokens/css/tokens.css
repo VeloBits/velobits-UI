@@ -66,7 +66,7 @@
   --primary: #007acc;
   --primary-hover: #0062a3;
   --on-primary: #ffffff;
-  /* Links, inline icons, active nav labels. --primary itself measures 3.90:1 on
+  /* Links, inline icons, active nav labels. --primary itself measures 3.86:1 on
    * the page, which fails AA for text. NEVER use --primary for a link. */
   --primary-text: #0062b3;
   --primary-soft: rgba(0, 122, 204, 0.1);
@@ -304,6 +304,9 @@ body.dark {
   --primary: #007acc;
   --primary-hover: #1177bb;
   --on-primary: #ffffff;
+  /* Not a light-theme quirk: --primary measures 4.01:1 here, still under AA's
+   * 4.5:1, so it fails as text in this theme too. --primary-text is the text
+   * step, 7.45:1 on the page. */
   --primary-text: #4aacff;
   --primary-soft: rgba(0, 122, 204, 0.22);
 
