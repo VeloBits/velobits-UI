@@ -17,6 +17,28 @@
 @import '@fontsource-variable/geist';
 @import '@fontsource-variable/jetbrains-mono';
 
+/*
+ * ⚠️ EDITING THE TOKEN LAYER? TURBOPACK WILL NOT NOTICE.
+ *
+ * `next dev` caches the PostCSS result for THIS file on disk, keyed on this
+ * file's own contents, and does not track transitive `@import`s through
+ * node_modules as invalidation inputs. So a change inside
+ * `@velobitsio/tokens/css/*.css` , which is where every token, the glass tier
+ * and the control material live , leaves the cached output in place. A plain
+ * dev-server RESTART does not help either: the cache is in `.next/cache`, not
+ * in memory.
+ *
+ * The symptom is a CSS error that has already been fixed, or a token change
+ * that simply does not appear, while `next build` on the identical files is
+ * clean. That asymmetry is the tell. Two ways out:
+ *
+ *   rm -rf apps/docs/.next     # then restart dev
+ *   # or change this file's CONTENTS (not just its mtime) to re-key the entry
+ *
+ * Cost one debugging session on 2026-08-20, when controls.css moved to
+ * `@utility` and dev kept reporting "`@utility` cannot be nested" against a
+ * theme.css that no longer nested it.
+ */
 @import '@velobitsio/tokens/theme.css';
 
 /*

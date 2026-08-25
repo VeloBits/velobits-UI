@@ -79,11 +79,24 @@ export function SearchCommand() {
 
   return (
     <>
+      {/*
+       * Styled for the chrome bar, which is dark in BOTH themes , this trigger
+       * only ever renders inside `SiteHeader`.
+       *
+       * `variant="ghost"` plus an explicit edge, rather than `variant="secondary"`:
+       * secondary fills with `--bg2`, which is the LIGHT theme's recessed surface
+       * and would put a pale pill on a dark bar.
+       *
+       * The resting fill is `--chrome` itself (no wash) and the label is
+       * `--chrome-muted-fg`, which measures 6.50:1 there; the wash arrives on hover
+       * and takes the label to `--chrome-fg`. Both states clear AA either way on
+       * this bar , see the note on `--chrome-highlight`.
+       */}
       <Button
-        variant="secondary"
+        variant="ghost"
         size="sm"
         onClick={() => setOpen(true)}
-        className="gap-2 text-muted-foreground"
+        className="gap-2 border border-chrome-border text-chrome-muted-fg hover:bg-chrome-highlight hover:text-chrome-fg"
       >
         <SearchIcon />
         <span className="hidden sm:inline">Search documentation…</span>

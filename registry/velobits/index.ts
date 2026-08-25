@@ -82,6 +82,7 @@ export { NativeSelect } from './ui/native-select';
 export { ScrollArea, ScrollBar } from './ui/scroll-area';
 export { Separator } from './ui/separator';
 export { Skeleton } from './ui/skeleton';
+export { Slider, type SliderProps } from './ui/slider';
 export { Spinner, type SpinnerProps } from './ui/spinner';
 export { Switch } from './ui/switch';
 export { Textarea } from './ui/textarea';

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { light as lightTokens } from '@velobitsio/tokens';
 import { Badge, Card, CardDescription, CardHeader, CardTitle } from '@velobitsio/ui';
 
 import { COMPONENT_GROUPS, componentHref } from '@/lib/docs-nav';
@@ -18,20 +19,25 @@ export const metadata: Metadata = {
  * site said "37 components" for as long as there were 37, and then `motion` was
  * added and it said 37 in four places. A number that is written once and derived
  * everywhere cannot do that.
+ *
+ * The token count was the counter-example sitting in the very next clause: it was
+ * hardcoded as "36", the palette grew past it, and nothing noticed , the sentence
+ * arguing for derived numbers was itself carrying a stale one. Now derived too.
  */
 export default function ComponentsIndexPage() {
   const componentCount = COMPONENT_GROUPS.filter((group) =>
     ['Primitives', 'Overlays', 'Composites'].includes(group.title),
   ).reduce((total, group) => total + group.names.length, 0);
+  const tokenCount = Object.keys(lightTokens).length;
 
   return (
     <main id="main" className="space-y-12 py-8 pb-24">
       <header className="space-y-3">
         <h1 className="text-3xl font-semibold tracking-tight">Components</h1>
         <p className="max-w-3xl leading-7 text-muted-foreground">
-          {componentCount} components across three tiers, on 36 semantic tokens, every one of which
-          is either contrast-gated or carries a recorded exemption. Each page carries its install
-          command, what it depends on, and a prop table extracted from the source.
+          {componentCount} components across three tiers, on {tokenCount} semantic tokens, every one
+          of which is either contrast-gated or carries a recorded exemption. Each page carries its
+          install command, what it depends on, and a prop table extracted from the source.
         </p>
       </header>
 

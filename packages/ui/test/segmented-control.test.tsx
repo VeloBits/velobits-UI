@@ -385,6 +385,80 @@ describe('SegmentedControl, FIX 2 , a real disable, not pointer-events-none', ()
   });
 });
 
+describe('SegmentedControl, FIX 3 , a selection you can actually see', () => {
+  /**
+   * ## The bug this pins, and why nothing caught it for a release
+   *
+   * The active segment was `bg-panel` + `control-raised` on a `bg-bg2` track.
+   * Two independent failures stacked into no indicator at all in dark mode:
+   *
+   *   1. `--bg2` and `--panel` are the SAME value in dark (`#2C2D2C`), so the
+   *      fill measured 1.00:1 against its own track.
+   *   2. `data-[state=on]:control-raised` generated no CSS whatsoever. A
+   *      Tailwind variant can only compose over a utility Tailwind owns, and
+   *      `control-raised` was a hand-written class in a `components` layer. The
+   *      class sat in the DOM looking right while the computed box-shadow was
+   *      `none`. `packages/tokens/css/controls.css` now declares it as
+   *      `@utility`, and `controls-css.test.ts` guards that end.
+   *
+   * These assertions cover the half that lives in this file: the class contract.
+   * They cannot see computed CSS , happy-dom does not run Tailwind , which is
+   * precisely why the failure was invisible to a test suite before. What they DO
+   * catch is the indicator being dropped or renamed, which is how it would go.
+   */
+  const OPTS: SegmentOption[] = [
+    { value: 'a', label: 'A' },
+    { value: 'b', label: 'B' },
+  ];
+
+  function segments() {
+    return screen.getAllByRole('radio');
+  }
+
+  it('marks the selected segment with a border, not the fill alone', () => {
+    render(<SegmentedControl value="a" onValueChange={vi.fn()} options={OPTS} aria-label="G" />);
+    const [selected] = segments();
+    expect(
+      selected!.className,
+      'The fill is 1.00:1 against the track in dark mode, so `bg-panel` cannot be ' +
+        'the only selected-state signal. --field-border is the one ramp step ' +
+        'clearing 3:1 against both themes.',
+    ).toContain('data-[state=on]:border-field-border');
+  });
+
+  it('keeps the raised material on the selected segment', () => {
+    render(<SegmentedControl value="a" onValueChange={vi.fn()} options={OPTS} aria-label="G" />);
+    expect(segments()[0]!.className).toContain('data-[state=on]:control-raised');
+  });
+
+  it('reserves the border on EVERY segment, so selecting one shifts nothing', () => {
+    /**
+     * A border applied only to the active segment makes it 2px wider than the
+     * others and shunts the rest of the row sideways on every change. A ring
+     * would avoid that too, but Tailwind composes `ring-*` into `box-shadow`,
+     * which `control-raised` sets outright , the two cannot share the element.
+     */
+    render(<SegmentedControl value="a" onValueChange={vi.fn()} options={OPTS} aria-label="G" />);
+    for (const segment of segments()) {
+      expect(segment.className, 'every segment reserves the 1px').toContain(
+        'border border-transparent',
+      );
+    }
+  });
+
+  it('the track and the selected fill are the two halves that were identical', () => {
+    /**
+     * Recorded so the collision is discoverable from the test rather than only
+     * from the docblock: the track is `--bg2`, the pill is `--panel`, and in dark
+     * those are the same hex. Neither class is wrong , they just cannot carry the
+     * signal alone, which is what the border above is for.
+     */
+    render(<SegmentedControl value="a" onValueChange={vi.fn()} options={OPTS} aria-label="G" />);
+    expect(screen.getByRole('radiogroup').className).toContain('bg-bg2');
+    expect(segments()[0]!.className).toContain('data-[state=on]:bg-panel');
+  });
+});
+
 describe('SegmentedControl, axe', () => {
   it('finds no structural violations, named by aria-label', async () => {
     const violations = await audit(

@@ -52,7 +52,7 @@ describe('the generated neutral ramp', () => {
   it('stays a WARM ramp , chroma never reaches zero', () => {
     /**
      * The point of generating this rather than using Tailwind's neutral scale:
-     * a pure grey beside the brand cream reads cold. Chroma is small but must
+     * a pure grey beside the brand lime reads cold. Chroma is small but must
      * stay non-zero, and it should decay toward the dark end.
      */
     for (const [step, hex] of ramp) {

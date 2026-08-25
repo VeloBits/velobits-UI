@@ -56,7 +56,7 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     fg: 'primaryText',
     bg: 'bg',
     target: 'text',
-    note: 'the reason --primary is not a text token: the seed itself is 3.90:1 on cream',
+    note: 'the reason --primary is not a text token: the seed itself is 3.86:1 on the page',
   },
   { label: 'link / primary-text on panel', fg: 'primaryText', bg: 'panel', target: 'text' },
   { label: 'on-primary over a primary fill', fg: 'onPrimary', bg: 'primary', target: 'text' },
@@ -94,8 +94,8 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
     target: 'nonText',
     only: 'dark',
     note:
-      'dark only, and that is the palette speaking rather than a concession. Lime on cream is ' +
-      '1.13:1, so a lime fill CANNOT carry a 3:1 boundary in light mode. That is fine for a ' +
+      'dark only, and that is the palette speaking rather than a concession. Lime on the light ' +
+      'page is 1.12:1, so a lime fill CANNOT carry a 3:1 boundary in light mode. That is fine for a ' +
       'badge or a button, where high-contrast text inside identifies the element , and NOT fine ' +
       'for a lone graphical indicator (a status dot, an indicator bar, an unlabelled chart mark), ' +
       'which needs an outline or a darker companion in light mode. Asserted below.',
@@ -152,6 +152,32 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   { label: 'rose text on page', fg: 'rose', bg: 'bg', target: 'text' },
   { label: 'rose text on panel', fg: 'rose', bg: 'panel', target: 'text' },
 
+  /* ── app chrome: the PLUM bar, in both themes, so none of the theme's own
+   *    foregrounds apply to it. Charcoal `--fg` on `--chrome` is 1.23:1,
+   *    `mutedFg` 1.84:1, `primaryText` 1.87:1 , which is why every one of these
+   *    pairs exists rather than the tier borrowing them. Gated in both themes
+   *    even though the tier is theme-invariant: that is what would catch someone
+   *    giving dark mode its own chrome value later and forgetting the
+   *    foregrounds. */
+  { label: 'chrome text on the app bar', fg: 'chromeFg', bg: 'chrome', target: 'text' },
+  {
+    label: 'chrome muted text on the app bar',
+    fg: 'chromeMutedFg',
+    bg: 'chrome',
+    target: 'text',
+    note: 'inactive nav labels. 12px+, so the full 4.5:1 applies, not largeText.',
+  },
+  {
+    label: 'chrome accent (active nav item) on the app bar',
+    fg: 'chromeAccent',
+    bg: 'chrome',
+    target: 'text',
+    note:
+      'LIME, in both themes , the brand pair, and 8.85:1 on plum. `primaryText` is the ' +
+      'light-theme blue step and measures 1.87:1 here; even the dark blue step manages only ' +
+      '4.75:1. Same class of mistake as white-on-lime, in the opposite direction.',
+  },
+
   /* ── chart series vs the page they are drawn on ───────────────────────────
    * `nonText`, because a series mark is a graphical object, not text. Note this
    * gate is necessary but NOT sufficient: the five hues are isoluminant, so
@@ -185,7 +211,7 @@ export const CONTRAST_EXEMPT: Readonly<Record<string, string>> = {
     'a backdrop, and gated as one: the `bg` side of the "on-danger over the danger HOVER fill" pair. Measured rather than hover-exempted because dark mode lifts this fill, and lifting it is what broke white text on the base token in the first place',
   primarySoft: 'gated by the soft-chip composite suite, not by a flat pair',
   brandSoft:
-    'translucent wash with no text-on-wash pairing: Badge deliberately has no soft-lime-with-lime-text variant (lime on cream is 1.13:1), so there is nothing to composite',
+    'translucent wash with no text-on-wash pairing: Badge deliberately has no soft-lime-with-lime-text variant (lime on the light page is 1.12:1), so there is nothing to composite',
   successSoft: 'gated by the soft-chip composite suite, not by a flat pair',
   dangerSoft: 'gated by the soft-chip composite suite, not by a flat pair',
   warningSoft: 'gated by the soft-chip composite suite, not by a flat pair',
@@ -194,6 +220,13 @@ export const CONTRAST_EXEMPT: Readonly<Record<string, string>> = {
   highlight: 'translucent hover wash on an otherwise transparent control',
   overlay: 'a scrim; its job is to reduce contrast behind a modal',
   mutedOnGlass: 'gated by the glass composite suite, not by a flat pair',
+  chrome: 'a backdrop, and the `bg` side of all three chrome pairs',
+  chromeBorder:
+    "decorative , the app bar's bottom edge, exactly as `border` is for a card outline. WCAG 1.4.11 applies to visuals required to IDENTIFY a component; a bar that is already 196/255 from the light page is not identified by its edge.",
+  chromeHighlight:
+    'a translucent hover wash, gated by the chrome composite suite below rather than by a flat pair. Every chrome foreground still clears AA over it (fg 7.79:1, mutedFg 5.17:1, accent 7.04:1), which is what makes promoting a hovered label to `chromeFg` optional rather than mandatory.',
+  chromeAccentSoft:
+    'gated by the chrome composite suite, not by a flat pair , the same treatment `primarySoft` gets',
 };
 
 /** Resolve a pair against a theme. Returns null when the pair is theme-scoped elsewhere. */
@@ -451,7 +484,7 @@ export function resolveGlassOverlay(pair: GlassOverlayPair): {
  * colour the text actually sits on is not the wash: it is the wash FLATTENED
  * over whatever surface the chip is placed on. A wash at α 0.10–0.12 barely
  * moves the backdrop, which is exactly the problem , the composite inherits the
- * backdrop's luminance, and the page is the worst case in light mode (cream is
+ * backdrop's luminance, and the page is the worst case in light mode (the page is
  * darker than the white panel) while the panel is the worst case in dark
  * (lighter than the page).
  *
@@ -461,7 +494,7 @@ export function resolveGlassOverlay(pair: GlassOverlayPair): {
  * {@link GLASS_SURFACE_PAIRS}; the assertions live in `test/contrast.test.ts`.
  *
  * `brandSoft` is deliberately absent: there is no soft-lime-with-lime-text
- * Badge variant, because lime on cream is 1.13:1 , see {@link CONTRAST_EXEMPT}.
+ * Badge variant, because lime on the light page is 1.12:1 , see {@link CONTRAST_EXEMPT}.
  */
 export interface SoftChipPair {
   /** Human-readable, and what the failure message prints. */
@@ -538,4 +571,76 @@ export function resolveSoftChip(
       { name: 'glass surface (bottom)', composite: onGlass(tier.surfaceBottom) },
     ],
   };
+}
+
+/* ── the chrome composites: text over a translucent wash over the app bar ──── */
+
+/**
+ * The translucent chrome washes, and the foregrounds each one actually renders
+ * with. Same shape as {@link SOFT_CHIP_PAIRS}, and it exists for the same reason:
+ * a wash at α 0.08–0.16 barely moves its backdrop, so the colour the text sits on
+ * is the wash FLATTENED over `--chrome`, not the wash.
+ *
+ * ## What this suite caught, and then stopped needing to
+ *
+ * On the first version of this tier , a `neutral-800` bar with a `neutral-400`
+ * muted step , the hover wash lifted the bar to `#3E3E3D` and dropped muted chrome
+ * text to **4.25:1**. Both tokens passed every flat pair they belonged to, and the
+ * combination still failed, so a hovered nav item HAD to promote its label to
+ * `chromeFg` or go under AA.
+ *
+ * Moving the bar to plum and the muted step to `neutral-300` retired that
+ * constraint: muted-over-wash is now 5.17:1, so the promotion is a design choice
+ * again. The suite stays, and now asserts the slack rather than the workaround ,
+ * a future re-tune that eats it fails here instead of shipping.
+ */
+export interface ChromeCompositePair {
+  /** Human-readable, and what the failure message prints. */
+  label: string;
+  /** The foreground that renders on this wash. */
+  fg: keyof SemanticTokens;
+  /** The translucent wash over `--chrome`. */
+  wash: keyof SemanticTokens;
+  /** Why this foreground and not another. Printed on failure. */
+  because: string;
+}
+
+export const CHROME_COMPOSITE_PAIRS: readonly ChromeCompositePair[] = [
+  {
+    label: 'active nav item (chromeAccent over chromeAccentSoft)',
+    fg: 'chromeAccent',
+    wash: 'chromeAccentSoft',
+    because: 'the selected item in the app bar renders this pairing, not the flat accent',
+  },
+  {
+    label: 'hovered nav item (chromeFg over chromeHighlight)',
+    fg: 'chromeFg',
+    wash: 'chromeHighlight',
+    because: 'the promoted label on a hovered item',
+  },
+  {
+    label: 'hovered nav item WITHOUT promotion (chromeMutedFg over chromeHighlight)',
+    fg: 'chromeMutedFg',
+    wash: 'chromeHighlight',
+    because:
+      'the pairing that failed at 4.25:1 on the near-black version of this tier, and the ' +
+      'reason label promotion on hover was once mandatory. Gated so the slack plum bought ' +
+      'cannot be quietly spent again.',
+  },
+  {
+    label: 'active nav item on a hovered active item (chromeAccent over chromeHighlight)',
+    fg: 'chromeAccent',
+    wash: 'chromeHighlight',
+    because: 'the current page is also hoverable, so this composite renders',
+  },
+];
+
+/** Flatten a chrome composite into the opaque colour its text actually sits on. */
+export function resolveChromeComposite(
+  pair: ChromeCompositePair,
+  theme: ThemeName,
+): { fg: string; composite: string } {
+  const t = themes[theme];
+  const wash = parseRgba(t[pair.wash]);
+  return { fg: t[pair.fg], composite: compositeOver(wash.hex, t.chrome, wash.alpha) };
 }

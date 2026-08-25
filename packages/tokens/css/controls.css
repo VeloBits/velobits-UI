@@ -1,9 +1,7 @@
 /*
- * THE CONTROL MATERIAL. Imported by theme.css into Tailwind's `components` layer,
- * so a call site can still override with a `shadow-*` utility (a later layer)
- * without `!important`.
+ * THE CONTROL MATERIAL. Imported by theme.css.
  *
- * See `src/controls.ts` for the reasoning and every measurement. The three facts
+ * See `src/controls.ts` for the reasoning and every measurement. The four facts
  * that matter if you are only reading the CSS:
  *
  *   1. This is the glass language applied to CONTROLS. Before it, every control
@@ -16,11 +14,55 @@
  *      visible material here; the perceptibility gate and see-through-ness pull in
  *      opposite directions. Edges cost nothing from that budget.
  *
- *   3. NEITHER CLASS MAY EVER COMPOSE `--shadow-sm`. It is `none` in dark mode, and
+ *   3. NEITHER UTILITY MAY EVER COMPOSE `--shadow-sm`. It is `none` in dark mode, and
  *      `none` inside a comma-separated box-shadow list invalidates the whole
  *      declaration , which would silently delete dark mode's lit edge, i.e. its
  *      only material. That is what `--control-shadow` exists for, and why it is
  *      never spelled `none`.
+ *
+ *   4. These are `@utility` rules, NOT plain classes. See the block below , this
+ *      is load-bearing, and getting it wrong fails silently.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * ## WHY `@utility` AND NOT `.control-raised { … }` IN `@layer components`
+ *
+ * They were plain classes in a `components`-layer import until 2026-08-20, and
+ * that shipped a bug that was invisible in code review and invisible in the DOM:
+ *
+ *     data-[state=on]:control-raised      ← generated NOTHING
+ *
+ * A Tailwind variant can only be composed over a utility Tailwind itself owns.
+ * `control-raised` was hand-written CSS, so `data-[state=on]:control-raised` was
+ * an unknown class , not an error, not a warning, just no rule. The class sat in
+ * the DOM looking correct while `getComputedStyle` returned `box-shadow: none`.
+ *
+ * Two call sites were affected and both had the same symptom , a selected thing
+ * that did not look selected:
+ *
+ *   segmented-control.tsx   the active segment (measured 1.00:1 against its own
+ *                           track in dark mode, where --bg2 IS --panel)
+ *   tabs.tsx                the active pill of `variant="default"`
+ *
+ * `theme.css` already documents this exact failure mode for the `z-*` scale:
+ * "Declaring `--z-index-tooltip` in `@theme` emits a CSS variable and NO utility,
+ * so `z-tooltip` silently does nothing (an unknown class, not an error)." Same
+ * trap, one layer over. `@utility` is the fix in both places.
+ *
+ * ### The layer question, and why the move is safe
+ *
+ * The old `layer(components)` import existed so a `shadow-*` utility at a call
+ * site could override the material without `!important`. As utilities these are
+ * now in the same layer as `shadow-*`, so CSS source order would decide , except
+ * it never gets the chance: `lib/cn.ts` declares `control-material` and `shadow`
+ * as conflicting class groups **in both directions**, so exactly one box-shadow
+ * class survives any `cn()` call. `primitives.test.tsx` pins that
+ * (`cn('shadow-sm', 'control-raised') === 'control-raised'`). The JS merge, not
+ * the cascade, is what arbitrates , and that was already true before this change.
+ *
+ * ⚠️ Consequently these MUST stay top-level. Wrapping this file back in
+ * `@layer(components)` on import would put `@utility` inside a layer, where it is
+ * not valid , and the variant forms would silently stop generating again.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 /*
@@ -32,11 +74,24 @@
  *
  * In light mode `--control-lit` is `transparent` and this is shadow-only: a white
  * highlight on a white fill measures 1.00:1 at every alpha. Do not raise it.
+ *
+ * Reduced transparency drops the translucent EDGE and keeps the opaque shadow.
+ * `--control-lit` is translucent by construction , it has to be, since it
+ * composites over whatever fill the control carries. A user asking for less
+ * transparency still needs raised and recessed to be distinguishable, so the
+ * raised shadow stays and only the inner edge goes. Nested inside the utility
+ * rather than written as a separate block, because a bare `.control-raised`
+ * override could not reach the variant forms (`data-[state=on]:control-raised`)
+ * that this file now generates.
  */
-.control-raised {
+@utility control-raised {
   box-shadow:
     inset 0 1px 0 var(--control-lit),
     var(--control-shadow);
+
+  @media (prefers-reduced-transparency: reduce) {
+    box-shadow: var(--control-shadow);
+  }
 }
 
 /*
@@ -47,29 +102,15 @@
  * me" from "press me". A symmetric inset reads as a hole rather than a field.
  *
  * No drop shadow, deliberately: a recessed element that also casts a shadow is
- * physically contradictory, and at control scale it just muddies the edge.
+ * physically contradictory, and at control scale it just muddies the edge. Which
+ * is also why reduced transparency leaves it with nothing , there is no opaque
+ * half to keep. Kept in step with the same query in glass.css and texture.css:
+ * one preference, one coherent answer across all three layers.
  */
-.control-recessed {
+@utility control-recessed {
   box-shadow: inset 0 1px 2px var(--control-inset);
-}
 
-/*
- * Reduced transparency drops the translucent EDGES and keeps the opaque shadow.
- *
- * Both `--control-lit` and `--control-inset` are translucent by construction ,
- * they have to be, since they composite over whatever fill the control carries. A
- * user asking for less transparency still needs raised and recessed to be
- * distinguishable, so the raised shadow stays and only the inner edges go.
- *
- * Kept in step with the same query in glass.css and texture.css: one preference,
- * one coherent answer across all three layers.
- */
-@media (prefers-reduced-transparency: reduce) {
-  .control-raised {
-    box-shadow: var(--control-shadow);
-  }
-
-  .control-recessed {
+  @media (prefers-reduced-transparency: reduce) {
     box-shadow: none;
   }
 }
