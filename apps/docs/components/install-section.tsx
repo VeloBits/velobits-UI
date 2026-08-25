@@ -121,10 +121,16 @@ export function InstallSection({ item }: { item: DocRegistryItem }) {
                   Copy and paste the following into <code>{file.target}</code>:
                 </p>
                 <CodePanel
-                  html={file.html}
-                  source={file.source}
+                  variants={file.variants}
                   label={file.target}
                   maxHeight="34rem"
+                  /*
+                   * The file's own path names this block's language selection ,
+                   * a key a caller lifting that state can recognise, rather than
+                   * the `useId()` value the switcher falls back to. It is a state
+                   * key and not a DOM id; `file.path` is already unique per item.
+                   */
+                  blockId={`install:${file.path}`}
                 />
               </div>
             ))

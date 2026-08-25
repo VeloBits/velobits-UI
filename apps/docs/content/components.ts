@@ -749,9 +749,16 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         description:
           'The `terminal` variant is the theme-invariant --code / --on-code pair , a revealed secret has to be transcribed exactly, and a surface that flips changes which characters are easy to misread.',
       },
+      {
+        name: 'code-block-languages-demo',
+        title: 'Several languages, and one that ships elsewhere',
+        description:
+          'Pass `variants` and the block grows a language selector; pass one language and it does not. The first entry is the default, which is what keeps a block in its own language , the second block lists Rust first and opens in Rust. `registerCodeLanguages` is how a language the library has never heard of arrives with its own label and its own colour. Every switch reports `(language, { blockId })`, so a page of blocks can be mirrored into a store without any correlation work.',
+      },
     ],
     notes: [
       'The copy button presence-checks navigator.clipboard , the whole object, not just the method , because the entire API is absent on an insecure origin, so the property access itself throws.',
+      'A language selector appears only above one variant. This is deliberate rather than incidental: a control whose two options render the same characters lies about having an effect, so the docs build drops a derived variant that came back byte-identical to its source, and the block falls back to having no selector.',
     ],
   },
 

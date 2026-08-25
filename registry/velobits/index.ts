@@ -198,6 +198,23 @@ export {
   type BreadcrumbLinkProps,
 } from './ui/breadcrumb';
 export { CodeBlock, codeBlockVariants, type CodeBlockProps } from './ui/code-block';
+/*
+ * Shipped as a file of the `code-block` registry item rather than as an item of
+ * its own, because it is the language selector's data and nothing else consumes
+ * it , and because a second item would demand a tsup entry, an `exports` subpath
+ * and a barrel line of its own for one Map and four functions. Exported here
+ * next to `CodeBlock` so the pair reads as the pair it is.
+ */
+export {
+  CODE_LANGUAGES,
+  codeLanguageLabel,
+  registerCodeLanguages,
+  resetCodeLanguages,
+  resolveCodeLanguage,
+  toCodeVariants,
+  type CodeLanguage,
+  type CodeVariant,
+} from './lib/code-languages';
 export {
   DataTable,
   nextSort,

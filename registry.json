@@ -843,7 +843,7 @@
       "name": "code-block",
       "type": "registry:ui",
       "title": "CodeBlock",
-      "description": "Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on.",
+      "description": "Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on. `variants` adds a language DROPDOWN whose FIRST entry is the default, so a block keeps its own language; a select rather than a segmented row because the language registry is open-ended, so the option count is not a number this component gets to know. It reports every switch as (language, { blockId }) in controlled and uncontrolled mode alike, and renders nothing at all below two languages.",
       "dependencies": [
         "class-variance-authority",
         "@velobitsio/icons"
@@ -851,6 +851,7 @@
       "registryDependencies": [
         "https://ui.velobits.dev/r/cn.json",
         "https://ui.velobits.dev/r/button.json",
+        "https://ui.velobits.dev/r/native-select.json",
         "https://ui.velobits.dev/r/velobits-theme.json"
       ],
       "files": [
@@ -858,6 +859,11 @@
           "path": "registry/velobits/ui/code-block.tsx",
           "type": "registry:ui",
           "target": "@ui/velobits/code-block.tsx"
+        },
+        {
+          "path": "registry/velobits/lib/code-languages.ts",
+          "type": "registry:lib",
+          "target": "@ui/velobits/code-languages.ts"
         }
       ]
     },

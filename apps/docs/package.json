@@ -5,7 +5,7 @@
   "description": "VeloBits design system docs. Also the registry host: /r/*.json is what the shadcn CLI fetches.",
   "type": "module",
   "scripts": {
-    "docs:data": "tsx ../../scripts/build-registry.ts && tsx ../../scripts/build-docs-data.ts",
+    "docs:data": "tsx ../../scripts/build-registry.ts && tsx ../../scripts/build-docs-data.ts && tsx ../../scripts/build-guide-code.ts",
     "dev": "npm run docs:data && next dev --port 4100",
     "build": "npm run docs:data && next build && tsx ../../scripts/flatten-prefetch-payloads.ts",
     "start": "serve out --listen 4100",

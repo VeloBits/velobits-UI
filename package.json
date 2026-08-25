@@ -32,7 +32,7 @@
     "release": "turbo run build && changeset publish",
     "postinstall": "tsx scripts/patch-radix-pure-iife.ts",
     "registry:build": "tsx scripts/build-registry.ts",
-    "docs:data": "tsx scripts/build-docs-data.ts",
+    "docs:data": "tsx scripts/build-docs-data.ts && tsx scripts/build-guide-code.ts",
     "docs": "npm run dev -w @velobitsio/docs",
     "docs:serve": "npm run start -w @velobitsio/docs"
   },

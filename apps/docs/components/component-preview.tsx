@@ -81,7 +81,7 @@ export function ComponentPreview({
     );
   }
 
-  const { Component, source, html, sourceCli, htmlCli } = example;
+  const { Component, npm, cli } = example;
 
   return (
     <Tabs defaultValue="preview" className="my-6">
@@ -115,6 +115,15 @@ export function ComponentPreview({
          * paths a real install produces.
          *
          * CLI first, to match the Installation tabs above it.
+         *
+         * These tabs are NOT the language selector inside each panel, and the two
+         * are deliberately not folded into one control. This axis is which import
+         * paths a listing uses, which is a fact about how the reader installed the
+         * library; the selector's axis is TypeScript or JavaScript, which is a
+         * fact about the project they are pasting into. Every combination of the
+         * two is a real reader, so one control with three or four options would
+         * have to spend its labels spelling out a matrix, and would tie a choice
+         * the reader makes once for the whole site to a choice they make per file.
          */}
         <Tabs defaultValue="cli">
           <TabsList variant="line">
@@ -123,20 +132,27 @@ export function ComponentPreview({
           </TabsList>
 
           <TabsContent value="cli" className="pt-3">
+            {/*
+             * `blockId` is a name for this block's language selection, not a DOM
+             * id. Derived from the example and the import flavour so it is stable
+             * across renders and meaningful in a store, which is what a caller
+             * lifting the state later would key by; `useId()` would be stable too,
+             * but only this component would know what it referred to.
+             */}
             <CodePanel
-              html={htmlCli}
-              source={sourceCli}
+              variants={cli}
               label={`${name} with CLI imports`}
               maxHeight="34rem"
+              blockId={`example:${name}:cli`}
             />
           </TabsContent>
 
           <TabsContent value="npm" className="pt-3">
             <CodePanel
-              html={html}
-              source={source}
+              variants={npm}
               label={`${name} with npm imports`}
               maxHeight="34rem"
+              blockId={`example:${name}:npm`}
             />
           </TabsContent>
         </Tabs>

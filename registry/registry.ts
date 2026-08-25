@@ -419,10 +419,17 @@ const ui: RegistryItem[] = [
     type: 'registry:ui',
     title: 'CodeBlock',
     description:
-      'Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on.',
+      'Preformatted code, with a copy button that survives an insecure origin (navigator.clipboard is absent over plain http). The `terminal` variant is the theme-invariant --code/--on-code pair, which is what a one-time secret is revealed on. `variants` adds a language DROPDOWN whose FIRST entry is the default, so a block keeps its own language; a select rather than a segmented row because the language registry is open-ended, so the option count is not a number this component gets to know. It reports every switch as (language, { blockId }) in controlled and uncontrolled mode alike, and renders nothing at all below two languages.',
     dependencies: [CVA, '@velobitsio/icons'],
-    registryDependencies: ['cn', 'button', 'velobits-theme'],
-    files: [{ path: 'registry/velobits/ui/code-block.tsx', type: 'registry:ui' }],
+    registryDependencies: ['cn', 'button', 'native-select', 'velobits-theme'],
+    files: [
+      { path: 'registry/velobits/ui/code-block.tsx', type: 'registry:ui' },
+      // The selector's open language registry. A file of this item rather than an
+      // item of its own: nothing else consumes it, and a second item would owe
+      // the registry ↔ tsup ↔ exports ↔ barrel parity a tsup entry, a subpath
+      // and a barrel line for one Map and four functions.
+      { path: 'registry/velobits/lib/code-languages.ts', type: 'registry:lib' },
+    ],
   },
   {
     name: 'data-table',

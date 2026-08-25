@@ -17,6 +17,60 @@
  *
  * and `apps/docs/public/search-index.json` for ⌘K.
  *
+ * ## Every code payload is a LIST of languages, not a string
+ *
+ * Nothing here emits "the source" any more. It emits a `DocCodeVariant[]` , the
+ * same block, rendered in each language it can honestly be shown in , and the
+ * docs' `CodeBlock` turns that list into a language selector. **Index 0 is the
+ * default**, which is the entire mechanism by which TypeScript stays the language
+ * you land on: it is listed first. There is no separate "default" field to keep
+ * in agreement with the list, because a second source of truth about ordering is
+ * a second thing that can disagree with the ordering.
+ *
+ * The JavaScript entry is derived, never authored , `scripts/code-transform.ts`
+ * runs the TypeScript through the compiler's emitter and Prettier. See that file
+ * for why the compiler rather than a regex, and for the four things that make it
+ * decline to derive anything at all.
+ *
+ * A variant list is only as long as the truth allows, and most lists here are
+ * length one. Two reasons, and neither is a failure:
+ *
+ *   - The payload is not TypeScript. The theme item's usage snippet is CSS, so it
+ *     gets a single-entry CSS list. Offering a JavaScript tab on a CSS block and
+ *     then showing the same CSS is worse than offering nothing.
+ *   - The payload has no TypeScript in it to strip. A demo that destructures a
+ *     hook and returns JSX is already valid JavaScript, and so is every one of
+ *     the 48 usage snippets in `content.ts` , they are import lines and JSX, and
+ *     not one of them carries an annotation. Their JavaScript tab would be their
+ *     TypeScript tab.
+ *
+ * A one-entry list is how a block knows to render no selector, so in both cases
+ * the control's absence is the accurate statement that there is nothing to choose
+ * between. The run prints the split, with reasons, because a missing selector on
+ * the page looks the same whether it was a decision or a bug.
+ *
+ * Examples carry the variant axis TWICE, crossed with the distribution axis they
+ * already had: `npm` (the barrel import) and `cli` (the per-file imports the
+ * shadcn CLI installs) are each a full variant list. Four payloads per example.
+ * The order the two axes are applied in is not free , `toCliSource` matches an
+ * import line with an anchored regex, so it has to see Prettier's line breaks
+ * rather than the emitter's. Hence: transpile, format, and only then rewrite the
+ * imports, on both languages independently.
+ *
+ * ## ⚠️ The second language costs about 60% more output, on purpose
+ *
+ * Highlighted HTML already dominated this directory (~3.4 MB of ~4.4 MB), and
+ * every derived variant is another copy of it: 4.4 MB before the variant axis,
+ * ~7.2 MB after, with the JavaScript renderings about 37% of all variant bytes.
+ * It would be much worse if every payload derived , the registry sources do, but
+ * only 11 of 52 examples and none of the usage snippets have any TypeScript to
+ * strip.
+ *
+ * The alternative , highlighting in the browser , trades a one-time download for
+ * a flash of unstyled code on every code tab, on a site that is a static export
+ * precisely so it does not do work at render time. The total is printed at the
+ * end of the run so the number is at least never a surprise.
+ *
  * ## Why generate rather than read at render time
  *
  * The site is a static export, so a Server Component *could* just `readFileSync`
@@ -35,7 +89,7 @@
  * rule. `app/globals.css` carries the matching `@source not` lines. This is the
  * same failure that already forced one for `public/r`.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -46,6 +100,13 @@ import ts from 'typescript';
 import { registry } from '../registry/registry.ts';
 import { COMPONENT_CONTENT } from '../apps/docs/content/components.ts';
 import { COMPONENT_GROUPS, GROUPED_COMPONENT_NAMES, GUIDE_NAV } from '../apps/docs/lib/docs-nav.ts';
+import {
+  identicalTransforms,
+  sameCode,
+  skippedTransforms,
+  tsToJs,
+  type TransformSkip,
+} from './code-transform.ts';
 import { displayTarget, importSpecifierFor, targetFor } from './registry-layout.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -76,6 +137,108 @@ async function highlight(code: string, lang: string): Promise<string> {
     themes: { light: 'github-light', dark: 'github-dark' },
     defaultColor: false,
   });
+}
+
+/* ── Language variants ─────────────────────────────────────────────────────── */
+
+/**
+ * One rendering of a code payload, in one language. Mirrors `CodeVariant` in
+ * `registry/velobits/lib/code-languages.ts`, which is what the docs' `CodeBlock`
+ * consumes , the field is `code` and not `source` for exactly that reason.
+ */
+interface DocCodeVariant {
+  language: string;
+  code: string;
+  html: string;
+}
+
+/**
+ * The interface, as text, for the generated files to declare for themselves.
+ *
+ * This script mirrors its interfaces into each output rather than importing them
+ * from one shared module, so that a generated file is readable on its own and
+ * `apps/docs` has nothing to import from `scripts/`. Three files need this one,
+ * so it is a constant instead of three copies that can drift.
+ */
+const DOC_CODE_VARIANT_INTERFACE =
+  `export interface DocCodeVariant {\n` +
+  `  /** A CODE_LANGUAGES id: 'ts' | 'js' | 'css' | … */\n` +
+  `  language: string;\n` +
+  `  /** The literal code, for the copy button. */\n` +
+  `  code: string;\n` +
+  `  /** Shiki markup for \`code\`, built at build time. */\n` +
+  `  html: string;\n` +
+  `}\n\n`;
+
+/**
+ * Which Shiki grammar paints a given language id.
+ *
+ * A mapping and not an identity because the ids are about what a reader CHOOSES
+ * and the grammars are about how it is coloured, and the two do not line up: `ts`
+ * and `tsx` are one grammar here because every payload in this repo that is
+ * TypeScript is also potentially JSX, and highlighting a component with the
+ * plain `ts` grammar loses the tags. Unknown ids fall through to the id itself,
+ * which is right for the ones that already agree (`css`).
+ */
+const GRAMMAR_FOR: Record<string, string> = {
+  ts: 'tsx',
+  tsx: 'tsx',
+  js: 'jsx',
+  jsx: 'jsx',
+  css: 'css',
+};
+
+/** Highlight one payload and label it, without deriving anything. */
+async function variant(language: string, code: string): Promise<DocCodeVariant> {
+  return { language, code, html: await highlight(code, GRAMMAR_FOR[language] ?? language) };
+}
+
+/**
+ * A TypeScript payload, plus its mechanically derived JavaScript when there IS a
+ * derived JavaScript worth showing , in that order, so TypeScript is the default
+ * by virtue of being first.
+ *
+ * Whether the second entry exists is `scripts/code-transform.ts`'s call, not
+ * this file's: a snippet whose JavaScript cannot be trusted gets no second
+ * language, and a one-entry list is how the block knows to render no selector.
+ *
+ * ⚠️ That is now a NARROW rule, and it used to be a wide one. It also refused the
+ * case where the two languages print the same characters , which measured as *every
+ * one of the 48 Usage snippets*, i.e. the selector disappeared from the most
+ * prominent block on every component page. `tsToJs` now returns those unchanged
+ * with `derived: false`; see its {@link TsToJsResult} docblock for why an identical
+ * rendering is still worth showing.
+ */
+async function tsJsVariants(source: string, fileName: string): Promise<DocCodeVariant[]> {
+  const js = await tsToJs(source, fileName);
+  const variants = [await variant('ts', source)];
+  if (js !== null) variants.push(await variant('js', js.code));
+  return variants;
+}
+
+/**
+ * How many payloads each section handed to the transform, so the report can say
+ * what fraction of each got a JavaScript variant. `skippedTransforms` grows in
+ * call order, so a section's skips are the slice added while it ran.
+ */
+const transformCounts: {
+  section: string;
+  total: number;
+  skips: TransformSkip[];
+  identical: TransformSkip[];
+}[] = [];
+
+/** Open a tally for one section; call the returned function once it has run. */
+function countTransforms(section: string, total: number): () => void {
+  const fromSkips = skippedTransforms.length;
+  const fromIdentical = identicalTransforms.length;
+  return () =>
+    transformCounts.push({
+      section,
+      total,
+      skips: skippedTransforms.slice(fromSkips).map((entry) => entry.reason),
+      identical: identicalTransforms.slice(fromIdentical).map((entry) => entry.reason),
+    });
 }
 
 /* ── 0. The sidebar must place every registry item ─────────────────────────── */
@@ -221,6 +384,7 @@ if (!exampleFiles.length) {
 
 const exampleImports: string[] = [];
 const exampleEntries: string[] = [];
+const closeExampleCount = countTransforms('examples', exampleFiles.length);
 
 for (const [index, file] of exampleFiles.entries()) {
   const name = file.replace(/\.tsx$/, '');
@@ -231,42 +395,84 @@ for (const [index, file] of exampleFiles.entries()) {
   // and `../../registry/examples/x` is only correct while it stays there.
   exampleImports.push(`import ${ident} from '@/registry/examples/${name}';`);
 
-  // The same example as a CLI consumer would write it. A null here is a real
-  // failure rather than a missing nicety: it means an example imports something
-  // no registry item exports, so one of the two distributions cannot run it.
+  /*
+   * The two axes, applied in the one order that works.
+   *
+   * `toCliSource` matches a barrel import with a regex anchored to physical line
+   * starts and ends. It copes with a Prettier-wrapped multi-line import , the
+   * inner `[^}]+` spans newlines , but it is matching TEXT, so it has to be
+   * looking at final text. Transpiling after the rewrite would hand the emitter
+   * several import lines and get back whatever it felt like wrapping them to;
+   * formatting after the rewrite would reflow lines the rewrite just authored.
+   * So: transpile, format, THEN rewrite , independently for each language.
+   *
+   * A null from either rewrite is a real failure rather than a missing nicety:
+   * it means an example imports something no registry item exports, so one of
+   * the two distributions cannot run it. Which language failed is named, because
+   * the JavaScript path can fail where the TypeScript one did not , `import type`
+   * lines are elided by the transform, so the two rewrites are not looking at the
+   * same set of imports.
+   *
+   * `tsToJs` returning null is a different thing entirely and is NOT a failure:
+   * it means this example has no JavaScript rendering worth a tab, so both
+   * flavours are TypeScript-only and neither shows a selector.
+   */
+  const js = await tsToJs(source, `examples/${file}`);
+  const jsSource = js?.code ?? null;
+
   const cliSource = toCliSource(source);
   if (cliSource === null) {
-    console.error(`could not build the CLI import variant of ${file}`);
+    console.error(`could not build the CLI import variant of ${file} (TypeScript)`);
     process.exit(1);
   }
+
+  const npm = [await variant('ts', source)];
+  const cli = [await variant('ts', cliSource)];
+
+  if (jsSource !== null) {
+    const cliJsSource = toCliSource(jsSource);
+    if (cliJsSource === null) {
+      console.error(`could not build the CLI import variant of ${file} (derived JavaScript)`);
+      process.exit(1);
+    }
+
+    npm.push(await variant('js', jsSource));
+
+    /*
+     * The CLI flavour gets its own last look. The rewrite runs over both
+     * languages, and it can erase the only thing that distinguished them , a
+     * type-only barrel import, say , leaving two identical blocks behind a
+     * selector that claims otherwise. Rare, and cheap to rule out.
+     */
+    if (!sameCode(cliSource, cliJsSource)) cli.push(await variant('js', cliJsSource));
+  }
+
   exampleEntries.push(
     `  ${JSON.stringify(name)}: {\n` +
       `    name: ${JSON.stringify(name)},\n` +
       `    Component: ${ident},\n` +
-      `    source: ${JSON.stringify(source)},\n` +
-      `    html: ${JSON.stringify(await highlight(source, 'tsx'))},\n` +
-      `    sourceCli: ${JSON.stringify(cliSource)},\n` +
-      `    htmlCli: ${JSON.stringify(await highlight(cliSource, 'tsx'))},\n` +
+      `    npm: ${JSON.stringify(npm)},\n` +
+      `    cli: ${JSON.stringify(cli)},\n` +
       `  },`,
   );
 }
+
+closeExampleCount();
 
 writeFileSync(
   join(outDir, 'examples.ts'),
   BANNER +
     `import type { ComponentType } from 'react';\n\n` +
     exampleImports.join('\n') +
-    `\n\nexport interface DocExample {\n` +
+    `\n\n` +
+    DOC_CODE_VARIANT_INTERFACE +
+    `export interface DocExample {\n` +
     `  name: string;\n` +
     `  Component: ComponentType;\n` +
-    `  /** The literal source, for the copy button. */\n` +
-    `  source: string;\n` +
-    `  /** The same source, highlighted at build time. */\n` +
-    `  html: string;\n` +
-    `  /** The same example, importing the per-file paths the shadcn CLI installs. */\n` +
-    `  sourceCli: string;\n` +
-    `  /** The CLI variant, highlighted at build time. */\n` +
-    `  htmlCli: string;\n` +
+    `  /** Barrel-import flavour. [0] is the default language. */\n` +
+    `  npm: DocCodeVariant[];\n` +
+    `  /** shadcn-CLI per-file-import flavour. [0] is the default language. */\n` +
+    `  cli: DocCodeVariant[];\n` +
     `}\n\n` +
     `export const examples: Record<string, DocExample> = {\n` +
     exampleEntries.join('\n') +
@@ -280,8 +486,8 @@ interface EmittedFile {
   path: string;
   /** Where the shadcn CLI lands it in a consumer's tree. */
   target: string;
-  source: string;
-  html: string;
+  /** TypeScript first, then the derived JavaScript. */
+  variants: DocCodeVariant[];
 }
 
 interface EmittedItem {
@@ -312,6 +518,11 @@ for (const group of COMPONENT_GROUPS) {
 }
 
 const emittedItems: EmittedItem[] = [];
+const closeRegistryCount = countTransforms(
+  'registry files',
+  registry.items.reduce((total, item) => total + (item.files?.length ?? 0), 0),
+);
+
 for (const item of registry.items) {
   const files: EmittedFile[] = [];
   for (const file of item.files ?? []) {
@@ -319,8 +530,10 @@ for (const item of registry.items) {
     files.push({
       path: file.path,
       target: file.target ?? installTarget(file.path),
-      source,
-      html: await highlight(source, file.path.endsWith('.tsx') ? 'tsx' : 'ts'),
+      // Every installable file is `.ts` or `.tsx`, so every one is a candidate.
+      // The path is never opened , it only picks the dialect and labels the
+      // entry if the transform decides there is nothing to show.
+      variants: await tsJsVariants(source, file.path),
     });
   }
 
@@ -337,16 +550,18 @@ for (const item of registry.items) {
   });
 }
 
+closeRegistryCount();
+
 writeFileSync(
   join(outDir, 'registry-data.ts'),
   BANNER +
+    DOC_CODE_VARIANT_INTERFACE +
     `export interface DocRegistryFile {\n` +
     `  path: string;\n` +
     `  /** Where the shadcn CLI lands it in a consumer's tree. */\n` +
     `  target: string;\n` +
-    `  source: string;\n` +
-    `  /** The same source, highlighted at build time. */\n` +
-    `  html: string;\n` +
+    `  /** TypeScript at [0], derived JavaScript at [1]. */\n` +
+    `  variants: DocCodeVariant[];\n` +
     `}\n\n` +
     `export interface DocRegistryItem {\n` +
     `  name: string;\n` +
@@ -664,20 +879,39 @@ if (contentProblems.length) {
 }
 
 interface EmittedContent {
-  usage: { source: string; html: string } | null;
+  usage: { variants: DocCodeVariant[] } | null;
   examples: { name: string; title: string | null; description: string | null }[];
   notes: string[];
 }
 
 const emittedContent: Record<string, EmittedContent> = {};
+const closeContentCount = countTransforms(
+  'usage snippets',
+  Object.values(COMPONENT_CONTENT).filter((content) => content.usage).length - 1 /* the CSS one */,
+);
+
 for (const [name, content] of Object.entries(COMPONENT_CONTENT)) {
   emittedContent[name] = {
     usage: content.usage
       ? {
-          source: content.usage,
-          // The theme item's snippet is CSS; everything else is TSX. Getting this
-          // wrong is not an error, just wrong colours, so it is worth the branch.
-          html: await highlight(content.usage, name === 'velobits-theme' ? 'css' : 'tsx'),
+          /*
+           * The theme item's snippet is CSS; everything else is TSX. Getting the
+           * grammar wrong used to be only wrong colours; now it also decides
+           * whether a language selector appears, so the CSS branch is a
+           * single-entry list , there is no JavaScript rendering of an
+           * `@import`, and offering one would be a lie the reader can click on.
+           *
+           * These snippets are fragments, not modules , an import line and then a
+           * bare JSX expression, in one case with a literal `…` in it. That shape
+           * is the one `tsToJs` refuses outright (the emitter reprints sibling
+           * elements as a comma sequence), so a good number of these come back
+           * TypeScript-only. See `code-transform.ts`; the tally is printed at the
+           * end of the run.
+           */
+          variants:
+            name === 'velobits-theme'
+              ? [await variant('css', content.usage)]
+              : await tsJsVariants(content.usage, `content/${name}.tsx`),
         }
       : null,
     examples: (content.examples ?? []).map((example) => ({
@@ -689,16 +923,20 @@ for (const [name, content] of Object.entries(COMPONENT_CONTENT)) {
   };
 }
 
+closeContentCount();
+
 writeFileSync(
   join(outDir, 'content.ts'),
   BANNER +
+    DOC_CODE_VARIANT_INTERFACE +
     `export interface DocContentExample {\n` +
     `  name: string;\n` +
     `  title: string | null;\n` +
     `  description: string | null;\n` +
     `}\n\n` +
     `export interface DocContent {\n` +
-    `  usage: { source: string; html: string } | null;\n` +
+    `  /** [0] is the default language. One entry means: show no selector. */\n` +
+    `  usage: { variants: DocCodeVariant[] } | null;\n` +
     `  examples: DocContentExample[];\n` +
     `  notes: string[];\n` +
     `}\n\n` +
@@ -922,6 +1160,65 @@ console.log(`  props.ts          ${Object.keys(componentProps).length} items wit
 console.log(`  search-index.json ${searchIndex.length} entries`);
 console.log(
   `  skills/${SKILL_NAME}  ${skillFiles.length} files + ${SKILL_NAME}.mdc, plus ${Object.keys(skillLayouts).join(' and ')}`,
+);
+
+/*
+ * What got a JavaScript variant, and what did not.
+ *
+ * A single-variant block renders no language selector, which is correct but is
+ * also indistinguishable, on the page, from a selector that failed to render. So
+ * the split is printed with its reasons: `identical` and `bare-jsx` are the
+ * transform working as designed, while `degenerate` means it met something it
+ * could not carry across and is the one worth chasing.
+ */
+console.log(`\njs variants:`);
+for (const { section, total, skips, identical } of transformCounts) {
+  /*
+   * Three numbers, not two, because "has a JavaScript variant" and "the
+   * JavaScript differs from the TypeScript" are different facts and conflating
+   * them was itself a false claim in the build log: for a while this printed
+   * `52/52 derived` for a section in which most snippets were returned unchanged.
+   */
+  const byReason = identical.reduce<Record<string, number>>((counts, reason) => {
+    counts[reason] = (counts[reason] ?? 0) + 1;
+    return counts;
+  }, {});
+  const same = Object.entries(byReason)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([reason, count]) => `${count} ${reason}`)
+    .join(', ');
+  console.log(
+    `  ${section.padEnd(15)} ${total - skips.length}/${total} with a js variant , ` +
+      `${total - skips.length - identical.length} genuinely restated` +
+      (identical.length ? `, ${identical.length} already js (${same})` : '') +
+      (skips.length ? `, ${skips.length} refused` : ''),
+  );
+}
+
+if (skippedTransforms.length) {
+  console.log(
+    `\n  no js variant:\n    ` +
+      skippedTransforms.map(({ fileName, reason }) => `${fileName} , ${reason}`).join('\n    '),
+  );
+}
+
+/*
+ * The payload, in one number.
+ *
+ * Highlighted markup is most of what this script writes, and carrying a second
+ * language of it is a deliberate trade (see the header). A cost that is never
+ * printed is a cost nobody notices growing, so it is printed , with the largest
+ * file named, since that is the one any future look at this will start from.
+ */
+const generatedSizes = readdirSync(outDir)
+  .map((file) => [file, statSync(join(outDir, file)).size] as const)
+  .sort(([, a], [, b]) => b - a);
+const generatedBytes = generatedSizes.reduce((total, [, size]) => total + size, 0);
+const mb = (bytes: number): string => `${(bytes / 1_000_000).toFixed(2)} MB`;
+
+console.log(
+  `\n  apps/docs/lib/generated/ is now ${mb(generatedBytes)} across ` +
+    `${generatedSizes.length} files (largest: ${generatedSizes[0][0]}, ${mb(generatedSizes[0][1])})`,
 );
 
 if (noProps.length) {

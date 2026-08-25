@@ -145,10 +145,18 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
               </Link>{' '}
               for why it is one flat folder.
             </p>
+            {/*
+             * `variants` is ordered and its first entry is the default language,
+             * so a TSX snippet opens on TypeScript and the CSS one on
+             * `/docs/velobits-theme` opens on CSS , and, having no second
+             * language, renders without a selector and without a client component
+             * at all. `blockId` names this block's selection for anyone who later
+             * lifts it; it is a state key, not a DOM id.
+             */}
             <CodePanel
-              html={content.usage.html}
-              source={content.usage.source}
+              variants={content.usage.variants}
               label={`${item.title} usage`}
+              blockId={`usage:${slug}`}
             />
           </section>
         )}
