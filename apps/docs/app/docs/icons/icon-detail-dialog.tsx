@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { type CSSProperties, useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 import {
   AlertTriangleIcon,
@@ -49,6 +49,10 @@ import {
   TRUE_SIZE_STRIP,
   accessibleName,
   colorStyle,
+  FILLABLE_ELEMENTS,
+  type GlyphShape,
+  knockoutFlags,
+  iconStyle as buildIconStyle,
   contrastRatio,
   findAnimation,
   findColor,
@@ -222,6 +226,7 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
     paths: string;
     iconColor: string;
     surfaceColor: string;
+    shapes: GlyphShape[];
   } | null>(null);
 
   useEffect(() => {
@@ -235,21 +240,68 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
       paths: svg.innerHTML,
       iconColor: getComputedStyle(svg).color,
       surfaceColor: getComputedStyle(stage).backgroundColor,
+      /*
+       * The measurement the knockout rule runs on , see `knockoutFlags`.
+       *
+       * `getBBox()` is the only way to ask "is this path inside that rect", and
+       * only the browser can answer it. It returns the GEOMETRY box in the 24x24
+       * user space, excluding the stroke, which is what containment should be
+       * judged on: a 2px stroke straddling the edge of a container would
+       * otherwise push every flush-fitting child out of its own parent.
+       *
+       * ⚠️ Measured off the LIVE element, not a parse of `paths`. Re-deriving a
+       * bounding box from path data by hand means implementing arc and bezier
+       * extrema, and getting that subtly wrong shows up as one icon painting a
+       * child the wrong colour , the kind of bug nobody traces back to a maths
+       * error in a docs page.
+       */
+      shapes: [...svg.children].map((child) => {
+        const box = (child as SVGGraphicsElement).getBBox();
+        return {
+          tag: child.tagName.toLowerCase(),
+          closed:
+            FILLABLE_ELEMENTS.includes(child.tagName.toLowerCase() as never) ||
+            (child.tagName.toLowerCase() === 'path' &&
+              /[Zz]$/.test(child.getAttribute('d')?.trim() ?? '')),
+          x: box.x,
+          y: box.y,
+          width: box.width,
+          height: box.height,
+        };
+      }),
     });
+    /*
+     * `config.filled` is deliberately NOT a dependency. The bounding boxes are a
+     * property of the geometry, not of the paint, so a fill toggle cannot change
+     * them , and adding it would re-measure on every flip for an identical
+     * answer.
+     */
   }, [stage, name, config.colorId, config.customColor, config.surfaceId, theme]);
 
   /*
    * Does this glyph have anything a fill can legitimately paint?
    *
-   * 52 of 198 icons are made entirely of open paths, where a fill only ever
+   * 81 of 201 icons are made entirely of open paths, where a fill only ever
    * invents a chord , so the toggle is disabled for those rather than left
    * offering a change that cannot happen. Read from the icon's own rendered
    * markup, so it stays true if the geometry changes.
    *
-   * It was 78 until a closed `<path>` started counting as fillable, which handed
-   * the toggle to the 26 single-silhouette glyphs , `ShieldIcon`, `HeartIcon`,
-   * `AlertTriangleIcon` , that a solid fill suits better than anything else in
-   * the set and that had it disabled the whole time.
+   * ⚠️ THE FIGURE EVERYTHING QUOTED , "78 of 198" , WAS WRONG IN BOTH HALVES.
+   * Counted from source across all 201 exported icons: 94 carry a fillable
+   * primitive, 29 carry a closed `<path>`, 3 carry both, so 120 are fillable and
+   * **81** are not. The set is 201, not 198 , three icons (`CheckIcon`,
+   * `ChevronUpIcon`, `MinusIcon`) are declared on a SINGLE LINE, and every count
+   * derived by splitting the file on the multi-line `createIcon(\n  'Name'` form
+   * silently missed them. All three are lone open paths, so they land in this
+   * number.
+   *
+   * Behaviour moved as well, and by more than the docs implied: the gate only
+   * looked for `rect`/`circle`/`ellipse`/`polygon`, so it used to disable **107**
+   * , every glyph whose only closed shape was a `<path>` ending in `Z`/`z` was
+   * reported as having nothing to fill. Those 26 , `ShieldIcon`, `HeartIcon`,
+   * `AlertTriangleIcon`, `FolderIcon` and the rest of the single-path
+   * silhouettes , are the glyphs a solid fill suits best, and they had the
+   * control greyed out the whole time. 107 → 81.
    *
    * Before the first DOM read lands, treated as fillable so the switch does not
    * flicker to disabled for one commit on open.
@@ -275,8 +327,20 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
   );
 
   const surface = findSurface(config.surfaceId);
-  const glyphClassName = iconClassName(effective);
-  const iconStyle = colorStyle(config);
+  const shapes = resolved?.shapes ?? [];
+  const glyphClassName = iconClassName(effective, shapes);
+  /*
+   * How many children the containment pass actually cuts. Zero for most of the
+   * set, and the control says so rather than claiming a knockout that is not
+   * there , the same honesty the disabled-toggle hint has always had.
+   */
+  const cutCount = knockoutFlags(shapes).filter(Boolean).length;
+  /*
+   * `Record<string, string>` carrying `--icon-knock`, which React accepts on
+   * `style` but `CSSProperties` does not type. The cast is at the one boundary
+   * rather than inside `iconStyle`, so the config layer stays free of React.
+   */
+  const iconStyle = buildIconStyle(effective) as CSSProperties | undefined;
   const paint = gradientPaint(effective, gradientId);
   const animation = findAnimation(config.animationId);
   const liveGradient = gradientRender(config.gradient);
@@ -409,7 +473,7 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
     return contrastRatio(foreground, background);
   }, [resolved, config]);
 
-  const jsx = toJsx(name, effective);
+  const jsx = toJsx(name, effective, shapes);
 
   const svgMarkup = useMemo(() => {
     if (!resolved) return '';
@@ -435,6 +499,7 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
       resolved.paths,
       foreground ? toHex(foreground) : 'currentColor',
       background ? toHex(background) : 'transparent',
+      resolved.shapes,
     );
   }, [effective, resolved]);
 
@@ -802,8 +867,8 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                 />
               </div>
               {/*
-               * A real reason, not a greyed-out control with no explanation. 78 of
-               * the 198 glyphs are drawn entirely from open paths, so there is no
+               * A real reason, not a greyed-out control with no explanation. 81 of
+               * the 201 glyphs are drawn entirely from open paths, so there is no
                * enclosed region for a fill to land in , and the honest thing is to
                * say that rather than to offer a switch that moves and changes
                * nothing. It also teaches the distinction the set is built on.
@@ -822,8 +887,9 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                */}
               {effective.filled ? (
                 <p className="text-xs text-muted-foreground">
-                  Cut out in the {surface.label.toLowerCase()} colour , the snippet carries that
-                  surface with it.
+                  {cutCount === 0
+                    ? 'Nothing sits inside the filled shape, so no part of this glyph is cut out.'
+                    : `${cutCount === 1 ? 'One shape is' : `${cutCount} shapes are`} cut out in the ${surface.label.toLowerCase()} colour , the snippet carries that surface with it.`}
                 </p>
               ) : null}
             </div>

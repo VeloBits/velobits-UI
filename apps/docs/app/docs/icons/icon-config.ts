@@ -141,37 +141,26 @@ export const COLOR_CHOICES: ColorChoice[] = [
  *
  * ## The surface is now load-bearing, and that is the cost
  *
- * A knockout is only a knockout against the thing it was cut from. The stroke
- * paints `--bg`/`--panel`/`--code`/`--brand` per `SurfaceChoice.knockoutClass`,
+ * A knockout is only a knockout against the thing it was cut from. The cut is
+ * painted `--bg`/`--panel`/`--code`/`--brand` per `SurfaceChoice.knockoutVar`,
  * so the emitted snippet carries the surface it was configured on, and dropping
  * that snippet onto a different background shows the wrong colour in the cut.
- * That is why the knockout is a TOKEN utility and not the hex read off the DOM:
- * a token still tracks the theme, so at least light/dark cannot drift. The `.svg`
- * export has no stylesheet and therefore has no choice , see `toSvgMarkup`.
+ * That is why the knockout is a TOKEN reference and not the hex read off the
+ * DOM: a token still tracks the theme, so at least light/dark cannot drift. The
+ * `.svg` export has no stylesheet and therefore has no choice , see
+ * `toSvgMarkup`.
  *
- * ## What this genuinely breaks, counted rather than hand-waved
+ * ## ⚠️ WHICH children are cut is a SEPARATE question, and getting it wrong
+ * deleted a third of the set
  *
- * 97 of 198 glyphs have both fillable and open geometry. In 56 of them the open
- * geometry is nested INSIDE the fillable shape , the `Adler32Icon` case , and
- * the knockout is exactly right. In the other 41 it sits OUTSIDE, so it is
- * knocked out against a surface it was never over, and simply vanishes:
- *
- *   `SunIcon`      r=4 disc plus 8 rays      → the rays go, leaving a dot
- *   `UserIcon`     head circle plus shoulders → the shoulders go, leaving a disc
- *   `SearchIcon`   r=8 lens plus the handle   → the handle goes
- *   `LockIcon`     body rect plus the shackle → indistinguishable from `PasswordIcon`
- *
- * Roughly 18 of the 41 collapse to a dot or a bar; the rest keep a readable
- * silhouette and lose a feature. Two further cases are fillable-inside-fillable
- * rather than open-inside-fillable and so are not in that count: `ToggleIcon` /
- * `ToggleMarkIcon` lose the knob into the pill, and `CircleHalfIcon` , the set's
- * one hand-authored duotone , fills to a complete disc and stops being half.
- *
- * Fixing these needs per-element containment (does this open path lie inside
- * that filled shape?), which a selector cannot ask and which would have to be
- * emitted as `nth-child` rules pinned to the package's internal child order.
- * That is a worse thing to hand a reader than a preview that shows the problem,
- * so the toggle stays live for these and the stage tells the truth immediately.
+ * The first version of this cut every open element, on the assumption that open
+ * geometry is always the contents of a filled container. It is not:
+ * `ArchiveIcon`'s only closed shape is its LID, so cutting the box below it left
+ * a bar. ~41 of 201 glyphs failed that way. The rule is now containment , a
+ * child is cut only if it lies inside a shape being filled , which leaves
+ * `ArchiveIcon`, `SunIcon`, `SearchIcon`, `LockIcon` and `UserIcon` with no cut
+ * at all and their geometry intact. The whole of that reasoning, and the
+ * `getBBox` measurement it needs, is in the docblock above `GlyphShape`.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 /**
@@ -193,7 +182,7 @@ export const COLOR_CHOICES: ColorChoice[] = [
  * `>path:not([d$=Z i])`. Both quoted spellings normalise to the same rule, so
  * the unquoted one is used.
  *
- * Counted across the set (198 icons, `packages/icons/src/icons.tsx`):
+ * Counted across the set (201 icons, `packages/icons/src/icons.tsx`):
  *
  *   rect 59, circle 63, ellipse 1, polygon 3   126 shapes, ALWAYS closed
  *   path ending in Z or z                       31 paths, genuinely closed
@@ -239,8 +228,9 @@ export function isClosedPath(attributes: string): boolean {
  * was the only area they ever had.
  *
  * `<line>` is absent here on purpose: it encloses no area, so it never fills,
- * and naming it would add a class that does nothing. It DOES appear in
- * `SurfaceChoice.knockoutClass`, because a line very much can be knocked out.
+ * and naming it would add a class that does nothing. A line CAN still be knocked
+ * out , that is a different question, decided per child by `knockoutFlags` and
+ * carried by `KNOCKOUT_STROKE_CLASSES`.
  *
  * ## Why this is a class and not a prop
  *
@@ -717,26 +707,23 @@ export interface SurfaceChoice {
    */
   labelClassName: string;
   /**
-   * The knockout paint, as `stroke-*` utilities aimed at this surface's own
-   * token, applied to every open element when `IconConfig.filled` is on.
+   * What a knockout is painted with on this surface, as a `var()` reference fed
+   * to `KNOCKOUT_VAR` through one inline style on the root.
    *
-   * ⚠️ FOUR LITERALS, NOT ONE TEMPLATE. Tailwind reads source files as plain
-   * text and never evaluates them, so `` `[&>line]:stroke-${token}` `` generates
-   * nothing at all while looking perfect in the DOM. See `FILL_SUPPRESS_CLASS`
-   * for the same trap and the two other places this codebase has hit it.
+   * A token reference and not a resolved hex, which is the whole reason a
+   * knockout is survivable: `var(--bg)` still follows the theme toggle. It
+   * cannot follow a change of SURFACE , the snippet names one , which is the
+   * cost the knockout docblock above `CLOSED_PATH_SELECTOR` spells out.
    *
-   * The token, not the resolved hex, and that is the whole reason a knockout is
-   * survivable at all: `stroke-bg` compiles to `stroke: var(--bg)`, so the cut
-   * still follows the theme toggle. It cannot follow a change of SURFACE , the
-   * snippet names one , which is the cost the knockout docblock above
-   * `CLOSED_PATH_SELECTOR` spells out.
+   * ## Why a variable rather than four sets of `stroke-*` utilities
    *
-   * `line` is here and absent from `FILL_SUPPRESS_CLASS`, deliberately: a line
-   * encloses no area so it can never be filled, and is knocked out like any
-   * other open geometry. `rect`/`circle`/`ellipse`/`polygon` are absent from
-   * both , they are the shapes being cut FROM, and keep the root's paint.
+   * The knockout is decided PER CHILD (see `knockoutFlags`), so the class that
+   * carries it has to be `nth-child`-indexed. Naming the surface in the utility
+   * as well would multiply the literal table Tailwind must SEE by four , 4
+   * surfaces x 12 indices x fill/stroke = 96 hand-written strings. Routing the
+   * colour through one inherited custom property collapses that to 24.
    */
-  knockoutClass: string;
+  knockoutVar: string;
 }
 
 /*
@@ -772,7 +759,7 @@ export const PAGE_SURFACE: SurfaceChoice = {
   label: 'Page',
   className: 'bg-bg',
   labelClassName: 'text-muted-foreground',
-  knockoutClass: '[&>path:not([d$=Z_i])]:stroke-bg [&>polyline]:stroke-bg [&>line]:stroke-bg',
+  knockoutVar: 'var(--bg)',
 };
 
 /**
@@ -796,38 +783,207 @@ export const SURFACE_CHOICES: SurfaceChoice[] = [
     label: 'Panel',
     className: 'bg-panel',
     labelClassName: 'text-muted-foreground',
-    knockoutClass:
-      '[&>path:not([d$=Z_i])]:stroke-panel [&>polyline]:stroke-panel [&>line]:stroke-panel',
+    knockoutVar: 'var(--panel)',
   },
   {
     id: 'code',
     label: 'Code',
     className: 'bg-code',
     labelClassName: 'text-on-code',
-    knockoutClass:
-      '[&>path:not([d$=Z_i])]:stroke-code [&>polyline]:stroke-code [&>line]:stroke-code',
+    knockoutVar: 'var(--code)',
   },
   {
     id: 'brand',
     label: 'Brand',
     className: 'bg-brand',
     labelClassName: 'text-on-brand',
-    knockoutClass:
-      '[&>path:not([d$=Z_i])]:stroke-brand [&>polyline]:stroke-brand [&>line]:stroke-brand',
+    knockoutVar: 'var(--brand)',
   },
 ];
 
+/* ── Which children get cut, and which are the thing being cut FROM ───────── */
+
 /**
- * The element types a knockout paints, PARSED BACK OUT of one of those literals.
+ * ⚠️ A KNOCKOUT IS DECIDED BY CONTAINMENT, NOT BY ELEMENT TYPE.
  *
- * Same contract as `FILL_SUPPRESSED_ELEMENTS`, for the same consumer: the `.svg`
- * export has no stylesheet and has to write the knockout onto each element by
- * hand. Reading it off the literal Tailwind actually compiles means the file on
- * disk and the glyph on screen cannot disagree about which shapes get cut.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * The first version of this cut EVERY open element , every `path` without a
+ * close, every `polyline`, every `line` , in the surface colour. That is right
+ * when the open geometry is the CONTENTS of a filled container, which is the
+ * majority case: `Adler32Icon` is a rect plus the strokes of an "A", and an "A"
+ * cut out of a solid block is exactly the intended look.
+ *
+ * It is wrong, and destructively so, whenever the open geometry sits OUTSIDE the
+ * shape being filled , then it is painted the colour of a background it was
+ * never over, and simply disappears. Reported against `ArchiveIcon`:
+ *
+ *     <rect x="3" y="4" width="18" height="4" rx="1" />        ← the LID
+ *     <path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8" />    ← the BOX, below it
+ *     <path d="M10 12h4" />                                    ← the handle
+ *
+ * The only closed shape is the lid, so cutting both paths left an 18x4 bar and
+ * nothing else. The icon did not degrade, it stopped being an icon. The same
+ * failure hit ~41 of the 201 glyphs: `SunIcon` lost all eight rays and became a
+ * dot, `UserIcon` its shoulders, `SearchIcon` its handle, and
+ * `LockIcon`/`LockOpenIcon`/`PasswordIcon` their shackles , which left those
+ * three indistinguishable from one another.
+ *
+ * ## The rule that is actually correct
+ *
+ * A child is knocked out **iff it lies inside a shape that is being filled**.
+ * Nothing else changes, and that is the point: `ArchiveIcon`'s box is not inside
+ * its lid, so it keeps its own colour and the glyph is its original self with a
+ * solid lid. `Adler32Icon`'s "A" IS inside the rect, so it is cut. One test,
+ * both answers, no per-icon list to maintain.
+ *
+ * Depth PARITY rather than a boolean, because containment nests: a mark inside a
+ * shape inside a container is back on the outer fill's colour, not the surface's.
+ * Nothing in the set nests three deep today; the parity costs one `% 2` and means
+ * the rule does not quietly become wrong when something does.
+ *
+ * ## Why this needs `getBBox` and cannot be a selector
+ *
+ * "Is this path inside that rect" is geometry, and CSS cannot ask it. The browser
+ * can , `getBBox()` on each child , so the dialog measures the glyph it has
+ * already rendered and hands the answer here as `GlyphShape[]`. Same reasoning as
+ * `hasFillableGeometry` reading the icon's own markup instead of a lookup table:
+ * a second copy of the package's geometry goes stale in silence.
+ *
+ * ⚠️ THE COST, AND IT IS REAL: the answer can only be expressed as `nth-child`,
+ * so an emitted snippet is pinned to the package's internal CHILD ORDER. Reorder
+ * a glyph's geometry in a future release and a snippet copied today paints the
+ * wrong child. Accepted, because the alternative is a fill that deletes a third
+ * of the set, and because the indices travel WITH the copied markup rather than
+ * living anywhere that could drift from it independently.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
-export const KNOCKOUT_ELEMENTS = [...PAGE_SURFACE.knockoutClass.matchAll(/\[&>(\w+)/g)].map(
-  (match) => match[1]!,
-);
+
+/** One rendered child of a glyph, as the containment pass sees it. */
+export interface GlyphShape {
+  /** Lower-case tag name , `rect`, `path`, `line`, … */
+  tag: string;
+  /** `true` when this element encloses an area, so a fill can land on it. */
+  closed: boolean;
+  /** `getBBox()`, in the 24x24 user space. */
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Float slack for the containment test, in user units of a 24-wide grid.
+ *
+ * Deliberately tiny. A generous tolerance is not a kindness here: at 1.0 the
+ * `SearchIcon` handle (bbox running out to x=20, against a lens bbox ending at
+ * x=19) reads as contained and the handle disappears , which is the exact bug
+ * this pass exists to remove. Only float noise is being absorbed.
+ */
+const CONTAINMENT_EPSILON = 0.01;
+
+/** `true` when `inner` sits inside `outer`, which must be strictly the larger. */
+function contains(outer: GlyphShape, inner: GlyphShape): boolean {
+  /*
+   * Strictly larger by AREA first, or two children sharing a bounding box would
+   * each "contain" the other and the depth count would depend on iteration
+   * order. `CircleHalfIcon` is the near miss: its half-disc shares three edges
+   * with the circle it sits in, and is separated by area rather than by any
+   * single edge comparison.
+   */
+  if (outer.width * outer.height <= inner.width * inner.height + CONTAINMENT_EPSILON) {
+    return false;
+  }
+  return (
+    inner.x >= outer.x - CONTAINMENT_EPSILON &&
+    inner.y >= outer.y - CONTAINMENT_EPSILON &&
+    inner.x + inner.width <= outer.x + outer.width + CONTAINMENT_EPSILON &&
+    inner.y + inner.height <= outer.y + outer.height + CONTAINMENT_EPSILON
+  );
+}
+
+/**
+ * Which children are cut out, one flag per child, in document order.
+ *
+ * Only a CLOSED shape can enclose anything, so only closed shapes count as
+ * containers. An open path's bounding box is not a region that gets painted, and
+ * treating it as one would cut `ArchiveIcon`'s handle out of a box that has no
+ * fill in it to be cut from.
+ */
+export function knockoutFlags(shapes: GlyphShape[]): boolean[] {
+  return shapes.map((shape, index) => {
+    const depth = shapes.filter(
+      (other, otherIndex) => otherIndex !== index && other.closed && contains(other, shape),
+    ).length;
+    return depth % 2 === 1;
+  });
+}
+
+/**
+ * The custom property the indexed knockout classes read.
+ *
+ * Set once on the root from `SurfaceChoice.knockoutVar` and inherited by every
+ * child, so the surface enters the glyph through ONE inline style rather than
+ * through the class of every cut element.
+ */
+export const KNOCKOUT_VAR = '--icon-knock';
+
+/**
+ * The largest child count in the set , `SunIcon` and `KeyboardIcon`, both 9.
+ * The tables below run to 12 so a slightly busier glyph cannot fall off the end
+ * of them unnoticed; `iconClassName` clamps to the table length rather than
+ * emitting a class name that was never compiled.
+ */
+export const MAX_GLYPH_CHILDREN = 12;
+
+/**
+ * The indexed knockout utilities.
+ *
+ * ⚠️ TWENTY-FOUR LITERALS, WRITTEN OUT, AND THEY HAVE TO BE. Tailwind v4 scans
+ * source files as PLAIN TEXT and never evaluates them, so building these with
+ * `Array.from({ length: 12 }, (_, i) => …)` produces the identical strings at
+ * runtime and NO CSS AT ALL , the classes reach the DOM, nothing is painted, and
+ * nothing anywhere reports it. Third variation of that trap in this file alone;
+ * see `FILL_SUPPRESS_CLASS`.
+ *
+ * `nth-child` is 1-based and these arrays are 0-based, which is the one
+ * off-by-one worth stating out loud: index `i` holds the class for child `i`.
+ */
+export const KNOCKOUT_STROKE_CLASSES = [
+  '[&>*:nth-child(1)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(2)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(3)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(4)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(5)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(6)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(7)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(8)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(9)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(10)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(11)]:stroke-[var(--icon-knock)]',
+  '[&>*:nth-child(12)]:stroke-[var(--icon-knock)]',
+] as const;
+
+/**
+ * The fill half, needed only for a CLOSED child that is itself cut out ,
+ * `ToggleIcon`'s knob inside its pill is the case that requires it. An open
+ * child's fill is already `none` from `FILL_SUPPRESS_CLASS`, so handing it one of
+ * these would put an inert class in a copied snippet, which is a question the
+ * reader has to answer for no reason.
+ */
+export const KNOCKOUT_FILL_CLASSES = [
+  '[&>*:nth-child(1)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(2)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(3)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(4)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(5)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(6)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(7)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(8)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(9)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(10)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(11)]:fill-[var(--icon-knock)]',
+  '[&>*:nth-child(12)]:fill-[var(--icon-knock)]',
+] as const;
 
 /**
  * The sizes the "true size" strip renders at.
@@ -928,7 +1084,7 @@ export function isGradient(config: IconConfig): boolean {
  * gradient contributes no colour class , it paints through `stroke`, not through
  * the inherited `color` , so only the animation survives in that branch.
  */
-export function iconClassName(config: IconConfig): string | undefined {
+export function iconClassName(config: IconConfig, shapes: GlyphShape[] = []): string | undefined {
   const parts = [
     config.colorId === CUSTOM_COLOR_ID || isGradient(config)
       ? undefined
@@ -937,18 +1093,67 @@ export function iconClassName(config: IconConfig): string | undefined {
     // Only when a fill is actually on , the classes are inert otherwise, and an
     // inert class in a copied snippet is a question the reader has to answer.
     config.filled ? FILL_SUPPRESS_CLASS : undefined,
-    /*
-     * The knockout, and the one place the SURFACE leaks into the icon's own
-     * className. It has to: a cut-out is only a cut-out against the thing it was
-     * cut from, so the snippet has to name a background, and the surface control
-     * is where the reader said which one.
-     */
-    config.filled ? findSurface(config.surfaceId).knockoutClass : undefined,
+    ...(config.filled ? knockoutClasses(shapes) : []),
   ].filter(Boolean);
   return parts.length ? parts.join(' ') : undefined;
 }
 
-/** The inline `color` the preview and the emitted JSX both use, if any. */
+/**
+ * The `nth-child` classes that cut the contained children out.
+ *
+ * Empty for most of the set, and that is the headline: `ArchiveIcon`,
+ * `SunIcon`, `SearchIcon`, `LockIcon`, `UserIcon` and the other ~40 glyphs whose
+ * geometry all sits at the same level get NO knockout classes at all. Their fill
+ * lands on the closed shapes and every stroke keeps the colour it already had ,
+ * which is precisely the "the icon must not change on fill" requirement, arrived
+ * at by the rule rather than by a special case.
+ *
+ * Clamped to the literal tables. A glyph with more children than
+ * `MAX_GLYPH_CHILDREN` loses its cut on the overflow rather than being handed a
+ * class name Tailwind never compiled , a missing cut is visible, and a class that
+ * silently does nothing is the failure mode this whole file keeps guarding
+ * against.
+ */
+export function knockoutClasses(shapes: GlyphShape[]): string[] {
+  const classes: string[] = [];
+  knockoutFlags(shapes).forEach((cut, index) => {
+    if (!cut || index >= MAX_GLYPH_CHILDREN) return;
+    classes.push(KNOCKOUT_STROKE_CLASSES[index]!);
+    // Only a closed child is painted by the root's fill, so only a closed child
+    // needs that fill overridden as well. See KNOCKOUT_FILL_CLASSES.
+    if (shapes[index]!.closed) classes.push(KNOCKOUT_FILL_CLASSES[index]!);
+  });
+  return classes;
+}
+
+/**
+ * The inline style the preview and the emitted JSX both use, if any.
+ *
+ * Two things share it: a custom `color`, and , whenever a fill is on , the
+ * knockout colour, as `--icon-knock`.
+ *
+ * ⚠️ THE VARIABLE AND THE CLASSES ARE ONE FEATURE AND MUST SHIP TOGETHER. The
+ * indexed utilities compile to `stroke: var(--icon-knock)` with no fallback, and
+ * `stroke`/`fill` are INHERITED properties, so an unresolvable `var()` is invalid
+ * at computed-value time and the child quietly inherits the root's paint instead
+ * , a cut that does not appear, reported by nothing. Emitting the class without
+ * this style is therefore a silent no-op, which is why one function owns both
+ * and why `toJsx` writes the style whenever it writes the classes.
+ *
+ * The variable is set even when it repeats the page default, because the snippet
+ * is going into someone else's tree where `--icon-knock` does not exist at all.
+ */
+export function iconStyle(config: IconConfig): Record<string, string> | undefined {
+  const style: Record<string, string> = {};
+  if (config.colorId === CUSTOM_COLOR_ID) style.color = config.customColor;
+  if (config.filled) style[KNOCKOUT_VAR] = findSurface(config.surfaceId).knockoutVar;
+  return Object.keys(style).length ? style : undefined;
+}
+
+/**
+ * @deprecated Superseded by `iconStyle`, which also carries the knockout colour.
+ * Kept as the narrow colour-only accessor the contrast readout still wants.
+ */
 export function colorStyle(config: IconConfig): { color: string } | undefined {
   return config.colorId === CUSTOM_COLOR_ID ? { color: config.customColor } : undefined;
 }
@@ -972,7 +1177,7 @@ export function gradientPaint(
   const paint = `url(#${id})`;
   /*
    * Full alpha, like every other colour choice. A gradient survives the knockout
-   * without a special case because `FILL_SUPPRESS_CLASS` and `knockoutClass`
+   * without a special case because `FILL_SUPPRESS_CLASS` and the knockout classes
    * both EXCLUDE the closed geometry rather than repainting it , so a closed
    * path keeps inheriting `url(#…)` from the root, and only the open geometry is
    * overridden to the surface token.
@@ -1049,7 +1254,7 @@ export function accessibleName(config: IconConfig): string {
  * and a snippet that quietly said 16 while the preview showed 64 would be the
  * one real lie this panel could tell. See `SIZE_PRESETS`.
  */
-export function toJsx(name: string, config: IconConfig): string {
+export function toJsx(name: string, config: IconConfig, shapes: GlyphShape[] = []): string {
   const props = [`size={${config.size}}`];
 
   if (config.strokeWidth !== DEFAULT_STROKE_WIDTH) {
@@ -1084,11 +1289,20 @@ export function toJsx(name: string, config: IconConfig): string {
     props.push('fill="currentColor"');
   }
 
-  const className = iconClassName(config);
+  const className = iconClassName(config, shapes);
   if (className) props.push(`className="${className}"`);
 
-  const style = colorStyle(config);
-  if (style) props.push(`style={{ color: '${style.color}' }}`);
+  /*
+   * One `style` for both the custom colour and `--icon-knock`. Written as a
+   * quoted key because `--icon-knock` is not a JS identifier, and emitted
+   * whenever the classes are , see `iconStyle` for why splitting them is a
+   * silent no-op rather than a partial feature.
+   */
+  const style = iconStyle(config);
+  if (style) {
+    const entries = Object.entries(style).map(([key, value]) => `'${key}': '${value}'`);
+    props.push(`style={{ ${entries.join(', ')} }}`);
+  }
 
   props.push(...accessibilityProps(config));
 
@@ -1191,6 +1405,7 @@ export function toSvgMarkup(
   paths: string,
   resolvedColor: string,
   resolvedSurfaceColor: string,
+  shapes: GlyphShape[] = [],
 ): string {
   const { linecap, linejoin } = END_STYLES[config.ends];
 
@@ -1279,27 +1494,55 @@ export function toSvgMarkup(
    * on one surface, and that is inherent to handing someone a standalone file.
    */
   if (config.filled) {
-    const candidates = [...new Set([...FILL_SUPPRESSED_ELEMENTS, ...KNOCKOUT_ELEMENTS])].join('|');
+    /*
+     * Walks EVERY child, not just the open ones, because the decision is now
+     * per-index rather than per-tag , `ToggleIcon`'s knob is a `<circle>` and is
+     * cut, while `ArchiveIcon`'s box is a `<path>` and is not. `cuts` comes from
+     * the same `knockoutFlags` pass the preview uses, so the file and the stage
+     * cannot disagree about which children are interior.
+     */
+    const cuts = knockoutFlags(shapes);
+    let index = -1;
     body = body.replace(
-      new RegExp(`<(${candidates})\\b([^>]*)`, 'g'),
+      /<([a-zA-Z]+)\b([^>]*)/g,
       (match, tag: string, attributes: string) => {
+        index += 1;
+        const open = FILL_SUPPRESSED_ELEMENTS.includes(tag) && !isClosedPath(attributes);
+        const cut = cuts[index] === true;
         /*
-         * A closed path is the shape being cut FROM, not a cut. It takes no
-         * attribute at all so it keeps inheriting the root's `fill`/`stroke` ,
-         * which is a colour or a `url(#…)` paint server, and this branch is not
-         * allowed to care which. Exactly the reasoning behind the `:not()` in
-         * `FILL_SUPPRESS_CLASS`, transposed to attributes.
+         * Suppress the fill on open geometry whether or not it is cut: a fill on
+         * an open path invents the chord, which is not in the drawing. `line`
+         * encloses no area, so writing `fill="none"` onto it would be a no-op
+         * attribute in a file someone is going to read.
          */
-        if (tag === 'path' && isClosedPath(attributes)) return match;
+        const fill = open ? 'none' : cut && tag !== 'line' ? resolvedSurfaceColor : undefined;
+        const stroke = cut ? resolvedSurfaceColor : undefined;
+        if (!fill && !stroke) return match;
+
         /*
-         * `line` encloses no area, so writing `fill="none"` onto it would be a
-         * no-op attribute in a file someone is going to read.
+         * ⚠️ STRIP THE ELEMENT'S OWN `fill`/`stroke` BEFORE WRITING OURS.
+         *
+         * 21 elements in the package hardcode `fill="currentColor" stroke="none"`
+         * for a solid mark , `ToggleIcon`'s knob is one , and simply prepending
+         * produced `<circle fill="#efedea" … fill="currentColor" …>`. Browsers
+         * take the FIRST occurrence, so the preview and the exported file
+         * happened to agree, and it looked fine. It is still a duplicate
+         * attribute, which is not valid markup: a strict XML parser is entitled
+         * to reject the file outright, and Figma and Inkscape are exactly the
+         * consumers this export exists for.
+         *
+         * `fill="` and `stroke="` are matched with the quote attached, so
+         * `fill-opacity` and `stroke-width`/`stroke-linecap` are untouched.
          */
-        const knockout =
-          tag === 'line'
-            ? ` stroke="${resolvedSurfaceColor}"`
-            : ` fill="none" stroke="${resolvedSurfaceColor}"`;
-        return `<${tag}${knockout}${attributes}`;
+        const kept = attributes
+          .replace(fill ? /\s+fill="[^"]*"/g : /(?!)/g, '')
+          .replace(stroke ? /\s+stroke="[^"]*"/g : /(?!)/g, '');
+
+        const written = [
+          fill ? ` fill="${fill}"` : '',
+          stroke ? ` stroke="${stroke}"` : '',
+        ].join('');
+        return `<${tag}${written}${kept}`;
       },
     );
   }
