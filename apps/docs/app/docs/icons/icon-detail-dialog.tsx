@@ -39,7 +39,6 @@ import {
   CUSTOM_COLOR_ID,
   DEFAULT_CONFIG,
   END_STYLES,
-  FILL_OPACITY,
   GRADIENT_COLOR_ID,
   GRAPHIC_CONTRAST_MIN,
   SIZE_MAX,
@@ -220,10 +219,15 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
   /*
    * Does this glyph have anything a fill can legitimately paint?
    *
-   * 78 of 198 icons are made entirely of open paths, where a fill only ever
+   * 52 of 198 icons are made entirely of open paths, where a fill only ever
    * invents a chord , so the toggle is disabled for those rather than left
    * offering a change that cannot happen. Read from the icon's own rendered
    * markup, so it stays true if the geometry changes.
+   *
+   * It was 78 until a closed `<path>` started counting as fillable, which handed
+   * the toggle to the 26 single-silhouette glyphs , `ShieldIcon`, `HeartIcon`,
+   * `AlertTriangleIcon` , that a solid fill suits better than anything else in
+   * the set and that had it disabled the whole time.
    *
    * Before the first DOM read lands, treated as fillable so the switch does not
    * flicker to disabled for one commit on open.
@@ -290,12 +294,16 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
     strokeLinejoin: END_STYLES[config.ends].linejoin,
     fill: effective.filled ? 'currentColor' : 'none',
     /*
-     * The wash, not a solid. `undefined` when the toggle is off rather than `1`,
-     * so the attribute is absent entirely and the emitted snippet and the preview
-     * agree about what is set. See FILL_OPACITY for why a solid fill is not an
-     * option: it erases every container glyph in the set.
+     * At FULL alpha, and no `fillOpacity` beside it. The fill used to be a 20%
+     * wash because a solid one erases every container glyph , the inner shapes
+     * paint in the same colour as the slab behind them and vanish into it. What
+     * makes solid safe now is `glyphClassName`, which carries both halves of the
+     * knockout: no fill on open geometry, and a surface-coloured stroke on it, so
+     * the contents are cut out of the slab rather than lost in it.
+     *
+     * The two therefore travel together. A `fill` here with no class is the old
+     * erasure bug, exactly.
      */
-    fillOpacity: effective.filled ? FILL_OPACITY : undefined,
     className: glyphClassName,
     style: iconStyle,
     /*
@@ -390,7 +398,22 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
      * like a right one , `currentColor` at least keeps the file inheriting, which
      * is what the package does anyway.
      */
-    return toSvgMarkup(effective, resolved.paths, foreground ? toHex(foreground) : 'currentColor');
+    /*
+     * The surface travels with it now. A knockout in a standalone file cannot be
+     * a token , there is no stylesheet to resolve `--bg` , so the export bakes
+     * the surface the reader configured. `currentColor` is not a fallback that
+     * works here either: the knockout has to be the BACKGROUND, and an element
+     * inheriting `currentColor` would paint the cut in the icon's own colour and
+     * hide it completely. `transparent` is the honest failure , the cut shows
+     * whatever is behind the file, which is what a knockout means.
+     */
+    const background = parseRgb(resolved.surfaceColor);
+    return toSvgMarkup(
+      effective,
+      resolved.paths,
+      foreground ? toHex(foreground) : 'currentColor',
+      background ? toHex(background) : 'transparent',
+    );
   }, [effective, resolved]);
 
   /*
@@ -737,7 +760,8 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
 
             {/* Fill , grouped with the two stroke controls, because all three
                 change the shape rather than the colour or the size. Expect it to
-                look wrong on open paths; `IconConfig.filled` records why, and the
+                look wrong on the glyphs whose open geometry sits outside the
+                shape being filled; `IconConfig.filled` records why, and the
                 preview shows it immediately, which is the point. */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-2">
@@ -767,6 +791,19 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                   All open paths , nothing encloses a fillable region.
                 </p>
               )}
+              {/*
+               * The one thing a reader cannot see by looking at the stage: the
+               * cut is painted in the SURFACE colour, so the snippet is tied to
+               * the surface picked above it and will show the wrong colour in the
+               * cut anywhere else. Shown only while the fill is on, because until
+               * then it is a fact about nothing.
+               */}
+              {effective.filled ? (
+                <p className="text-xs text-muted-foreground">
+                  Cut out in the {surface.label.toLowerCase()} colour , the snippet carries that
+                  surface with it.
+                </p>
+              ) : null}
             </div>
 
             {/*
