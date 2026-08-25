@@ -241,15 +241,24 @@ describe('CommandDialog', () => {
     );
   });
 
-  it('anchors near the top, because a centred palette jumps on every keystroke', async () => {
+  it('centres on both axes through auto margins, leaving `transform` to the animation', async () => {
     render(<Controlled />);
     await userEvent.click(screen.getByRole('button', { name: 'Open palette' }));
     const dialog = await waitFor(() => screen.getByRole('dialog'));
-    expect(dialog.className).toContain('top-[15vh]');
-    // Horizontal centring is symmetric, so the physical pair is correct in both
-    // directions , `start-1/2` would break RTL, because translate does not flip.
-    expect(dialog.className).toContain('left-1/2');
-    expect(dialog.className).toContain('-translate-x-1/2');
+    expect(dialog.className).toContain('inset-0');
+    expect(dialog.className).toContain('m-auto');
+    // `h-fit` is what keeps `inset-0` a centring instruction rather than a
+    // stretch , without it the box fills the viewport and the palette floats at
+    // the top of a full-height pane.
+    expect(dialog.className).toContain('h-fit');
+    // No layout translate, and no physical inset pair. `tw-animate-css` writes
+    // the whole `transform` property, so a translate here is dropped for the
+    // length of the open animation (the off-centre jump); `left`/`top` are also
+    // physical, and `translate` does not flip under `dir="rtl"`.
+    expect(dialog.className).not.toContain('-translate-x-1/2');
+    expect(dialog.className).not.toContain('-translate-y-1/2');
+    expect(dialog.className).not.toContain('left-1/2');
+    expect(dialog.className).not.toContain('top-1/2');
     expect(dialog.className).not.toContain('start-1/2');
   });
 });

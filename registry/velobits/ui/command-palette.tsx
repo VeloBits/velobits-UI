@@ -47,7 +47,7 @@ import { cn } from '../lib/cn';
  *
  * ## Composed on Radix's Dialog primitive directly, not on our `Dialog`
  *
- * A palette needs an unpadded, top-anchored content box and its own close
+ * A palette needs an unpadded content box with no ✕ of its own and its own close
  * behaviour, so it would spend its life overriding `dialogContentVariants`.
  * Building on the primitive also keeps this file installable on its own , a CLI
  * consumer needs `cmdk` and `radix-ui`, not the whole Dialog component.
@@ -418,14 +418,28 @@ function CommandDialog({
           data-slot="command-palette-dialog"
           className={cn(
             'glass fixed z-modal overflow-hidden rounded-xl p-0 shadow-lg',
-            // Top-anchored rather than centred: the list grows downwards as the
-            // user types, and a vertically centred palette jumps on every
-            // keystroke.
-            'top-[15vh] w-[calc(100%-2rem)] max-w-lg',
-            // Horizontal centring is symmetric, so the PHYSICAL pair is correct
-            // in both directions. `start-1/2` would break RTL , `translate` does
-            // not flip, so the box would be pushed off the wrong edge.
-            'left-1/2 -translate-x-1/2',
+            /*
+             * Centred on BOTH axes, with `inset-0` + `margin: auto` rather than
+             * `top-1/2 left-1/2` + a translate , the same way `dialog.tsx`
+             * centres, and for the same two reasons:
+             *
+             *  1. `top`/`left` are physical and `translate` does not flip, so
+             *     the translate pair pushes the box off the wrong edge under
+             *     `dir="rtl"`. Auto margins are direction-agnostic.
+             *  2. `tw-animate-css`'s enter/exit keyframes write the WHOLE
+             *     `transform` property (translate3d + scale3d + rotate), so a
+             *     layout translate on the same element is discarded for the
+             *     duration of the animation , the off-centre jump on open.
+             *     Keeping layout out of `transform` leaves it free to animate.
+             *
+             * The cost of centring, stated rather than discovered: the box grows
+             * downwards as results arrive, and an auto-margin centre re-splits
+             * the leftover space on every change, so the frame drifts by half of
+             * whatever the list gains. `max-h-80` on `CommandList` bounds the
+             * total drift at ~160px and it settles once the list is full; give
+             * `CommandList` a fixed `h-*` if a palette must not move at all.
+             */
+            'inset-0 m-auto h-fit w-[calc(100%-2rem)] max-w-lg',
             'duration-enter ease-out',
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
