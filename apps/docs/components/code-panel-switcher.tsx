@@ -2,7 +2,14 @@
 
 import { useId, useState } from 'react';
 
-import { NativeSelect, resolveCodeLanguage } from '@velobitsio/ui';
+import {
+  resolveCodeLanguage,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@velobitsio/ui';
 
 import type { DocCodeVariant } from './code-panel';
 import { CopyButton } from './copy-button';
@@ -150,23 +157,28 @@ export function CodePanelSwitcher({
        */}
       <div className="absolute end-2 top-2 z-raised flex items-center gap-1.5">
         {/*
-         * A DROPDOWN, and specifically the system's `NativeSelect` , a real
-         * `<select>`.
+         * A DROPDOWN, and since 2026-08-26 the system's `Select` rather than
+         * `NativeSelect`.
          *
-         * This replaced a `SegmentedControl`, which is the same decision ADR-0031
-         * already made for `NativeSelect` itself and for the same reason it holds
-         * here: a segmented row spends horizontal space per option, so it is a
-         * control that works at two languages and starts eating the code's first
-         * line at four. A `<select>` is one width forever, which is the only
-         * property that survives someone registering a fifth language.
+         * The dropdown itself replaced a `SegmentedControl` for a reason that has
+         * not changed: a segmented row spends horizontal space per option, so it
+         * works at two languages and starts eating the code's first line at four.
+         * A dropdown is one width forever, which is the only property that
+         * survives someone registering a fifth language. And an option's text IS
+         * its accessible name, so there is no 2.5.3 Label-in-Name problem to work
+         * around , the segmented implementation printed "TS" and hid "TypeScript"
+         * beside it for exactly that reason.
          *
-         * Native rather than a Radix popover: an `<option>`'s text IS its
-         * accessible name, the selection is in the accessibility tree as
-         * `<select>` state rather than inferred from styling, the whole control is
-         * one tab stop, and mobile gets the platform picker. It also means there
-         * is no 2.5.3 Label-in-Name problem to work around , the previous
-         * implementation printed "TS" and hid "TypeScript" beside it for exactly
-         * that reason, and an option simply does not need the trick.
+         * What DID change is which dropdown. This control floats over a syntax-
+         * highlighted panel, and a native `<select>`'s option popup is drawn by
+         * the OS , square, unshadowed, unpadded, and on Chromium filled from the
+         * select's own `background`. It was the least finished-looking surface on
+         * the docs site and also one of the most clicked. `Select` keeps every
+         * property listed above (one tab stop, name from the option text,
+         * selection in the accessibility tree rather than inferred from styling)
+         * and adds a panel that belongs to the design system. ADR-0031's
+         * testability objection expired with the polyfills in
+         * `packages/ui/test/setup.ts`; see the docblock in `select.tsx`.
          *
          * `aria-label` rather than the `aria-labelledby` + visible caption that
          * `skill-install.tsx` uses: that pattern exists to avoid duplicating a
@@ -175,31 +187,35 @@ export function CodePanelSwitcher({
          * otherwise offers a screen-reader user a dozen identically named
          * dropdowns.
          *
-         * The size overrides are the whole adaptation: `NativeSelect` is `h-9
-         * w-full` because it is normally a form field. `pe-8` is NOT reduced ,
-         * that padding is what the percent-encoded chevron in the component's own
-         * background is positioned against, and tightening it clips the glyph.
+         * `size="sm"` instead of the four size overrides this used to carry. That
+         * variant exists because of this call site , and `w-auto` is still needed
+         * because a trigger is `w-full` for the form case and this one sits in a
+         * shrink-to-fit row.
          */}
-        <NativeSelect
-          aria-label={label ? `Code language for ${label}` : 'Code language'}
-          value={active.language}
-          onChange={(event) => select(event.target.value)}
-          className="h-7 w-auto ps-2 pe-8 text-xs backdrop-blur-sm"
-          /*
-           * The registered language's own colour, when it has one. `accent` is
-           * how a consumer's language arrives looking like itself rather than
-           * like our `--primary`; applied to the control because browsers largely
-           * ignore per-`<option>` styling, so the closed dropdown is the only
-           * surface that can carry it reliably.
-           */
-          style={language.accent ? { color: language.accent } : undefined}
-        >
-          {variants.map((entry) => (
-            <option key={entry.language} value={entry.language}>
-              {resolveCodeLanguage(entry.language).label}
-            </option>
-          ))}
-        </NativeSelect>
+        <Select value={active.language} onValueChange={select}>
+          <SelectTrigger
+            aria-label={label ? `Code language for ${label}` : 'Code language'}
+            size="sm"
+            className="w-auto backdrop-blur-sm"
+            /*
+             * The registered language's own colour, when it has one. `accent` is
+             * how a consumer's language arrives looking like itself rather than
+             * like our `--primary`. It stays on the TRIGGER: the panel is ours to
+             * paint now, but tinting each row would put the accent and the
+             * highlight on one surface, fighting.
+             */
+            style={language.accent ? { color: language.accent } : undefined}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {variants.map((entry) => (
+              <SelectItem key={entry.language} value={entry.language}>
+                {resolveCodeLanguage(entry.language).label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <CopyButton
           /*
            * The selected variant's literal text, and a name that says which one.

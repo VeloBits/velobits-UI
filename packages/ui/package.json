@@ -218,6 +218,16 @@
         "default": "./dist/scroll-area.cjs"
       }
     },
+    "./select": {
+      "import": {
+        "types": "./dist/select.d.ts",
+        "default": "./dist/select.js"
+      },
+      "require": {
+        "types": "./dist/select.d.cts",
+        "default": "./dist/select.cjs"
+      }
+    },
     "./separator": {
       "import": {
         "types": "./dist/separator.d.ts",
@@ -598,7 +608,7 @@
       ]
     },
     {
-      "name": "Slider alone, our code only (the newest primitive's per-entry proof)",
+      "name": "Slider alone, our code only (a primitive that carries no popper)",
       "path": "dist/slider.js",
       "limit": "2 kB",
       "ignore": [
@@ -614,7 +624,32 @@
       ]
     },
     {
-      "name": "the whole barrel, our code only (40 components, minus the 2 subpath-only ones)",
+      "name": "Select alone, our code only (the newest primitive's per-entry proof)",
+      "path": "dist/select.js",
+      "limit": "3 kB",
+      "ignore": [
+        "react",
+        "react-dom",
+        "framer-motion",
+        "@velobitsio/icons",
+        "@velobitsio/tokens",
+        "radix-ui",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "name": "Select alone, with every dependency (Radix Select + popper; 36 kB at T3)",
+      "path": "dist/select.js",
+      "limit": "40 kB",
+      "ignore": [
+        "react",
+        "react-dom"
+      ]
+    },
+    {
+      "name": "the whole barrel, our code only (41 components, minus the 2 subpath-only ones)",
       "path": "dist/index.js",
       "limit": "32 kB",
       "ignore": [
@@ -630,9 +665,9 @@
       ]
     },
     {
-      "name": "the whole barrel, with every dependency (what a consumer pays; 64 kB at T3, 68 kB before Slider)",
+      "name": "the whole barrel, with every dependency (what a consumer pays; 64 kB at T3, 68 kB before Slider, 70.8 kB before Select , which added 4.99 kB of popper)",
       "path": "dist/index.js",
-      "limit": "72 kB",
+      "limit": "80 kB",
       "ignore": [
         "react",
         "react-dom"

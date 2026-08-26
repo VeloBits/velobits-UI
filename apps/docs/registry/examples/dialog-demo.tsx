@@ -16,7 +16,11 @@ import {
   FieldLabel,
   Input,
   Label,
-  NativeSelect,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Popover,
   PopoverContent,
   PopoverDescription,
@@ -86,11 +90,23 @@ export default function DialogDemo() {
               </PopoverHeader>
               <div className="space-y-2 pt-2">
                 <Label htmlFor="cx-dialog-env">Enable in</Label>
-                <NativeSelect id="cx-dialog-env" defaultValue="none">
-                  <option value="none">No environment</option>
-                  <option value="dev">Development only</option>
-                  <option value="all">All environments</option>
-                </NativeSelect>
+                {/*
+                 * Three layers deep , Select inside Popover inside Dialog , which
+                 * is the deepest stack the system supports and the reason
+                 * `SelectContent` is `z-popover` rather than `z-dropdown`. All
+                 * three portal to the body, so nothing here is nesting: they are
+                 * siblings ordered purely by rung.
+                 */}
+                <Select defaultValue="none">
+                  <SelectTrigger id="cx-dialog-env">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No environment</SelectItem>
+                    <SelectItem value="dev">Development only</SelectItem>
+                    <SelectItem value="all">All environments</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </PopoverContent>
           </Popover>

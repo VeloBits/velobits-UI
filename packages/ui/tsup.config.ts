@@ -69,6 +69,7 @@ const CLIENT = {
   label: `${R}/ui/label.tsx`,
   'native-select': `${R}/ui/native-select.tsx`,
   'scroll-area': `${R}/ui/scroll-area.tsx`,
+  select: `${R}/ui/select.tsx`,
   separator: `${R}/ui/separator.tsx`,
   skeleton: `${R}/ui/skeleton.tsx`,
   slider: `${R}/ui/slider.tsx`,

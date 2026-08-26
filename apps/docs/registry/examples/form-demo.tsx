@@ -3,7 +3,16 @@
 import { useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 
-import { Button, Input, NativeSelect, Textarea } from '@velobitsio/ui';
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+} from '@velobitsio/ui';
 // Deliberately NOT from the barrel. `react-hook-form` is an OPTIONAL peer and the
 // barrel is one bundled module, so re-exporting Form there would put a top-level
 // `import 'react-hook-form'` in dist/index.js and break every consumer that has
@@ -77,12 +86,26 @@ export default function FormDemo() {
           name="environment"
           label="Create in"
           description="A new flag starts off wherever you create it."
+          /*
+           * `field` does not spread onto a `Select` , react-hook-form hands out
+           * `onChange`/`onBlur`/`value`/`ref` for a native control, and Radix
+           * takes `onValueChange` and has no single focusable node to hold the
+           * ref. So the three that matter are wired by hand: `value`,
+           * `onValueChange` (which is `field.onChange` , RHF accepts a bare value
+           * as well as an event), and `name`, which makes Radix render the hidden
+           * native control so a plain form submit still carries it.
+           */
           render={({ field }) => (
-            <NativeSelect {...field}>
-              <option value="dev">Development</option>
-              <option value="staging">Staging</option>
-              <option value="prod">Production</option>
-            </NativeSelect>
+            <Select name={field.name} value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger onBlur={field.onBlur}>
+                <SelectValue placeholder="Pick an environment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dev">Development</SelectItem>
+                <SelectItem value="staging">Staging</SelectItem>
+                <SelectItem value="prod">Production</SelectItem>
+              </SelectContent>
+            </Select>
           )}
         />
         {/*

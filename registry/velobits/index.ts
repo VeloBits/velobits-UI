@@ -80,6 +80,20 @@ export { Kbd } from './ui/kbd';
 export { Label } from './ui/label';
 export { NativeSelect } from './ui/native-select';
 export { ScrollArea, ScrollBar } from './ui/scroll-area';
+export {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+  selectTriggerVariants,
+  type SelectTriggerProps,
+} from './ui/select';
 export { Separator } from './ui/separator';
 export { Skeleton } from './ui/skeleton';
 export { Slider, type SliderProps } from './ui/slider';

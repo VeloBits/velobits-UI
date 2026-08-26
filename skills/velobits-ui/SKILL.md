@@ -5,7 +5,7 @@ description: Install, configure and write UI with the VeloBits design system, th
 
 # VeloBits UI
 
-One token and component layer for every VeloBits surface. 48 semantic tokens, 40
+One token and component layer for every VeloBits surface. 48 semantic tokens, 41
 components built on Radix and Tailwind v4, 201 stroke icons, a two-tier glass
 material, and a contrast gate every colour pair has already passed.
 
@@ -191,7 +191,7 @@ cannot express, such as printing the current mode as text.
 
 ## 6. What already exists, so nothing gets rebuilt
 
-48 registry items: 40 components in three tiers, plus the foundation. Check this
+49 registry items: 41 components in three tiers, plus the foundation. Check this
 list before writing a component from scratch, and check `/r/registry.json` before
 concluding something is missing. Both numbers and every name below are asserted
 against the registry by `packages/ui/test/skill-parity.test.ts`, so this list
@@ -200,17 +200,22 @@ cannot quietly fall behind the code it describes.
 - **Foundation** `velobits` (installs everything), `velobits-theme`, `cn`,
   `theme`, `velobits-provider`, `use-theme`, `use-media-query`, `use-row-selection`
 - **Primitives** `glass-surface`, `card`, `alert`, `button`, `badge`, `input`,
-  `textarea`, `native-select`, `checkbox`, `switch`, `slider`, `label`, `field`,
-  `avatar`, `kbd`, `separator`, `skeleton`, `spinner`, `tooltip`, `scroll-area`
+  `textarea`, `select`, `native-select`, `checkbox`, `switch`, `slider`, `label`,
+  `field`, `avatar`, `kbd`, `separator`, `skeleton`, `spinner`, `tooltip`,
+  `scroll-area`
 - **Overlays** `dialog`, `side-panel`, `popover`, `dropdown-menu`, `toast`,
   `command-palette`
 - **Composites** `app-shell`, `data-table`, `table`, `form`, `accordion`, `tabs`,
   `segmented-control`, `status-chip`, `empty-state`, `pagination`, `breadcrumb`,
   `code-block`, `diff-viewer`, `motion`
 
-There is no `select` beyond `native-select`, no `sheet` (it is `side-panel`) and no
-`sonner` (it is `toast`). Icons come from `@velobitsio/icons`, not lucide, and
-every export name ends in `Icon`.
+There are TWO dropdowns and they are not interchangeable. `select` is the default
+, Radix underneath, so the open panel is a glass surface you can style, with a
+check indicator and `sm`/`default` sizes. `native-select` is a real `<select>`,
+for when the platform's own picker IS the design (a mobile-first form) or a form
+post needs a native control in the payload. There is no `sheet` (it is
+`side-panel`) and no `sonner` (it is `toast`). Icons come from
+`@velobitsio/icons`, not lucide, and every export name ends in `Icon`.
 
 Two commands read the registry directly, and both beat guessing:
 

@@ -8,7 +8,7 @@ import { CheckIcon, CopyIcon } from '@velobitsio/icons';
 import { cn } from '../lib/cn';
 import { resolveCodeLanguage, toCodeVariants, type CodeVariant } from '../lib/code-languages';
 import { buttonVariants } from './button';
-import { NativeSelect } from './native-select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 
 /**
  * Preformatted code, a config payload, a curl snippet, a revealed secret.
@@ -328,46 +328,59 @@ function CodeBlock({
 }
 
 /**
- * ## A DROPDOWN, and specifically the system's own `NativeSelect`
+ * ## A DROPDOWN, and since 2026-08-26 the system's `Select` rather than `NativeSelect`
  *
  * This was a segmented row of `role="radio"` buttons with roving `tabIndex` and
- * arrow-key handling. It is a `<select>` now, which deletes all of that.
+ * arrow-key handling. It became a dropdown, which deleted all of that.
  *
- * Two reasons, and the second is the durable one:
+ * Two reasons for the dropdown, and the second is the durable one:
  *
  *  , A segmented row spends horizontal space per option. It is comfortable at two
  *    languages, tight at three, and at four it is eating the first line of the
- *    code it sits over. A `<select>` is one control width no matter how many
+ *    code it sits over. A dropdown is one control width no matter how many
  *    languages are registered , and since {@link registerCodeLanguages} exists
  *    precisely so consumers can add their own, "how many options" is not a number
  *    this component gets to know.
- *  , An `<option>`'s text IS its accessible name. The row needed "TS" visible
- *    with "TypeScript" appended in an `sr-only` span, because an `aria-label` of
+ *  , An option's text IS its accessible name. The row needed "TS" visible with
+ *    "TypeScript" appended in an `sr-only` span, because an `aria-label` of
  *    "TypeScript" over visible "TS" breaks WCAG 2.5.3 Label in Name. A dropdown
  *    has room for the real word, so the workaround goes away rather than moving.
  *
- * `NativeSelect` is reused rather than hand-rolled, and it is the right thing to
- * reuse: ADR-0031 chose a native `<select>` over Radix Select for this system, so
- * there is no popper to bundle , which was the whole objection to reusing
- * `SegmentedControl` here (Radix ToggleGroup plus roving-focus plus direction, in
- * a per-entry bundle, for two buttons). It also means the platform supplies
- * keyboard support, and mobile gets the OS picker.
+ * ## Why it is `Select` now and not `NativeSelect`
+ *
+ * This control sits ON TOP OF a code block, and a native `<select>`'s option
+ * popup is drawn by the OS: square corners, no shadow, no padding, and , on
+ * Chromium , a fill taken from the select's own `background`. Over a syntax-
+ * highlighted panel that is the least finished-looking surface on the page, and
+ * it is the one thing a reader of the docs clicks on every visit.
+ *
+ * The objection that used to rule Radix out here was bundle weight (a popper for
+ * two buttons) plus ADR-0031's testability argument. Neither holds now: the
+ * popper is already paid for , `Dialog`, `Popover`, `DropdownMenu` and `Tooltip`
+ * all ship it, so any consumer with an overlay has it , and the testability
+ * ground expired with the polyfills in `packages/ui/test/setup.ts`. See the
+ * docblock in `select.tsx`.
+ *
+ * `size="sm"` rather than hand-patched heights. That variant exists BECAUSE of
+ * this call site and the icon playground's two pickers, all of which previously
+ * wrote `h-7 w-auto text-xs` plus a background-position nudge by hand.
  *
  * `accent` and `className` from the language definition are applied on top, so a
  * consumer who registers Python with Python's blue gets it here without this file
- * knowing Python exists. `accent` lands on the CONTROL rather than on the options
- * because browsers largely ignore per-`<option>` styling; the closed dropdown is
- * the only surface that can carry it reliably.
+ * knowing Python exists. `accent` lands on the TRIGGER; unlike the native
+ * control, the panel is ours to paint too, but tinting per-option would make the
+ * highlight and the accent fight for the same row.
  *
  * ## Why the terminal variant is not re-tinted
  *
  * The row used to darken itself on a `terminal` block. The dropdown deliberately
- * does not, and this is a decision rather than an omission: `NativeSelect` paints
- * its chevron as a percent-encoded background SVG whose colour is spelled out per
- * theme (`dark:bg-[url…]`), so a hand-tinted track puts a light-theme glyph on a
- * dark fill with no variant to correct it , an invisible chevron on the one
- * control whose entire job is to look openable. A control that reads as a control
- * on any surface is worth more here than one that blends into two.
+ * does not, and it is now a plainer decision than it was: the panel is glass on
+ * the overlay tier and reads correctly over either variant, so a hand-tinted
+ * track would buy blending at the cost of a control that no longer looks like a
+ * control. (Under `NativeSelect` this was also a hard constraint rather than a
+ * preference , its chevron was a background SVG with its colour spelled out per
+ * theme, so a hand-tinted track put a light-theme glyph on a dark fill with no
+ * variant to correct it.)
  */
 function LanguageSelector({
   variants,
@@ -385,27 +398,34 @@ function LanguageSelector({
   const language = resolveCodeLanguage(value);
 
   return (
-    <NativeSelect
-      aria-label={name}
-      data-slot="code-block-languages"
-      value={value}
-      onChange={(event) => onSelect(event.target.value)}
-      style={language.accent ? { color: language.accent } : undefined}
-      className={cn(
-        // `NativeSelect` is `h-9 w-full` because it is normally a form field.
-        // `pe-8` is NOT tightened , that padding is what the chevron in its own
-        // background is positioned against, and reducing it clips the glyph.
-        'absolute top-2 z-raised h-7 w-auto ps-2 pe-8 text-xs',
-        className,
-        language.className,
-      )}
-    >
-      {variants.map((entry) => (
-        <option key={entry.language} value={entry.language}>
-          {resolveCodeLanguage(entry.language).label}
-        </option>
-      ))}
-    </NativeSelect>
+    <Select value={value} onValueChange={onSelect}>
+      <SelectTrigger
+        aria-label={name}
+        data-slot="code-block-languages"
+        size="sm"
+        style={language.accent ? { color: language.accent } : undefined}
+        className={cn(
+          /*
+           * `w-auto` because `SelectTrigger` is `w-full` for the form case, and
+           * this one is absolutely positioned in a corner , a full-width trigger
+           * would span the block. The panel still floors at the trigger's width,
+           * so a narrow trigger does not produce a narrow panel.
+           */
+          'absolute top-2 z-raised w-auto',
+          className,
+          language.className,
+        )}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {variants.map((entry) => (
+          <SelectItem key={entry.language} value={entry.language}>
+            {resolveCodeLanguage(entry.language).label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 

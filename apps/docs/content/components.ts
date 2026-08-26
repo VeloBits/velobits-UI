@@ -209,6 +209,41 @@ export function App() {
     ],
   },
 
+  select: {
+    usage: `import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@velobitsio/ui';
+
+<Select defaultValue="prod">
+  <SelectTrigger aria-label="Environment">
+    <SelectValue />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="dev">Development</SelectItem>
+    <SelectItem value="prod">Production</SelectItem>
+  </SelectContent>
+</Select>`,
+    examples: [
+      {
+        name: 'select-demo',
+        title: 'Field, placeholder, and a grouped list',
+        description:
+          'The interesting half of this component is what it does when it opens, so all three states are on screen at once.',
+      },
+    ],
+    notes: [
+      'The default dropdown for this system. A native `<select>` can be styled to the pixel while it is CLOSED and not at all while it is OPEN , the option popup belongs to the operating system, so there is no radius, no shadow, no padding, no check indicator, and on Chromium a fill taken from the control’s own background. This is the same control with the open state brought inside the design system.',
+      '`size="sm"` is the toolbar height, matching `Button` size `sm`. It exists because the CodeBlock language switcher and the icon playground’s pickers all used to hand-patch `h-7 w-auto text-xs`; if you find yourself writing that, use the variant.',
+      'The panel is `z-popover`, not `z-dropdown`. It portals to the body, so it is a SIBLING of any Popover or Dialog it was opened from rather than a child , at a lower rung it would paint behind the surface it belongs to, not merely clip. Radix Select is modal, so nothing can be opened over it to contest that rung. It TIES with Popover at 1300, and the tiebreak is tree order: the Select’s portal is always the later body child, because it cannot open before the surface holding its trigger exists.',
+      'Selection is exposed as `aria-selected` on exactly one option and as the trigger’s text, so it never rests on colour alone. The highlight is `data-[highlighted]`, which Radix drives from BOTH the pointer and the keyboard , style a hover state instead and the panel is perfect with a mouse and invisible to the arrow keys.',
+      'Reach for `NativeSelect` when the platform’s own picker IS the design: a mobile-first form, where iOS gives a wheel and Android a full-screen list, or a control that must work without JS. That is a real choice, not a fallback.',
+    ],
+  },
+
   'native-select': {
     usage: `import { NativeSelect } from '@velobitsio/ui';
 
@@ -218,7 +253,8 @@ export function App() {
 </NativeSelect>`,
     examples: [{ name: 'native-select-demo', title: 'Basic' }],
     notes: [
-      'The platform picker is also what a phone and a screen reader handle best, so the testability argument and the accessibility one point the same way here , which is rarer than it sounds.',
+      'The escape hatch, not the default , `Select` is. Reach for this one when the platform picker IS the design: a mobile-first form (iOS renders a wheel, Android a full-screen list) or a control that has to survive with no JS. On a desktop-shaped surface the OS-drawn option popup is the least finished thing on the page.',
+      'ADR-0031 originally chose this over Radix Select because Radix was undriveable under happy-dom. That ground expired , the polyfills in `packages/ui/test/setup.ts` cover it and `Select` is now driven end-to-end by its own suite , so this component was KEPT on its own merits rather than as a testing concession.',
     ],
   },
 

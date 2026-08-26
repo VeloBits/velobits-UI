@@ -100,6 +100,7 @@ export const COMPONENT_GROUPS: ComponentGroup[] = [
       'badge',
       'input',
       'textarea',
+      'select',
       'native-select',
       'checkbox',
       'switch',

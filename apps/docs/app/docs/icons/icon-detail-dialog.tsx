@@ -21,8 +21,12 @@ import {
   DialogHeader,
   DialogTitle,
   Label,
-  NativeSelect,
   SegmentedControl,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Slider,
   Switch,
   Tabs,
@@ -740,39 +744,46 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                 <Label htmlFor={sizeLabelId} className="text-sm font-medium text-fg">
                   Size
                 </Label>
-                <NativeSelect
-                  id={sizeLabelId}
+                {/*
+                 * `Select`, not `NativeSelect`, since 2026-08-26 , and the
+                 * background caveat this call site used to carry went with it.
+                 *
+                 * `NativeSelect` painted its chevron as a background-image data
+                 * URI, so no background utility could be added here: tailwind-merge
+                 * treats a second background-image class as a conflict and evicts
+                 * one of them, leaving a control with no dropdown indicator at all
+                 * (`appearance-none` had already removed the native arrow). Only
+                 * repositioning was safe, which is what the old
+                 * `bg-[position:…]` override was doing.
+                 *
+                 * A Radix trigger's chevron is a real `<svg>` child, so there is
+                 * no background to collide with and no position to nudge. The
+                 * four size overrides collapse into `size="sm"` as well.
+                 *
+                 * (The first draft of the old comment spelled the data-URI utility
+                 * out literally and the build died on it: Tailwind v4 scans source
+                 * files as PLAIN TEXT, harvested the example from the comment as a
+                 * real candidate, and emitted a rule whose URL was the ellipsis
+                 * character , "Module not found" pointing at globals.css thousands
+                 * of columns into generated CSS, with nothing naming this file.
+                 * `native-select.tsx` still warns about that trap for anyone using
+                 * the native control.)
+                 */}
+                <Select
                   value={String(config.size)}
-                  onChange={(event) => setSize(Number(event.target.value))}
-                  /*
-                   * No background utility may be added here.
-                   *
-                   * `NativeSelect` carries its chevron as a background-image data
-                   * URI, and tailwind-merge would treat a second background-image
-                   * class as a conflict and evict it, leaving a select with no
-                   * dropdown indicator at all (`appearance-none` already removed
-                   * the native one). Repositioning it is fine, since background
-                   * POSITION is a different property group.
-                   *
-                   * The first draft of this comment spelled that data-URI utility
-                   * out literally, and the build died on it: Tailwind v4 scans
-                   * source files as PLAIN TEXT, so it harvested the example from
-                   * the comment as a real candidate and emitted a rule whose URL
-                   * was the ellipsis character. Turbopack then failed to resolve
-                   * that as a module , "Module not found: Can't resolve" pointing
-                   * at globals.css, thousands of columns into generated CSS, with
-                   * nothing naming this file. `native-select.tsx` warns about this
-                   * exact trap in its own docblock, which is why it never writes
-                   * the broken form out either.
-                   */
-                  className="h-7 w-auto ps-2 pe-7 text-xs tabular-nums bg-[position:right_0.375rem_center]"
+                  onValueChange={(value) => setSize(Number(value))}
                 >
-                  {sizeOptions.map((size) => (
-                    <option key={size} value={size}>
-                      {size} px
-                    </option>
-                  ))}
-                </NativeSelect>
+                  <SelectTrigger id={sizeLabelId} size="sm" className="w-auto tabular-nums">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="tabular-nums">
+                    {sizeOptions.map((size) => (
+                      <SelectItem key={size} value={String(size)}>
+                        {size} px
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center gap-2">
@@ -915,22 +926,23 @@ export function IconDetailDialog({ name, Icon, open, onOpenChange }: IconDetailD
                 <Label htmlFor={animationLabelId} className="text-sm font-medium text-fg">
                   Motion
                 </Label>
-                <NativeSelect
-                  id={animationLabelId}
+                <Select
                   value={config.animationId}
-                  onChange={(event) =>
-                    setConfig((previous) => ({ ...previous, animationId: event.target.value }))
+                  onValueChange={(value) =>
+                    setConfig((previous) => ({ ...previous, animationId: value }))
                   }
-                  // Same background caveat as the size select above: a background
-                  // utility here would evict the chevron data URI. Position only.
-                  className="h-7 w-auto ps-2 pe-7 text-xs bg-[position:right_0.375rem_center]"
                 >
-                  {ANIMATION_CHOICES.map((choice) => (
-                    <option key={choice.id} value={choice.id}>
-                      {choice.label}
-                    </option>
-                  ))}
-                </NativeSelect>
+                  <SelectTrigger id={animationLabelId} size="sm" className="w-auto">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ANIMATION_CHOICES.map((choice) => (
+                      <SelectItem key={choice.id} value={choice.id}>
+                        {choice.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               {animation?.note ? (
                 <p className="text-xs text-muted-foreground">{animation.note}</p>

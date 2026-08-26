@@ -1,10 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   registerCodeLanguages,
   resetCodeLanguages,
+  resolveCodeLanguage,
 } from '../../../registry/velobits/lib/code-languages';
 import { CodeBlock } from '../../../registry/velobits/ui/code-block';
 import { audit } from './axe';
@@ -246,14 +247,67 @@ describe('CodeBlock, when there is nothing to choose between', () => {
   });
 });
 
+/**
+ * ── DRIVING THE LANGUAGE SELECTOR ───────────────────────────────────────────
+ *
+ * The selector was a native `<select>` until 2026-08-26 and is a Radix `Select`
+ * now, so `userEvent.selectOptions` (which requires a real `<select>` element)
+ * cannot drive it and `control.value` cannot read it. These two helpers are the
+ * entire adaptation, and both encode a rule worth knowing:
+ *
+ *  , **Open with `fireEvent.keyDown`, never with a pointer.** The open panel is a
+ *    modal Radix layer: it sets `pointer-events: none` on `document.body`, and
+ *    `userEvent` THROWS on any element inheriting that rather than failing an
+ *    assertion, so the error does not look like a selector problem at all.
+ *  , **Options are found by their LABEL, not by their value.** An option's text
+ *    is its accessible name, which is the same reason this control retired the
+ *    2.5.3 `sr-only` workaround the segmented row needed. `resolveCodeLanguage`
+ *    is the one source of that mapping, so a consumer-registered language works
+ *    here without this file knowing it exists.
+ */
+async function pickLanguage(trigger: HTMLElement, language: string) {
+  fireEvent.keyDown(trigger, { key: 'Enter' });
+  const option = await screen.findByRole('option', {
+    name: resolveCodeLanguage(language).label,
+  });
+  fireEvent.click(option);
+  // The panel unmounts on select; anything asserted while it is still up races
+  // the exit animation and, worse, is still under the pointer-events lock.
+  await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull());
+}
+
+/**
+ * What the closed control is showing , the Radix equivalent of reading `.value`,
+ * except it reads the LABEL, because that is what a user sees and what the
+ * accessibility tree carries. The raw value is asserted separately off the
+ * `<pre>`'s `data-language`, which is where it is actually observable.
+ */
+function shownLanguage(trigger: HTMLElement): string {
+  return trigger.textContent ?? '';
+}
+
+/** The options in the panel. Opens it, reads it, and leaves it open. */
+async function openOptions(trigger: HTMLElement) {
+  fireEvent.keyDown(trigger, { key: 'Enter' });
+  await screen.findByRole('listbox');
+  return screen.getAllByRole('option');
+}
+
 describe('CodeBlock, the language selector', () => {
   afterEach(resetCodeLanguages);
 
-  it('appears once two languages exist, and reserves a row for the controls', () => {
+  it('appears once two languages exist, and reserves a row for the controls', async () => {
     const { container } = render(<CodeBlock copyable variants={PAIR} />);
-    // A native <select> maps to `combobox`, and its options are in the tree.
-    expect(container.querySelectorAll('select')).toHaveLength(1);
-    expect(screen.getAllByRole('option')).toHaveLength(2);
+    /*
+     * ONE trigger, and the options live in a PORTAL that only exists while the
+     * panel is open , so unlike the native `<select>` this replaced, they are not
+     * in the tree at rest. `container.querySelectorAll('select')` would now find
+     * nothing at all (Radix mirrors into a hidden native control only inside a
+     * `<form>`), which is why this counts triggers instead.
+     */
+    expect(container.querySelectorAll('[data-slot="code-block-languages"]')).toHaveLength(1);
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
+    expect(await openOptions(screen.getByRole('combobox'))).toHaveLength(2);
     const cls = container.querySelector('pre')!.className;
     /**
      * A ROW, not a first-line indent. The old segmented row was two fixed-width
@@ -292,34 +346,38 @@ describe('CodeBlock, the language selector', () => {
     expect(screen.getByRole('combobox', { name: 'Code language for Usage' })).toBeTruthy();
   });
 
-  it('gives each option the language’s full name, with no 2.5.3 workaround', () => {
+  it('gives each option the language’s full name, with no 2.5.3 workaround', async () => {
     /**
-     * An `<option>`'s text IS its accessible name, so the dropdown can simply say
+     * An option's text IS its accessible name, so the dropdown can simply say
      * "TypeScript". The segmented row could not: it had room for "TS" only, and an
      * `aria-label` of "TypeScript" over visible "TS" breaks Label in Name, so it
      * had to append the expansion in an `sr-only` span. The control shape retired
      * the workaround rather than relocating it.
      */
     render(<CodeBlock variants={PAIR} />);
+    await openOptions(screen.getByRole('combobox'));
     expect(screen.getByRole('option', { name: 'TypeScript' }).textContent).toBe('TypeScript');
     expect(screen.getByRole('option', { name: 'JavaScript' }).textContent).toBe('JavaScript');
     // And nothing is hidden from the accessibility tree to make that work.
     expect(document.querySelector('[data-slot="code-block-languages"] .sr-only')).toBeNull();
   });
 
-  it('carries the selection as the select’s own value, not as styling', () => {
+  it('carries the selection in the accessibility tree, not as styling', async () => {
     /**
      * The whole "not colour alone" problem the segmented row had to solve , in
      * dark mode `--bg2` IS `--panel`, so a fill was a 1.00:1 indicator , does not
-     * arise for a `<select>`: which option is current is the control's value, in
-     * the accessibility tree, and the platform draws it.
+     * arise for a dropdown: which option is current is the control's own state,
+     * exposed as `aria-selected` on exactly one option and as the trigger's text.
+     * The tick beside the row is the visible half of that, not the source of it.
      */
     render(<CodeBlock variants={PAIR} />);
-    const control = screen.getByRole('combobox', { name: 'Code language' }) as HTMLSelectElement;
-    expect(control.value).toBe('ts');
-    expect((screen.getByRole('option', { name: 'TypeScript' }) as HTMLOptionElement).selected).toBe(
-      true,
-    );
+    const control = screen.getByRole('combobox', { name: 'Code language' });
+    expect(shownLanguage(control)).toContain('TypeScript');
+
+    const options = await openOptions(control);
+    const selected = options.filter((o) => o.getAttribute('aria-selected') === 'true');
+    expect(selected).toHaveLength(1);
+    expect(selected[0]!.textContent).toBe('TypeScript');
   });
 
   it('keeps the pre’s own semantics untouched when a selector is present', () => {
@@ -352,10 +410,11 @@ describe('CodeBlock, the language selector', () => {
 
   it('paints a registered accent and merges its className onto the control', async () => {
     /**
-     * `accent` lands on the CONTROL rather than on the options, because browsers
-     * largely ignore per-`<option>` styling , the closed dropdown is the only
-     * surface that can carry a consumer's colour reliably. So it follows the
-     * SELECTION: pick the other language and the accent goes with it.
+     * `accent` lands on the TRIGGER rather than on the options. The panel is ours
+     * to paint now , that is the point of the Radix control , but tinting each
+     * row would put the accent and the highlight on the same surface, fighting.
+     * So it follows the SELECTION: pick the other language and the accent goes
+     * with it.
      */
     registerCodeLanguages([
       {
@@ -371,7 +430,7 @@ describe('CodeBlock, the language selector', () => {
     expect(control.getAttribute('style')).toContain('#3776ab');
     expect(control.className).toContain('tracking-wide');
 
-    await userEvent.selectOptions(control, 'ts');
+    await pickLanguage(control, 'ts');
     expect(control.getAttribute('style') ?? '').not.toContain('#3776ab');
     expect(control.className).not.toContain('tracking-wide');
   });
@@ -382,7 +441,7 @@ describe('CodeBlock, which language is showing', () => {
     const { container } = render(<CodeBlock variants={PAIR} />);
     expect(container.querySelector('code')!.textContent).toBe(TS);
     expect(container.querySelector('pre')!.getAttribute('data-language')).toBe('ts');
-    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('ts');
+    expect(shownLanguage(screen.getByRole('combobox'))).toContain('TypeScript');
   });
 
   it('lets defaultLanguage override the first entry', () => {
@@ -392,11 +451,15 @@ describe('CodeBlock, which language is showing', () => {
   });
 
   it('ignores a defaultLanguage this block was never given', () => {
-    // Falling back to the first variant keeps the control's value in step with
-    // the code on screen; a <select> whose value names no option shows blank.
+    /*
+     * Falling back to the first variant keeps the control in step with the code
+     * on screen. Under the native `<select>` a value naming no option showed
+     * blank; under Radix it shows the PLACEHOLDER, and there is none here , so
+     * the trigger would render empty. Same class of bug, louder failure.
+     */
     const { container } = render(<CodeBlock defaultLanguage="rust" variants={PAIR} />);
     expect(container.querySelector('code')!.textContent).toBe(TS);
-    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('ts');
+    expect(shownLanguage(screen.getByRole('combobox'))).toContain('TypeScript');
   });
 
   it('renders pre-highlighted html when a variant has it, and text when it does not', async () => {
@@ -410,7 +473,7 @@ describe('CodeBlock, which language is showing', () => {
     );
     expect(container.querySelector('code [data-hl="keyword"]')).not.toBeNull();
 
-    await userEvent.selectOptions(screen.getByRole('combobox'), 'js');
+    await pickLanguage(screen.getByRole('combobox'), 'js');
     expect(container.querySelector('code [data-hl]')).toBeNull();
     expect(container.querySelector('code')!.textContent).toBe(JS);
   });
@@ -431,7 +494,7 @@ describe('CodeBlock, which language is showing', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Copy code' }));
     expect(writeText).toHaveBeenLastCalledWith(TS);
 
-    await userEvent.selectOptions(screen.getByRole('combobox'), 'js');
+    await pickLanguage(screen.getByRole('combobox'), 'js');
     await userEvent.click(screen.getByRole('button', { name: 'Copy code' }));
     expect(writeText).toHaveBeenLastCalledWith(JS);
     expect(writeText).not.toHaveBeenCalledWith('<span>markup</span>');
@@ -456,7 +519,7 @@ describe('CodeBlock, controlled and uncontrolled selection', () => {
       <CodeBlock blockId="usage" variants={PAIR} onLanguageChange={onLanguageChange} />,
     );
 
-    await userEvent.selectOptions(screen.getByRole('combobox'), 'js');
+    await pickLanguage(screen.getByRole('combobox'), 'js');
     expect(container.querySelector('code')!.textContent).toBe(JS);
     expect(onLanguageChange).toHaveBeenCalledWith('js', { blockId: 'usage' });
   });
@@ -467,10 +530,10 @@ describe('CodeBlock, controlled and uncontrolled selection', () => {
       <CodeBlock selectedLanguage="ts" variants={PAIR} onLanguageChange={onLanguageChange} />,
     );
 
-    await userEvent.selectOptions(screen.getByRole('combobox'), 'js');
+    await pickLanguage(screen.getByRole('combobox'), 'js');
     // Unmoved: the caller owns the value and has not changed it.
     expect(container.querySelector('code')!.textContent).toBe(TS);
-    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe('ts');
+    expect(shownLanguage(screen.getByRole('combobox'))).toContain('TypeScript');
     expect(onLanguageChange).toHaveBeenCalledWith('js', { blockId: expect.any(String) });
   });
 
@@ -491,7 +554,7 @@ describe('CodeBlock, controlled and uncontrolled selection', () => {
     // dispatch per interaction with the option that is already showing.
     const onLanguageChange = vi.fn();
     render(<CodeBlock variants={PAIR} onLanguageChange={onLanguageChange} />);
-    await userEvent.selectOptions(screen.getByRole('combobox'), 'ts');
+    await pickLanguage(screen.getByRole('combobox'), 'ts');
     expect(onLanguageChange).not.toHaveBeenCalled();
   });
 });
@@ -511,19 +574,15 @@ describe('CodeBlock, one page with several blocks', () => {
       </>,
     );
 
-    const first = screen.getByRole('combobox', {
-      name: 'Code language for First',
-    }) as HTMLSelectElement;
-    const second = screen.getByRole('combobox', {
-      name: 'Code language for Second',
-    }) as HTMLSelectElement;
+    const first = screen.getByRole('combobox', { name: 'Code language for First' });
+    const second = screen.getByRole('combobox', { name: 'Code language for Second' });
 
-    await userEvent.selectOptions(first, 'js');
-    expect(first.value).toBe('js');
+    await pickLanguage(first, 'js');
+    expect(shownLanguage(first)).toContain('JavaScript');
     // Independent: the second block never heard about it.
-    expect(second.value).toBe('ts');
+    expect(shownLanguage(second)).toContain('TypeScript');
 
-    await userEvent.selectOptions(second, 'js');
+    await pickLanguage(second, 'js');
 
     const ids = onLanguageChange.mock.calls.map((call) => (call[1] as { blockId: string }).blockId);
     expect(ids).toHaveLength(2);
@@ -537,17 +596,18 @@ describe('CodeBlock, the selector’s keyboard and announcements', () => {
     /**
      * The segmented row had to implement this: a radiogroup is one tab stop, so
      * it needed a roving `tabIndex` and Arrow handlers that select as they move.
-     * A `<select>` is one tab stop by construction and the platform owns the
-     * option keyboard, which is most of why this is a `<select>`.
+     * A dropdown is one tab stop with the options on a layer, and neither the
+     * native control nor Radix asks this component for a single line of keyboard
+     * code , which is most of why this is a dropdown.
      */
     const { container } = render(<CodeBlock copyable variants={PAIR} />);
-    const control = screen.getByRole('combobox') as HTMLSelectElement;
+    const control = screen.getByRole('combobox');
     expect(control.getAttribute('tabindex')).toBeNull();
 
     await userEvent.tab();
     expect(document.activeElement).toBe(control);
 
-    await userEvent.selectOptions(control, 'js');
+    await pickLanguage(control, 'js');
     expect(container.querySelector('code')!.textContent).toBe(JS);
   });
 
@@ -562,7 +622,7 @@ describe('CodeBlock, the selector’s keyboard and announcements', () => {
     const live = container.querySelector('[data-slot="code-block-language-status"]')!;
     expect(live.textContent).toBe('');
 
-    await userEvent.selectOptions(screen.getByRole('combobox'), 'js');
+    await pickLanguage(screen.getByRole('combobox'), 'js');
     await waitFor(() => expect(live.textContent).toBe('JavaScript'));
   });
 });
