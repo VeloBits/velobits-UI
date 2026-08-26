@@ -135,7 +135,7 @@
   --chart-4: #af7011;
   --chart-5: #368a8a;
 
-  /* ── app chrome: the top bar , PLUM IN BOTH THEMES ──────────────────────── */
+  /* ── app chrome: the top bar , PLUM HERE, BLACK IN DARK ─────────────────── */
   /* The light theme's header used to be tier-O glass, i.e. a near-white bar on a
    * near-white page: the product's identity and its primary navigation read as
    * part of the document rather than as the frame around it.
@@ -144,18 +144,19 @@
    * as near-black , correct, and characterless. The plum seed is already a
    * sanctioned dark surface (it is --elevated in dark mode), its OKLCH lightness
    * (0.355) sits ABOVE charcoal's (0.288) so it is genuinely lighter, and it
-   * carries brand rather than only contrast. 196/255 from the light page,
-   * 67/255 from the dark one , nearly 3x the neutral bar's separation there.
+   * carries brand rather than only contrast. 196/255 from the light page.
    *
-   * THEME-INVARIANT: the .dark block restates every value identically. Chrome does
-   * not sit against the page, it sits above it, and it is dark in both themes.
+   * ONLY --chrome flips. The .dark block restates the six foregrounds
+   * identically and sets the surface to #000000: plum was chosen to frame a LIGHT
+   * page, and on a near-black page it is the only chromatic mass on screen.
    *
-   * Every value is an existing palette entry: the plum seed, the lime seed, and
-   * three ramp steps. A branded dark bar needs no new colours.
+   * Every FOREGROUND is an existing palette entry: the lime seed and three ramp
+   * steps. A branded dark bar needs no new colours.
    *
    * NONE of the theme's own foregrounds work here. Charcoal --fg on plum is
    * 1.23:1, --muted-fg 1.84:1, --primary-text 1.87:1. That is why the tier ships
-   * six tokens. */
+   * six tokens , and note the failure is SILENT in dark, where --fg is
+   * neutral-100 and the same class reads perfectly. */
   --chrome: #592941;
   /* 9.80:1. */
   --chrome-fg: #eeece9;
@@ -361,8 +362,13 @@ body.dark {
   --chart-4: #b37519;
   --chart-5: #3b8f8e;
 
-  /* ── app chrome , IDENTICAL to light, deliberately. See the light block. ─── */
-  --chrome: #592941;
+  /* ── app chrome , BLACK here, plum in light. The six foregrounds ARE identical
+   * to the light block; only the surface flips. Plum was picked to frame a LIGHT
+   * page , on this near-black page it is the only chromatic mass on screen and
+   * reads as a coloured component rather than as chrome. #000000 and not
+   * neutral-950 (#0F0F0E), which sits 7/255 from the page and would be carried
+   * by --chrome-border alone. See the `chrome` docblock in src/semantic.ts. ─── */
+  --chrome: #000000;
   --chrome-fg: #eeece9;
   --chrome-muted-fg: #c4c2c0;
   --chrome-border: #61605f;

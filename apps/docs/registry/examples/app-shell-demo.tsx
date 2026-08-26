@@ -59,7 +59,21 @@ export default function AppShellDemo() {
             <Badge variant="info" className="ms-2">
               Production
             </Badge>
-            <Button variant="ghost" size="icon" aria-label="Search" className="ms-auto">
+            {/*
+             * `ghost` is `text-fg hover:bg-highlight` , two THEME tokens, and this
+             * bar is the one surface that does not follow the theme. Without the
+             * override this icon is charcoal on the plum bar in light mode (1.23:1,
+             * which is what you see: a search icon that is barely there) and
+             * perfectly legible in dark, where `text-fg` happens to be
+             * `neutral-100`. The demo carries the fix so that anyone copying it
+             * copies the working version.
+             */}
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Search"
+              className="ms-auto text-chrome-fg hover:bg-chrome-highlight hover:text-chrome-fg"
+            >
               <SearchIcon />
             </Button>
           </AppShellHeader>

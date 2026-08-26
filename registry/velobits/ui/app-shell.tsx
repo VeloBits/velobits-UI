@@ -275,12 +275,23 @@ function AppShell({
   );
 }
 
+type AppShellHeaderSurface = 'chrome' | 'glass' | 'panel';
+
+/**
+ * Which surface the header painted, for the controls inside it.
+ *
+ * `null` , and not `'chrome'` , when there is no header above, so a trigger used
+ * outside one keeps plain `ghost` styling rather than inheriting foregrounds for a
+ * bar that is not there.
+ */
+const AppShellHeaderContext = createContext<AppShellHeaderSurface | null>(null);
+
 export interface AppShellHeaderProps extends React.ComponentProps<'header'> {
   /**
    * `chrome` (the default) , the dark app bar. Tier-O glass, or the opaque panel,
    * for a shell that wants the bar to read as part of the document instead.
    */
-  surface?: 'chrome' | 'glass' | 'panel';
+  surface?: AppShellHeaderSurface;
 }
 
 /**
@@ -303,13 +314,34 @@ export interface AppShellHeaderProps extends React.ComponentProps<'header'> {
  * around it. The app had no chrome, which is most of what separates "an
  * application" from "a web page".
  *
- * `chrome` is the PLUM seed, in BOTH themes , see the docblock on
- * `SemanticTokens.chrome`. The consequence for anything rendered inside this
- * header: **none of the ordinary foreground utilities apply.** On plum, `text-fg`
- * is 1.23:1, `text-muted-foreground` 1.84:1 and `text-link` 1.87:1. Use
+ * `chrome` is the PLUM seed in light and BLACK in dark , see the docblock on
+ * `SemanticTokens.chrome`. The bar is dark in both, which is the property that
+ * matters here: **none of the ordinary foreground utilities apply.** On plum,
+ * `text-fg` is 1.23:1, `text-muted-foreground` 1.84:1 and `text-link` 1.87:1. Use
  * `text-chrome-fg`, `text-chrome-muted-fg`, and `text-chrome-accent` (lime, at
  * 8.85:1) for the current item. `hover:bg-chrome-highlight` is safe with any of
  * them.
+ *
+ * ⚠️ **This is the trap, and it only springs in light mode.** `text-fg` is
+ * `neutral-100` in dark, so a control styled with theme tokens , `Button
+ * variant="ghost"` above all, which is `text-fg hover:bg-highlight` , looks
+ * completely finished on the dark bar and is 1.23:1 in light. Anything you put in
+ * this header needs the `chrome*` foregrounds:
+ *
+ * ```tsx
+ * <Button
+ *   variant="ghost"
+ *   size="icon"
+ *   className="text-chrome-fg hover:bg-chrome-highlight hover:text-chrome-fg"
+ * />
+ * ```
+ *
+ * `hover:bg-highlight` is the second half of the same bug: charcoal at α 0.05,
+ * i.e. it DARKENS a bar that is already the darkest thing on the page. There is no
+ * `chrome` Button variant on purpose , chrome is a property of the container a
+ * control happens to sit in, not of the control, so a variant would be selectable
+ * everywhere and correct only here. `AppShellSidebarTrigger` is exempt because it
+ * reads the surface off this header's context; nothing else can.
  *
  * `surface="glass"` and `surface="panel"` are still here for a shell that wants
  * the bar to belong to the document , a docs reader, a marketing page.
@@ -341,19 +373,39 @@ export interface AppShellHeaderProps extends React.ComponentProps<'header'> {
  * `box-shadow` is a plain drop shadow. Doing the same to a Tier-S component would
  * delete the inset specular highlight that is dark mode's entire material.
  */
-function AppShellHeader({ className, surface = 'chrome', ...props }: AppShellHeaderProps) {
+function AppShellHeader({
+  className,
+  surface = 'chrome',
+  children,
+  ...props
+}: AppShellHeaderProps) {
   return (
-    <header
-      data-slot="app-shell-header"
-      className={cn(
-        'sticky top-0 z-sticky flex h-13 shrink-0 items-center gap-2 px-3 sm:px-4',
-        surface === 'chrome' && 'border-b border-chrome-border bg-chrome text-chrome-fg',
-        surface === 'glass' && 'glass border-x-0 border-t-0 shadow-sm',
-        surface === 'panel' && 'border-b border-border bg-panel',
-        className,
-      )}
-      {...props}
-    />
+    /*
+     * The surface is published to descendants so `AppShellSidebarTrigger` can
+     * style itself for the bar it landed on. It is a prop on THIS component and
+     * context for the children because only the header knows the answer , the
+     * trigger is written by the caller, in the caller's JSX, and cannot.
+     *
+     * Deliberately not a `chrome` Button variant: see the docblock. A variant is
+     * selectable anywhere; this is readable only from inside the container that
+     * makes it true.
+     */
+    <AppShellHeaderContext.Provider value={surface}>
+      <header
+        data-slot="app-shell-header"
+        data-surface={surface}
+        className={cn(
+          'sticky top-0 z-sticky flex h-13 shrink-0 items-center gap-2 px-3 sm:px-4',
+          surface === 'chrome' && 'border-b border-chrome-border bg-chrome text-chrome-fg',
+          surface === 'glass' && 'glass border-x-0 border-t-0 shadow-sm',
+          surface === 'panel' && 'border-b border-border bg-panel',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </header>
+    </AppShellHeaderContext.Provider>
   );
 }
 
@@ -362,8 +414,22 @@ function AppShellHeader({ className, surface = 'chrome', ...props }: AppShellHea
  *
  * A real `SidePanelTrigger`, so Radix owns `aria-expanded`, `aria-controls`, and
  * returning focus here when the drawer closes.
+ *
+ * ## It repaints itself for a chrome bar, and that is not a convenience
+ *
+ * `buttonVariants({ variant: 'ghost' })` is `text-fg hover:bg-highlight` , both
+ * theme tokens, on the one surface in the shell that does not follow the theme.
+ * Left alone, this icon is `neutral-100` on the dark bar in dark mode (fine) and
+ * charcoal on plum in light mode (1.23:1, effectively invisible). A bug that is
+ * correct in the theme most people build in is a bug that ships.
+ *
+ * So it reads the surface off `AppShellHeader` and swaps in the `chrome*`
+ * foregrounds when it is on one. Under `surface="glass"` / `"panel"`, or outside a
+ * header entirely, plain `ghost` is right and it stays put.
  */
 function AppShellSidebarTrigger({ className, ...props }: React.ComponentProps<'button'>) {
+  const surface = useContext(AppShellHeaderContext);
+
   return (
     <SidePanelTrigger asChild>
       <button
@@ -373,6 +439,7 @@ function AppShellSidebarTrigger({ className, ...props }: React.ComponentProps<'b
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'icon' }),
           'size-8 md:hidden',
+          surface === 'chrome' && 'text-chrome-fg hover:bg-chrome-highlight hover:text-chrome-fg',
           className,
         )}
         {...props}

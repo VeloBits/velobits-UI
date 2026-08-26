@@ -133,7 +133,8 @@ export interface SemanticTokens {
   chart4: string;
   chart5: string;
   /**
-   * App chrome , the top bar surface. **The plum seed, in BOTH themes.**
+   * App chrome , the top bar surface. **Plum in light, black in dark**; the six
+   * foregrounds beside it are the same value in both.
    *
    * ## Why chrome is its own tier
    *
@@ -159,24 +160,49 @@ export interface SemanticTokens {
    * step a grey bar needs (`blueSteps.textDark`, 4.75:1 on plum) is dimmer *and*
    * off-brand.
    *
-   * ## Why theme-INVARIANT, when nothing else here is
+   * ## The SURFACE flips; the six foregrounds do not
    *
-   * Every other surface flips because it has to stay legible against a page that
-   * flips. Chrome does not sit against the page , it sits *above* it, and it is
-   * dark in both themes, so the same value works in both:
+   * This is the one token in the tier that has a different value per theme, and
+   * the split is worth stating precisely because the tier shipped
+   * theme-invariant and the docblock argued for it:
    *
-   *   light  over a `#EFEDEA` page , 196/255. Unmistakably a frame.
-   *   dark   over a `#161615` page ,  67/255, reading as raised chrome. (Nearly
-   *          three times the separation the neutral bar had, which is the second
-   *          thing plum buys: a chromatic bar cannot be confused with the page.)
+   *   light  PLUM `#592941` over a `#EFEDEA` page , 196/255. Unmistakably a frame.
+   *   dark   BLACK `#000000` over a `#161615` page , 22/255, and recessed rather
+   *          than raised.
    *
-   * That it equals dark mode's `elevated` is not a collision , both are "plum as
-   * a dark surface", which is what the seed is for. They never abut.
+   * Plum was chosen against a *light* page, where the job is to be a frame. In
+   * dark mode there is no light page to frame: the bar sits on near-black, and a
+   * plum strip there is the only chromatic mass on the screen , it reads as a
+   * component that has been coloured rather than as chrome. The docs site header
+   * had already hand-rolled `dark:bg-black` over this token for exactly that
+   * reason, which is the signal that the token was wrong and not the header.
+   *
+   * The direction of separation inverts with the theme, and that is correct
+   * rather than a bug: chrome is *darker than the page* in both, so in light mode
+   * it reads as a frame laid over the document and in dark mode as a well the
+   * document sits above. `chromeBorder` draws the edge in both cases, so 22/255
+   * is a bonus rather than the load-bearing separation.
+   *
+   * **`#000000` is off the 74° ramp, and deliberately.** {@link neutral} bottoms
+   * out at `#0F0F0E`, which is 7/255 from the dark page , a bar that has to be
+   * found by its border alone. This value is also literally what the docs header
+   * rendered before this token absorbed it, so the two cannot drift apart again.
+   *
+   * That the light value equals dark mode's `elevated` is not a collision , both
+   * are "plum as a dark surface", which is what the seed is for. They never abut.
    *
    * The consequence worth knowing: **none of the theme's text tokens work on it in
    * light mode.** Charcoal `fg` on plum is 1.23:1, `mutedFg` 1.84:1, `primaryText`
    * 1.87:1. Every foreground that lands on chrome needs the `chrome*` token beside
    * it, which is why this tier ships six tokens rather than one.
+   *
+   * ⚠️ **The failure is silent in exactly one theme**, which is why it keeps
+   * shipping. `text-fg` on this bar is `neutral-100` in dark and reads perfectly;
+   * the SAME class is charcoal in light and reads 1.23:1. So a control styled with
+   * theme tokens , `Button variant="ghost"` is the one that gets dropped in here ,
+   * looks finished to anyone building in dark mode and is invisible to every user
+   * in light mode. Use {@link SemanticTokens.chromeFg} and friends, or inherit the
+   * header's own colour; never `fg` / `mutedFg` / `link`.
    */
   chrome: string;
   /** Text and icons on `chrome` , 9.80:1. Never `fg`, which is 1.23:1 there. */
@@ -309,11 +335,12 @@ export const light: SemanticTokens = {
   chart3: '#BC5F8D',
   chart4: '#AF7011',
   chart5: '#368A8A',
-  // The chrome tier. EVERY value is an existing palette entry doing a second job:
-  // the plum seed, the lime seed, three ramp steps. A branded dark bar needs no
-  // new colours , it needs the two seeds the palette already reserves for dark
-  // surfaces and dark-surface accents. Restated identically in the dark block
-  // below rather than inherited; see `code`/`onCode` for the same discipline.
+  // The chrome tier. Every FOREGROUND is an existing palette entry doing a second
+  // job: the lime seed and three ramp steps. A branded dark bar needs no new
+  // colours , it needs the seeds the palette already reserves for dark surfaces
+  // and dark-surface accents. Restated in the dark block below rather than
+  // inherited; see `code`/`onCode` for the same discipline. Only `chrome` itself
+  // differs between the two, and the docblock says why.
   chrome: seed.plum,
   chromeFg: neutral[100],
   chromeMutedFg: neutral[300],
@@ -398,10 +425,15 @@ export const dark: SemanticTokens = {
   chart3: '#C06492',
   chart4: '#B37519',
   chart5: '#3B8F8E',
-  // Identical to light, deliberately , see the docblock on `chrome`. Chrome is
-  // dark in both themes, so the tier does not flip; it is restated rather than
-  // omitted so that editing one half cannot silently change the other.
-  chrome: seed.plum,
+  // BLACK, not plum , the one token in this tier that differs from light. Plum
+  // was picked to frame a light page; on a near-black page it is the only
+  // chromatic mass on screen and reads as a coloured component rather than as
+  // chrome. See the docblock on `chrome` for why this is #000000 rather than
+  // `neutral[950]` (7/255 from the page, i.e. carried by its border alone).
+  //
+  // The six foregrounds below ARE identical to light, and are restated rather
+  // than omitted so that editing one half cannot silently change the other.
+  chrome: '#000000',
   chromeFg: neutral[100],
   chromeMutedFg: neutral[300],
   chromeBorder: neutral[600],

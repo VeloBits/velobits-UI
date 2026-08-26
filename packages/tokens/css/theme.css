@@ -177,14 +177,17 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* ── app chrome , the PLUM top bar, in BOTH themes ──────────────────────── */
+  /* ── app chrome , the top bar. PLUM in light, BLACK in dark ─────────────── */
   /* `bg-chrome text-chrome-fg`, then `text-chrome-muted-fg` on the labels that are
-   * not the current page and `text-chrome-accent` (lime) on the one that is.
+   * not the current page and `text-chrome-accent` (lime) on the one that is. The
+   * SURFACE flips with the theme; the six foregrounds do not, so none of these
+   * ever needs a `dark:` variant beside it.
    *
    * None of the ordinary foreground utilities work on this surface: on plum,
    * `text-fg` is 1.23:1, `text-muted-foreground` 1.84:1 and `text-link` 1.87:1.
    * All three pass every gate they belong to elsewhere, which is exactly why this
-   * is a token tier and not a class on the header.
+   * is a token tier and not a class on the header , and note the failure is
+   * SILENT in dark mode, where `--fg` is neutral-100 and reads perfectly.
    *
    * `hover:bg-chrome-highlight` is safe with any chrome foreground , every one of
    * them clears AA over the wash. Gated by CHROME_COMPOSITE_PAIRS. */

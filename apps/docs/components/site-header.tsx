@@ -78,20 +78,26 @@ export function SiteHeader() {
 
   return (
     /*
-     * The app-chrome tier , the PLUM bar, in both themes. This was Tier-O glass,
+     * The app-chrome tier , PLUM in light, BLACK in dark. This was Tier-O glass,
      * which in light mode meant a near-white bar on a near-white page: the row
      * carrying the product name and the primary nav read as part of the document
      * rather than as the frame around it.
      *
+     * `dark:bg-black` used to live on this element, because the token was plum in
+     * both themes and a plum strip on a near-black page is the only chromatic mass
+     * on screen. That override is GONE , `--chrome` carries it now, so the docs
+     * header and `AppShellHeader` cannot drift apart again. If this bar ever needs
+     * a `dark:` variant, the token is wrong, not the header.
+     *
      * Everything inside therefore uses the `chrome*` foregrounds, NOT `fg` /
      * `muted-foreground` / `link`. On plum those measure 1.23:1, 1.84:1 and
-     * 1.87:1 , the surface does not flip with the theme, so the theme's own text
-     * tokens do not apply to it. See `SemanticTokens.chrome`.
+     * 1.87:1 , the bar is dark in BOTH themes while those tokens flip with the
+     * page, so light mode is where they fail. See `SemanticTokens.chrome`.
      *
      * `z-sticky` sits BELOW `z-dropdown` deliberately, or the header would paint
      * over its own menus.
      */
-    <header className="sticky top-0 z-sticky border-b border-chrome-border bg-chrome dark:bg-black text-chrome-fg">
+    <header className="sticky top-0 z-sticky border-b border-chrome-border bg-chrome text-chrome-fg">
       <div className="mx-auto flex h-14 w-full max-w-screen-2xl items-center gap-3 px-4 sm:px-6">
         {/*
          * The whole sidebar, in a real SidePanel below the lg breakpoint. Same
@@ -161,10 +167,12 @@ export function SiteHeader() {
          * That is the reason chrome is a token tier rather than one class on the
          * header element.
          *
-         * Measured for the active item: the lime wash composites to #6B493F over
-         * plum and `--chrome-accent` on it holds 6.07:1. One number for both themes,
-         * because the tier is theme-invariant. The hovered inactive item composites
-         * to #663A50, where the muted label is 5.17:1 , so the label promotion in
+         * Measured for the active item on the LIGHT bar, which is the worse of the
+         * two: the lime wash composites to #6B493F over plum and `--chrome-accent`
+         * on it holds 6.07:1. Over the black bar every one of these only improves ,
+         * the foregrounds are theme-invariant and the surface got darker. The
+         * hovered inactive item composites to #663A50, where the muted label is
+         * 5.17:1 , so the label promotion in
          * the hover rule below is a design choice, not a requirement.
          *
          * EVERY item carries the padding, radius and font-weight; only the fill

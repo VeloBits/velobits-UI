@@ -172,10 +172,12 @@ theme, and they are not in the contrast gate.
 3.86:1 on the paper page, so links use `text-link` and no `Button` variant paints
 it as text. Lime is asymmetric, `bg-brand` with `text-on-brand` is the only
 sanctioned pairing, and `--accent-text` is lime in dark and plum in light. Glass
-has two tiers, and nesting them cancels them out. App chrome is plum in **both**
-themes, so none of the theme's own foregrounds apply to it , `--fg` on `--chrome`
-is 1.23:1, which is why the tier ships its own `chrome-*` foregrounds rather than
-borrowing. `references/design-rules.md` carries the rest, including what changing
+has two tiers, and nesting them cancels them out. App chrome is plum in light and
+black in dark, and **dark in both**, so none of the theme's own foregrounds apply
+to it , `--fg` on `--chrome` is 1.23:1 in light and perfectly legible in dark,
+which is why the tier ships its own `chrome-*` foregrounds (those ARE
+theme-invariant) rather than borrowing. A control styled `text-fg` on this bar
+looks finished in dark mode and is invisible in light. `references/design-rules.md` carries the rest, including what changing
 a colour costs.
 
 **Reach for a component's `surface` prop, not a `bg-*` utility.** A utility wins

@@ -152,13 +152,16 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   { label: 'rose text on page', fg: 'rose', bg: 'bg', target: 'text' },
   { label: 'rose text on panel', fg: 'rose', bg: 'panel', target: 'text' },
 
-  /* ── app chrome: the PLUM bar, in both themes, so none of the theme's own
-   *    foregrounds apply to it. Charcoal `--fg` on `--chrome` is 1.23:1,
-   *    `mutedFg` 1.84:1, `primaryText` 1.87:1 , which is why every one of these
-   *    pairs exists rather than the tier borrowing them. Gated in both themes
-   *    even though the tier is theme-invariant: that is what would catch someone
-   *    giving dark mode its own chrome value later and forgetting the
-   *    foregrounds. */
+  /* ── app chrome: PLUM in light, BLACK in dark, and dark in both, so none of
+   *    the theme's own foregrounds apply to it. Charcoal `--fg` on `--chrome` is
+   *    1.23:1, `mutedFg` 1.84:1, `primaryText` 1.87:1 , which is why every one of
+   *    these pairs exists rather than the tier borrowing them.
+   *
+   *    ⚠️ This block used to end: "Gated in both themes even though the tier is
+   *    theme-invariant: that is what would catch someone giving dark mode its own
+   *    chrome value later and forgetting the foregrounds." That is exactly what
+   *    happened on 2026-08-26, and the per-theme gate is why the change cost one
+   *    token edit instead of a contrast regression. Leave it per-theme. */
   { label: 'chrome text on the app bar', fg: 'chromeFg', bg: 'chrome', target: 'text' },
   {
     label: 'chrome muted text on the app bar',

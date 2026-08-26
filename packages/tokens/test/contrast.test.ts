@@ -9,7 +9,7 @@ import {
   round2,
 } from '../src/color';
 import { GLASS_ALPHA_FLOOR, GLASS_SPECULAR_ALPHA, glass } from '../src/glass';
-import { worstCaseBackdrops } from '../src/palette';
+import { neutral, worstCaseBackdrops } from '../src/palette';
 import { themes, type SemanticTokens, type ThemeName } from '../src/semantic';
 import {
   CHROME_COMPOSITE_PAIRS,
@@ -736,9 +736,15 @@ describe('the chrome composites , a fill and a text token that must move togethe
     );
   });
 
-  it('chrome is theme-invariant', () => {
+  it('the chrome FOREGROUNDS are theme-invariant , only the surface flips', () => {
+    /**
+     * The tier shipped fully invariant. `chrome` itself no longer is: plum in
+     * light, black in dark. The six foregrounds still are, and that is the
+     * property worth pinning , it is what lets a call site write
+     * `text-chrome-muted-fg` with no `dark:` variant beside it and be right in
+     * both themes, which is the whole ergonomic argument for the tier.
+     */
     for (const key of [
-      'chrome',
       'chromeFg',
       'chromeMutedFg',
       'chromeBorder',
@@ -748,5 +754,34 @@ describe('the chrome composites , a fill and a text token that must move togethe
     ] as const) {
       expect(themes.light[key], key).toBe(themes.dark[key]);
     }
+    expect(themes.light.chrome).not.toBe(themes.dark.chrome);
+  });
+
+  it('chrome is DARKER than its own page in both themes , the tier is a well, not a card', () => {
+    /**
+     * The direction of separation is the invariant that survived, and it is the
+     * one that carries the meaning: chrome is never lighter than the document it
+     * frames. Light gets 196/255 of it, dark 22/255 , which is why
+     * `chromeBorder` is load-bearing in dark and merely tidy in light.
+     */
+    for (const theme of THEMES) {
+      const t = themes[theme];
+      expect(relativeLuminance(t.chrome), `${theme}: chrome vs page`).toBeLessThan(
+        relativeLuminance(t.bg),
+      );
+    }
+  });
+
+  it('dark chrome is off the ramp on purpose , neutral-950 would not separate', () => {
+    /**
+     * `#0F0F0E` is the palette's darkest neutral and the obvious "use an existing
+     * entry" choice. Against the `neutral-925` page it is 7/255, i.e. a bar found
+     * only by its border. This asserts the gap the literal buys, so nobody
+     * "tidies" the hex back onto the ramp without seeing the number.
+     */
+    const toByte = (hex: string) => parseInt(hex.slice(1, 3), 16);
+    const page = toByte(themes.dark.bg);
+    expect(page - toByte(themes.dark.chrome)).toBeGreaterThanOrEqual(20);
+    expect(page - toByte(neutral[950])).toBeLessThan(10);
   });
 });

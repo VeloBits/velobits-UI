@@ -289,8 +289,9 @@ describe('AppShell, glass', () => {
   it('defaults the header to the chrome tier, NOT glass', () => {
     /**
      * The default was `glass`, and in light mode that made the bar a near-white
-     * strip on a near-white page , the app had no frame. `chrome` is the plum
-     * seed in both themes.
+     * strip on a near-white page , the app had no frame. `chrome` is the plum seed
+     * in light and black in dark; dark in both, which is the part that matters to
+     * everything rendered inside it.
      *
      * The `bg-chrome` assertion is the load-bearing half: a header that silently
      * fell back to glass would still render, still pass every contrast gate, and
@@ -301,6 +302,38 @@ describe('AppShell, glass', () => {
     expect(header).toContain('bg-chrome');
     expect(header).toContain('text-chrome-fg');
     expect(header).not.toContain('glass');
+  });
+
+  it('repaints the sidebar trigger for a chrome bar , the bug that is invisible in dark', () => {
+    /**
+     * `buttonVariants({ variant: 'ghost' })` is `text-fg hover:bg-highlight`, and
+     * both are THEME tokens on the one surface that does not follow the theme.
+     *
+     * The reason this needs a test rather than a docblock: `--fg` is `neutral-100`
+     * in dark mode, so the unfixed trigger renders perfectly on the dark bar and
+     * is 1.23:1 charcoal-on-plum in light. It looks finished in the theme most
+     * people build in. No contrast gate can see it either , the gates measure
+     * tokens against surfaces, and nothing in them knows this button landed here.
+     */
+    const { container } = render(<Fixture />);
+    const cls = container.querySelector('[data-slot="app-shell-sidebar-trigger"]')!.className;
+    expect(cls).toContain('text-chrome-fg');
+    expect(cls).toContain('hover:bg-chrome-highlight');
+  });
+
+  it('leaves the trigger alone on a glass or panel bar, which DO follow the theme', () => {
+    /**
+     * The other half, and the reason this is context and not an unconditional
+     * class: `text-chrome-fg` is `neutral-100`, so hard-coding it would move the
+     * bug rather than fix it , invisible on a light glass or panel header.
+     */
+    for (const surface of ['glass', 'panel'] as const) {
+      const { container, unmount } = render(<Fixture headerSurface={surface} />);
+      const cls = container.querySelector('[data-slot="app-shell-sidebar-trigger"]')!.className;
+      expect(cls, surface).not.toContain('text-chrome-fg');
+      expect(cls, surface).toContain('text-fg');
+      unmount();
+    }
   });
 
   it('still offers the Tier-O glass header, and does NOT blur the rail', () => {
