@@ -203,9 +203,13 @@ describe('Popover glass tier', () => {
   it('uses the elevated tier, which is what glass-on-glass needs', async () => {
     /**
      * Plain overlay glass over overlay glass compounds into a milky panel with no
-     * readable edge between the layers, and in dark mode a chromatic tint at the
-     * base alpha drifts visibly green over the lime brand fill. `.glass-elevated`
-     * is the plum-tinted, higher-alpha step for exactly this case.
+     * readable edge between the layers. `.glass-elevated` is the higher-alpha step
+     * for exactly this case , a near-black in dark mode (plum until 2026-08-26),
+     * and nothing at all in light, where a popover is plain white tier-O glass.
+     *
+     * Asserted as CLASSES, not colours. The values live on `glass.darkElevated` in
+     * `@velobitsio/tokens` and are gated there against both of the tier's
+     * backdrops; what this file owns is that the popover opts into the tier.
      */
     render(<FilterPopover />);
     const cls = (await open()).className;

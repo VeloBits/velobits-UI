@@ -14,9 +14,19 @@ import { cn } from '../lib/cn';
  *
  * `.glass-elevated` exists for glass stacked on glass: a Popover opened from
  * inside a Dialog. Plain overlay glass over overlay glass compounds to a milky
- * panel with no readable edge between the two layers, and in dark mode a
- * chromatic tint at the base alpha drifts visibly green over the lime brand
- * fill , hence the plum-tinted, higher-alpha step.
+ * panel with no readable edge between the two layers , hence the separate,
+ * higher-alpha step.
+ *
+ * In dark mode that step is a NEAR-BLACK (`oklch(0.145 0.002 74)`), one notch
+ * below the neutral ramp's last step. It was the plum seed until 2026-08-26,
+ * which separated by hue and worked , but this class is on every Popover and
+ * every DropdownMenu submenu unconditionally, not only the stacked ones, so the
+ * whole dark theme's popovers read as brand-coloured panels. A lightness step
+ * composites 11/255 below the page and 18/255 below the tier-O glass beneath it,
+ * and `fg` / `--muted-on-glass` both improve as the surface darkens (13.49:1 /
+ * 11.96:1 worst-case). Light mode has no `.glass-elevated` rule at all , a light
+ * popover is plain white tier-O glass, unchanged. Measurements live on
+ * `glass.darkElevated` in `@velobitsio/tokens`.
  *
  * ## Which is also why the Portal is not optional
  *

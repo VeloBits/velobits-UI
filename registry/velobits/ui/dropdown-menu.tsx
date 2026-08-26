@@ -72,9 +72,10 @@ import { cn } from '../lib/cn';
  * sticky topbar raised to 1100 "to be safe" swallows its own menu , see the
  * z-ladder note in `@velobitsio/tokens/theme.css`.
  *
- * Submenus use `glass glass-elevated`, the plum-tinted tier, because a plain
- * glass panel over another plain glass panel composites to a single indistinct
- * smear. That is also why the tier exists.
+ * Submenus use `glass glass-elevated`, the near-black dark-mode tier, because a
+ * plain glass panel over another plain glass panel composites to a single
+ * indistinct smear. That is also why the tier exists. (It was plum until
+ * 2026-08-26 , same job, separated by hue instead of lightness.)
  */
 function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;

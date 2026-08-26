@@ -30,13 +30,15 @@ import { ChevronDownIcon, PlusIcon } from '@velobitsio/icons';
 /**
  * The Popover inside is load-bearing rather than decorative.
  *
- * `.glass-elevated` , Tier O stacked on Tier O , is the one composite in the
- * system that no gate measures: `GLASS_OVERLAY_PAIRS` excludes it by name, and a
- * `GlassSurface tier="elevated"` sitting on the page forms a different composite
- * from the one that matters. Nesting is the only way to see the real thing, and a
- * picker inside a creation dialog is a genuine product pattern, so the check rides
- * along on a demo that earns its place anyway. Removing the Popover silently
- * removes the only coverage the elevated tier has.
+ * `.glass-elevated` , Tier O stacked on Tier O , is the composite the token suite
+ * reasons about arithmetically and can never actually see: `GLASS_OVERLAY_PAIRS`
+ * excludes the tier by name, and while `contrast.test.ts` now measures it against
+ * both of its backdrops (added 2026-08-26, when the tier went from plum to a
+ * near-black and its 60/255 hue separation became an 11/255 lightness one), that
+ * is a computed composite, not a rendered one. Nesting is the only way to see the
+ * real thing, and a picker inside a creation dialog is a genuine product pattern,
+ * so the check rides along on a demo that earns its place anyway. Removing the
+ * Popover leaves the elevated tier with no rendered coverage at all.
  */
 export default function DialogDemo() {
   return (

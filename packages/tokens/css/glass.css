@@ -119,13 +119,37 @@
 
 /*
  * Elevated glass: for a surface stacked above an already-glass overlay (a
- * Popover inside a Dialog). Plum-tinted in dark mode, and at a higher alpha
- * because a chromatic tint at 0.85 drifts visibly green over the lime brand fill.
+ * Popover inside a Dialog, a DropdownMenu submenu).
+ *
+ * DARK-ONLY, and it always has been , light has no `.glass-elevated` rule at
+ * all, so a light popover is plain tier-O white glass. Nothing here can affect
+ * the light theme.
+ *
+ * `oklch(0.145 0.002 74)`, one notch below the ramp's last step and on its hue.
+ * This was `rgba(89, 41, 65, 0.9)` , the plum seed , until it was replaced with
+ * a near-black on 2026-08-26. Plum separated by HUE, which meant every dark-mode
+ * popover and submenu read as a brand-coloured panel rather than as elevation,
+ * stacked or not. Separating by LIGHTNESS instead composites 11/255 BELOW the
+ * page and 18/255 below the tier-O glass underneath it , both clear of the
+ * 8/255 perceptibility floor , while `fg` and `--muted-on-glass` both improve
+ * (13.49:1 / 11.96:1 worst-case, against the plum's 7.33 / 6.50).
+ *
+ * The alpha stays at 0.9. It was 0.9 because a chromatic tint at 0.85 drifted
+ * visibly green over the lime brand fill; a neutral has no hue to drift, but at
+ * 0.85 the surface picks up 15% of an arbitrary backdrop, which over a white or
+ * lime one spends the 11/255 this tier is now carried by.
+ *
+ * The border steps 0.14 → 0.18 with it: at 0.14 a near-black panel's edge
+ * measures 1.37:1, weaker than the plum tier shipped, and the edge does more
+ * work now that the fill is 11/255 from the page rather than 60.
+ *
+ * Values mirror `glass.darkElevated` in src/glass.ts, which is the source of
+ * truth and where the measurements live; tokens-css.test.ts asserts they agree.
  */
 .dark .glass-elevated,
 body.dark .glass-elevated {
-  --glass-bg: rgba(89, 41, 65, 0.9);
-  --glass-border: rgba(242, 235, 232, 0.14);
+  --glass-bg: rgba(11, 10, 9, 0.9);
+  --glass-border: rgba(242, 235, 232, 0.18);
 }
 
 /*

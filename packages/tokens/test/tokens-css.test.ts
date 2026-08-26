@@ -190,11 +190,46 @@ describe('glass CSS agrees with glass.ts', () => {
     );
   });
 
-  it('the plum elevated tier is declared in glass.css', () => {
+  /**
+   * `.glass-elevated` lives in glass.css rather than as a `--glass-*` variable in
+   * tokens.css, so the loop above cannot reach it , both of its values have to be
+   * named here or they drift silently. That is not hypothetical: the tier was a
+   * plum until 2026-08-26, and the BORDER moved with the surface when it became a
+   * near-black (0.14 → 0.18, because a near-black panel leans on its edge in a way
+   * a 60/255 plum did not).
+   */
+  it('the elevated tier surface is declared in glass.css', () => {
     const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8');
     expect(normalise(glassCss)).toContain(
       normalise(rgba(glass.darkElevated.surface, glass.darkElevated.alpha)),
     );
+  });
+
+  it('the elevated tier border is declared in glass.css', () => {
+    const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8');
+    expect(normalise(glassCss)).toContain(normalise(glass.darkElevated.border));
+  });
+
+  /**
+   * The tier is dark-only by design , a light popover is plain tier-O white glass
+   * , so the rule must never appear outside a `.dark` scope. A bare
+   * `.glass-elevated` selector would repaint every light overlay.
+   */
+  it('the elevated tier is scoped to dark only', () => {
+    const glassCss = readFileSync(join(here, '../css/glass.css'), 'utf8');
+    // Comments first , this file documents `.glass-elevated` in prose several
+    // times over, and a selector match that swallows a comment block is how this
+    // assertion would quietly stop asserting anything.
+    const rules = glassCss.replace(/\/\*[\s\S]*?\*\//g, '');
+    const selectors = [...rules.matchAll(/([^{}]*\.glass-elevated[^{}]*)\{/g)].map((m) =>
+      m[1]!.trim(),
+    );
+    expect(selectors.length).toBeGreaterThan(0);
+    for (const selector of selectors) {
+      for (const part of selector.split(',')) {
+        expect(part.trim()).toMatch(/(^|\s)(\.dark|body\.dark)(\s|\.)/);
+      }
+    }
   });
 
   it('blur radii agree', () => {

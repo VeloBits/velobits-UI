@@ -42,9 +42,11 @@ export interface GlassSurfaceProps extends React.ComponentProps<'div'> {
  * value is measured against all seven worst-case backdrops in the palette and
  * muted text steps up to `--muted-on-glass`.
  *
- * `tier="elevated"` is Tier O stacked on Tier O , a Popover inside a Dialog. It
- * is plum-tinted in dark mode and runs at a higher alpha, because a chromatic
- * tint at 0.85 drifts visibly green over the lime brand fill.
+ * `tier="elevated"` is Tier O stacked on Tier O , a Popover inside a Dialog. In
+ * dark mode it is a near-black one notch below the ramp, sitting 11/255 under the
+ * page and 18/255 under the tier-O glass it stacks on; it runs at a higher alpha
+ * so an arbitrary backdrop cannot lift the composite back toward the page. Light
+ * mode has no elevated rule , the tier resolves to plain tier-O white glass.
  *
  * ## What is still FORBIDDEN
  *

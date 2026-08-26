@@ -324,7 +324,9 @@ describe('DropdownMenu, submenus', () => {
   it('stacks the submenu on the elevated glass tier, not plain glass on plain glass', async () => {
     /**
      * Two `.glass` panels at the same alpha composite into one indistinct smear
-     * , which is the whole reason `glass-elevated` exists.
+     * , which is the whole reason `glass-elevated` exists. In dark mode the tier
+     * is a near-black step below the ramp (18/255 under the tier-O glass it sits
+     * on); it was the plum seed until 2026-08-26, same job by hue instead.
      */
     render(<WithSub />);
     const trigger = await waitFor(() => screen.getByRole('menuitem', { name: 'Move to' }));

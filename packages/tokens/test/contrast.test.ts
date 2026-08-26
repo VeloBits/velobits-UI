@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { compositeOver, contrastRatio, hexToOklch, hexToRgb, round2 } from '../src/color';
+import {
+  compositeOver,
+  contrastRatio,
+  hexToOklch,
+  hexToRgb,
+  relativeLuminance,
+  round2,
+} from '../src/color';
 import { GLASS_ALPHA_FLOOR, GLASS_SPECULAR_ALPHA, glass } from '../src/glass';
 import { worstCaseBackdrops } from '../src/palette';
 import { themes, type SemanticTokens, type ThemeName } from '../src/semantic';
@@ -550,6 +557,65 @@ describe('THE PERCEPTIBILITY GATE , tier-S glass is not an opaque panel in disgu
       ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
     });
   }
+
+  /**
+   * The elevated tier is excluded from {@link GLASS_OVERLAY_PAIRS} on the grounds
+   * that its backdrop is another overlay rather than the page , true of the case
+   * it was designed for (a Popover inside a Dialog) and false of how it actually
+   * ships, because `PopoverContent` and `DropdownMenuSubContent` carry
+   * `.glass-elevated` unconditionally. Most dark-mode popovers in the product open
+   * straight over the page.
+   *
+   * So it is measured against BOTH backdrops here. While the tier was the plum
+   * seed neither number was in any danger (60/255 and 54/255) and nothing needed
+   * this; the moment it became a lightness step on 2026-08-26 both became live
+   * constraints, and the obvious candidate , `neutral[950]`, the ramp's own last
+   * step , fails the page half at 6/255. That is the same defect class the tier-O
+   * gate above was added for, and nothing else in this file would have caught it.
+   */
+  describe('the elevated tier is perceptible against BOTH of its backdrops', () => {
+    const tier = glass.darkElevated;
+    const page = themes.dark.bg;
+    /** What tier O itself composites to over the page , the surface a stacked
+     *  Popover or a submenu is actually sitting on. */
+    const beneath = compositeOver(glass.dark.surface, page, glass.dark.alpha);
+
+    for (const [what, backdrop] of [
+      ['the page it opens over', page],
+      ['the tier-O glass it stacks on', beneath],
+    ] as const) {
+      it(`differs from ${what} by ≥${PERCEPTIBILITY_FLOOR}/255`, () => {
+        const composite = compositeOver(tier.surface, backdrop, tier.alpha);
+        const delta = maxChannelDelta(composite, backdrop);
+        expect(
+          delta,
+          `Elevated glass (${tier.surface} @α${tier.alpha}) composites over ${what} ` +
+            `(${backdrop}) to ${composite} , only ${delta}/255 apart, so the panel is ` +
+            `carried entirely by its 1px border.\n\n` +
+            `This tier separates by LIGHTNESS (it was the plum seed until 2026-08-26 and ` +
+            `separated by hue), and the two backdrops pull in opposite directions: the page ` +
+            `is neutral-925 and tier O composites 8/255 ABOVE it, so going darker is the ` +
+            `direction with room. neutral[950] is NOT far enough , 6/255 off the page.`,
+        ).toBeGreaterThanOrEqual(PERCEPTIBILITY_FLOOR);
+      });
+    }
+
+    /**
+     * The direction, asserted, because "make it a bit lighter" is the intuitive
+     * dark-mode elevation move and it is the one that breaks here: `--panel` is
+     * `neutral-800`, so upward the tier collides with an opaque Card (neutral-750
+     * lands 7/255 from it) while the whole range below neutral-950 is empty.
+     */
+    it('sits BELOW the page, not above it', () => {
+      const composite = compositeOver(tier.surface, page, tier.alpha);
+      expect(relativeLuminance(composite)).toBeLessThan(relativeLuminance(page));
+    });
+
+    it('carries no brand hue , it is a neutral, and that is the whole point', () => {
+      const [r, , b] = channels(tier.surface);
+      expect(Math.abs(r! - b!)).toBeLessThanOrEqual(4);
+    });
+  });
 
   it('the specular highlight is a DARK-MODE-ONLY material , you cannot lighten white', () => {
     /**

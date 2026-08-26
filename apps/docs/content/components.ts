@@ -407,7 +407,7 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         name: 'dialog-demo',
         title: 'A creation dialog, with a picker inside it',
         description:
-          'Focus is trapped while open, Escape closes, and focus returns to the trigger. The environment picker opens on the ELEVATED tier , glass stacked on glass, plum-tinted in dark so it does not sink into the dialog beneath.',
+          'Focus is trapped while open, Escape closes, and focus returns to the trigger. The environment picker opens on the ELEVATED tier , glass stacked on glass, a near-black step in dark so it does not sink into the dialog beneath.',
       },
     ],
     notes: [
@@ -443,7 +443,8 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
 </Popover>`,
     examples: [{ name: 'popover-demo', title: 'Anchored and non-modal' }],
     notes: [
-      'It is the elevated tier , glass stacked on glass , which is the one composite in the system no automated gate measures, because a `tier="elevated"` surface sitting on the page forms a different composite from the one that matters. The Dialog page nests a real one, which is where that gets checked.',
+      'It is the elevated tier , glass stacked on glass. In dark mode that is a near-black step below the neutral ramp (it was the plum seed until 2026-08-26, separating by hue rather than lightness); in light mode there is no elevated rule at all and a popover is plain white overlay glass.',
+      'The tier is measured against BOTH of its backdrops , the page a popover usually opens over, and the overlay glass it stacks on , but only arithmetically. A rendered `tier="elevated"` surface sitting on the page forms a different composite from the nested one, so the Dialog page nests a real one, which is where that gets seen.',
     ],
   },
 

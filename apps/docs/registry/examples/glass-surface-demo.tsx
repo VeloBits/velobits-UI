@@ -24,7 +24,7 @@ export default function GlassSurfaceDemo() {
       <GlassSurface tier="elevated" className="rounded-lg p-4 text-sm">
         <p className="font-medium">tier=&quot;elevated&quot;</p>
         <p className="mt-1 text-muted-foreground">
-          Tier O stacked on Tier O. Plum-tinted in dark so it clears the overlay below.
+          Tier O stacked on Tier O. A near-black step in dark so it clears the overlay below.
         </p>
       </GlassSurface>
     </div>

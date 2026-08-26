@@ -1,8 +1,10 @@
-// `neutral` is deliberately NOT imported any more. Every tier here is a literal
-// now, because the one tier that referenced a ramp step (`dark: neutral[900]`)
-// silently became the page colour when `--bg` was also `neutral[900]` , see the
-// docblock on `dark` below. Reaching for the ramp again is how that returns.
-import { seed } from './palette';
+// NOTHING IS IMPORTED HERE, AND THAT IS THE POINT. Every tier below is a literal
+// hex, because the two tiers that referenced a shared colour both went wrong in
+// the same way: `dark: neutral[900]` silently became the page colour when `--bg`
+// was also `neutral[900]` (0/255), and `darkElevated: seed.plum` inherited the
+// brand hue for a job that only ever needed a lightness step, which is what made
+// every dark-mode popover a plum panel. See the docblocks on `dark` and
+// `darkElevated`. Reaching for the ramp or the seeds again is how those return.
 
 /**
  * TWO TIERS, AND THEY ARE NOT THE SAME MATERIAL.
@@ -209,15 +211,73 @@ export const glass = {
     border: 'rgba(242, 235, 232, 0.12)',
   },
   /**
-   * The elevated dark tier , a plum-tinted glass for surfaces stacked above an
-   * already-dark overlay. Runs at a higher alpha because plum is a chromatic
-   * tint: at 0.85 the composite over a lime backdrop drifts visibly green.
+   * The elevated dark tier , glass for surfaces stacked above an already-dark
+   * overlay: a Popover opened from inside a Dialog, a DropdownMenu submenu,
+   * `GlassSurface tier="elevated"`.
+   *
+   * ## It was `seed.plum`, and it is a near-black now
+   *
+   * Plum separated by HUE, which worked , 60/255 off the page , but it meant
+   * every dark-mode popover and submenu in the product was a plum panel, whether
+   * or not it was actually stacked on anything. The tier reads as brand colour
+   * rather than as elevation. This value separates by LIGHTNESS instead, the same
+   * move `surfaceLight` made when the ramp was de-pinked, and it is the only
+   * lever left once the hue is gone.
+   *
+   * **The direction is DOWN, and that is the deliberate half.** The obvious dark-UI
+   * elevation is a lighter panel, and the plum went that way (OKLCH L 0.355, above
+   * the page). Down is what was asked for, and it measures better here: the page is
+   * `neutral-925` and `--panel` is `neutral-800`, so upward the tier runs into the
+   * panel (`neutral-750` lands 7/255 off it) while downward the whole sub-950 range
+   * is empty. The panel is not a wall this tier has to respect , tier O is gated
+   * against `--bg` only, never `--panel` (see `GLASS_OVERLAY_PAIRS`) , but a
+   * popover that measures 2/255 from an opaque Card still reads as a mistake.
+   *
+   * ## Why #0B0A09 and not `neutral[950]`
+   *
+   * `neutral[950]` (#0F0F0E) at this alpha composites 6/255 off the page, BELOW
+   * {@link PERCEPTIBILITY_FLOOR} , the same class of bug as the `neutral[900]`
+   * tier-O surface documented above, and the gate would not have caught it because
+   * `darkElevated` is excluded from the overlay pairs (its backdrop is another
+   * overlay, not the page). It is now swept against both in
+   * `test/contrast.test.ts`.
+   *
+   * `oklch(0.145 0.002 74)` , one notch below the ramp's last step, holding the
+   * ramp's own 74° hue at the chroma the dark end decays to. At α 0.9 it
+   * composites:
+   *
+   *   over the page (#161615)          → #0C0B0A, **11/255**
+   *   over tier O's own composite      → #0D0C0B, **18/255**
+   *
+   * and holds `fg` 13.49:1 / `--muted-on-glass` 11.96:1 against the worst of the
+   * seven {@link worstCaseBackdrops} , every figure better than the plum's 7.33 /
+   * 6.50, because light-on-dark can only improve as the surface darkens.
+   *
+   * At chroma 0.001 the 8-bit grid quantises this to a dead #0A0A0A. 0.002 is the
+   * lowest chroma that survives as a warm colour at this lightness (R−B = 2), and
+   * a cold grey next to the brand lime is the one thing the whole ramp exists to
+   * avoid.
+   *
+   * ## The alpha stays at 0.9, for a different reason than before
+   *
+   * It ran at 0.9 because plum was a chromatic tint and drifted visibly green over
+   * the lime backdrop at 0.85. A neutral has no hue to drift, but the alpha still
+   * earns its place: at 0.85 this surface picks up 15% of an arbitrary backdrop,
+   * and against a white or lime one that is what pulls the composite back up
+   * toward the page and spends the 11/255 the tier is carried by.
    */
   darkElevated: {
-    surface: seed.plum,
+    surface: '#0B0A09',
     alpha: 0.9,
     blur: '16px',
-    border: 'rgba(242, 235, 232, 0.14)',
+    /*
+     * 0.14 → 0.18. A near-black panel is separated from its backdrop by 11/255
+     * and by its edge, so the edge does more work here than it did when the tier
+     * was a 60/255 plum. At 0.14 over this composite the border measures 1.37:1,
+     * BELOW what the plum tier shipped (1.46:1); 0.18 restores it to 1.57:1.
+     * Still the sanctioned translucent border , see the note on `.glass`.
+     */
+    border: 'rgba(242, 235, 232, 0.18)',
   },
 
   /**
