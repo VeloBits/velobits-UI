@@ -599,10 +599,36 @@ const FORWARDED_FROM = [
   'node_modules/radix-ui',
   'node_modules/@radix-ui',
   'node_modules/framer-motion',
+  /*
+   * framer-motion 12 re-exports its types from these two packages, so a
+   * denylist naming only `framer-motion` misses most of them , `_dragX`,
+   * `onUpdate`, `values` and ~230 others were reaching the Motion tables from
+   * `motion-dom`. Naming the implementation packages as well as the entry
+   * point is the rule here, not an exception for this one dependency.
+   */
+  'node_modules/motion-dom',
+  'node_modules/motion-utils',
   'node_modules/react-hook-form',
   'node_modules/cmdk',
   'node_modules/typescript/lib',
 ];
+
+/**
+ * Every prop name a plain DOM element accepts , `onClick`, `aria-*`, `translate`
+ * and ~277 others , derived by parsing {@link DomPropsProbe} rather than written
+ * out, so the set follows `@types/react` without maintenance.
+ *
+ * Used only for props the extractor reports with NO declaration; see the filter
+ * below for why that case cannot be decided by file path.
+ */
+const domPropNames: ReadonlySet<string> = new Set(
+  Object.keys(
+    withCustomConfig(join(docsDir, 'tsconfig.json'), {
+      // No filter: the point is the complete surface.
+      propFilter: () => true,
+    }).parse([join(root, 'scripts/dom-props-probe.tsx')])[0]?.props ?? {},
+  ),
+);
 
 const parser = withCustomConfig(join(docsDir, 'tsconfig.json'), {
   savePropValueAsString: true,
@@ -610,12 +636,36 @@ const parser = withCustomConfig(join(docsDir, 'tsconfig.json'), {
   shouldRemoveUndefinedFromOptional: true,
   skipChildrenPropWithoutDoc: false,
   propFilter: (prop: PropItem) => {
-    const declarations = prop.declarations ?? [];
-    if (!declarations.length) return true;
     // Normalised because these are Windows paths here and POSIX paths in CI.
-    return !declarations.every((d) =>
-      FORWARDED_FROM.some((needle) => d.fileName.replace(/\\/g, '/').includes(needle)),
-    );
+    const denied = (fileName: string) =>
+      FORWARDED_FROM.some((needle) => fileName.replace(/\\/g, '/').includes(needle));
+
+    const declarations = prop.declarations ?? [];
+
+    /*
+     * NO DECLARATIONS AT ALL is the interesting case, and it used to
+     * `return true` , which is how the four Motion tables came to list **1333
+     * props between them**, every DOM handler React has.
+     *
+     * TypeScript synthesises a member whenever a type is built by mapping or
+     * `Omit<>`, and a synthesised member has no declaration to point at, so the
+     * file denylist above cannot see it. Measured on `FadeIn`: 274 of its 335
+     * props arrive with no declarations, no parent and no description.
+     *
+     * ⚠️ BUT THE OBVIOUS FIX IS WRONG, and it fails silently. `VariantProps<typeof
+     * badgeVariants>` is a mapped type too, so `variant`, `size`, `surface`,
+     * `side` and `wrap` are synthesised in exactly the same way , dropping
+     * everything undeclared removes **the props anyone actually came to read**,
+     * from 13 components, while the tables still look perfectly plausible.
+     *
+     * So the discriminator is the prop's NAME against the DOM surface, learned
+     * at build time from {@link DomPropsProbe} rather than hardcoded. Verified
+     * both ways on the current tree: all 274 of `FadeIn`'s undeclared props are
+     * in that set, and **not one** cva variant prop is.
+     */
+    if (!declarations.length) return !domPropNames.has(prop.name);
+
+    return !declarations.every((d) => denied(d.fileName));
   },
 });
 

@@ -6,19 +6,22 @@ const ALL_STATUSES: readonly Status[] = ['on', 'off', 'partial', 'pending', 'arc
 
 export default function StatusChipDemo() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-3">
         {ALL_STATUSES.map((status) => (
           <StatusChip key={status} status={status} />
         ))}
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <StatusChip status="partial">40%</StatusChip>
-        <StatusChip status="partial">5%</StatusChip>
-        <span className="text-sm text-muted-foreground">
-          The label override: a percentage is strictly more information than &ldquo;Partial&rdquo;
-          in the same space, and it still says the state.
-        </span>
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">
+          <span className="font-medium text-fg">The label override.</span> A percentage is strictly
+          more information than &ldquo;Partial&rdquo; in the same space, and it still says the
+          state.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusChip status="partial">40%</StatusChip>
+          <StatusChip status="partial">5%</StatusChip>
+        </div>
       </div>
     </div>
   );

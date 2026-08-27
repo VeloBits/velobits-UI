@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { CircleCheckIcon, ZapIcon } from '@velobitsio/icons';
+
 import { STATUS_ORDER, StatusChip, type Status } from '../../../registry/velobits/ui/status-chip';
 import { audit } from './axe';
 
@@ -135,6 +137,117 @@ describe('StatusChip, palette reuse', () => {
   });
 });
 
+describe('StatusChip, the customisable channels', () => {
+  it('lets a caller replace the glyph', () => {
+    /**
+     * The five built-ins cover a control plane's own vocabulary. They do not
+     * cover a provider logo, a spinner for a state still resolving, or a house
+     * glyph a consuming product already uses for the same idea.
+     */
+    const { container: stock, unmount } = render(<StatusChip status="pending" />);
+    const stockPath = stock.querySelector('svg')!.innerHTML;
+    unmount();
+
+    const { container } = render(<StatusChip status="pending" icon={<ZapIcon />} />);
+    expect(container.querySelector('svg')!.innerHTML).not.toBe(stockPath);
+  });
+
+  it('takes an ELEMENT, not a component type , the system-wide icon idiom', () => {
+    /**
+     * `icon={<ZapIcon />}`, the same shape as EmptyState. An element is what
+     * lets a non-icon glyph through at all; a `ComponentType<IconProps>` slot
+     * would accept only things built by `createIcon`.
+     */
+    const { container } = render(
+      <StatusChip status="pending" icon={<span data-testid="not-an-icon">◐</span>} />,
+    );
+    expect(container.querySelector('[data-testid="not-an-icon"]')).not.toBeNull();
+  });
+
+  it('hides an overridden glyph even when the glyph does not hide itself', () => {
+    /**
+     * `createIcon` sets `aria-hidden`; an arbitrary element does not. So the
+     * attribute lives on the WRAPPER , otherwise a caller passing a bare <svg>
+     * or an <img> silently adds a second announcement of the state, which is
+     * invisible on screen and audible only to the readers this component exists
+     * to serve.
+     */
+    const { container } = render(
+      <StatusChip status="on" icon={<svg data-testid="bare" viewBox="0 0 24 24" />} />,
+    );
+    const bare = container.querySelector('[data-testid="bare"]')!;
+    // The glyph itself carries nothing , that is the point of the case.
+    expect(bare.getAttribute('aria-hidden')).toBeNull();
+    // ...and it is still out of the tree, because an ancestor hides it.
+    expect(bare.closest('[aria-hidden="true"]')).not.toBeNull();
+  });
+
+  it('lets a caller replace the colour, and only with a gated pairing', () => {
+    /**
+     * The override is `variant`, so every reachable value is a wash/text pair
+     * SOFT_CHIP_PAIRS has already measured flattened over page, panel and glass
+     * in both themes. A `color` prop taking a hex would let a caller invent a
+     * pairing nothing gates, on the one component whose whole argument is that
+     * the pairing is gated.
+     */
+    const { container } = render(<StatusChip status="on" variant="info" />);
+    const cls = container.querySelector('[data-slot="status-chip"]')!.className;
+    expect(cls).toContain('bg-info-soft');
+    expect(cls).not.toContain('bg-success-soft');
+  });
+
+  it('keeps the status identity when every channel is overridden', () => {
+    /**
+     * `data-status` and STATUS_ORDER are keyed on `status`, not on what the chip
+     * was dressed as , a chip painted blue and given a bolt still has to sort,
+     * filter and group as the state it actually is.
+     */
+    const { container } = render(
+      <StatusChip status="off" icon={<ZapIcon />} variant="info">
+        Draining
+      </StatusChip>,
+    );
+    expect(container.querySelector('[data-status="off"]')).not.toBeNull();
+    expect(STATUS_ORDER.off).toBe(0);
+  });
+
+  it('renders the glyph at 11px, which needs a CLASS and not `size`', () => {
+    /**
+     * REGRESSION GUARD, and it is guarding a bug that shipped.
+     *
+     * This component rendered `<StatusIcon size={11} />` from the day it was
+     * written, and the glyph measured 12 the whole time: `size` emits
+     * `width`/`height` presentation attributes, Badge sets
+     * `[&_svg:not([class*='size-'])]:size-3`, and a presentation attribute loses
+     * the cascade to any author rule. Nothing caught it because happy-dom
+     * applies no Tailwind at all, so the ATTRIBUTE was the only observable and
+     * it said 11.
+     *
+     * So the assertion is on the class, and specifically on the merge: Badge's
+     * rule and this one are the same utility on the same element, and only
+     * twMerge collapsing them makes the winner deterministic rather than a
+     * question of stylesheet order.
+     */
+    const { container } = render(<StatusChip status="on" />);
+    const cls = container.querySelector('[data-slot="status-chip"]')!.className;
+    expect(cls).toContain("[&_svg:not([class*='size-'])]:size-[11px]");
+    expect(cls).not.toContain("[&_svg:not([class*='size-'])]:size-3");
+    // And the dead `size` attribute is gone rather than lingering as a lie.
+    expect(container.querySelector('svg')!.getAttribute('width')).not.toBe('11');
+  });
+
+  it('lets an overriding icon opt out of the size with a class', () => {
+    /**
+     * The documented escape hatch is `className="size-4"`. `size={16}` is the
+     * one that does not work, for the reason above.
+     */
+    const { container } = render(
+      <StatusChip status="on" icon={<CircleCheckIcon className="size-4" />} />,
+    );
+    expect(container.querySelector('svg')!.getAttribute('class')).toContain('size-4');
+  });
+});
+
 describe('STATUS_ORDER', () => {
   it('sorts off first and archived last', () => {
     /**
@@ -159,6 +272,10 @@ describe('StatusChip, axe', () => {
         {ALL.map((status) => (
           <StatusChip key={status} status={status} />
         ))}
+        {/* And the customised form, whose glyph is hidden by a wrapper. */}
+        <StatusChip status="off" icon={<ZapIcon />} variant="info">
+          Draining
+        </StatusChip>
       </div>,
     );
     expect(violations.map((v) => v.id)).toEqual([]);

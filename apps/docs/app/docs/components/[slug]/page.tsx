@@ -9,6 +9,7 @@ import { CodePanel } from '@/components/code-panel';
 import { ComponentPreview } from '@/components/component-preview';
 import { DocsPager } from '@/components/docs-pager';
 import { DocsToc, type TocEntry } from '@/components/docs-toc';
+import { InlineMarkup } from '@/components/inline-markup';
 import { InstallSection } from '@/components/install-section';
 import { PropsTable } from '@/components/props-table';
 import { Requirements } from '@/components/requirements';
@@ -118,7 +119,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
 
           {content?.notes?.map((note, index) => (
             <p key={index} className="max-w-3xl leading-7 text-muted-foreground">
-              {note}
+              <InlineMarkup text={note} />
             </p>
           ))}
         </header>
@@ -173,7 +174,9 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
                   {example.title ?? example.name}
                 </h3>
                 {example.description && (
-                  <p className="max-w-3xl text-sm text-muted-foreground">{example.description}</p>
+                  <p className="max-w-3xl text-sm text-muted-foreground">
+                    <InlineMarkup text={example.description} />
+                  </p>
                 )}
                 <ComponentPreview name={example.name} center={false} />
               </div>
@@ -190,8 +193,8 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
             <p className="max-w-3xl text-sm text-muted-foreground">
               Extracted from the TypeScript sources at build time, so it cannot disagree with the
               code. Props inherited from the underlying DOM element or Radix primitive are forwarded
-              but not listed: a table carrying 240 DOM handlers hides the three props that are
-              actually this component&apos;s.
+              but not listed: 240 DOM handlers would bury the handful that are actually this
+              component&apos;s.
             </p>
             <PropsTable groups={propGroups} />
           </section>

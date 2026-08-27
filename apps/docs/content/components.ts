@@ -705,7 +705,12 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
   'status-chip': {
     usage: `import { StatusChip } from '@velobitsio/ui';
 
-<StatusChip status="partial">40%</StatusChip>`,
+<StatusChip status="partial">40%</StatusChip>
+
+// All three channels are overridable; \`status\` still says what it IS.
+<StatusChip status="on" icon={<CalendarIcon />} variant="info">
+  On · staging
+</StatusChip>`,
     examples: [
       {
         name: 'status-chip-demo',
@@ -713,9 +718,18 @@ Open the palette <Kbd>⌘</Kbd> <Kbd>K</Kbd>`,
         description:
           'Every status ships a DISTINCT glyph. Colour alone fails 1.4.1, and on-versus-off is the distinction a control plane exists to make unambiguous.',
       },
+      {
+        name: 'status-chip-custom',
+        title: 'Overriding the glyph and the colour',
+        description:
+          'The icon prop takes an ELEMENT, so a spinner or a vendor mark fits the same slot, and an aria-hidden wrapper keeps it out of the tree whether or not the glyph hides itself. The colour override is a Badge variant rather than a colour, deliberately: every reachable value is a pairing the soft-chip contrast suite has already measured.',
+      },
     ],
     notes: [
       'The chip is uppercased by CSS, never in the DOM , some screen readers spell a short all-caps token letter by letter, "oh en". The transform covers a children override too, so `Rolling out` is painted `ROLLING OUT`. That is easy to miss because the override was designed for a percentage, and digits cannot show a text-transform. Add className="normal-case" where caps are wrong for the value.',
+      'There is no color prop, and that is the point. The colour override is a Badge variant, so it reaches only pairings the soft-chip suite measures flattened over page, panel and glass in both themes. A hex or a CSS variable would let a caller invent a wash/text pair nothing gates, on the one component whose whole argument is that the pair IS gated , and it would fail silently, because a chip that is merely hard to read still looks like it works.',
+      'Size an overriding glyph with a CLASS (className="size-4"), never with size={16}. The size prop emits width and height presentation attributes, and those lose the cascade to any author rule , so the chip’s own 11px utility wins and the number is silently ignored. This component passed size={11} internally for its whole life and rendered at Badge’s 12 the entire time.',
+      'The status prop stays required and stays a closed union even when the icon, the colour and the label have all been replaced. It is what data-status and STATUS_ORDER are keyed on, so a dressed-up chip still sorts, filters and groups as the state it actually is , and nothing in the component can see a SET of chips, so keeping two states distinguishable in silhouette after an override is the caller’s job.',
     ],
   },
 

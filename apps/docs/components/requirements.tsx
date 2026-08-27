@@ -47,7 +47,14 @@ export function Requirements({ item }: { item: DocRegistryItem }) {
         Requirements
       </h2>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      {/*
+       * `[&>*]:min-w-0` is load-bearing, not tidiness. A grid item's `min-width`
+       * defaults to `auto`, which floors it at the intrinsic width of its
+       * content , so the `<pre>` below could not shrink and its own
+       * `overflow-x-auto` never engaged. The card pushed the PAGE sideways
+       * instead, by 32px at a 375px viewport, on every component page.
+       */}
+      <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">The token layer</CardTitle>
@@ -143,7 +150,12 @@ export function Requirements({ item }: { item: DocRegistryItem }) {
       {item.registryDependencies.includes('cn') && (
         <Alert variant="warning">
           <AlertTriangleIcon />
-          <AlertTitle>Already using shadcn/ui? Overwrite `utils`</AlertTitle>
+          {/* `<code>`, not backticks: this is JSX, and the body below already
+              spells it this way. The literal pair shipped on every page whose
+              component depends on `cn`. */}
+          <AlertTitle>
+            Already using shadcn/ui? Overwrite <code>utils</code>
+          </AlertTitle>
           <AlertDescription>
             <p>
               This installs our <code>cn</code> to your <code>utils</code> module, the same place

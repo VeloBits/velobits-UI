@@ -29,6 +29,12 @@ import { Badge, type BadgeProps } from './badge';
  * circle, a clock, a box. The text label is the third channel, which is why
  * there is no icon-only mode: a chip that renders as a bare coloured dot is
  * exactly the thing this component exists to stop people writing.
+ *
+ * **`icon` and `variant` let a caller change both of those channels, and the
+ * rule survives the override.** Recolouring two statuses to the same variant, or
+ * pointing two at the same glyph, rebuilds the failure by hand , the component
+ * cannot detect it, because it only ever sees one chip at a time. If you
+ * override, override so that the set stays distinguishable in silhouette.
  * ─────────────────────────────────────────────────────────────────────────────
  *
  * ## It composes `Badge` rather than re-deriving the palette
@@ -41,6 +47,13 @@ import { Badge, type BadgeProps } from './badge';
  * themes , the soft-chip suite in `@velobitsio/tokens`. The token re-tune
  * that made those composites pass landed for `Badge` and this component at the
  * same time, precisely because there is only one set of values.
+ *
+ * **This is also why the colour override is `variant` and not a colour.** Every
+ * value it accepts is a pairing that suite has already measured. A `color` prop
+ * taking a hex or a CSS variable would let a caller invent a wash/text pair that
+ * nothing gates, on a component whose entire argument is that the pair is gated
+ * , and it would fail silently, because a chip that is merely hard to read still
+ * looks like it works.
  *
  * ## The DOM text is sentence case; the uppercase is CSS
  *
@@ -87,6 +100,11 @@ const PRESENTATION: Record<
  *
  * `off` first: someone opening a list during an incident is looking for what is
  * switched off. `archived` last, because it is not a live state at all.
+ *
+ * Keyed on `status`, which is the reason `status` stays required and stays a
+ * closed union even when everything it controls has been overridden: a chip
+ * dressed as something else still has to sort, filter and group as the state it
+ * actually is.
  */
 export const STATUS_ORDER: Record<Status, number> = {
   off: 0,
@@ -96,8 +114,41 @@ export const STATUS_ORDER: Record<Status, number> = {
   archived: 4,
 };
 
-export interface StatusChipProps extends Omit<BadgeProps, 'variant' | 'children'> {
+export interface StatusChipProps extends Omit<BadgeProps, 'children'> {
   status: Status;
+  /**
+   * Replaces the status's glyph. An **element**, not a component type ,
+   * `icon={<ZapIcon />}`, matching `EmptyState` and every other icon slot in
+   * the system, so a spinner for a state still resolving or a vendor logo for a
+   * provider-specific one is passable too.
+   *
+   * Rendered inside an `aria-hidden` wrapper rather than trusting whatever is
+   * passed to carry it, because the label beside it already says the state and a
+   * second announcement is pure noise.
+   *
+   * SIZE IS SET BY CLASS, NOT BY `size`. The chip carries
+   * `[&_svg:not([class*='size-'])]:size-[11px]`, so `className="size-4"` on the
+   * icon opts out and `size={16}` does **not** , `size` renders `width`/`height`
+   * attributes, and an SVG presentation attribute loses the cascade to any
+   * author rule, so the class silently wins. (That is a live trap rather than a
+   * hypothetical: this component passed `size={11}` internally from the day it
+   * was written and rendered at Badge's 12 the whole time.)
+   */
+  icon?: React.ReactNode;
+  /**
+   * Replaces the status's colour.
+   *
+   * Deliberately `Badge`'s variant rather than a colour: every value here is a
+   * wash/text pairing the soft-chip contrast suite has already measured
+   * flattened over the page, the panel and glass, in both themes. See the note
+   * on the palette above for why this is not a `color` prop.
+   *
+   * The case for it is an axis the five statuses do not carry , a staging
+   * environment whose `on` should not read as production-green, a `partial` that
+   * is a planned rollout rather than a warning. It is not a licence to make
+   * on and off the same colour.
+   */
+  variant?: BadgeProps['variant'];
   /**
    * Replaces the default word. The case for it: a partial rollout should read
    * `25%`, which is strictly more information than `Partial` in the same space.
@@ -114,33 +165,49 @@ export interface StatusChipProps extends Omit<BadgeProps, 'variant' | 'children'
   children?: React.ReactNode;
 }
 
-function StatusChip({ status, children, className, ...props }: StatusChipProps) {
-  const { icon: StatusIcon, variant, label } = PRESENTATION[status];
+function StatusChip({ status, icon, variant, children, className, ...props }: StatusChipProps) {
+  const { icon: StatusIcon, variant: statusVariant, label } = PRESENTATION[status];
 
   return (
     <Badge
       data-slot="status-chip"
       data-status={status}
-      variant={variant}
+      variant={variant ?? statusVariant}
       className={cn(
         // `tabular-nums` so a percentage does not change width as it counts:
         // proportional digits make a column of chips ripple on every poll.
         'gap-1 px-1.5 font-semibold uppercase tabular-nums',
+        /*
+         * 11px rather than Badge's default 12: at this weight the glyph
+         * otherwise out-measures the cap height of the text next to it and the
+         * chip reads icon-first.
+         *
+         * It has to be a CLASS to take effect. Badge sets the same rule at
+         * `size-3`, and both are author CSS on the same element, so `cn`'s
+         * twMerge collapses them to this one , deterministically, rather than
+         * leaving the outcome to stylesheet order.
+         */
+        "[&_svg:not([class*='size-'])]:size-[11px]",
         className,
       )}
       {...props}
     >
       {/*
-       * Left decorative , `createIcon` already sets `aria-hidden`, and that is
-       * correct here rather than something to override: the label beside it
-       * carries the meaning. The glyph is the second channel for *sighted*
-       * readers with a colour deficiency, not a third announcement.
+       * `aria-hidden` on the WRAPPER, not on the glyph. Our own icons set it
+       * themselves, but `icon` accepts any element , a bare `<svg>`, an `<img>`,
+       * an emoji in a span , and the failure when one of those arrives without
+       * it is invisible on screen and audible only to the people this component
+       * was written for.
        *
-       * 11px rather than Badge's default 12: at this weight the glyph otherwise
-       * out-measures the cap height of the text next to it and the chip reads
-       * icon-first.
+       * Same reasoning and the same shape as `EmptyState`.
        */}
-      <StatusIcon size={11} />
+      <span
+        aria-hidden
+        data-slot="status-chip-icon"
+        className="flex shrink-0 items-center justify-center"
+      >
+        {icon ?? <StatusIcon />}
+      </span>
       {children ?? label}
     </Badge>
   );
