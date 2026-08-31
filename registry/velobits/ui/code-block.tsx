@@ -85,8 +85,18 @@ const codeBlockVariants = cva(
       variant: {
         /** The default: an inset well on the surrounding surface. */
         panel: 'border border-border bg-bg2 control-recessed p-3 text-fg',
-        /** The pinned dark surface. See the docblock. */
-        terminal: 'bg-code p-3 text-on-code',
+        /**
+         * The pinned dark surface. See the docblock.
+         *
+         * `scrollbar-on-dark` is not decoration: this block scrolls (the root is
+         * `overflow-auto`), and `--code` is #101828 in BOTH themes, so the
+         * default thumb escalation , which mixes toward `--fg` , runs backwards
+         * here in light mode. Measured: rest 4.58:1, hover 2.69:1, drag 1.79:1,
+         * i.e. the bar fades into the block exactly as you reach for it. The
+         * utility re-anchors hover and drag to the neutral ramp; rest is already
+         * `--neutral-500` and does not move. See scrollbar.css.
+         */
+        terminal: 'bg-code p-3 text-on-code scrollbar-on-dark',
       },
       wrap: {
         /**

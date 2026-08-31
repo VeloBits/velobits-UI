@@ -93,7 +93,10 @@ export default function GlobalError({
               // Focusable because it scrolls, exactly as `CodeBlock` is. Hand-rolled
               // for the reason in the docblock: this page assumes nothing renders.
               tabIndex={0}
-              className="mt-8 overflow-auto rounded-md bg-code p-3 text-start font-mono text-xs break-all whitespace-pre-wrap text-on-code"
+              // `scrollbar-on-dark` for the same reason `CodeBlock`'s terminal
+              // variant carries it: `--code` is dark in both themes, so the
+              // default thumb escalation inverts here in light mode.
+              className="scrollbar-on-dark mt-8 overflow-auto rounded-md bg-code p-3 text-start font-mono text-xs break-all whitespace-pre-wrap text-on-code"
             >
               {detail}
             </pre>

@@ -79,7 +79,7 @@ file, so adjust the depth for the workspace layout.
 
 `@velobitsio/tokens` also exports narrower entries for cases that do not want the
 whole Tailwind setup: `tokens.css` (the raw variables), `glass.css`,
-`controls.css`, `texture.css`, and `keycloakify.css`. The TS side exports the same
+`controls.css`, `texture.css`, `scrollbar.css`, and `keycloakify.css`. The TS side exports the same
 values, `light` and `dark`, for anything that needs a colour in JS, such as a chart
 library.
 

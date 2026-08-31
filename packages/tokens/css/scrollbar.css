@@ -1,0 +1,275 @@
+/*
+ * THE NATIVE SCROLLBAR. Imported by theme.css.
+ *
+ * `ScrollArea` styles the scrollbar of a box that opts into it. This styles the
+ * one every OTHER scroller gets , the document itself, `overflow-y-auto` on a
+ * docs sidebar, a `CodeBlock` scrolling a long line , which until now was
+ * whatever the platform drew. On Linux Chrome that is a 15px gutter with a flat
+ * fill and two arrow buttons, i.e. the single most dated element on the page,
+ * sitting immediately beside a design system that measured everything else.
+ *
+ * The look is deliberately the SAME look `ScrollArea` already ships, so that the
+ * two are indistinguishable: a 10px gutter, a transparent track, and a pill
+ * thumb painted `--field-border`. Both numbers are copied from
+ * `scroll-area.tsx` (`w-2.5` is 10px) rather than re-chosen, so a page that
+ * mixes a native scroller and a `ScrollArea` , which the docs site does , has
+ * one bar width, not two.
+ *
+ * Three facts, if you are only reading the CSS:
+ *
+ *   1. THE STANDARD PROPERTIES AND THE WEBKIT PSEUDO-ELEMENTS ARE MUTUALLY
+ *      EXCLUSIVE, and the failure is silent. See the block below. This is the
+ *      one thing in this file that will cost you an afternoon.
+ *
+ *   2. The track is transparent, and that is the design, not an omission. It
+ *      would otherwise be the widest block of flat colour on a long page, and
+ *      filling it is most of what makes a custom scrollbar look dated. Same
+ *      reasoning `ScrollArea` is documented with.
+ *
+ *   3. The thumb is `--field-border` and NOT `--border`. A scrollbar reports
+ *      position and accepts a drag, so WCAG 1.4.11 applies to it and it has to
+ *      clear 3:1; a separator divides nothing a reader must perceive and is free
+ *      to recede. That is what the two line tokens are for.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * ## ⚠️ TRAP: `scrollbar-width` / `scrollbar-color` DELETE THIS WHOLE FILE
+ *
+ * Chrome has supported the standard `scrollbar-width` and `scrollbar-color`
+ * properties since 121, and when either one is set on a scroller **Chrome stops
+ * applying `::-webkit-scrollbar-*` to it entirely**. Not "merges", not "loses on
+ * the cascade" , ignores. So the intuitive belt-and-braces spelling
+ *
+ *     * { scrollbar-width: thin; scrollbar-color: … }   ← for Firefox
+ *     ::-webkit-scrollbar-thumb { … }                   ← for everyone else
+ *
+ * is not belt-and-braces at all: the second half never runs in Chrome, and what
+ * ships is the platform bar at a slightly narrower width , arrow buttons, filled
+ * track and all. Nothing warns. The rules are right there in DevTools, greyed
+ * out only if you know to look at the scrollbar's own pane.
+ *
+ * Measured here on 2026-08-27, Chrome 150, four boxes side by side:
+ *
+ *   webkit pseudos only          no buttons, pill thumb, transparent track  ✅
+ *   pseudos + standard props     buttons back, filled track, pseudos ignored ✗
+ *   standard props only          buttons, filled track (identical to above)
+ *   untouched                    15px platform bar
+ *
+ * Hence the `@supports not selector(::-webkit-scrollbar)` gate: Firefox does not
+ * recognise the selector and takes the standard branch, Chrome and Safari do and
+ * skip it, and neither engine is ever handed both. Do not "simplify" the gate
+ * away, and do not add `scrollbar-width` to a component's class list , the same
+ * trap fires per-element.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * ## THE ESCALATION, AND THE ONE SURFACE IT INVERTS ON
+ *
+ * Resting, hovered and dragged are three states and have to look like three
+ * states. Rest is `--field-border`; hover and drag mix that toward `--fg`, which
+ * means the thumb DARKENS in light mode and LIGHTENS in dark mode , contrast
+ * against the page rises in both directions from one expression. Measured
+ * (Chrome resolves the `color-mix` to these):
+ *
+ *              light                dark
+ *   rest       #838180              #838180
+ *   hover      #5D5D5C              #ACAAA9
+ *   drag       #434342              #CDCBC8
+ *
+ *                       rest    hover   drag
+ *   light  on --bg      3.32    5.64    8.48
+ *          on --panel   3.88    6.59    9.90
+ *   dark   on --bg      4.67    7.83   11.19
+ *          on --panel   3.56    5.96    8.52
+ *
+ * ⚠️ That reasoning holds only for surfaces that follow the theme, and TWO IN
+ * THIS SYSTEM DO NOT: `--code` (#101828 in both themes) and `--chrome` (plum in
+ * light, black in dark). On a surface that is dark while the theme is light, the
+ * escalation runs the wrong way and hover makes the thumb LESS visible:
+ *
+ *   light thumb on --code   rest 4.58   hover 2.69   drag 1.79   ← inverted
+ *
+ * i.e. a `CodeBlock variant="terminal"` whose bar vanishes into the block the
+ * moment you reach for it, and no gate in this repo can see it , the same blind
+ * spot that shipped an invisible `variant="ghost"` on the chrome bar. The fix is
+ * `scrollbar-on-dark` at the bottom of this file, applied by any surface that is
+ * dark in both themes. `--chrome` needs no scroller today (AppShell's three
+ * `overflow-y-auto` regions are all panel or glass); if one ever grows there, it
+ * needs the same utility.
+ *
+ * ⚠️ ALSO PRE-EXISTING, AND NOT INTRODUCED HERE: `--field-border` on `--bg2`
+ * measures **2.91:1** in light mode, just under the 3:1 that 1.4.11 asks of a
+ * thumb. `contrast-pairs.ts` gates `fieldBorder` against the page and the panel
+ * and not against `--bg2`, so it is unmeasured rather than accepted. It applies
+ * identically to `ScrollArea` and to every `Input` border on a `bg-bg2` surface,
+ * so it is a palette question and not a scrollbar one , flagged here because
+ * this is where it was found.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+@layer base {
+  /*
+   * FIREFOX ONLY. Read the trap above before touching this.
+   *
+   * `*` rather than `:root`, for two reasons. `scrollbar-width` does not
+   * inherit, so it has to reach every scroller on its own; and `scrollbar-color`
+   * does inherit, which means declaring it once on `:root` would freeze
+   * `var(--field-border)` to whatever `:root` resolves it to. That is trap 1
+   * from theme.css: the apps toggle `body.dark`, `:root` is its ANCESTOR, and a
+   * value substituted at the root can never see the override. Per-element it
+   * resolves per-element, so an app that darkens on `body` is still correct.
+   */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar-thumb, var(--field-border))
+        var(--scrollbar-track, transparent);
+    }
+  }
+
+  /*
+   * The gutter. 10px is `ScrollArea`'s `w-2.5`, so the two bars occupy the same
+   * lane , see the docblock. Both axes, because `width` governs a vertical bar
+   * and `height` a horizontal one and a page can have both.
+   */
+  ::-webkit-scrollbar {
+    width: var(--scrollbar-size, 10px);
+    height: var(--scrollbar-size, 10px);
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track, transparent);
+  }
+
+  /*
+   * The arrow buttons, which is most of what reads as "browser from 2009".
+   * Present by default on Linux and Windows Chrome and absent on macOS, so this
+   * is also what makes the same page look the same on all three.
+   */
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  /*
+   * The thumb, as a floating capsule rather than a block filling the gutter.
+   *
+   * The inset is a TRANSPARENT BORDER plus `background-clip: content-box`, not
+   * padding: a scrollbar pseudo-element has no padding box to clip to, and this
+   * is the only spelling that leaves air on both sides of the pill. 10px gutter
+   * minus 2px each side is a 6px thumb at rest, which is within a pixel of the
+   * 7px `ScrollArea` draws inside the same 10px lane.
+   */
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb, var(--field-border));
+    background-clip: content-box;
+    border: var(--scrollbar-inset, 2px) solid transparent;
+    border-radius: var(--radius-pill, 999px);
+  }
+
+  /*
+   * A floor on the thumb's length, so a very long document does not reduce it to
+   * a dot that carries no position information and is not worth aiming at.
+   * `:vertical` and `:horizontal` are WebKit's own orientation pseudo-classes;
+   * one rule with both `min-height` and `min-width` would pin the thumb's
+   * THICKNESS too and square off the capsule.
+   */
+  ::-webkit-scrollbar-thumb:vertical {
+    min-height: 2.5rem;
+  }
+  ::-webkit-scrollbar-thumb:horizontal {
+    min-width: 2.5rem;
+  }
+
+  /*
+   * Hover and drag: darker (light) or lighter (dark) AND wider, because colour
+   * alone is not a state change anyone notices at 6px. Shedding 1px of inset
+   * grows the pill 6px → 8px inside a gutter whose width never changes, so
+   * nothing reflows.
+   *
+   * `max(0px, …)` because a consumer is allowed to set `--scrollbar-inset: 0`
+   * for a flush bar, and a negative border-width invalidates the declaration.
+   */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(
+      --scrollbar-thumb-hover,
+      color-mix(in oklab, var(--fg) 40%, var(--field-border))
+    );
+    border-width: max(0px, calc(var(--scrollbar-inset, 2px) - 1px));
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background-color: var(
+      --scrollbar-thumb-active,
+      color-mix(in oklab, var(--fg) 70%, var(--field-border))
+    );
+    border-width: max(0px, calc(var(--scrollbar-inset, 2px) - 1px));
+  }
+
+  /*
+   * Forced colours: hand the bar back to the OS.
+   *
+   * Windows High Contrast is a user substituting their own palette for ours, and
+   * a scrollbar is exactly the kind of chrome that substitution exists for. The
+   * standard property is the one to release , Chrome forces the pseudo-elements
+   * on its own, and `scrollbar-width: thin` is a SIZE rather than a colour, so it
+   * is left alone and the bar stays the width the layout was built around.
+   */
+  @media (forced-colors: active) {
+    @supports not selector(::-webkit-scrollbar) {
+      * {
+        scrollbar-color: auto;
+      }
+    }
+  }
+}
+
+/*
+ * ⚠️ `@utility`, NOT plain classes, and this file is therefore imported WITHOUT
+ * a layer. controls.css documents the bug that taught us the difference: a
+ * Tailwind variant can only be composed over a utility Tailwind itself owns, so
+ * `md:scrollbar-none` over a hand-written class generates nothing , no error, no
+ * warning, just no rule. `@utility` inside `@layer` is invalid and brings the
+ * same silence back.
+ */
+
+/*
+ * No bar at all. For a horizontally scrolled strip , a chip row, a tab overflow ,
+ * where the scroll affordance is the content running off the edge and a 10px
+ * gutter under it is just a line.
+ *
+ * Both halves say hide, so the mutual-exclusion trap at the top of this file is
+ * harmless here: whichever branch the engine takes, it hides. This is the same
+ * pair Radix injects for the `ScrollArea` viewport, and the reason `ScrollArea`
+ * is unaffected by everything above , its `[data-radix-scroll-area-viewport]`
+ * rule is both more specific and unlayered.
+ *
+ * ⚠️ Hiding the bar does not remove the scroller. The region still has to be
+ * reachable and operable by keyboard (WCAG 2.1.1) , that means `tabIndex={0}`,
+ * exactly as `CodeBlock` carries it.
+ */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * For a surface that is dark in BOTH themes , `bg-code`, `bg-chrome` , where
+ * mixing toward `--fg` runs the escalation backwards in light mode and hover
+ * makes the thumb harder to see instead of easier. See the docblock.
+ *
+ * Re-anchored to literal ramp steps rather than to a theme token, because the
+ * whole point is that this surface does not follow the theme. Rest is unchanged
+ * (`--neutral-500` IS `--field-border`), so only the two escalated states move.
+ * Over `--code` (#101828): rest 4.58, hover 9.99, drag 15.05.
+ *
+ * The same pattern glass.css uses when `.glass` re-points `--muted-fg` at
+ * `--muted-on-glass`: a surface that composites differently re-anchors the
+ * inherited variable rather than every call site under it doing so.
+ */
+@utility scrollbar-on-dark {
+  --scrollbar-thumb: var(--neutral-500);
+  --scrollbar-thumb-hover: var(--neutral-300);
+  --scrollbar-thumb-active: var(--neutral-100);
+}

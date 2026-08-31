@@ -50,6 +50,21 @@
  * instead of being reset by it. Opt-in per element; nothing here touches `body`. */
 @import './texture.css' layer(components);
 
+/* The native scrollbar , the same 10px pill `ScrollArea` draws, applied to every
+ * scroller the platform would otherwise style itself (the document, an
+ * `overflow-y-auto` sidebar, a long line inside a `CodeBlock`).
+ *
+ * NOT `layer(components)`, for controls.css's reason: it declares `@utility`
+ * rules (`scrollbar-none`, `scrollbar-on-dark`), which must be top-level. Its
+ * base rules carry their own `@layer base` block internally, so they still sit
+ * below every utility and are overridable without `!important`.
+ *
+ * ⚠️ Read its trap before adding `scrollbar-width` or `scrollbar-color`
+ * ANYWHERE: setting either on a scroller makes Chrome discard every
+ * `::-webkit-scrollbar-*` rule for it, silently, and hands back the platform bar
+ * with its arrow buttons. */
+@import './scrollbar.css';
+
 /* Tailwind v4's replacement for tailwindcss-animate: the enter/exit keyframes
  * Radix-backed portals animate with. Already a dashboard-app dependency. */
 @import 'tw-animate-css';

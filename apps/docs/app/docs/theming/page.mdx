@@ -86,6 +86,45 @@ tier composite about 2/255 apart and cancel each other out. Every surface-bearin
 component takes a `surface` prop for exactly this reason; reach for it rather
 than a `bg-*` utility, which wins the cascade and takes the material with it.
 
+## Scrollbars
+
+The import restyles **every native scrollbar** in your app, not just the ones
+inside a `ScrollArea`: the document, an `overflow-y-auto` sidebar, a long line in
+a `CodeBlock`. You get a 10px gutter, a transparent track, no arrow buttons, and
+a pill thumb painted `--field-border` , the same bar `ScrollArea` draws, at the
+same width, so a page that mixes the two shows one design and not two.
+
+Six variables tune it, and because they inherit you can set them on any
+scroller or on any ancestor of one:
+
+```css
+--scrollbar-size          /* gutter, default 10px          */
+--scrollbar-inset         /* air each side, default 2px    */
+--scrollbar-track         /* default transparent           */
+--scrollbar-thumb         /* default var(--field-border)   */
+--scrollbar-thumb-hover   /* default mixes toward --fg     */
+--scrollbar-thumb-active  /* default mixes toward --fg     */
+```
+
+Two utilities:
+
+**`scrollbar-none`** hides the bar. For a horizontally scrolled strip where the
+affordance is content running off the edge. It does not remove the scroller, so
+the region still needs `tabIndex={0}` to stay keyboard-operable.
+
+**`scrollbar-on-dark`** for a surface that is dark in **both** themes , `bg-code`,
+`bg-chrome`. The default hover and drag states mix toward `--fg`, which raises
+contrast in light and in dark alike, but only on a surface that follows the
+theme. On one that does not, the mix runs backwards and reaching for the thumb
+makes it fade out (measured over `--code` in light: 4.58:1 at rest, 2.69:1 on
+hover). `CodeBlock variant="terminal"` carries it already.
+
+> **Do not set `scrollbar-width` or `scrollbar-color` yourself.** Setting either
+> one on a scroller makes Chrome discard every `::-webkit-scrollbar` rule for it
+> and hand back the platform bar, arrow buttons and all. Nothing warns. The token
+> layer confines both properties to a Firefox-only `@supports` gate for this
+> reason.
+
 ## Fonts
 
 The token layer _names_ the typefaces and deliberately does not ship them:

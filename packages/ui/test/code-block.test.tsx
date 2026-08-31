@@ -90,6 +90,27 @@ describe('CodeBlock, the terminal variant', () => {
     expect(cls).not.toContain('dark:');
   });
 
+  it('re-anchors its scrollbar, because the surface ignores the theme', () => {
+    /**
+     * The root is `overflow-auto`, so this block has a scrollbar, and `--code` is
+     * #101828 in BOTH themes. The default thumb escalation mixes toward `--fg`,
+     * which on a dark surface under a LIGHT theme runs backwards , rest 4.58:1,
+     * hover 2.69:1, drag 1.79:1 , so the bar fades into the block exactly as you
+     * reach for it. `scrollbar-on-dark` re-anchors hover and drag to the neutral
+     * ramp (9.99:1 and 15.05:1); rest is already --neutral-500 and does not move.
+     *
+     * happy-dom applies no CSS, so nothing here can SEE the fade , this asserts
+     * the class, and `scrollbar-css.test.ts` in @velobitsio/tokens measures what
+     * the class is worth. The `panel` variant must not carry it: `bg-bg2` does
+     * follow the theme, and re-anchoring there would invert it the other way.
+     */
+    const terminal = render(<CodeBlock variant="terminal">tf_live_9f2a</CodeBlock>);
+    expect(terminal.container.querySelector('pre')!.className).toContain('scrollbar-on-dark');
+
+    const panel = render(<CodeBlock>{SNIPPET}</CodeBlock>);
+    expect(panel.container.querySelector('pre')!.className).not.toContain('scrollbar-on-dark');
+  });
+
   it('breaks all characters when wrapping, not just words', () => {
     /** A 64-character opaque key has no word boundaries; `break-words` overflows. */
     const { container } = render(
