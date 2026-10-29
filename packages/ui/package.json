@@ -537,7 +537,7 @@
     "@velobitsio/tokens": "*",
     "axe-core": "^4.12.1",
     "framer-motion": "^12.43.0",
-    "happy-dom": "^20.11.1",
+    "happy-dom": "^21.0.4",
     "publint": "^0.3.23",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
